@@ -4,7 +4,7 @@ param([switch]$NoBuild)
 
 $ErrorActionPreference = 'Stop'
 $Repo       = $PSScriptRoot
-$Ws         = if ($env:SL_LAB_WS) { $env:SL_LAB_WS } else { 'D:\sl-shop' }   # 플러그인 밖(2026-09-13)
+$Ws         = if ($env:SL_LAB_WS) { $env:SL_LAB_WS } else { Join-Path $env:USERPROFILE 'sl-shop' }   # 플러그인 밖(2026-09-13)
 $Mod        = Join-Path $Repo 'apps\shop-api'
 $MavenHome  = Get-ChildItem (Join-Path $Repo '.runtime') -Directory -Filter 'apache-maven-*' | Select-Object -First 1 -ExpandProperty FullName
 

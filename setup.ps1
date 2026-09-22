@@ -17,7 +17,7 @@
 # =============================================================================
 param(
     [Parameter(Mandatory = $true)][string]$Plugin,
-    [string]$Ws = $(if ($env:SL_LAB_WS) { $env:SL_LAB_WS } else { 'D:\sl-shop' }),
+    [string]$Ws = $(if ($env:SL_LAB_WS) { $env:SL_LAB_WS } else { Join-Path $env:USERPROFILE 'sl-shop' }),
     [string]$DbName = 'sl_shop',
     [switch]$Force, [switch]$SkipDb, [switch]$SkipBuild
 )

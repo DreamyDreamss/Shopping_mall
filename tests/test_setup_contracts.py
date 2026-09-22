@@ -1,0 +1,111 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""세팅·기동 스크립트의 계약 회귀.
+
+speclinker에서 테스트베드를 분리하며(2026-09-22) 함께 옮겨 온 회귀다 — 스크립트가 이 저장소로
+왔으니 그 계약을 지키는 테스트도 여기 있어야 한다. 각 단언은 서버 실측에서 나온 것이고,
+주석의 날짜가 그 사고 날짜다.
+"""
+import io
+import os
+import re
+
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+def _read(name):
+    # .ps1은 BOM으로 시작한다(PowerShell 5.1이 BOM 없는 UTF-8의 한글을 ANSI로 읽는다) — utf-8-sig로 읽는다
+    return io.open(os.path.join(REPO, name), encoding='utf-8-sig').read()
+
+
+def test_builds_spa_before_the_jar_that_embeds_it():
+    """shop-api jar가 shop-web/dist를 /shop으로 싣는다. dist는 git 밖이라 SR 뒤 재빌드하지 않으면 옛 화면이 실린다
+    (2026-09-19: 9/17 dist에 쇼핑 홈이 없어 첫 화면이 주문 목록으로 떨어졌다)."""
+    for name, spa, jar in (('setup.ps1', 'npm run build --silent', 'mvn.cmd'),
+                           ('setup-linux.sh', 'npm run build --silent', 'mvn -q -DskipTests package'),
+                           ('run-app.ps1', 'npm run build --silent', 'mvn.cmd'),
+                           ('run-app.sh', 'npm run build --silent', 'mvn -q -DskipTests package')):
+        src = _read(name)
+        assert spa in src, f'{name}: SPA를 빌드하지 않는다'
+        # jar 빌드 명령의 마지막 등장(실제 package 호출)이 SPA 빌드 뒤여야 한다
+        assert src.index(spa) < src.rindex(jar), f'{name}: jar를 SPA보다 먼저 만든다'
+
+
+def test_pipes_are_sigpipe_safe():
+    """2026-09-16 서버 실측 — `tar | head -1`의 SIGPIPE가 pipefail로 전파돼 설치가 **메시지 없이** 죽었다."""
+    for name in ('setup-linux.sh', 'run-app.sh'):
+        src = _read(name)
+        if 'set -euo pipefail' not in src:
+            continue
+        for ln in src.splitlines():
+            if re.search(r'\|\s*head\b', ln) and not ln.lstrip().startswith('#'):
+                assert '|| true' in ln, f'{name}: SIGPIPE로 죽을 수 있는 파이프 — {ln.strip()[:80]}'
+
+
+def test_db_setup_keeps_the_hard_won_mariadb_flags():
+    """2026-09-16 Azure Ubuntu 24.04 실측 — skip-name-resolve가 없으면 TCP root 접속이 ERROR 1698로 막히고,
+    lower_case_table_names=1이 없으면 Windows 덤프의 `members`와 앱 SQL의 `MEMBERS`가 다른 테이블이 된다."""
+    setup = _read('setup-linux.sh')
+    assert 'skip-name-resolve' in setup
+    assert 'lower_case_table_names=1' in setup
+    # DB 검증은 앱·MCP가 실제로 쓰는 경로(TCP)로 해야 한다 — sudo 소켓 접속만 보면 뒤 단계가 전부 헛돈다
+    assert 'TCP(127.0.0.1:3307)' in setup
+
+
+def test_setup_is_one_shot():
+    """시연 준비 — 마지막 단계(앱·브리지 기동)가 수동 명령이면 "한 번에 세팅"이 아니다."""
+    setup = _read('setup-linux.sh')
+    assert '--start)   START=1' in setup or '--start) START=1' in setup
+    assert 'run-app.sh' in setup and 'serve-speclens.sh' in setup
+
+
+def test_no_absolute_paths_are_baked_in():
+    """분리의 요지 — 두 저장소는 project.env로만 물린다. 경로가 박히면 다음 환경에서 깨진다."""
+    bad = re.compile(r'[A-Za-z]:[\\/](?:gen-harness|sl-shop|sl-lab|speclinker)')
+    for name in ('setup-linux.sh', 'setup.ps1', 'run-app.sh', 'run-app.ps1', 'README.md'):
+        src = _read(name)
+        for ln in src.splitlines():
+            s = ln.strip()
+            if s.startswith('#') or s.startswith('Write-Host'):
+                continue          # 주석·사용법 예시는 사람이 읽는 것이라 예외
+            assert not bad.search(ln), f'{name}: 절대 경로가 박혀 있다 — {s[:80]}'
+
+
+def test_seed_uses_tokens_not_absolute_paths():
+    """seed/ 는 토큰으로 담고 setup이 실제 경로로 치환한다. 절대 경로가 섞이면 다음 환경에서 어긋난다."""
+    seed = os.path.join(REPO, 'seed')
+    exts = {'.md', '.json', '.jsonl', '.txt', '.html', '.yaml', '.yml', '.csv', '.xml'}
+    offenders = []
+    for base, _dirs, files in os.walk(seed):
+        for f in files:
+            if os.path.splitext(f)[1].lower() not in exts:
+                continue
+            p = os.path.join(base, f)
+            try:
+                t = io.open(p, encoding='utf-8').read()
+            except (UnicodeDecodeError, OSError):
+                continue
+            if re.search(r'[A-Za-z]:[\\/](?:gen-harness|sl-shop|sl-lab|speclinker)', t):
+                offenders.append(os.path.relpath(p, REPO))
+    assert not offenders, '절대 경로가 남은 seed 파일:\n  ' + '\n  '.join(offenders[:10])
+
+
+def test_setup_substitutes_every_token_the_seed_uses():
+    """치환 규칙이 빠지면 워크스페이스에 `{{...}}`가 그대로 남아 화면이 깨진 경로를 보여 준다."""
+    seed = os.path.join(REPO, 'seed')
+    used = set()
+    exts = {'.md', '.json', '.jsonl', '.txt', '.html', '.yaml', '.yml', '.csv', '.xml'}
+    for base, _dirs, files in os.walk(seed):
+        for f in files:
+            if os.path.splitext(f)[1].lower() not in exts:
+                continue
+            try:
+                t = io.open(os.path.join(base, f), encoding='utf-8').read()
+            except (UnicodeDecodeError, OSError):
+                continue
+            used.update(re.findall(r'\{\{[A-Z_]+\}\}', t))
+    assert used, 'seed에 토큰이 하나도 없다 — 토큰화가 빠졌는가?'
+    for script in ('setup-linux.sh', 'setup.ps1'):
+        src = _read(script)
+        for tok in sorted(used):
+            assert tok in src, f'{script}: {tok} 를 치환하지 않는다'

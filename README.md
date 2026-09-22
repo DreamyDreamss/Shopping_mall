@@ -24,15 +24,15 @@ bash setup-linux.sh --plugin ~/speclinker --start
 ### Windows
 
 ```powershell
-cd D:\Shopping_mall
-powershell -ExecutionPolicy Bypass -File setup.ps1 -Plugin D:\speclinker
+cd $env:USERPROFILE\Shopping_mall
+powershell -ExecutionPolicy Bypass -File setup.ps1 -Plugin $env:USERPROFILE\speclinker
 ```
 
 세팅이 만드는 것:
 
 | 무엇 | 기본값 |
 |---|---|
-| 워크스페이스 | `$HOME/sl-shop` (Windows `D:\sl-shop`) — `--ws` / `-Ws` 로 변경 |
+| 워크스페이스 | `$HOME/sl-shop` (Windows `%USERPROFILE%\sl-shop`) — `--ws` / `-Ws` 로 변경 |
 | DB | `sl_shop` @ MariaDB `127.0.0.1:3307` — `--db-name` / `-DbName` 로 변경 |
 | `project.env` | 두 저장소를 잇는 **유일한 접합면**. 실행 시점 경로로 생성된다 |
 | `.mcp.json` | DB MCP · 목업 지라 MCP 등록 (무비밀번호 — 127.0.0.1 전용) |
