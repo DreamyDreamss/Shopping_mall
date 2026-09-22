@@ -141,11 +141,16 @@ done
 ok "seed 전개: SR $(ls -d "$WS"/docs/변경관리/SR-* 2>/dev/null | wc -l)건 · 설계서 $(find "$WS/docs/05_설계서" -name spec.md 2>/dev/null | wc -l)건 · 카탈로그 $(find "$WS/_lab/catalog" -type f 2>/dev/null | wc -l)건 · 납품 $(find "$WS/docs/09_납품" -type f 2>/dev/null | wc -l)건"
 
 # seed는 절대 경로를 토큰으로 담는다 — 여기서 이 환경의 실제 경로로 되돌린다.
-step "4-a 파생 색인 생성"
-# 화면 목록(설계서·화면·API)은 **파생 색인**(docs/viewer/spec_index.json)을 읽는다. 이것을 안 만들면
-# 워크스페이스에 설계서가 다 있어도 SpecLens가 **빈 목록**으로 뜬다(2026-09-22 서버 실측 — 설계서 20건이
-# 들어갔는데 화면이 0건이었다). 뷰어 자산 동기화도 이 스크립트가 함께 한다.
-( cd "$WS" && "$PY" "$PLUGIN/scripts/gen_spec_index.py" . ) >/dev/null 2>&1   && ok "spec_index 생성"   || warn "색인 생성 실패 — cd $WS && $PY $PLUGIN/scripts/gen_spec_index.py . 로 확인하세요(화면 목록이 빕니다)"
+step "4-a 파생물 생성(스캔 → 라우터 인벤토리 → 색인)"
+# **연쇄다** — 뒤 단계가 앞 산출물을 읽는다. 하나라도 빠지면 조용히 나중에 터진다:
+#   scan_source.js → _tmp/source_index.json
+#     → build_router_inventory.py → _tmp/screen_inventory_static.json
+#       → gen_spec_index.py → docs/viewer/spec_index.json (화면 목록·뷰어 자산)
+# 2026-09-22 서버 실측 둘: 색인이 없어 설계서 20건이 화면에 0건으로 떴고, 인벤토리가 없어
+# UIS 재생성(regen-spec)이 `screen_inventory_static.json 없음`으로 exit 1 했다.
+( cd "$WS" && node "$PLUGIN/scripts/scan_source.js" . ) >/dev/null 2>&1 && ok "source_index" || warn "소스 스캔 실패 — 재생성·RECON이 막힙니다(cd $WS && node $PLUGIN/scripts/scan_source.js .)"
+( cd "$WS" && "$PY" "$PLUGIN/scripts/build_router_inventory.py" . ) >/dev/null 2>&1 && ok "screen_inventory" || warn "라우터 인벤토리 실패 — 화면 재생성이 막힙니다(cd $WS && $PY $PLUGIN/scripts/build_router_inventory.py .)"
+( cd "$WS" && "$PY" "$PLUGIN/scripts/gen_spec_index.py" . ) >/dev/null 2>&1 && ok "spec_index" || warn "색인 생성 실패 — 화면 목록이 빕니다(cd $WS && $PY $PLUGIN/scripts/gen_spec_index.py .)"
 
 step "4-b 경로 토큰 치환"
 SUBST=$(find "$WS" -type f \( -name '*.md' -o -name '*.json' -o -name '*.jsonl' -o -name '*.txt' \
