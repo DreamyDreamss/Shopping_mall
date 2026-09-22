@@ -1,0 +1,23 @@
+[
+  {
+    "column": "DEL_YN",
+    "values": [
+      "N"
+    ],
+    "group": null,
+    "files": [
+      "member.xml",
+      "order.xml"
+    ]
+  },
+  {
+    "column": "SALE_YN",
+    "values": [
+      "Y"
+    ],
+    "group": null,
+    "files": [
+      "product.xml"
+    ]
+  }
+]

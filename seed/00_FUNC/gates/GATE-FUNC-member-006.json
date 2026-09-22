@@ -1,0 +1,380 @@
+{
+  "func": "FUNC-member-006",
+  "epic": null,
+  "story": "docs/00_FUNC/stories/STORY-FUNC-member-006.md",
+  "gate": "CONCERNS",
+  "reviewer": "qa-agent",
+  "updated": "2026-09-12T22:47:16",
+  "layers": {
+    "spec": "pass",
+    "security": "pass",
+    "regression": "pass",
+    "baseline": "concerns",
+    "scope": "pass",
+    "rules": "concerns",
+    "conformance": "pass"
+  },
+  "top_issues": [
+    {
+      "severity": "low",
+      "layer": "regression",
+      "finding": "MEMBER_REFRESH_TOKENS에 member_id 인덱스가 없다(DB 실측: PRIMARY(token_hash) 단독). revokeAllForMember가 풀스캔이라, 이번 라운드에 logout이 @Transactional이 되면서 그 스캔의 next-key 락이 두 번째 UPDATE·커밋 시점까지 유지된다(round1 autocommit은 문장 종료 시 해제). 락 순환이 없어 데드락은 성립하지 않고 랩 규모에서 실패로 이어지지 않으나, 동시 로그아웃이 전 회원에 걸쳐 직렬화된다. 인덱스 부재 자체는 005 유산이라 이번 라운드 결함으로 세우지 않는다.",
+      "suggested_action": "후속 SR에서 ALTER TABLE MEMBER_REFRESH_TOKENS ADD INDEX IF NOT EXISTS idx_mrt_member_id (member_id) (멱등, ddl-idempotent 준수) — purgeExpiredOrRevoked/enforceActiveCap도 함께 이득"
+    },
+    {
+      "severity": "low",
+      "layer": "spec",
+      "finding": "@Transactional 자체를 고정하는 테스트가 없다 — MemberSessionServiceTest는 서비스를 new로 직접 생성해 프록시를 거치지 않으므로 어노테이션이 제거돼도 실패하는 테스트가 없다(호출 순서는 InOrder가 고정하나 원자성은 미고정).",
+      "suggested_action": "후속 유지보수 세션에서 @SpringBootTest + DAO 스파이로 두 번째 UPDATE 실패 시 첫 UPDATE가 롤백되는지 고정"
+    },
+    {
+      "severity": "low",
+      "layer": "baseline",
+      "finding": "shop-web: 건수 미상(러너 요약 줄을 못 읽음)",
+      "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+    },
+    {
+      "severity": "medium",
+      "layer": "rules",
+      "finding": "규칙 위반 [lab/file-size-cap/java-file-cap] modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java:0 — 자바 파일 450줄 초과 — 책임을 나눈다(필터·핸들러·서비스가 한 파일에 자라면 QA가 스코프를 못 가른다)",
+      "suggested_action": "규칙을 지키도록 고치거나, 규칙이 틀렸으면 SpecLens /rules에서 규칙을 고치세요"
+    },
+    {
+      "severity": "low",
+      "layer": "conformance",
+      "finding": "SR 수용 기준 '세션 만료 시 장바구니 유지'를 '로그아웃(explicit logout) 경로가 CART_ITEMS를 건드리지 않는다'로 좁혀 해석·구현했다. '세션 만료'(예: idle/refreshToken 만료로 인한 자연 만료)와 '로그아웃'(사용자 명시 동작)은 원문상 다른 이벤트일 수 있으나, 이 FUNC(shop-api)에는 서버측 idle 세션 타임아웃 개념 자체가 없고(apiKey 자체엔 만료가 없음, refreshToken만 30일 TTL), 프런트엔드 장바구니 영속 로직은 story '범위 밖' 절에서 shop-web(FUNC-member-004) 소관으로 명시적으로 배제되어 있다. 그 경계 안에서는 구현이 합리적이며 상충 사실이 diff에 드러나지 않는다.",
+      "suggested_action": "관찰 기록만 — shop-web(FUNC-member-004) 검증 시 '세션 만료' 이벤트(예: refresh 401로 인한 강제 로그아웃)에서도 클라이언트측 장바구니가 유지되는지 별도 확인 필요.",
+      "confidence": "high",
+      "file": "docs/00_FUNC/stories/STORY-FUNC-member-006.md",
+      "line": 134
+    }
+  ],
+  "rounds": [
+    {
+      "round": 1,
+      "gate": "CONCERNS",
+      "human": {
+        "decision": "rework",
+        "by": "사람",
+        "at": "2026-09-12T22:27:46",
+        "comment": "[결정 요약] medium 1(로그아웃 부분 실패 경로)과 low 중 3,5는 이번에, 2,4는 후속. [구현 방식] logout()의 두 UPDATE(apiKey revoke, refresh 전체 revoke)를 하나의 @Transactional(로그아웃 메서드 한정)로 묶는다 - SR-231 r2의 교훈은 '실패 경로에서 남아야 하는 카운터'를 트랜잭션에 넣지 말라는 것이고, 로그아웃은 둘 다 함께 성공/실패해야 하는 경우라 트랜잭션이 맞다. 순서는 refresh 전체 폐기 -> apiKey 폐기. memberApiKey.xml ON DUPLICATE KEY UPDATE 컬럼 순서 의존은 주석 + 순서 고정 테스트 한 줄. [보안 순서] 변경 없음. [테스트,완료 조건] '로그아웃 -> 재로그인 -> 새 키로 200, 옛 키 401' HTTP 통합 테스트 추가; mvnw test 393 이상 전부 통과; 기준선 재기록. [후속 SR,이월] ApiKeyAuthFilter 451줄(should) 분리는 후속 리팩터 TODO; 정적 맵 회원(M-0001) 로그아웃 no-op 204는 랩 픽스처 특성으로 Dev 기록에 명시하고 후속 TODO.",
+        "targets": []
+      },
+      "layers": {
+        "spec": "pass",
+        "security": "concerns",
+        "regression": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "MemberSessionService#logout이 비트랜잭션으로 apiKey 폐기(revokeByMemberId) -> 리프레시 토큰 전체 폐기(revokeAllForMember) 순서로 실행한다. 1번 커밋 후 2번이 실패하면 apiKey가 이미 폐기돼 selectMemberIdByApiKey가 null을 반환하므로 같은 키로 로그아웃을 재시도할 수 없고(필터가 401), 남은 리프레시 토큰은 30일간 활성으로 남는다. 그 토큰으로 refresh를 치면 확장된 issueIfAbsent가 폐기된 apiKey를 새 키로 rotate해 세션이 통째로 되살아난다(TC-006-27이 바로 그 상태에서 200 + 유효한 새 키를 실측). 계획 '데이터' 절의 '각 statement가 idempotent해 재시도 시 안전하다'는 논거가 이 순서에서는 성립하지 않는다.",
+          "suggested_action": "logout의 두 DAO 호출 순서를 뒤집는다(revokeAllForMember 먼저, revokeByMemberId 나중) — 중간 실패 시 apiKey가 살아 있어 재시도가 성립하고 부분 상태가 SR 수용 기준 쪽으로 안전하게 치우친다. MemberSessionServiceTest#logout_apiKeyFound_revokesApiKeyThenAllRefreshTokensInOrder의 InOrder 단언도 함께 뒤집는다."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "file-size-cap(should) 초과 — 이번 변경으로 web/ApiKeyAuthFilter.java가 451줄로 450 상한을 넘었다(추가분은 주석 + 상수 1개). ApiKeyAuthIntegrationTest.java도 771줄.",
+          "suggested_action": "ApiKeyAuthFilter 클래스 상단의 round 이력 주석을 STORY/CHANGELOG로 옮겨 450줄 아래로 되돌린다(후속 TODO)."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "memberApiKey.xml의 issueIfAbsent ON DUPLICATE KEY UPDATE는 revoked_at 대입이 반드시 마지막이어야 앞의 두 IF(revoked_at IS NOT NULL, ...)가 원본 값을 읽는다(MySQL/MariaDB 좌->우 평가). 현재 순서는 정확하지만 줄 순서를 바꾸면 rotate가 조용히 반쪽이 된다.",
+          "suggested_action": "매퍼 주석에 '이 세 줄의 대입 순서를 바꾸지 말 것(revoked_at은 항상 마지막)'을 명시한다."
+        },
+        {
+          "severity": "low",
+          "layer": "security",
+          "finding": "정적 맵 회원 키(lab-member-0001-key)로 로그아웃하면 MEMBER_API_KEYS에 행이 없어 admin 키와 같은 idempotent no-op 분기에 들어 204를 반환하지만 아무것도 폐기되지 않는다(ApiKeyAuthIntegrationTest가 이 동작을 고정). 계획이 의도한 것은 admin 키 한정이었다.",
+          "suggested_action": "랩 픽스처 한정이라 실사용 영향은 낮다 — 후속 TODO로 기록만(실 로그인 회원은 DB 발급 키를 쓴다)."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "결정표 (a) '폐기된 apiKey 재발급 = 재로그인 시 새 키로 교체'의 1차 시나리오(로그아웃 -> 재로그인 -> 새 키로 API 200)가 HTTP 레벨로 검증되지 않았다. DAO 레벨(TC-006-12)과 refresh 경로(TC-006-27)로 기전은 덮였다.",
+          "suggested_action": "MemberSessionIntegrationTest에 로그아웃 후 재로그인 왕복 케이스 1건을 추가한다(GATE-005 핵심 우려였던 '영구 락아웃'의 직접 확인)."
+        }
+      ],
+      "cause": "plan_gap"
+    },
+    {
+      "round": 2,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "MEMBER_REFRESH_TOKENS에 member_id 인덱스가 없다(DB 실측: PRIMARY(token_hash) 단독). revokeAllForMember가 풀스캔이라, 이번 라운드에 logout이 @Transactional이 되면서 그 스캔의 next-key 락이 두 번째 UPDATE·커밋 시점까지 유지된다(round1 autocommit은 문장 종료 시 해제). 락 순환이 없어 데드락은 성립하지 않고 랩 규모에서 실패로 이어지지 않으나, 동시 로그아웃이 전 회원에 걸쳐 직렬화된다. 인덱스 부재 자체는 005 유산이라 이번 라운드 결함으로 세우지 않는다.",
+          "suggested_action": "후속 SR에서 ALTER TABLE MEMBER_REFRESH_TOKENS ADD INDEX IF NOT EXISTS idx_mrt_member_id (member_id) (멱등, ddl-idempotent 준수) — purgeExpiredOrRevoked/enforceActiveCap도 함께 이득"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "@Transactional 자체를 고정하는 테스트가 없다 — MemberSessionServiceTest는 서비스를 new로 직접 생성해 프록시를 거치지 않으므로 어노테이션이 제거돼도 실패하는 테스트가 없다(호출 순서는 InOrder가 고정하나 원자성은 미고정).",
+          "suggested_action": "후속 유지보수 세션에서 @SpringBootTest + DAO 스파이로 두 번째 UPDATE 실패 시 첫 UPDATE가 롤백되는지 고정"
+        }
+      ],
+      "cause": "none"
+    },
+    {
+      "round": 3,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "MEMBER_REFRESH_TOKENS에 member_id 인덱스가 없다(DB 실측: PRIMARY(token_hash) 단독). revokeAllForMember가 풀스캔이라, 이번 라운드에 logout이 @Transactional이 되면서 그 스캔의 next-key 락이 두 번째 UPDATE·커밋 시점까지 유지된다(round1 autocommit은 문장 종료 시 해제). 락 순환이 없어 데드락은 성립하지 않고 랩 규모에서 실패로 이어지지 않으나, 동시 로그아웃이 전 회원에 걸쳐 직렬화된다. 인덱스 부재 자체는 005 유산이라 이번 라운드 결함으로 세우지 않는다.",
+          "suggested_action": "후속 SR에서 ALTER TABLE MEMBER_REFRESH_TOKENS ADD INDEX IF NOT EXISTS idx_mrt_member_id (member_id) (멱등, ddl-idempotent 준수) — purgeExpiredOrRevoked/enforceActiveCap도 함께 이득"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "@Transactional 자체를 고정하는 테스트가 없다 — MemberSessionServiceTest는 서비스를 new로 직접 생성해 프록시를 거치지 않으므로 어노테이션이 제거돼도 실패하는 테스트가 없다(호출 순서는 InOrder가 고정하나 원자성은 미고정).",
+          "suggested_action": "후속 유지보수 세션에서 @SpringBootTest + DAO 스파이로 두 번째 UPDATE 실패 시 첫 UPDATE가 롤백되는지 고정"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "shop-web: 건수 미상(러너 요약 줄을 못 읽음)",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        }
+      ],
+      "layer": "baseline"
+    },
+    {
+      "round": 4,
+      "gate": "FAIL",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "concerns",
+        "scope": "fail"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "MEMBER_REFRESH_TOKENS에 member_id 인덱스가 없다(DB 실측: PRIMARY(token_hash) 단독). revokeAllForMember가 풀스캔이라, 이번 라운드에 logout이 @Transactional이 되면서 그 스캔의 next-key 락이 두 번째 UPDATE·커밋 시점까지 유지된다(round1 autocommit은 문장 종료 시 해제). 락 순환이 없어 데드락은 성립하지 않고 랩 규모에서 실패로 이어지지 않으나, 동시 로그아웃이 전 회원에 걸쳐 직렬화된다. 인덱스 부재 자체는 005 유산이라 이번 라운드 결함으로 세우지 않는다.",
+          "suggested_action": "후속 SR에서 ALTER TABLE MEMBER_REFRESH_TOKENS ADD INDEX IF NOT EXISTS idx_mrt_member_id (member_id) (멱등, ddl-idempotent 준수) — purgeExpiredOrRevoked/enforceActiveCap도 함께 이득"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "@Transactional 자체를 고정하는 테스트가 없다 — MemberSessionServiceTest는 서비스를 new로 직접 생성해 프록시를 거치지 않으므로 어노테이션이 제거돼도 실패하는 테스트가 없다(호출 순서는 InOrder가 고정하나 원자성은 미고정).",
+          "suggested_action": "후속 유지보수 세션에서 @SpringBootTest + DAO 스파이로 두 번째 UPDATE 실패 시 첫 UPDATE가 롤백되는지 고정"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "shop-web: 건수 미상(러너 요약 줄을 못 읽음)",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: project.env (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        }
+      ],
+      "layer": "scope"
+    },
+    {
+      "round": 5,
+      "gate": "FAIL",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "concerns",
+        "scope": "fail",
+        "rules": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "MEMBER_REFRESH_TOKENS에 member_id 인덱스가 없다(DB 실측: PRIMARY(token_hash) 단독). revokeAllForMember가 풀스캔이라, 이번 라운드에 logout이 @Transactional이 되면서 그 스캔의 next-key 락이 두 번째 UPDATE·커밋 시점까지 유지된다(round1 autocommit은 문장 종료 시 해제). 락 순환이 없어 데드락은 성립하지 않고 랩 규모에서 실패로 이어지지 않으나, 동시 로그아웃이 전 회원에 걸쳐 직렬화된다. 인덱스 부재 자체는 005 유산이라 이번 라운드 결함으로 세우지 않는다.",
+          "suggested_action": "후속 SR에서 ALTER TABLE MEMBER_REFRESH_TOKENS ADD INDEX IF NOT EXISTS idx_mrt_member_id (member_id) (멱등, ddl-idempotent 준수) — purgeExpiredOrRevoked/enforceActiveCap도 함께 이득"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "@Transactional 자체를 고정하는 테스트가 없다 — MemberSessionServiceTest는 서비스를 new로 직접 생성해 프록시를 거치지 않으므로 어노테이션이 제거돼도 실패하는 테스트가 없다(호출 순서는 InOrder가 고정하나 원자성은 미고정).",
+          "suggested_action": "후속 유지보수 세션에서 @SpringBootTest + DAO 스파이로 두 번째 UPDATE 실패 시 첫 UPDATE가 롤백되는지 고정"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "shop-web: 건수 미상(러너 요약 줄을 못 읽음)",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: project.env (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "medium",
+          "layer": "rules",
+          "finding": "규칙 위반 [lab/file-size-cap/java-file-cap] modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java:0 — 자바 파일 450줄 초과 — 책임을 나눈다(필터·핸들러·서비스가 한 파일에 자라면 QA가 스코프를 못 가른다)",
+          "suggested_action": "규칙을 지키도록 고치거나, 규칙이 틀렸으면 SpecLens /rules에서 규칙을 고치세요"
+        }
+      ],
+      "layer": "rules"
+    },
+    {
+      "round": 6,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "concerns",
+        "scope": "pass",
+        "rules": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "MEMBER_REFRESH_TOKENS에 member_id 인덱스가 없다(DB 실측: PRIMARY(token_hash) 단독). revokeAllForMember가 풀스캔이라, 이번 라운드에 logout이 @Transactional이 되면서 그 스캔의 next-key 락이 두 번째 UPDATE·커밋 시점까지 유지된다(round1 autocommit은 문장 종료 시 해제). 락 순환이 없어 데드락은 성립하지 않고 랩 규모에서 실패로 이어지지 않으나, 동시 로그아웃이 전 회원에 걸쳐 직렬화된다. 인덱스 부재 자체는 005 유산이라 이번 라운드 결함으로 세우지 않는다.",
+          "suggested_action": "후속 SR에서 ALTER TABLE MEMBER_REFRESH_TOKENS ADD INDEX IF NOT EXISTS idx_mrt_member_id (member_id) (멱등, ddl-idempotent 준수) — purgeExpiredOrRevoked/enforceActiveCap도 함께 이득"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "@Transactional 자체를 고정하는 테스트가 없다 — MemberSessionServiceTest는 서비스를 new로 직접 생성해 프록시를 거치지 않으므로 어노테이션이 제거돼도 실패하는 테스트가 없다(호출 순서는 InOrder가 고정하나 원자성은 미고정).",
+          "suggested_action": "후속 유지보수 세션에서 @SpringBootTest + DAO 스파이로 두 번째 UPDATE 실패 시 첫 UPDATE가 롤백되는지 고정"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "shop-web: 건수 미상(러너 요약 줄을 못 읽음)",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "medium",
+          "layer": "rules",
+          "finding": "규칙 위반 [lab/file-size-cap/java-file-cap] modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java:0 — 자바 파일 450줄 초과 — 책임을 나눈다(필터·핸들러·서비스가 한 파일에 자라면 QA가 스코프를 못 가른다)",
+          "suggested_action": "규칙을 지키도록 고치거나, 규칙이 틀렸으면 SpecLens /rules에서 규칙을 고치세요"
+        }
+      ],
+      "layer": "scope"
+    },
+    {
+      "round": 7,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "concerns",
+        "scope": "pass",
+        "rules": "concerns",
+        "conformance": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "MEMBER_REFRESH_TOKENS에 member_id 인덱스가 없다(DB 실측: PRIMARY(token_hash) 단독). revokeAllForMember가 풀스캔이라, 이번 라운드에 logout이 @Transactional이 되면서 그 스캔의 next-key 락이 두 번째 UPDATE·커밋 시점까지 유지된다(round1 autocommit은 문장 종료 시 해제). 락 순환이 없어 데드락은 성립하지 않고 랩 규모에서 실패로 이어지지 않으나, 동시 로그아웃이 전 회원에 걸쳐 직렬화된다. 인덱스 부재 자체는 005 유산이라 이번 라운드 결함으로 세우지 않는다.",
+          "suggested_action": "후속 SR에서 ALTER TABLE MEMBER_REFRESH_TOKENS ADD INDEX IF NOT EXISTS idx_mrt_member_id (member_id) (멱등, ddl-idempotent 준수) — purgeExpiredOrRevoked/enforceActiveCap도 함께 이득"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "@Transactional 자체를 고정하는 테스트가 없다 — MemberSessionServiceTest는 서비스를 new로 직접 생성해 프록시를 거치지 않으므로 어노테이션이 제거돼도 실패하는 테스트가 없다(호출 순서는 InOrder가 고정하나 원자성은 미고정).",
+          "suggested_action": "후속 유지보수 세션에서 @SpringBootTest + DAO 스파이로 두 번째 UPDATE 실패 시 첫 UPDATE가 롤백되는지 고정"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "shop-web: 건수 미상(러너 요약 줄을 못 읽음)",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "medium",
+          "layer": "rules",
+          "finding": "규칙 위반 [lab/file-size-cap/java-file-cap] modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java:0 — 자바 파일 450줄 초과 — 책임을 나눈다(필터·핸들러·서비스가 한 파일에 자라면 QA가 스코프를 못 가른다)",
+          "suggested_action": "규칙을 지키도록 고치거나, 규칙이 틀렸으면 SpecLens /rules에서 규칙을 고치세요"
+        },
+        {
+          "severity": "low",
+          "layer": "conformance",
+          "finding": "SR 수용 기준 '세션 만료 시 장바구니 유지'를 '로그아웃(explicit logout) 경로가 CART_ITEMS를 건드리지 않는다'로 좁혀 해석·구현했다. '세션 만료'(예: idle/refreshToken 만료로 인한 자연 만료)와 '로그아웃'(사용자 명시 동작)은 원문상 다른 이벤트일 수 있으나, 이 FUNC(shop-api)에는 서버측 idle 세션 타임아웃 개념 자체가 없고(apiKey 자체엔 만료가 없음, refreshToken만 30일 TTL), 프런트엔드 장바구니 영속 로직은 story '범위 밖' 절에서 shop-web(FUNC-member-004) 소관으로 명시적으로 배제되어 있다. 그 경계 안에서는 구현이 합리적이며 상충 사실이 diff에 드러나지 않는다.",
+          "suggested_action": "관찰 기록만 — shop-web(FUNC-member-004) 검증 시 '세션 만료' 이벤트(예: refresh 401로 인한 강제 로그아웃)에서도 클라이언트측 장바구니가 유지되는지 별도 확인 필요.",
+          "confidence": "high",
+          "file": "docs/00_FUNC/stories/STORY-FUNC-member-006.md",
+          "line": 134
+        }
+      ],
+      "layer": "conformance"
+    }
+  ],
+  "waiver": {
+    "active": false
+  },
+  "story_transitions": [
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "SR 승인(SR-232)",
+      "at": "2026-09-12T19:59:28"
+    },
+    {
+      "from": "Approved",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-12T21:33:06"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "사람",
+      "at": "2026-09-12T22:20:23"
+    },
+    {
+      "from": "Review",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-12T22:27:46"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "사람",
+      "at": "2026-09-12T22:36:45"
+    },
+    {
+      "from": "Review",
+      "to": "Done",
+      "by": "사람",
+      "at": "2026-09-12T23:01:37"
+    }
+  ],
+  "cause": "none",
+  "escalate": false,
+  "fail_rounds": 0,
+  "max_rounds": 3
+}

@@ -1,0 +1,3104 @@
+{
+  "func": "FUNC-order-001",
+  "epic": "SR-224",
+  "story": "docs/00_FUNC/stories/STORY-FUNC-order-001.md",
+  "gate": "CONCERNS",
+  "reviewer": "qa-agent",
+  "updated": "2026-09-12T00:29:46",
+  "layers": {
+    "spec": "concerns",
+    "security": "concerns",
+    "regression": "concerns",
+    "baseline": "concerns",
+    "scope": "fail",
+    "rules": "pass",
+    "conformance": "pass",
+    "stories": "pass"
+  },
+  "top_issues": [
+    {
+      "severity": "medium",
+      "layer": "spec",
+      "finding": "신규 — UIS-ORD-001 spec.md가 SR-224 미반영. 삭제된 옛 문구 '조회 결과 없음'을 §2 시나리오3·시나리오4·§5 표시조건 행에 그대로 기술하고 조건별 2분기(조회 결과가 없습니다 / 조건에 맞는 결과가 없습니다)를 담지 않았다. revision_history도 v1.2(SR-210)에서 멈춤. round7·round13 두 번의 사람 rework 결정이 이 파일의 현행화를 SR 산출물의 일부로 확정한 선례가 있어 scope_freeze '요구 본문 외 제외'에 해당하지 않는다. 함께 라인 앵커도 드리프트: §3 ② list.html:28-44→실제 28-51, ③ 51-65→58-72, ④ 68-70→79-82, §5 그리드 :51→58, 배송상태 :62→69, 빈결과 문구 :68→79-80, 전체N건 :70→82",
+      "suggested_action": "spec.md §2 시나리오3·4와 §5 표시조건을 2분기 문구로 갱신하고 라인 앵커를 현행 소스로 정정한 뒤 revision_history v1.3(SR-224)을 추가할 것"
+    },
+    {
+      "severity": "medium",
+      "layer": "regression",
+      "finding": "캐리오버 미해소 — AC①(del_yn 상시필터)·AC⑥(기간 경계·AND 결합)을 실DB로 검증하던 OrderListIntegrationTest(6건)가 여전히 소스 트리에 부재. selectOrders/countOrders의 SQL 의미를 실DB로 잠그는 테스트가 0건인 상태가 유지된다(OrderDaoTest 2건은 배송 조회 전용). 이번 라운드는 운영 코드 무변경(템플릿 텍스트 + 테스트 2파일)이라 위험이 증가하지는 않았다",
+      "suggested_action": "OrderListIntegrationTest를 복원하고 시드를 MEMBERS 선삽입으로 FK 위반 없이 고칠 것. 실패한 테스트를 삭제해 스위트를 green으로 만들지 말 것"
+    },
+    {
+      "severity": "medium",
+      "layer": "regression",
+      "finding": "캐리오버 — 워크스페이스 .gitignore:12가 modules/를 제외하고 대상 소스는 중첩 저장소(modules/shop-api, 자체 git)에 있다. 따라서 scope_verify.py(축 A)는 대상 소스 diff를 구조적으로 볼 수 없고, GATE가 매 라운드 보고하는 '구현 근거 없음(no-changes-classified)'은 변경 부재가 아니라 가시성 부재다. 이번 라운드도 QA가 중첩 저장소에서 git status/diff를 직접 실행해 dev 주장(list.html + OrderViewControllerTest 2파일만 변경, 운영 로직 무변경)을 사실로 확인했다",
+      "suggested_action": "축 A가 중첩 저장소(modules/shop-api)의 git을 읽도록 고치거나, 이 가시성 한계를 게이트 산출물에 명시할 것"
+    },
+    {
+      "severity": "medium",
+      "layer": "security",
+      "finding": "캐리오버(신규 아님) — 무인증 화면 라우트 GET /order/list?memberId=... 로 타인 주문 이력 열람 성립, 그리고 OrderService.java:72의 offset = Math.max(0,page-1)*size가 int 연산이라 page 극단값에서 오버플로 → 음수 OFFSET 500. 이번 라운드 변경은 사용자 입력을 출력에 넣지 않는 정적 텍스트 2줄이라 신규 공격 표면은 0건(조건식은 비교만 수행). 2026-09-09 11:38 사람 승인에서 후속 SR 추적으로 수용됐으나 코드상 미해소라 pass로 내리지 않는다",
+      "suggested_action": "SR-207 선례대로 evaluateMemberScope 편입 여부를 SR로 확정하고, offset을 long 계산으로 바꾸거나 page 상한·size 범위(1~100)를 강제할 것"
+    },
+    {
+      "severity": "low",
+      "layer": "regression",
+      "finding": "신규 — SR-224 '조건 있음' 경로가 4개 조건 중 memberId 하나만 테스트된다(orderList_emptyResultWithMemberIdFilter_showsConditionSpecificMessage). orderState/startDate/endDate 단독 케이스가 없어 list.html:80에서 그 3항을 지우고 :79에서 대응 항을 지우는 뮤테이션을 스위트가 잡지 못한다. startDate/endDate는 SR-209 프리셋 버튼(최근 7/30/90일)이 채우는 주 사용 경로라 실사용 노출도가 높다",
+      "suggested_action": "기간 조건(startDate/endDate)만 걸린 0건 케이스 테스트 1건 추가"
+    },
+    {
+      "severity": "low",
+      "layer": "spec",
+      "finding": "신규 — 서버 기본 기간과 '무조건' 문구의 의미 충돌. 이 화면은 product/cart와 달리 사용자가 조건을 안 넣어도 OrderService.list가 최근 30일 필터를 항상 적용하므로, 31일 이전 주문만 있으면 실제 데이터가 있는데도 '조회 결과가 없습니다'(데이터 자체가 없다는 함의)가 렌더된다. 요구 본문의 '검색 조건'을 사용자 입력 기준으로 읽은 이번 구현이 틀렸다고 보긴 어려우나 확정 문답에 이 케이스가 없다",
+      "suggested_action": "UIS-ORD-001에 '검색 조건 = 사용자 입력 조건(서버 기본 기간 제외)'으로 명문화하거나 요청자에게 기본 기간 적용 시 문구 선택을 확인할 것"
+    },
+    {
+      "severity": "low",
+      "layer": "spec",
+      "finding": "캐리오버 미해소 — STORY 수용 기준 7번째 항목이 '유효 구간(effectiveStart~effectiveEnd)이'에서 문장 절단되어 객관 검증 문구가 미완(판정은 INF-ORD-003 원문으로 대체 수행)",
+      "suggested_action": "다음 build_story 시 INF-ORD-003 본문으로 AC 문장 복원"
+    },
+    {
+      "severity": "low",
+      "layer": "regression",
+      "finding": "캐리오버 — order.xml selectOrders의 ORDER BY o.ordered_at DESC에 tie-breaker가 없어 동일 ordered_at 다건이면 페이지 간 행 중복/누락 가능. 같은 매퍼의 selectRecentByMember는 ', o.order_no DESC'를 갖고 있어 도메인 내 규약 불일치. 이번 SR과 무관",
+      "suggested_action": "selectOrders ORDER BY에 , o.order_no DESC 추가"
+    },
+    {
+      "severity": "low",
+      "layer": "baseline",
+      "finding": "shop-api: 기준선에 없는 소스 루트",
+      "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+    },
+    {
+      "severity": "high",
+      "layer": "scope",
+      "finding": "스코프 밖 변경: .gitignore (M)",
+      "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+    },
+    {
+      "severity": "high",
+      "layer": "scope",
+      "finding": "스코프 밖 변경: .understand-anything/linked-func-cache.json (M)",
+      "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+    },
+    {
+      "severity": "medium",
+      "layer": "conformance",
+      "finding": "축A(scope_verify.py)가 out_of_scope 2건(.gitignore, .understand-anything/linked-func-cache.json)을 보고 — 사용자 확정 규칙상 스코프 불일치는 그 자체로 게이트를 FAIL시킨다. 단, 실제 diff 내용을 직접 확인한 결과 두 파일 모두 이번 FUNC-order-001의 SR-224 작업(빈 목록 안내 문구 분기)과 무관: (1) .gitignore diff는 `.speclinker/job_logs/`·`app_process.json`·`app_*.log` 무시 패턴 3줄 추가뿐(워크스페이스 운영 로그 관리, 화면/API와 무관), (2) linked-func-cache.json diff는 전체 키의 경로 접두어를 `_src/shop-api/`→`modules/shop-api/`로 일괄 치환한 캐시 재생성 산출물이며 FUNC-order-001 관련 라인은 값 변경 없음(다른 FUNC 항목 추가/재정렬만 존재). round16 GATE 이력에서도 동일 2파일이 동일 사유로 waiver 처리된 전례와 일치.",
+      "suggested_action": "사람 승인권자가 이전 round16과 동일하게 waiver 처리(무관한 워크스페이스 공용 파일 변경으로 확인됨)하거나, 정책상 매 라운드 별도 확인이 필요하면 명시적으로 재승인.",
+      "confidence": "high"
+    },
+    {
+      "severity": "low",
+      "layer": "stories",
+      "finding": "UIS-ORD-001 §5 행 5개에 스토리가 없습니다: 오류 배너, 주문목록 그리드, 배송상태 열(SR-210), \"조회 결과 없음\" 문구, \"전체 N건\" 라벨",
+      "suggested_action": "그 상태의 스토리를 만들고 행에 `[이름](story:ID)`를 적으세요"
+    }
+  ],
+  "rounds": [
+    {
+      "round": 1,
+      "gate": "FAIL",
+      "human": {
+        "decision": "rework",
+        "by": "사람",
+        "at": "2026-09-07T10:33:06",
+        "comment": "필수수정1: endDate만 입력 시 startDate가 오늘-30일로 독립 보정되어 구간 역전(start>end)으로 항상 0건 반환됨(OrderService.list:53-54). 시작일 비우고 종료일만 입력하면 화면에서 바로 재현, 오류/안내 없음. start>end는 기존 400 유효성 실패 계약으로 거부하거나 보정 로직을 재검토하고 endDate 단독 테스트를 추가할 것. 필수수정2: '오류 시 기존 공통 오류 배너 표시' AC 미구현 상태이고 그 근거('템플릿 전체에 오류 배너 없음')가 사실과 다름 — cart/list.html(checkoutError), product/detail.html(addToCartError)에 동일 하우스 패턴 존재. 그 패턴을 따라 구현하거나, 정확한 사유로 갭을 재기록할 것.",
+        "targets": [
+          "modules/shop-api/src/main/java/com/sm/lab/shop/service/OrderService.java",
+          "modules/shop-api/src/main/resources/templates/order/list.html"
+        ]
+      },
+      "layers": {
+        "spec": "fail",
+        "security": "pass",
+        "regression": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "high",
+          "layer": "spec",
+          "finding": "endDate만 제시하면 startDate가 오늘-30일로 보정돼 구간이 역전(start>end)되고 항상 0건이 200으로 반환된다. 화면 폼에서 시작일을 비우고 종료일만 채우면 빈 문자열이 null로 바인딩되어 그대로 재현 — 오류도 안내도 없다(OrderService.list:53-54).",
+          "suggested_action": "D3(독립 보정) 재검토 또는 startDate > endDate를 기존 400 유효성 실패 계약으로 거부. endDate 단독 케이스 테스트 추가."
+        },
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "'오류 시 기존 공통 오류 배너 표시' AC 미구현. 근거로 기록된 '템플릿 전체에 오류 배너 없음(grep 확인)'이 사실과 다르다 — cart/list.html:28-29(checkoutError), product/detail.html:49-50(addToCartError)에 동일 하우스 패턴이 존재한다.",
+          "suggested_action": "해당 패턴을 따라 구현하거나, '이 라우트에는 흡수하는 오류 경로가 없다'는 정확한 사유로 갭을 재기록하고 승인받을 것."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "selectOrders와 selectOrdersInPeriod가 del_yn='N' 상시필터·MEMBERS 조인·정렬을 중복 보유해 드리프트 위험. 기록된 사유(MyBatis 오버로드 미지원)는 성립하지 않는다 — 오버로드가 필요한 상황이 아니었다. countOrders는 프로덕션 호출자가 사라져 테스트 전용이 됐다.",
+          "suggested_action": "기존 selectOrders에 선택적 startDate/endDate를 <if> 가드로 추가해 스테이트먼트를 한 벌로 통합하고 exportCsv는 null 전달."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "DATE(o.ordered_at) BETWEEN는 non-sargable — 현재 ORDERS 인덱스는 PK(order_no)와 fk_orders_member(member_id)뿐이라 즉시 손실은 없으나 향후 ordered_at 인덱스가 무력화된다.",
+          "suggested_action": "o.ordered_at >= #{startDate} AND o.ordered_at < #{endDate} + INTERVAL 1 DAY 로 재작성(양끝 포함 의미 동일)."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "LocalDate.now()는 JVM 기본 존, 비교는 DB 저장 DATETIME 기준 — 앱·DB 존이 다르면 최근 30일 경계가 하루 어긋난다.",
+          "suggested_action": "기준 타임존을 명시하거나 Clock 주입으로 고정."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "기간 필터가 mock 수준 pass-through까지만 검증돼 양끝 포함 경계가 실 MariaDB에서 성립하는지 무증명. endDate 단독·명시적 역전 구간 테스트도 없다.",
+          "suggested_action": "OrderExportIntegrationTest와 같은 방식으로 기간 경계 통합 테스트 1건 추가."
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "재작성한 기간필터 SQL 분기(order.xml selectOrders/countOrders의 startDate/endDate <if>)가 161건 테스트 중 한 번도 실행되지 않는다 — 실 DB 테스트는 모두 null,null로 호출해 가드를 건너뛰고 기간 테스트는 전부 DAO를 Mockito로 대체한다. QA가 db-main MCP로 동등 SQL을 실 MariaDB에 질의해 양끝 포함 경계 의미는 검증했으나(2026-08-16 경계 2건 일치), MyBatis LocalDate 바인딩 경로는 무증명이다.",
+          "suggested_action": "OrderExportIntegrationTest와 동일 방식으로 실 DB 기간 경계 통합 테스트 1건(경계일 포함/제외) 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "4xx 흡수 시 result.items가 빈 리스트라 오류 배너와 '조회 결과 없음'(list.html:58)·'전체 0건'(:59)이 동시에 렌더된다 — AC(scr_empty_state)는 오류와 빈 결과를 구분된 상태로 기술한다.",
+          "suggested_action": "오류 상태에서는 빈 결과 안내·총건수를 숨기도록 th:if에 searchError == null 조건 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "endDate만 입력한 경우 400 메시지가 사용자가 입력한 적 없는 서버 계산 기본 시작일을 사유로 제시해 원인을 흐린다(OrderService.list:59-60).",
+          "suggested_action": "기본값 적용 사실과 사용자가 취할 행동을 알려주는 문구로 교체"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "LocalDate.now()는 JVM 기본 존, 비교 대상은 DB ordered_at(DATETIME)이며 기준 존이 명시돼 있지 않다. 실측상 DB @@time_zone=SYSTEM이고 앱과 동일 호스트라 현재 영향은 없다(round2에서 범위를 이유로 보류 선언, 타당).",
+          "suggested_action": "기준 타임존 명시 또는 Clock 주입으로 고정(별도 라운드)"
+        }
+      ]
+    },
+    {
+      "round": 3,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "concerns",
+        "baseline": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "재작성한 기간필터 SQL 분기(order.xml selectOrders/countOrders의 startDate/endDate <if>)가 161건 테스트 중 한 번도 실행되지 않는다 — 실 DB 테스트는 모두 null,null로 호출해 가드를 건너뛰고 기간 테스트는 전부 DAO를 Mockito로 대체한다. QA가 db-main MCP로 동등 SQL을 실 MariaDB에 질의해 양끝 포함 경계 의미는 검증했으나(2026-08-16 경계 2건 일치), MyBatis LocalDate 바인딩 경로는 무증명이다.",
+          "suggested_action": "OrderExportIntegrationTest와 동일 방식으로 실 DB 기간 경계 통합 테스트 1건(경계일 포함/제외) 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "4xx 흡수 시 result.items가 빈 리스트라 오류 배너와 '조회 결과 없음'(list.html:58)·'전체 0건'(:59)이 동시에 렌더된다 — AC(scr_empty_state)는 오류와 빈 결과를 구분된 상태로 기술한다.",
+          "suggested_action": "오류 상태에서는 빈 결과 안내·총건수를 숨기도록 th:if에 searchError == null 조건 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "endDate만 입력한 경우 400 메시지가 사용자가 입력한 적 없는 서버 계산 기본 시작일을 사유로 제시해 원인을 흐린다(OrderService.list:59-60).",
+          "suggested_action": "기본값 적용 사실과 사용자가 취할 행동을 알려주는 문구로 교체"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "LocalDate.now()는 JVM 기본 존, 비교 대상은 DB ordered_at(DATETIME)이며 기준 존이 명시돼 있지 않다. 실측상 DB @@time_zone=SYSTEM이고 앱과 동일 호스트라 현재 영향은 없다(round2에서 범위를 이유로 보류 선언, 타당).",
+          "suggested_action": "기준 타임존 명시 또는 Clock 주입으로 고정(별도 라운드)"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "기준선 없음 — record 먼저",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "테스트 기준선 없음 — 대조하지 못했다",
+          "suggested_action": "`/sl-test --baseline`으로 기준선을 먼저 기록하세요"
+        }
+      ],
+      "layer": "baseline"
+    },
+    {
+      "round": 4,
+      "gate": "FAIL",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "concerns",
+        "baseline": "concerns",
+        "scope": "fail"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "재작성한 기간필터 SQL 분기(order.xml selectOrders/countOrders의 startDate/endDate <if>)가 161건 테스트 중 한 번도 실행되지 않는다 — 실 DB 테스트는 모두 null,null로 호출해 가드를 건너뛰고 기간 테스트는 전부 DAO를 Mockito로 대체한다. QA가 db-main MCP로 동등 SQL을 실 MariaDB에 질의해 양끝 포함 경계 의미는 검증했으나(2026-08-16 경계 2건 일치), MyBatis LocalDate 바인딩 경로는 무증명이다.",
+          "suggested_action": "OrderExportIntegrationTest와 동일 방식으로 실 DB 기간 경계 통합 테스트 1건(경계일 포함/제외) 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "4xx 흡수 시 result.items가 빈 리스트라 오류 배너와 '조회 결과 없음'(list.html:58)·'전체 0건'(:59)이 동시에 렌더된다 — AC(scr_empty_state)는 오류와 빈 결과를 구분된 상태로 기술한다.",
+          "suggested_action": "오류 상태에서는 빈 결과 안내·총건수를 숨기도록 th:if에 searchError == null 조건 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "endDate만 입력한 경우 400 메시지가 사용자가 입력한 적 없는 서버 계산 기본 시작일을 사유로 제시해 원인을 흐린다(OrderService.list:59-60).",
+          "suggested_action": "기본값 적용 사실과 사용자가 취할 행동을 알려주는 문구로 교체"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "LocalDate.now()는 JVM 기본 존, 비교 대상은 DB ordered_at(DATETIME)이며 기준 존이 명시돼 있지 않다. 실측상 DB @@time_zone=SYSTEM이고 앱과 동일 호스트라 현재 영향은 없다(round2에서 범위를 이유로 보류 선언, 타당).",
+          "suggested_action": "기준 타임존 명시 또는 Clock 주입으로 고정(별도 라운드)"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "기준선 없음 — record 먼저",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "테스트 기준선 없음 — 대조하지 못했다",
+          "suggested_action": "`/sl-test --baseline`으로 기준선을 먼저 기록하세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: modules/shop-api/src/test/java/com/sm/lab/shop/CheckoutAtomicityTest.java (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: modules/shop-api/src/test/java/com/sm/lab/shop/CheckoutConcurrencyTest.java (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        }
+      ],
+      "layer": "scope"
+    },
+    {
+      "round": 5,
+      "gate": "FAIL",
+      "human": {
+        "decision": "waiver",
+        "by": "사람",
+        "at": "2026-09-07T11:02:08",
+        "comment": "축A 스코프 불일치 수용 — CheckoutAtomicityTest/CheckoutConcurrencyTest의 countOrders 호출부 변경은 OrderDao 시그니처 확장(startDate/endDate 추가)에 따른 순수 기계적 call-site 추종, 둘 다 null 전달 유지로 동작 변화 없음. 실diff 확인.",
+        "targets": []
+      },
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "concerns",
+        "baseline": "concerns",
+        "scope": "fail",
+        "rules": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "재작성한 기간필터 SQL 분기(order.xml selectOrders/countOrders의 startDate/endDate <if>)가 161건 테스트 중 한 번도 실행되지 않는다 — 실 DB 테스트는 모두 null,null로 호출해 가드를 건너뛰고 기간 테스트는 전부 DAO를 Mockito로 대체한다. QA가 db-main MCP로 동등 SQL을 실 MariaDB에 질의해 양끝 포함 경계 의미는 검증했으나(2026-08-16 경계 2건 일치), MyBatis LocalDate 바인딩 경로는 무증명이다.",
+          "suggested_action": "OrderExportIntegrationTest와 동일 방식으로 실 DB 기간 경계 통합 테스트 1건(경계일 포함/제외) 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "4xx 흡수 시 result.items가 빈 리스트라 오류 배너와 '조회 결과 없음'(list.html:58)·'전체 0건'(:59)이 동시에 렌더된다 — AC(scr_empty_state)는 오류와 빈 결과를 구분된 상태로 기술한다.",
+          "suggested_action": "오류 상태에서는 빈 결과 안내·총건수를 숨기도록 th:if에 searchError == null 조건 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "endDate만 입력한 경우 400 메시지가 사용자가 입력한 적 없는 서버 계산 기본 시작일을 사유로 제시해 원인을 흐린다(OrderService.list:59-60).",
+          "suggested_action": "기본값 적용 사실과 사용자가 취할 행동을 알려주는 문구로 교체"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "LocalDate.now()는 JVM 기본 존, 비교 대상은 DB ordered_at(DATETIME)이며 기준 존이 명시돼 있지 않다. 실측상 DB @@time_zone=SYSTEM이고 앱과 동일 호스트라 현재 영향은 없다(round2에서 범위를 이유로 보류 선언, 타당).",
+          "suggested_action": "기준 타임존 명시 또는 Clock 주입으로 고정(별도 라운드)"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "기준선 없음 — record 먼저",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "테스트 기준선 없음 — 대조하지 못했다",
+          "suggested_action": "`/sl-test --baseline`으로 기준선을 먼저 기록하세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: modules/shop-api/src/test/java/com/sm/lab/shop/CheckoutAtomicityTest.java (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: modules/shop-api/src/test/java/com/sm/lab/shop/CheckoutConcurrencyTest.java (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        }
+      ],
+      "layer": "rules"
+    },
+    {
+      "round": 6,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "concerns",
+        "baseline": "concerns",
+        "scope": "fail",
+        "rules": "pass",
+        "conformance": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "재작성한 기간필터 SQL 분기(order.xml selectOrders/countOrders의 startDate/endDate <if>)가 161건 테스트 중 한 번도 실행되지 않는다 — 실 DB 테스트는 모두 null,null로 호출해 가드를 건너뛰고 기간 테스트는 전부 DAO를 Mockito로 대체한다. QA가 db-main MCP로 동등 SQL을 실 MariaDB에 질의해 양끝 포함 경계 의미는 검증했으나(2026-08-16 경계 2건 일치), MyBatis LocalDate 바인딩 경로는 무증명이다.",
+          "suggested_action": "OrderExportIntegrationTest와 동일 방식으로 실 DB 기간 경계 통합 테스트 1건(경계일 포함/제외) 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "4xx 흡수 시 result.items가 빈 리스트라 오류 배너와 '조회 결과 없음'(list.html:58)·'전체 0건'(:59)이 동시에 렌더된다 — AC(scr_empty_state)는 오류와 빈 결과를 구분된 상태로 기술한다.",
+          "suggested_action": "오류 상태에서는 빈 결과 안내·총건수를 숨기도록 th:if에 searchError == null 조건 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "endDate만 입력한 경우 400 메시지가 사용자가 입력한 적 없는 서버 계산 기본 시작일을 사유로 제시해 원인을 흐린다(OrderService.list:59-60).",
+          "suggested_action": "기본값 적용 사실과 사용자가 취할 행동을 알려주는 문구로 교체"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "LocalDate.now()는 JVM 기본 존, 비교 대상은 DB ordered_at(DATETIME)이며 기준 존이 명시돼 있지 않다. 실측상 DB @@time_zone=SYSTEM이고 앱과 동일 호스트라 현재 영향은 없다(round2에서 범위를 이유로 보류 선언, 타당).",
+          "suggested_action": "기준 타임존 명시 또는 Clock 주입으로 고정(별도 라운드)"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "기준선 없음 — record 먼저",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "테스트 기준선 없음 — 대조하지 못했다",
+          "suggested_action": "`/sl-test --baseline`으로 기준선을 먼저 기록하세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: modules/shop-api/src/test/java/com/sm/lab/shop/CheckoutAtomicityTest.java (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: modules/shop-api/src/test/java/com/sm/lab/shop/CheckoutConcurrencyTest.java (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "medium",
+          "layer": "conformance",
+          "finding": "축 A(scope_verify.py)가 out_of_scope로 분류한 파일이 2건 존재 — modules/shop-api/src/test/java/com/sm/lab/shop/CheckoutAtomicityTest.java, CheckoutConcurrencyTest.java. 실제 diff는 orderDao.countOrders(MEMBER_ID, null) 호출을 시그니처 추종으로 countOrders(MEMBER_ID, null, null, null)로 바꾼 것뿐이고(동작 불변, null,null=무필터), Dev 기록 round2 '테스트(수정/추가)' 섹션에 이 변경이 명시적으로 기록돼 있어 은폐된 변경은 아니다. 다만 이 검증 규칙상 축 A의 out_of_scope 보고는 스코프 불일치 차단 게이트이며 그대로 병기한다.",
+          "suggested_action": "이 두 파일 변경이 FUNC-order-001 범위 내 불가피한 시그니처 추종 리플임을 확인·승인하고 넘어갈지, 축 A 스코프 정책(공유 DAO 메서드 시그니처 변경 시 호출자 테스트 갱신을 어떻게 분류할지)을 조정할지 결정 필요.",
+          "confidence": "high",
+          "file": "modules/shop-api/src/test/java/com/sm/lab/shop/CheckoutAtomicityTest.java",
+          "line": 54
+        },
+        {
+          "severity": "low",
+          "layer": "conformance",
+          "finding": "QA round2 권고1(후속 추적 TODO #1) — order.xml의 신규 startDate/endDate <if> SQL 분기가 161건 스위트 어디에서도 실 DB로 실행되지 않는다(기간 관련 테스트는 전부 Mockito로 OrderDao 대체, 실DB 테스트(OrderExportIntegrationTest 등)는 전부 null,null 호출). QA가 db-main MCP로 동등 SQL의 의미는 확인했으나 MyBatis LocalDate 바인딩 경로는 무증명. 사람이 '추적등록 후 진행'으로 이미 수용한 항목으로 story TODO #1과 일치 — 신규 발견 아님.",
+          "suggested_action": "story TODO #1(OrderExportIntegrationTest와 동일 방식의 실DB 기간 경계 통합 테스트 1건)을 다음 라운드에서 처리.",
+          "confidence": "high",
+          "file": "modules/shop-api/src/main/resources/mapper/order.xml",
+          "line": 20
+        },
+        {
+          "severity": "low",
+          "layer": "conformance",
+          "finding": "QA round2 권고2(후속 추적 TODO #2) — 4xx 흡수 시 result.items가 빈 리스트라 오류 배너와 '조회 결과 없음'/'전체 0건'이 동시에 렌더된다. list.html의 th:if 가드가 searchError 존재 여부와 무관해 실제로 확인됨(searchError!=null이면서 items가 항상 빈 리스트이므로 조회결과없음 문구도 함께 뜬다). story TODO #2와 일치 — 신규 발견 아님.",
+          "suggested_action": "story TODO #2대로 th:if=\"${searchError == null and #lists.isEmpty(result['items'])}\" 형태로 조건 분리.",
+          "confidence": "high",
+          "file": "modules/shop-api/src/main/resources/templates/order/list.html",
+          "line": 58
+        }
+      ],
+      "layer": "conformance"
+    },
+    {
+      "round": 7,
+      "gate": "CONCERNS",
+      "human": {
+        "decision": "rework",
+        "by": "사람",
+        "at": "2026-09-08T08:43:41",
+        "comment": "QA CONCERNS 권고 함께 고치기(round3): (1) UIS-ORD-001 spec.md §2 시나리오4·§5 표시조건을 AC에 명시된 문구(그리드는 searchError==null일 때만 렌더, 전체 N건 라벨도 동일 조건, 조회결과없음은 searchError==null and items 빈 목록)로 실제 갱신 — 이는 story AC 체크리스트에 명시된 항목이라 권고가 아니라 완료 조건이다. (2) UIS-ORD-001/INF-ORD-003 근거 소스의 라인 앵커 드리프트 정정(list.html 실제 45-58/61-63, OrderService.java 실제 58-72). (3) 회귀 테스트 공백 보완 — '정상 0건 시 전체 0건 라벨 유지'를 실제로 검증하는 테스트 1건 추가(기존 orderList_emptyResult_showsNoResultsMessage는 라벨 소실을 못 잡는다). (4) OrderViewControllerTest의 not(containsString(\"건\")) 과대 단정을 실제 문구 매칭으로 좁혀 오탐 위험 제거. (5) 대칭 결함(startDate만 미래 입력 시 서버계산 endDate를 역전사유로 노출)은 이번 스코프 밖 — 손대지 말고 story 후속 TODO로만 기록.",
+        "targets": [
+          "docs/05_설계서/order/UIS/UIS-ORD-001_주문목록/spec.md",
+          "docs/05_설계서/order/INF/INF-ORD-003.md",
+          "modules/shop-api/src/test/java/com/sm/lab/shop/controller/OrderViewControllerTest.java"
+        ]
+      },
+      "layers": {
+        "spec": "concerns",
+        "security": "pass",
+        "regression": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "UIS-ORD-001 설계서(spec.md)가 AS-IS 그대로 — §2 시나리오 4는 '4xx에도 목록이 비어있는 상태로 렌더된다', §5 표시조건에는 '조회 결과 없음'의 searchError 전제와 ③그리드·'전체 N건' 행이 없어 구현과 정면 모순",
+          "suggested_action": "docs/05_설계서/order/UIS/UIS-ORD-001_주문목록/spec.md §2 시나리오 4(line 40)를 '4xx 시 배너만 표시, 그리드·조회결과없음·전체N건 모두 숨김'으로 교체하고 §5 표에 그리드·전체N건 2행 추가 + 조회결과없음 행에 searchError null 전제 결합"
+        },
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "스펙 라인 앵커 드리프트 — UIS §3 ③ list.html:43-56→실제 45-58, ④ 57-59→실제 61-63, §5 근거 57-58→실제 61, INF-ORD-003 frontmatter OrderService.java:55-66→실제 58-72",
+          "suggested_action": "UIS-ORD-001 §3·§5 근거 라인과 INF-ORD-003 anchors를 현행 소스 라인으로 갱신"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "SR-208 회귀 범위가 명시한 '정상 0건 시 전체 0건 표시 유지'에 테스트가 없다 — 이번에 searchError == null 조건을 새로 건 대상이 바로 그 라벨인데 orderList_emptyResult_showsNoResultsMessage는 '조회 결과 없음'만 확인해 라벨이 사라져도 스위트가 녹색이다",
+          "suggested_action": "orderList_emptyResult_showsNoResultsMessage에 containsString(\"전체\") 및 totalCount 0 렌더 검증 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "OrderViewControllerTest:131,150의 not(containsString(\"건\"))은 페이지 전체에서 한 음절 '건'의 부재를 요구하는 과대 단정 — 배너/라벨에 '조건'·'건수' 같은 무관한 단어가 들어오면 오탐 실패",
+          "suggested_action": "xpath(\"//p[contains(.,'전체')]\").doesNotExist() 처럼 대상 요소를 특정하는 단정으로 교체"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "대칭 결함 잔존(이번 SR 범위 밖) — startDate만 미래 날짜로 입력하고 endDate 미입력이면 기존 문구가 서버 계산 endDate(오늘)를 '종료일'로 제시해 SR-208이 고친 것과 같은 유형의 혼란이 남는다",
+          "suggested_action": "scope_freeze('요구 본문 외 전부 제외')에 따라 이번 라운드에서는 수정하지 말고 후속 SR로 등록"
+        }
+      ]
+    },
+    {
+      "round": 8,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass"
+      },
+      "top_issues": []
+    },
+    {
+      "round": 9,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "기준선 없음 — record 먼저",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "테스트 기준선 없음 — 대조하지 못했다",
+          "suggested_action": "`/sl-test --baseline`으로 기준선을 먼저 기록하세요"
+        }
+      ],
+      "layer": "baseline"
+    },
+    {
+      "round": 10,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "concerns",
+        "scope": "fail"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "기준선 없음 — record 먼저",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "테스트 기준선 없음 — 대조하지 못했다",
+          "suggested_action": "`/sl-test --baseline`으로 기준선을 먼저 기록하세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: modules/shop-api/src/main/java/com/sm/lab/shop/service/OrderService.java (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        }
+      ],
+      "layer": "scope"
+    },
+    {
+      "round": 11,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "concerns",
+        "scope": "fail",
+        "rules": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "기준선 없음 — record 먼저",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "테스트 기준선 없음 — 대조하지 못했다",
+          "suggested_action": "`/sl-test --baseline`으로 기준선을 먼저 기록하세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: modules/shop-api/src/main/java/com/sm/lab/shop/service/OrderService.java (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        }
+      ],
+      "layer": "rules"
+    },
+    {
+      "round": 12,
+      "gate": "CONCERNS",
+      "human": {
+        "decision": "waiver",
+        "by": "사람",
+        "at": "2026-09-08T09:07:28",
+        "comment": "scope_verify.py 오분류 수용 — OrderService.java(list():58-72)는 SR-208 AC1을 구현하는 핵심 파일이며 45행에 linked_func: FUNC-order-001 주석도 존재한다. 기본 3줄 diff 컨텍스트가 주석 라인을 포함하지 못해 축A가 out_of_scope로 오분류했고 축B(conformance)는 그 판정을 그대로 병기한 것뿐 — 내용 정합 자체는 문제없음(AC1~9 전건 일치 확인됨). 실diff 확인 완료.",
+        "targets": []
+      },
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "concerns",
+        "scope": "fail",
+        "rules": "pass",
+        "conformance": "fail"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "기준선 없음 — record 먼저",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "테스트 기준선 없음 — 대조하지 못했다",
+          "suggested_action": "`/sl-test --baseline`으로 기준선을 먼저 기록하세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: modules/shop-api/src/main/java/com/sm/lab/shop/service/OrderService.java (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "high",
+          "layer": "conformance",
+          "finding": "AC1(INF-ORD-003 400 사유 문구 개선)의 핵심 구현 파일 OrderService.java가 scope_verify 축A(scope_verify.py)에서 FUNC-order-001 out_of_scope로 분류됨 — 그런데 실제 diff(list():58-72, 400 reason 분기 추가)는 이 story의 최우선 AC를 직접 구현하는 코드이고, 파일 내 45행에 `linked_func: FUNC-order-001` 주석도 존재한다. 축A 재판정은 verify-agent 소관이 아니므로 그대로 병기하되, 이 불일치 자체가 규칙(사용자 확정)상 차단 게이트다: 'out_of_scope 보고 시 FAIL'.",
+          "suggested_action": "scope_verify.py의 OrderService.java 분류 로직(diff hunk와 linked_func 주석 라인 매칭 방식)을 점검해 왜 이 hunk가 FUNC-order-001 classified에서 빠졌는지 확인할 것. 분류 오류라면 재분류 후 재검증, 의도된 분류라면(예: 파일이 다중 FUNC 공유라 파일단위로는 미분류) 그 근거를 축A 산출물에 남길 것.",
+          "confidence": "high",
+          "file": "modules/shop-api/src/main/java/com/sm/lab/shop/service/OrderService.java",
+          "line": 58
+        }
+      ],
+      "layer": "conformance"
+    },
+    {
+      "round": 13,
+      "gate": "CONCERNS",
+      "human": {
+        "decision": "rework",
+        "by": "사람",
+        "at": "2026-09-08T11:56:02",
+        "comment": "QA CONCERNS 권고 함께 고치기(round13): (1) UIS-ORD-001 spec.md(§1·§3)를 실제 구현 기준으로 갱신 — 6번째 열 '배송상태'(주문별 최신 배송 이력 상태, 이력 없으면 '-') 추가 반영, revision_history에 SR-210 항목 추가, 근거 라인 앵커를 현재 소스 기준(list.html, OrderViewController.java)으로 정정. (2) '최신 배송 이력' 정렬 기준 재검토 — 현재 ORDER BY shipped_at DESC, delivery_no DESC는 MariaDB DESC에서 NULL이 마지막으로 정렬되어, 미출고(READY, shipped_at NULL) 건이 더 나중에 생성됐어도 항상 SHIPPED 등 출고완료 이력 뒤로 밀린다(실데이터 20260816-0002로 재현됨). '최신'의 의미를 배송 이력 생성 시각(예: delivery_no 최댓값 또는 별도 등록시각 컬럼) 기준으로 명확히 하고 그 기준으로 쿼리를 정정할 것 — FUNC-order-006(LAB-113)과 다른 화면이므로 동일 판정 기준을 그대로 따를 필요는 없음, 이 화면(주문 목록)에 맞는 정의로 재검토. (3) 화면 경로 end-to-end 테스트 1건 추가 — OrderViewController 응답 모델에 담긴 deliveryStatusByOrderNo가 실제 list.html 6번째 열 렌더링까지 이어지는지 배선 결함을 잡을 수 있는 통합 테스트(현재는 계층별로만 검증되어 배선 결함이 스위트로 안 잡힘).",
+        "targets": [
+          "docs/05_설계서/order/UIS/UIS-ORD-001_주문목록/spec.md",
+          "modules/shop-api/src/main/java/com/sm/lab/shop/dao/OrderDao.java",
+          "modules/shop-api/src/main/resources/mapper/order.xml",
+          "modules/shop-api/src/test/java/com/sm/lab/shop/controller/OrderViewControllerTest.java"
+        ]
+      },
+      "layers": {
+        "spec": "concerns",
+        "security": "pass",
+        "regression": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "UIS-ORD-001 spec.md가 SR-210을 반영하지 않았다 — §1 개요·§3 블록표 ③의 위젯 목록이 기존 5개 열 그대로이고 revision_history가 v1.1(SR-208)에서 멈춰 있다. 같은 파일 v1.1이 dev-agent(SR-208 round3) 저작인 선례상 스펙 현행화는 SR 산출물의 일부다. 더불어 §3 앵커 list.html:45-58과 frontmatter OrderViewController.java:41-66이 이번 삽입으로 라인 드리프트됐다(그리드 약 48-67, orderList 약 47-80).",
+          "suggested_action": "spec.md §1·§3에 배송상태 열(값=최신 배송 이력 상태, 이력 없으면 \"-\")을 반영하고 앵커 라인을 정정한 뒤 revision_history v1.2를 추가할 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "\"최신 배송 이력\" 판정이 ORDER BY shipped_at DESC, delivery_no DESC라 shipped_at IS NULL인 미출고(READY) 건이 나중 생성이어도 항상 밀린다. 실데이터 20260816-0002(D-0816-1 SHIPPED 2026-08-17 08:20 + D-0816-2 READY NULL)에서 화면에 SHIPPED가 표시되는 것을 DB 직접 실행으로 확인. 분할 배송이 바로 이 열의 목적인데 요구사항·확정 문답에 \"최신\"의 정의가 없다.",
+          "suggested_action": "요청자에게 \"최근 출고 기준\"인지 \"최근 생성 이력 기준\"인지 확인하고, 확정 결과를 UIS-ORD-001에 명문화할 것(후자면 delivery_no DESC 단독 기준으로 변경)"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "컨트롤러→서비스→DAO→템플릿 전 구간을 실DB로 관통하는 테스트가 없다 — 계층별로만 검증됨(OrderDaoTest 실DB, OrderServiceTest mock DAO, OrderViewControllerTest mock 서비스). 모델 속성명 오타·매퍼 미등록 같은 배선 결함은 현재 스위트로 잡히지 않는다.",
+          "suggested_action": "GET /order/list를 실DB로 렌더해 배송상태 열 값을 단언하는 통합 테스트 1건 추가 검토(기존 관행 수준이라 선택)"
+        }
+      ]
+    },
+    {
+      "round": 14,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "OrderViewControllerTest.java:233 부정 단언 not(containsString(\">129000<\"))는 중복이라 발화 불가 — 템플릿이 '원'을 덧붙여 포맷 훼손 시 렌더는 '>129000원<'이 되고, '원'까지 사라진 경우는 232행 양성 단언이 먼저 실패한다",
+          "suggested_action": "233행 부정 단언을 삭제하거나 '>129000원<'로 교정 (실질 잠금은 232행이 전담 — 뮤테이션으로 확인)"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": ".speclinker/test_baseline.json 부재 — 대상 프로젝트 테스트 기준선 정본이 없어 GATE layers.baseline 대조가 무력",
+          "suggested_action": "이번 실측치(208건, 21개 테스트클래스)로 test_baseline_ws.py 기준선 생성"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "STORY-FUNC-order-001.md 39~40행 AC가 '유효 구간(effectiveStart~effectiveEnd)이'에서 문장 절단 — 객관 검증 불가",
+          "suggested_action": "다음 build_story 시 INF-ORD-003 원문으로 AC 문장 복원"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "Dev 기록·기존 구현 파일 경로 접두사가 _src/shop-api인데 실제 소스 루트는 modules/shop-api(project.env SOURCE_1_PATH) — _src는 워크스페이스에 미존재. STORY 7건 전체의 선재 관례",
+          "suggested_action": "스토리 생성기의 경로 라벨을 SOURCE_n_PATH 실경로와 일치시킬 것"
+        }
+      ]
+    },
+    {
+      "round": 15,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "concerns",
+        "baseline": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "OrderViewControllerTest.java:233 부정 단언 not(containsString(\">129000<\"))는 중복이라 발화 불가 — 템플릿이 '원'을 덧붙여 포맷 훼손 시 렌더는 '>129000원<'이 되고, '원'까지 사라진 경우는 232행 양성 단언이 먼저 실패한다",
+          "suggested_action": "233행 부정 단언을 삭제하거나 '>129000원<'로 교정 (실질 잠금은 232행이 전담 — 뮤테이션으로 확인)"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": ".speclinker/test_baseline.json 부재 — 대상 프로젝트 테스트 기준선 정본이 없어 GATE layers.baseline 대조가 무력",
+          "suggested_action": "이번 실측치(208건, 21개 테스트클래스)로 test_baseline_ws.py 기준선 생성"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "STORY-FUNC-order-001.md 39~40행 AC가 '유효 구간(effectiveStart~effectiveEnd)이'에서 문장 절단 — 객관 검증 불가",
+          "suggested_action": "다음 build_story 시 INF-ORD-003 원문으로 AC 문장 복원"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "Dev 기록·기존 구현 파일 경로 접두사가 _src/shop-api인데 실제 소스 루트는 modules/shop-api(project.env SOURCE_1_PATH) — _src는 워크스페이스에 미존재. STORY 7건 전체의 선재 관례",
+          "suggested_action": "스토리 생성기의 경로 라벨을 SOURCE_n_PATH 실경로와 일치시킬 것"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "기준선 없음 — record 먼저",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "테스트 기준선 없음 — 대조하지 못했다",
+          "suggested_action": "`/sl-test --baseline`으로 기준선을 먼저 기록하세요"
+        }
+      ],
+      "layer": "baseline"
+    },
+    {
+      "round": 16,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "concerns",
+        "baseline": "concerns",
+        "scope": "fail"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "OrderViewControllerTest.java:233 부정 단언 not(containsString(\">129000<\"))는 중복이라 발화 불가 — 템플릿이 '원'을 덧붙여 포맷 훼손 시 렌더는 '>129000원<'이 되고, '원'까지 사라진 경우는 232행 양성 단언이 먼저 실패한다",
+          "suggested_action": "233행 부정 단언을 삭제하거나 '>129000원<'로 교정 (실질 잠금은 232행이 전담 — 뮤테이션으로 확인)"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": ".speclinker/test_baseline.json 부재 — 대상 프로젝트 테스트 기준선 정본이 없어 GATE layers.baseline 대조가 무력",
+          "suggested_action": "이번 실측치(208건, 21개 테스트클래스)로 test_baseline_ws.py 기준선 생성"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "STORY-FUNC-order-001.md 39~40행 AC가 '유효 구간(effectiveStart~effectiveEnd)이'에서 문장 절단 — 객관 검증 불가",
+          "suggested_action": "다음 build_story 시 INF-ORD-003 원문으로 AC 문장 복원"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "Dev 기록·기존 구현 파일 경로 접두사가 _src/shop-api인데 실제 소스 루트는 modules/shop-api(project.env SOURCE_1_PATH) — _src는 워크스페이스에 미존재. STORY 7건 전체의 선재 관례",
+          "suggested_action": "스토리 생성기의 경로 라벨을 SOURCE_n_PATH 실경로와 일치시킬 것"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "기준선 없음 — record 먼저",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "테스트 기준선 없음 — 대조하지 못했다",
+          "suggested_action": "`/sl-test --baseline`으로 기준선을 먼저 기록하세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .gitignore (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .understand-anything/linked-func-cache.json (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        }
+      ],
+      "layer": "scope"
+    },
+    {
+      "round": 17,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "concerns",
+        "baseline": "concerns",
+        "scope": "fail",
+        "rules": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "OrderViewControllerTest.java:233 부정 단언 not(containsString(\">129000<\"))는 중복이라 발화 불가 — 템플릿이 '원'을 덧붙여 포맷 훼손 시 렌더는 '>129000원<'이 되고, '원'까지 사라진 경우는 232행 양성 단언이 먼저 실패한다",
+          "suggested_action": "233행 부정 단언을 삭제하거나 '>129000원<'로 교정 (실질 잠금은 232행이 전담 — 뮤테이션으로 확인)"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": ".speclinker/test_baseline.json 부재 — 대상 프로젝트 테스트 기준선 정본이 없어 GATE layers.baseline 대조가 무력",
+          "suggested_action": "이번 실측치(208건, 21개 테스트클래스)로 test_baseline_ws.py 기준선 생성"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "STORY-FUNC-order-001.md 39~40행 AC가 '유효 구간(effectiveStart~effectiveEnd)이'에서 문장 절단 — 객관 검증 불가",
+          "suggested_action": "다음 build_story 시 INF-ORD-003 원문으로 AC 문장 복원"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "Dev 기록·기존 구현 파일 경로 접두사가 _src/shop-api인데 실제 소스 루트는 modules/shop-api(project.env SOURCE_1_PATH) — _src는 워크스페이스에 미존재. STORY 7건 전체의 선재 관례",
+          "suggested_action": "스토리 생성기의 경로 라벨을 SOURCE_n_PATH 실경로와 일치시킬 것"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "기준선 없음 — record 먼저",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "테스트 기준선 없음 — 대조하지 못했다",
+          "suggested_action": "`/sl-test --baseline`으로 기준선을 먼저 기록하세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .gitignore (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .understand-anything/linked-func-cache.json (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        }
+      ],
+      "layer": "rules"
+    },
+    {
+      "round": 18,
+      "gate": "CONCERNS",
+      "human": {
+        "decision": "waiver",
+        "by": "사람",
+        "at": "2026-09-09T10:42:09",
+        "comment": "SR-225 라운드 — .gitignore(.speclinker/job_logs 등 무시목록 추가)와 .understand-anything/linked-func-cache.json(분석 캐시 자동 재생성)은 오늘 세션에서 여러 SR/FUNC를 순차 처리한 워크스페이스 공용 툴링 산출물이며 shop-api 모듈 코드와 무관함을 실측 git diff로 확인. 이 FUNC 범위 밖 변경이 맞으나 툴링 부작용이라 되돌릴 필요 없음 — waiver 수용.",
+        "targets": []
+      },
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "concerns",
+        "baseline": "concerns",
+        "scope": "fail",
+        "rules": "pass",
+        "conformance": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "OrderViewControllerTest.java:233 부정 단언 not(containsString(\">129000<\"))는 중복이라 발화 불가 — 템플릿이 '원'을 덧붙여 포맷 훼손 시 렌더는 '>129000원<'이 되고, '원'까지 사라진 경우는 232행 양성 단언이 먼저 실패한다",
+          "suggested_action": "233행 부정 단언을 삭제하거나 '>129000원<'로 교정 (실질 잠금은 232행이 전담 — 뮤테이션으로 확인)"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": ".speclinker/test_baseline.json 부재 — 대상 프로젝트 테스트 기준선 정본이 없어 GATE layers.baseline 대조가 무력",
+          "suggested_action": "이번 실측치(208건, 21개 테스트클래스)로 test_baseline_ws.py 기준선 생성"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "STORY-FUNC-order-001.md 39~40행 AC가 '유효 구간(effectiveStart~effectiveEnd)이'에서 문장 절단 — 객관 검증 불가",
+          "suggested_action": "다음 build_story 시 INF-ORD-003 원문으로 AC 문장 복원"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "Dev 기록·기존 구현 파일 경로 접두사가 _src/shop-api인데 실제 소스 루트는 modules/shop-api(project.env SOURCE_1_PATH) — _src는 워크스페이스에 미존재. STORY 7건 전체의 선재 관례",
+          "suggested_action": "스토리 생성기의 경로 라벨을 SOURCE_n_PATH 실경로와 일치시킬 것"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "기준선 없음 — record 먼저",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "테스트 기준선 없음 — 대조하지 못했다",
+          "suggested_action": "`/sl-test --baseline`으로 기준선을 먼저 기록하세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .gitignore (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .understand-anything/linked-func-cache.json (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "medium",
+          "layer": "conformance",
+          "finding": "STORY 'Dev 기록 SR-225' 절이 '실제 변경: 회귀 고정용 테스트만 추가 — orderList_totalAmount_rendersWithThousandsSeparator 추가'라고 서술하지만, 이 라운드의 실제 미커밋 diff(git -C {WORKSPACE}/modules/shop-api diff HEAD -- src/test/java/.../OrderViewControllerTest.java)는 `// linked_tc: TC-FUNC-order-001-23` 주석 1줄 추가뿐이다. 해당 테스트 메서드 본체(129,000원 렌더 확인)는 이미 선행 커밋 baa8378(커밋 메시지: 'SR-219 주문 목록 정렬을 주문일시 내림차순으로 고정')에 포함되어 있었다(git log -S로 원커밋 특정) — 즉 SR-225의 서술상 '이번 라운드 실제 변경'과 실측 diff가 어긋난다. 기능 자체(콤마 포맷)는 list.html:67에 이미 구현돼 있어 요구사항 충족은 사실이나, 어느 커밋에서 무엇이 배달됐는지의 감사 추적(SR↔commit 귀속)이 깨져 있다.",
+          "suggested_action": "SR-219/SR-225 라운드 처리 스크립트(커밋 생성 로직)를 점검 — SR-219 처리 중 미커밋 상태로 남아있던 SR-225 테스트 변경분이 함께 스테이징돼 잘못된 커밋 메시지로 묶인 것으로 보인다. 향후 라운드에서 SR별 diff/커밋 경계를 분리해 귀속시킬 것.",
+          "confidence": "high",
+          "file": "modules/shop-api/src/test/java/com/sm/lab/shop/controller/OrderViewControllerTest.java",
+          "line": 218
+        }
+      ],
+      "layer": "conformance"
+    },
+    {
+      "round": 19,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "concerns",
+        "regression": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "high",
+          "layer": "regression",
+          "finding": "AC①(del_yn 상시필터)·AC⑥(endDate 당일 포함 경계)·AC⑥(AND 결합)을 실DB로 검증하던 OrderListIntegrationTest(6건)가 소스 트리·git 이력 어디에도 없이 사라졌다 — 2026-09-07자 surefire 리포트만 잔존하고 그 마지막 실행은 1 failure(404) + 1 error(fk_orders_member 위반 시드)였다. 현재 selectOrders/countOrders의 SQL 의미를 실DB로 잠그는 테스트가 0건(OrderDaoTest 2건은 selectDeliveries/selectLatestDeliveryStates 전용)",
+          "suggested_action": "OrderListIntegrationTest를 복원하고 시드를 MEMBERS 선삽입으로 FK 위반 없이 고칠 것. 실패한 테스트를 삭제해 스위트를 green으로 만들지 말 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": ".speclinker/test_baseline.json 부재로 위 테스트 클래스 소실(21→22 클래스, 226→220건)을 게이트가 탐지하지 못했다 — 직전 라운드 low 이슈가 실제 사고로 현실화",
+          "suggested_action": "`/sl-test --baseline`으로 이번 실측치(21 클래스 / 220건)를 기준선으로 기록"
+        },
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "화면 라우트 /order/**가 ApiKeyAuthFilter.isOpenRoute 화이트리스트라 필터를 통째로 스킵하는데 /order/list는 memberId 파라미터를 그대로 받아 list.html:66에서 회원명+회원ID+주문번호·상태·총액·주문일시를 렌더 → GET /order/list?memberId=M-0002로 무자격 타인 주문 이력 열람 성립. SR-204 정책상 허용이나 SR-207 round7이 GET /member/{id}를 동일 사유로 화이트리스트에서 제외한 선례와 모순",
+          "suggested_action": "SR-207 선례대로 evaluateMemberScope에 편입할지 SR로 확정하고, 현행 유지 시 무인증 열람 허용을 한계로 명시"
+        },
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "OrderService.list의 offset = Math.max(0,page-1)*size가 int 연산 — page=2147483647, size=20이면 오버플로로 offset이 음수(-40)가 되어 LIMIT 20 OFFSET -40 SQL 오류 500. page/size에 상·하한 검증이 없고(size 무제한), /order/list는 무인증 라우트라 자격 없이 500을 유발할 수 있다",
+          "suggested_action": "offset을 long으로 계산하거나 page 상한을 두고 size에 1~100 범위를 강제(SR-215의 '서버가 자른다' 요구와 함께 처리)"
+        },
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "Dev 기록의 'OrderDaoTest(SQL 실측)가 위 7개 수용 기준을 각각 케이스로 커버'가 사실과 다르다 — OrderDaoTest 2건은 selectDeliveries/selectLatestDeliveryStates(FUNC-order-006/SR-210) 전용이고 selectOrders/countOrders를 호출하지 않는다",
+          "suggested_action": "Dev 기록의 커버리지 서술을 실제 테스트 대상에 맞게 정정"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "AC③(offset = max(0,page-1)*size)을 검증하는 테스트가 전부 page=1(offset 0)만 사용 — page≥2, page≤0(clamp) 경로 무검증",
+          "suggested_action": "page=3 등 offset 비영(非零) 케이스와 page=0/음수 clamp 케이스를 OrderServiceTest에 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "order.xml selectOrders의 ORDER BY o.ordered_at DESC에 tie-breaker가 없어 동일 ordered_at 다건이면 페이지 간 행 중복/누락 가능. 같은 매퍼의 selectRecentByMember는 ', o.order_no DESC'를 갖고 있어 도메인 내 규약 불일치",
+          "suggested_action": "selectOrders ORDER BY에 , o.order_no DESC 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "캐리오버 미수정 — OrderViewControllerTest.java:234의 not(containsString(\">129000<\"))는 발화 불가한 부정 단언(포맷 훼손 시 실제 렌더는 '>129000원<')",
+          "suggested_action": "'>129000원<'로 교정하거나 삭제(실질 잠금은 233행이 전담)"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "캐리오버 미수정 — STORY 수용 기준 7번째 항목이 '유효 구간(effectiveStart~effectiveEnd)이'에서 문장 절단되어 객관 검증 문구가 미완(판정은 INF-ORD-003 원문으로 대체 수행)",
+          "suggested_action": "다음 build_story 시 INF-ORD-003 본문으로 AC 문장 복원"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "스토리 범위 밖 참고 — HEAD 커밋 cfc7b07 'SR-215 주문 목록 페이지당 건수 선택(10·30·50)'이 GATE-FUNC-order-001.json만 변경하고 소스 변경 0. SR-215 요구(10·30·50, 기본 30, URL 유지, 서버측 50 클램프)가 코드·INF-ORD-003(size 기본 20 그대로)·스토리 AC 어디에도 전파되지 않았다",
+          "suggested_action": "SR-215 라운드의 SR↔산출물 귀속을 오케스트레이터가 재확인(이 라운드 승인 AC 7건에는 미포함이라 게이트 판정에는 미반영)"
+        }
+      ]
+    },
+    {
+      "round": 20,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "concerns",
+        "regression": "concerns",
+        "baseline": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "high",
+          "layer": "regression",
+          "finding": "AC①(del_yn 상시필터)·AC⑥(endDate 당일 포함 경계)·AC⑥(AND 결합)을 실DB로 검증하던 OrderListIntegrationTest(6건)가 소스 트리·git 이력 어디에도 없이 사라졌다 — 2026-09-07자 surefire 리포트만 잔존하고 그 마지막 실행은 1 failure(404) + 1 error(fk_orders_member 위반 시드)였다. 현재 selectOrders/countOrders의 SQL 의미를 실DB로 잠그는 테스트가 0건(OrderDaoTest 2건은 selectDeliveries/selectLatestDeliveryStates 전용)",
+          "suggested_action": "OrderListIntegrationTest를 복원하고 시드를 MEMBERS 선삽입으로 FK 위반 없이 고칠 것. 실패한 테스트를 삭제해 스위트를 green으로 만들지 말 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": ".speclinker/test_baseline.json 부재로 위 테스트 클래스 소실(21→22 클래스, 226→220건)을 게이트가 탐지하지 못했다 — 직전 라운드 low 이슈가 실제 사고로 현실화",
+          "suggested_action": "`/sl-test --baseline`으로 이번 실측치(21 클래스 / 220건)를 기준선으로 기록"
+        },
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "화면 라우트 /order/**가 ApiKeyAuthFilter.isOpenRoute 화이트리스트라 필터를 통째로 스킵하는데 /order/list는 memberId 파라미터를 그대로 받아 list.html:66에서 회원명+회원ID+주문번호·상태·총액·주문일시를 렌더 → GET /order/list?memberId=M-0002로 무자격 타인 주문 이력 열람 성립. SR-204 정책상 허용이나 SR-207 round7이 GET /member/{id}를 동일 사유로 화이트리스트에서 제외한 선례와 모순",
+          "suggested_action": "SR-207 선례대로 evaluateMemberScope에 편입할지 SR로 확정하고, 현행 유지 시 무인증 열람 허용을 한계로 명시"
+        },
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "OrderService.list의 offset = Math.max(0,page-1)*size가 int 연산 — page=2147483647, size=20이면 오버플로로 offset이 음수(-40)가 되어 LIMIT 20 OFFSET -40 SQL 오류 500. page/size에 상·하한 검증이 없고(size 무제한), /order/list는 무인증 라우트라 자격 없이 500을 유발할 수 있다",
+          "suggested_action": "offset을 long으로 계산하거나 page 상한을 두고 size에 1~100 범위를 강제(SR-215의 '서버가 자른다' 요구와 함께 처리)"
+        },
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "Dev 기록의 'OrderDaoTest(SQL 실측)가 위 7개 수용 기준을 각각 케이스로 커버'가 사실과 다르다 — OrderDaoTest 2건은 selectDeliveries/selectLatestDeliveryStates(FUNC-order-006/SR-210) 전용이고 selectOrders/countOrders를 호출하지 않는다",
+          "suggested_action": "Dev 기록의 커버리지 서술을 실제 테스트 대상에 맞게 정정"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "AC③(offset = max(0,page-1)*size)을 검증하는 테스트가 전부 page=1(offset 0)만 사용 — page≥2, page≤0(clamp) 경로 무검증",
+          "suggested_action": "page=3 등 offset 비영(非零) 케이스와 page=0/음수 clamp 케이스를 OrderServiceTest에 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "order.xml selectOrders의 ORDER BY o.ordered_at DESC에 tie-breaker가 없어 동일 ordered_at 다건이면 페이지 간 행 중복/누락 가능. 같은 매퍼의 selectRecentByMember는 ', o.order_no DESC'를 갖고 있어 도메인 내 규약 불일치",
+          "suggested_action": "selectOrders ORDER BY에 , o.order_no DESC 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "캐리오버 미수정 — OrderViewControllerTest.java:234의 not(containsString(\">129000<\"))는 발화 불가한 부정 단언(포맷 훼손 시 실제 렌더는 '>129000원<')",
+          "suggested_action": "'>129000원<'로 교정하거나 삭제(실질 잠금은 233행이 전담)"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "캐리오버 미수정 — STORY 수용 기준 7번째 항목이 '유효 구간(effectiveStart~effectiveEnd)이'에서 문장 절단되어 객관 검증 문구가 미완(판정은 INF-ORD-003 원문으로 대체 수행)",
+          "suggested_action": "다음 build_story 시 INF-ORD-003 본문으로 AC 문장 복원"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "스토리 범위 밖 참고 — HEAD 커밋 cfc7b07 'SR-215 주문 목록 페이지당 건수 선택(10·30·50)'이 GATE-FUNC-order-001.json만 변경하고 소스 변경 0. SR-215 요구(10·30·50, 기본 30, URL 유지, 서버측 50 클램프)가 코드·INF-ORD-003(size 기본 20 그대로)·스토리 AC 어디에도 전파되지 않았다",
+          "suggested_action": "SR-215 라운드의 SR↔산출물 귀속을 오케스트레이터가 재확인(이 라운드 승인 AC 7건에는 미포함이라 게이트 판정에는 미반영)"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "shop-api: 기준선에 없는 소스 루트",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        }
+      ],
+      "layer": "baseline"
+    },
+    {
+      "round": 21,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "concerns",
+        "regression": "concerns",
+        "baseline": "concerns",
+        "scope": "fail"
+      },
+      "top_issues": [
+        {
+          "severity": "high",
+          "layer": "regression",
+          "finding": "AC①(del_yn 상시필터)·AC⑥(endDate 당일 포함 경계)·AC⑥(AND 결합)을 실DB로 검증하던 OrderListIntegrationTest(6건)가 소스 트리·git 이력 어디에도 없이 사라졌다 — 2026-09-07자 surefire 리포트만 잔존하고 그 마지막 실행은 1 failure(404) + 1 error(fk_orders_member 위반 시드)였다. 현재 selectOrders/countOrders의 SQL 의미를 실DB로 잠그는 테스트가 0건(OrderDaoTest 2건은 selectDeliveries/selectLatestDeliveryStates 전용)",
+          "suggested_action": "OrderListIntegrationTest를 복원하고 시드를 MEMBERS 선삽입으로 FK 위반 없이 고칠 것. 실패한 테스트를 삭제해 스위트를 green으로 만들지 말 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": ".speclinker/test_baseline.json 부재로 위 테스트 클래스 소실(21→22 클래스, 226→220건)을 게이트가 탐지하지 못했다 — 직전 라운드 low 이슈가 실제 사고로 현실화",
+          "suggested_action": "`/sl-test --baseline`으로 이번 실측치(21 클래스 / 220건)를 기준선으로 기록"
+        },
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "화면 라우트 /order/**가 ApiKeyAuthFilter.isOpenRoute 화이트리스트라 필터를 통째로 스킵하는데 /order/list는 memberId 파라미터를 그대로 받아 list.html:66에서 회원명+회원ID+주문번호·상태·총액·주문일시를 렌더 → GET /order/list?memberId=M-0002로 무자격 타인 주문 이력 열람 성립. SR-204 정책상 허용이나 SR-207 round7이 GET /member/{id}를 동일 사유로 화이트리스트에서 제외한 선례와 모순",
+          "suggested_action": "SR-207 선례대로 evaluateMemberScope에 편입할지 SR로 확정하고, 현행 유지 시 무인증 열람 허용을 한계로 명시"
+        },
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "OrderService.list의 offset = Math.max(0,page-1)*size가 int 연산 — page=2147483647, size=20이면 오버플로로 offset이 음수(-40)가 되어 LIMIT 20 OFFSET -40 SQL 오류 500. page/size에 상·하한 검증이 없고(size 무제한), /order/list는 무인증 라우트라 자격 없이 500을 유발할 수 있다",
+          "suggested_action": "offset을 long으로 계산하거나 page 상한을 두고 size에 1~100 범위를 강제(SR-215의 '서버가 자른다' 요구와 함께 처리)"
+        },
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "Dev 기록의 'OrderDaoTest(SQL 실측)가 위 7개 수용 기준을 각각 케이스로 커버'가 사실과 다르다 — OrderDaoTest 2건은 selectDeliveries/selectLatestDeliveryStates(FUNC-order-006/SR-210) 전용이고 selectOrders/countOrders를 호출하지 않는다",
+          "suggested_action": "Dev 기록의 커버리지 서술을 실제 테스트 대상에 맞게 정정"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "AC③(offset = max(0,page-1)*size)을 검증하는 테스트가 전부 page=1(offset 0)만 사용 — page≥2, page≤0(clamp) 경로 무검증",
+          "suggested_action": "page=3 등 offset 비영(非零) 케이스와 page=0/음수 clamp 케이스를 OrderServiceTest에 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "order.xml selectOrders의 ORDER BY o.ordered_at DESC에 tie-breaker가 없어 동일 ordered_at 다건이면 페이지 간 행 중복/누락 가능. 같은 매퍼의 selectRecentByMember는 ', o.order_no DESC'를 갖고 있어 도메인 내 규약 불일치",
+          "suggested_action": "selectOrders ORDER BY에 , o.order_no DESC 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "캐리오버 미수정 — OrderViewControllerTest.java:234의 not(containsString(\">129000<\"))는 발화 불가한 부정 단언(포맷 훼손 시 실제 렌더는 '>129000원<')",
+          "suggested_action": "'>129000원<'로 교정하거나 삭제(실질 잠금은 233행이 전담)"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "캐리오버 미수정 — STORY 수용 기준 7번째 항목이 '유효 구간(effectiveStart~effectiveEnd)이'에서 문장 절단되어 객관 검증 문구가 미완(판정은 INF-ORD-003 원문으로 대체 수행)",
+          "suggested_action": "다음 build_story 시 INF-ORD-003 본문으로 AC 문장 복원"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "스토리 범위 밖 참고 — HEAD 커밋 cfc7b07 'SR-215 주문 목록 페이지당 건수 선택(10·30·50)'이 GATE-FUNC-order-001.json만 변경하고 소스 변경 0. SR-215 요구(10·30·50, 기본 30, URL 유지, 서버측 50 클램프)가 코드·INF-ORD-003(size 기본 20 그대로)·스토리 AC 어디에도 전파되지 않았다",
+          "suggested_action": "SR-215 라운드의 SR↔산출물 귀속을 오케스트레이터가 재확인(이 라운드 승인 AC 7건에는 미포함이라 게이트 판정에는 미반영)"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "shop-api: 기준선에 없는 소스 루트",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .gitignore (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .understand-anything/linked-func-cache.json (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "구현 근거 없음: FUNC-order-001 (no-changes-classified)",
+          "suggested_action": "linked_func 주석이 있는지, 변경이 실제로 있었는지 확인하세요"
+        }
+      ],
+      "layer": "scope"
+    },
+    {
+      "round": 22,
+      "gate": "CONCERNS",
+      "human": {
+        "decision": "waiver",
+        "by": "사람",
+        "at": "2026-09-09T11:06:04",
+        "comment": "이번 라운드 소스 변경 없음(기존 구현 재검증) — out_of_scope 2건(.gitignore, linked-func-cache.json)은 이 FUNC와 무관한 선행 변경",
+        "targets": []
+      },
+      "layers": {
+        "spec": "pass",
+        "security": "concerns",
+        "regression": "concerns",
+        "baseline": "concerns",
+        "scope": "fail",
+        "rules": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "high",
+          "layer": "regression",
+          "finding": "AC①(del_yn 상시필터)·AC⑥(endDate 당일 포함 경계)·AC⑥(AND 결합)을 실DB로 검증하던 OrderListIntegrationTest(6건)가 소스 트리·git 이력 어디에도 없이 사라졌다 — 2026-09-07자 surefire 리포트만 잔존하고 그 마지막 실행은 1 failure(404) + 1 error(fk_orders_member 위반 시드)였다. 현재 selectOrders/countOrders의 SQL 의미를 실DB로 잠그는 테스트가 0건(OrderDaoTest 2건은 selectDeliveries/selectLatestDeliveryStates 전용)",
+          "suggested_action": "OrderListIntegrationTest를 복원하고 시드를 MEMBERS 선삽입으로 FK 위반 없이 고칠 것. 실패한 테스트를 삭제해 스위트를 green으로 만들지 말 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": ".speclinker/test_baseline.json 부재로 위 테스트 클래스 소실(21→22 클래스, 226→220건)을 게이트가 탐지하지 못했다 — 직전 라운드 low 이슈가 실제 사고로 현실화",
+          "suggested_action": "`/sl-test --baseline`으로 이번 실측치(21 클래스 / 220건)를 기준선으로 기록"
+        },
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "화면 라우트 /order/**가 ApiKeyAuthFilter.isOpenRoute 화이트리스트라 필터를 통째로 스킵하는데 /order/list는 memberId 파라미터를 그대로 받아 list.html:66에서 회원명+회원ID+주문번호·상태·총액·주문일시를 렌더 → GET /order/list?memberId=M-0002로 무자격 타인 주문 이력 열람 성립. SR-204 정책상 허용이나 SR-207 round7이 GET /member/{id}를 동일 사유로 화이트리스트에서 제외한 선례와 모순",
+          "suggested_action": "SR-207 선례대로 evaluateMemberScope에 편입할지 SR로 확정하고, 현행 유지 시 무인증 열람 허용을 한계로 명시"
+        },
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "OrderService.list의 offset = Math.max(0,page-1)*size가 int 연산 — page=2147483647, size=20이면 오버플로로 offset이 음수(-40)가 되어 LIMIT 20 OFFSET -40 SQL 오류 500. page/size에 상·하한 검증이 없고(size 무제한), /order/list는 무인증 라우트라 자격 없이 500을 유발할 수 있다",
+          "suggested_action": "offset을 long으로 계산하거나 page 상한을 두고 size에 1~100 범위를 강제(SR-215의 '서버가 자른다' 요구와 함께 처리)"
+        },
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "Dev 기록의 'OrderDaoTest(SQL 실측)가 위 7개 수용 기준을 각각 케이스로 커버'가 사실과 다르다 — OrderDaoTest 2건은 selectDeliveries/selectLatestDeliveryStates(FUNC-order-006/SR-210) 전용이고 selectOrders/countOrders를 호출하지 않는다",
+          "suggested_action": "Dev 기록의 커버리지 서술을 실제 테스트 대상에 맞게 정정"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "AC③(offset = max(0,page-1)*size)을 검증하는 테스트가 전부 page=1(offset 0)만 사용 — page≥2, page≤0(clamp) 경로 무검증",
+          "suggested_action": "page=3 등 offset 비영(非零) 케이스와 page=0/음수 clamp 케이스를 OrderServiceTest에 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "order.xml selectOrders의 ORDER BY o.ordered_at DESC에 tie-breaker가 없어 동일 ordered_at 다건이면 페이지 간 행 중복/누락 가능. 같은 매퍼의 selectRecentByMember는 ', o.order_no DESC'를 갖고 있어 도메인 내 규약 불일치",
+          "suggested_action": "selectOrders ORDER BY에 , o.order_no DESC 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "캐리오버 미수정 — OrderViewControllerTest.java:234의 not(containsString(\">129000<\"))는 발화 불가한 부정 단언(포맷 훼손 시 실제 렌더는 '>129000원<')",
+          "suggested_action": "'>129000원<'로 교정하거나 삭제(실질 잠금은 233행이 전담)"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "캐리오버 미수정 — STORY 수용 기준 7번째 항목이 '유효 구간(effectiveStart~effectiveEnd)이'에서 문장 절단되어 객관 검증 문구가 미완(판정은 INF-ORD-003 원문으로 대체 수행)",
+          "suggested_action": "다음 build_story 시 INF-ORD-003 본문으로 AC 문장 복원"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "스토리 범위 밖 참고 — HEAD 커밋 cfc7b07 'SR-215 주문 목록 페이지당 건수 선택(10·30·50)'이 GATE-FUNC-order-001.json만 변경하고 소스 변경 0. SR-215 요구(10·30·50, 기본 30, URL 유지, 서버측 50 클램프)가 코드·INF-ORD-003(size 기본 20 그대로)·스토리 AC 어디에도 전파되지 않았다",
+          "suggested_action": "SR-215 라운드의 SR↔산출물 귀속을 오케스트레이터가 재확인(이 라운드 승인 AC 7건에는 미포함이라 게이트 판정에는 미반영)"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "shop-api: 기준선에 없는 소스 루트",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .gitignore (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .understand-anything/linked-func-cache.json (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "구현 근거 없음: FUNC-order-001 (no-changes-classified)",
+          "suggested_action": "linked_func 주석이 있는지, 변경이 실제로 있었는지 확인하세요"
+        }
+      ],
+      "layer": "rules"
+    },
+    {
+      "round": 23,
+      "gate": "CONCERNS",
+      "human": {
+        "decision": "approve",
+        "by": "사람",
+        "at": "2026-09-09T11:38:42",
+        "comment": "SR-210 round23 QA CONCERNS 수용 — SR-225(금액 표기 천 단위) 착수를 위해 story를 Done 전이 후 재개방. round23 잔여 이슈(회귀테스트 소실·baseline 미기록·무인증 라우트 열람·offset 오버플로 등)는 story 후속 TODO로 유지하고 별도 SR/작업으로 추적한다.",
+        "targets": []
+      },
+      "layers": {
+        "spec": "pass",
+        "security": "concerns",
+        "regression": "concerns",
+        "baseline": "concerns",
+        "scope": "fail",
+        "rules": "pass",
+        "conformance": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "high",
+          "layer": "regression",
+          "finding": "AC①(del_yn 상시필터)·AC⑥(endDate 당일 포함 경계)·AC⑥(AND 결합)을 실DB로 검증하던 OrderListIntegrationTest(6건)가 소스 트리·git 이력 어디에도 없이 사라졌다 — 2026-09-07자 surefire 리포트만 잔존하고 그 마지막 실행은 1 failure(404) + 1 error(fk_orders_member 위반 시드)였다. 현재 selectOrders/countOrders의 SQL 의미를 실DB로 잠그는 테스트가 0건(OrderDaoTest 2건은 selectDeliveries/selectLatestDeliveryStates 전용)",
+          "suggested_action": "OrderListIntegrationTest를 복원하고 시드를 MEMBERS 선삽입으로 FK 위반 없이 고칠 것. 실패한 테스트를 삭제해 스위트를 green으로 만들지 말 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": ".speclinker/test_baseline.json 부재로 위 테스트 클래스 소실(21→22 클래스, 226→220건)을 게이트가 탐지하지 못했다 — 직전 라운드 low 이슈가 실제 사고로 현실화",
+          "suggested_action": "`/sl-test --baseline`으로 이번 실측치(21 클래스 / 220건)를 기준선으로 기록"
+        },
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "화면 라우트 /order/**가 ApiKeyAuthFilter.isOpenRoute 화이트리스트라 필터를 통째로 스킵하는데 /order/list는 memberId 파라미터를 그대로 받아 list.html:66에서 회원명+회원ID+주문번호·상태·총액·주문일시를 렌더 → GET /order/list?memberId=M-0002로 무자격 타인 주문 이력 열람 성립. SR-204 정책상 허용이나 SR-207 round7이 GET /member/{id}를 동일 사유로 화이트리스트에서 제외한 선례와 모순",
+          "suggested_action": "SR-207 선례대로 evaluateMemberScope에 편입할지 SR로 확정하고, 현행 유지 시 무인증 열람 허용을 한계로 명시"
+        },
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "OrderService.list의 offset = Math.max(0,page-1)*size가 int 연산 — page=2147483647, size=20이면 오버플로로 offset이 음수(-40)가 되어 LIMIT 20 OFFSET -40 SQL 오류 500. page/size에 상·하한 검증이 없고(size 무제한), /order/list는 무인증 라우트라 자격 없이 500을 유발할 수 있다",
+          "suggested_action": "offset을 long으로 계산하거나 page 상한을 두고 size에 1~100 범위를 강제(SR-215의 '서버가 자른다' 요구와 함께 처리)"
+        },
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "Dev 기록의 'OrderDaoTest(SQL 실측)가 위 7개 수용 기준을 각각 케이스로 커버'가 사실과 다르다 — OrderDaoTest 2건은 selectDeliveries/selectLatestDeliveryStates(FUNC-order-006/SR-210) 전용이고 selectOrders/countOrders를 호출하지 않는다",
+          "suggested_action": "Dev 기록의 커버리지 서술을 실제 테스트 대상에 맞게 정정"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "AC③(offset = max(0,page-1)*size)을 검증하는 테스트가 전부 page=1(offset 0)만 사용 — page≥2, page≤0(clamp) 경로 무검증",
+          "suggested_action": "page=3 등 offset 비영(非零) 케이스와 page=0/음수 clamp 케이스를 OrderServiceTest에 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "order.xml selectOrders의 ORDER BY o.ordered_at DESC에 tie-breaker가 없어 동일 ordered_at 다건이면 페이지 간 행 중복/누락 가능. 같은 매퍼의 selectRecentByMember는 ', o.order_no DESC'를 갖고 있어 도메인 내 규약 불일치",
+          "suggested_action": "selectOrders ORDER BY에 , o.order_no DESC 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "캐리오버 미수정 — OrderViewControllerTest.java:234의 not(containsString(\">129000<\"))는 발화 불가한 부정 단언(포맷 훼손 시 실제 렌더는 '>129000원<')",
+          "suggested_action": "'>129000원<'로 교정하거나 삭제(실질 잠금은 233행이 전담)"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "캐리오버 미수정 — STORY 수용 기준 7번째 항목이 '유효 구간(effectiveStart~effectiveEnd)이'에서 문장 절단되어 객관 검증 문구가 미완(판정은 INF-ORD-003 원문으로 대체 수행)",
+          "suggested_action": "다음 build_story 시 INF-ORD-003 본문으로 AC 문장 복원"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "스토리 범위 밖 참고 — HEAD 커밋 cfc7b07 'SR-215 주문 목록 페이지당 건수 선택(10·30·50)'이 GATE-FUNC-order-001.json만 변경하고 소스 변경 0. SR-215 요구(10·30·50, 기본 30, URL 유지, 서버측 50 클램프)가 코드·INF-ORD-003(size 기본 20 그대로)·스토리 AC 어디에도 전파되지 않았다",
+          "suggested_action": "SR-215 라운드의 SR↔산출물 귀속을 오케스트레이터가 재확인(이 라운드 승인 AC 7건에는 미포함이라 게이트 판정에는 미반영)"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "shop-api: 기준선에 없는 소스 루트",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .gitignore (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .understand-anything/linked-func-cache.json (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "구현 근거 없음: FUNC-order-001 (no-changes-classified)",
+          "suggested_action": "linked_func 주석이 있는지, 변경이 실제로 있었는지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "conformance",
+          "finding": "이번 라운드 계획↔구현 대조 자체는 전건 근거 확보(7/7). 다만 story Dev 기록·QA·test-agent가 이미 지적한 회귀 안전망 결손(소실된 OrderListIntegrationTest 6건, test_baseline.json 미기록, offset 오버플로/타이브레이커 부재)은 축 B(정합) 범위 밖 — qa-agent 소관 유지.",
+          "suggested_action": "QA CONCERNS 권고사항(테스트 복원·baseline 기록)은 오케스트레이터가 별도 후속 조치로 추적",
+          "confidence": "high"
+        }
+      ],
+      "layer": "conformance"
+    },
+    {
+      "round": 24,
+      "gate": "CONCERNS",
+      "human": {
+        "decision": "track",
+        "by": "사람",
+        "at": "2026-09-09T12:08:47",
+        "comment": "SR-225(금액 표기 천 단위 구분) QA CONCERNS 수용 — Layer1 스펙 pass(SR-225 요구 3항 전건 충족, 소스 변경 0건). Layer2/3 concerns는 전량 캐리오버(round1~24 반복 지적)이거나 이번 SR과 무관한 변경(SR-216 소관 미커밋 2건)이다: (1)OrderListIntegrationTest 6건 복원 [high, 장기 미해소 부채, 이번 SR 범위 아님], (2).gitignore modules/ 제외로 인한 scope_verify 가시성 한계 [medium, 툴링 이슈], (3)무인증 memberId 열람·offset 오버플로 [medium, 2026-09-09 11:38 사람 승인에서 이미 후속 SR 추적 수용됨], (4)무관 미커밋 2건 분리 커밋 필요 [low]. 신규 코드 변경이 없어 신규 위험 없음 — 후속 추적으로 등록하고 SR-225를 완료 처리한다.",
+        "targets": []
+      },
+      "layers": {
+        "spec": "pass",
+        "security": "concerns",
+        "regression": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "high",
+          "layer": "regression",
+          "finding": "캐리오버 미해소 — AC①(del_yn 상시필터)·AC⑥(기간 경계·AND 결합)을 실DB로 검증하던 OrderListIntegrationTest(6건)가 여전히 소스 트리에 부재. selectOrders/countOrders의 SQL 의미를 실DB로 잠그는 테스트가 0건인 상태가 유지된다(OrderDaoTest 2건은 selectDeliveries/selectLatestDeliveryStates 전용). 이번 라운드는 운영 코드 무변경이라 위험이 증가하지는 않았다",
+          "suggested_action": "OrderListIntegrationTest를 복원하고 시드를 MEMBERS 선삽입으로 FK 위반 없이 고칠 것. 실패한 테스트를 삭제해 스위트를 green으로 만들지 말 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "신규 발견 — 워크스페이스 .gitignore:12가 modules/를 제외하고 대상 소스는 중첩 저장소(modules/shop-api, 자체 git)에 있다. 따라서 scope_verify.py(축 A)는 대상 소스 diff를 구조적으로 볼 수 없고, GATE가 매 라운드 보고하는 '구현 근거 없음: FUNC-order-001 (no-changes-classified)'는 변경 부재가 아니라 가시성 부재다. QA는 중첩 저장소에서 git status/diff를 직접 실행해 dev 주장(운영 코드 무변경, 테스트 1파일만 수정)을 사실로 확인했다",
+          "suggested_action": "축 A가 중첩 저장소(modules/shop-api)의 git을 읽도록 고치거나, 이 가시성 한계를 게이트 산출물에 명시할 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "캐리오버(신규 아님) — 무인증 화면 라우트 GET /order/list?memberId=... 로 타인 주문 이력 열람 성립, 그리고 OrderService.list의 offset = Math.max(0,page-1)*size가 int 연산이라 page 극단값에서 오버플로 → 음수 OFFSET 500. 이번 라운드 운영 코드 변경이 0건이라 신규 표면은 없다. 2026-09-09 11:38 사람 승인에서 후속 SR 추적으로 이미 수용됨",
+          "suggested_action": "SR-207 선례대로 evaluateMemberScope 편입 여부를 SR로 확정하고, offset을 long 계산으로 바꾸거나 page 상한·size 범위(1~100)를 강제할 것"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "이번 라운드 교정 확인 — OrderViewControllerTest.java:238 부정 단언이 not(containsString(\">129000원<\"))로 바뀌어 발화 가능해졌다(포맷팅 제거 뮤테이션 시 렌더가 <td>129000원</td>가 되어 매칭). 다만 같은 뮤테이션을 237행 양성 단언 containsString(\"129,000원\")도 잡으므로 독립 탐지력은 제한적 — round14~16·23의 지적 계약 자체는 충족",
+          "suggested_action": "추가 조치 불필요(캐리오버 종결). 향후 금액 열이 늘어날 때만 대상 요소를 특정한 xpath 단언으로 강화 검토"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "중첩 저장소 워킹트리에 이번 FUNC와 무관한 미커밋 변경 2건이 함께 남아 있다 — templates/product/detail.html, ProductViewControllerTest.java (SR-216/FUNC-order-010 소관). 워크스페이스 게이트에서는 modules/ 제외 때문에 보이지 않는다",
+          "suggested_action": "커밋 경계가 섞이지 않도록 FUNC-order-010 변경분을 분리 커밋할 것"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "캐리오버 미해소 — STORY 수용 기준 7번째 항목이 '유효 구간(effectiveStart~effectiveEnd)이'에서 문장 절단되어 객관 검증 문구가 미완(판정은 INF-ORD-003 원문으로 대체 수행)",
+          "suggested_action": "다음 build_story 시 INF-ORD-003 본문으로 AC 문장 복원"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "캐리오버 — order.xml selectOrders의 ORDER BY o.ordered_at DESC에 tie-breaker가 없어 동일 ordered_at 다건이면 페이지 간 행 중복/누락 가능. 같은 매퍼의 selectRecentByMember는 ', o.order_no DESC'를 갖고 있어 도메인 내 규약 불일치",
+          "suggested_action": "selectOrders ORDER BY에 , o.order_no DESC 추가"
+        }
+      ]
+    },
+    {
+      "round": 25,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "concerns",
+        "security": "concerns",
+        "regression": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "신규 — UIS-ORD-001 spec.md가 SR-224 미반영. 삭제된 옛 문구 '조회 결과 없음'을 §2 시나리오3·시나리오4·§5 표시조건 행에 그대로 기술하고 조건별 2분기(조회 결과가 없습니다 / 조건에 맞는 결과가 없습니다)를 담지 않았다. revision_history도 v1.2(SR-210)에서 멈춤. round7·round13 두 번의 사람 rework 결정이 이 파일의 현행화를 SR 산출물의 일부로 확정한 선례가 있어 scope_freeze '요구 본문 외 제외'에 해당하지 않는다. 함께 라인 앵커도 드리프트: §3 ② list.html:28-44→실제 28-51, ③ 51-65→58-72, ④ 68-70→79-82, §5 그리드 :51→58, 배송상태 :62→69, 빈결과 문구 :68→79-80, 전체N건 :70→82",
+          "suggested_action": "spec.md §2 시나리오3·4와 §5 표시조건을 2분기 문구로 갱신하고 라인 앵커를 현행 소스로 정정한 뒤 revision_history v1.3(SR-224)을 추가할 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "캐리오버 미해소 — AC①(del_yn 상시필터)·AC⑥(기간 경계·AND 결합)을 실DB로 검증하던 OrderListIntegrationTest(6건)가 여전히 소스 트리에 부재. selectOrders/countOrders의 SQL 의미를 실DB로 잠그는 테스트가 0건인 상태가 유지된다(OrderDaoTest 2건은 배송 조회 전용). 이번 라운드는 운영 코드 무변경(템플릿 텍스트 + 테스트 2파일)이라 위험이 증가하지는 않았다",
+          "suggested_action": "OrderListIntegrationTest를 복원하고 시드를 MEMBERS 선삽입으로 FK 위반 없이 고칠 것. 실패한 테스트를 삭제해 스위트를 green으로 만들지 말 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "캐리오버 — 워크스페이스 .gitignore:12가 modules/를 제외하고 대상 소스는 중첩 저장소(modules/shop-api, 자체 git)에 있다. 따라서 scope_verify.py(축 A)는 대상 소스 diff를 구조적으로 볼 수 없고, GATE가 매 라운드 보고하는 '구현 근거 없음(no-changes-classified)'은 변경 부재가 아니라 가시성 부재다. 이번 라운드도 QA가 중첩 저장소에서 git status/diff를 직접 실행해 dev 주장(list.html + OrderViewControllerTest 2파일만 변경, 운영 로직 무변경)을 사실로 확인했다",
+          "suggested_action": "축 A가 중첩 저장소(modules/shop-api)의 git을 읽도록 고치거나, 이 가시성 한계를 게이트 산출물에 명시할 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "캐리오버(신규 아님) — 무인증 화면 라우트 GET /order/list?memberId=... 로 타인 주문 이력 열람 성립, 그리고 OrderService.java:72의 offset = Math.max(0,page-1)*size가 int 연산이라 page 극단값에서 오버플로 → 음수 OFFSET 500. 이번 라운드 변경은 사용자 입력을 출력에 넣지 않는 정적 텍스트 2줄이라 신규 공격 표면은 0건(조건식은 비교만 수행). 2026-09-09 11:38 사람 승인에서 후속 SR 추적으로 수용됐으나 코드상 미해소라 pass로 내리지 않는다",
+          "suggested_action": "SR-207 선례대로 evaluateMemberScope 편입 여부를 SR로 확정하고, offset을 long 계산으로 바꾸거나 page 상한·size 범위(1~100)를 강제할 것"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "신규 — SR-224 '조건 있음' 경로가 4개 조건 중 memberId 하나만 테스트된다(orderList_emptyResultWithMemberIdFilter_showsConditionSpecificMessage). orderState/startDate/endDate 단독 케이스가 없어 list.html:80에서 그 3항을 지우고 :79에서 대응 항을 지우는 뮤테이션을 스위트가 잡지 못한다. startDate/endDate는 SR-209 프리셋 버튼(최근 7/30/90일)이 채우는 주 사용 경로라 실사용 노출도가 높다",
+          "suggested_action": "기간 조건(startDate/endDate)만 걸린 0건 케이스 테스트 1건 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "신규 — 서버 기본 기간과 '무조건' 문구의 의미 충돌. 이 화면은 product/cart와 달리 사용자가 조건을 안 넣어도 OrderService.list가 최근 30일 필터를 항상 적용하므로, 31일 이전 주문만 있으면 실제 데이터가 있는데도 '조회 결과가 없습니다'(데이터 자체가 없다는 함의)가 렌더된다. 요구 본문의 '검색 조건'을 사용자 입력 기준으로 읽은 이번 구현이 틀렸다고 보긴 어려우나 확정 문답에 이 케이스가 없다",
+          "suggested_action": "UIS-ORD-001에 '검색 조건 = 사용자 입력 조건(서버 기본 기간 제외)'으로 명문화하거나 요청자에게 기본 기간 적용 시 문구 선택을 확인할 것"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "캐리오버 미해소 — STORY 수용 기준 7번째 항목이 '유효 구간(effectiveStart~effectiveEnd)이'에서 문장 절단되어 객관 검증 문구가 미완(판정은 INF-ORD-003 원문으로 대체 수행)",
+          "suggested_action": "다음 build_story 시 INF-ORD-003 본문으로 AC 문장 복원"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "캐리오버 — order.xml selectOrders의 ORDER BY o.ordered_at DESC에 tie-breaker가 없어 동일 ordered_at 다건이면 페이지 간 행 중복/누락 가능. 같은 매퍼의 selectRecentByMember는 ', o.order_no DESC'를 갖고 있어 도메인 내 규약 불일치. 이번 SR과 무관",
+          "suggested_action": "selectOrders ORDER BY에 , o.order_no DESC 추가"
+        }
+      ]
+    },
+    {
+      "round": 26,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "concerns",
+        "security": "concerns",
+        "regression": "concerns",
+        "baseline": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "신규 — UIS-ORD-001 spec.md가 SR-224 미반영. 삭제된 옛 문구 '조회 결과 없음'을 §2 시나리오3·시나리오4·§5 표시조건 행에 그대로 기술하고 조건별 2분기(조회 결과가 없습니다 / 조건에 맞는 결과가 없습니다)를 담지 않았다. revision_history도 v1.2(SR-210)에서 멈춤. round7·round13 두 번의 사람 rework 결정이 이 파일의 현행화를 SR 산출물의 일부로 확정한 선례가 있어 scope_freeze '요구 본문 외 제외'에 해당하지 않는다. 함께 라인 앵커도 드리프트: §3 ② list.html:28-44→실제 28-51, ③ 51-65→58-72, ④ 68-70→79-82, §5 그리드 :51→58, 배송상태 :62→69, 빈결과 문구 :68→79-80, 전체N건 :70→82",
+          "suggested_action": "spec.md §2 시나리오3·4와 §5 표시조건을 2분기 문구로 갱신하고 라인 앵커를 현행 소스로 정정한 뒤 revision_history v1.3(SR-224)을 추가할 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "캐리오버 미해소 — AC①(del_yn 상시필터)·AC⑥(기간 경계·AND 결합)을 실DB로 검증하던 OrderListIntegrationTest(6건)가 여전히 소스 트리에 부재. selectOrders/countOrders의 SQL 의미를 실DB로 잠그는 테스트가 0건인 상태가 유지된다(OrderDaoTest 2건은 배송 조회 전용). 이번 라운드는 운영 코드 무변경(템플릿 텍스트 + 테스트 2파일)이라 위험이 증가하지는 않았다",
+          "suggested_action": "OrderListIntegrationTest를 복원하고 시드를 MEMBERS 선삽입으로 FK 위반 없이 고칠 것. 실패한 테스트를 삭제해 스위트를 green으로 만들지 말 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "캐리오버 — 워크스페이스 .gitignore:12가 modules/를 제외하고 대상 소스는 중첩 저장소(modules/shop-api, 자체 git)에 있다. 따라서 scope_verify.py(축 A)는 대상 소스 diff를 구조적으로 볼 수 없고, GATE가 매 라운드 보고하는 '구현 근거 없음(no-changes-classified)'은 변경 부재가 아니라 가시성 부재다. 이번 라운드도 QA가 중첩 저장소에서 git status/diff를 직접 실행해 dev 주장(list.html + OrderViewControllerTest 2파일만 변경, 운영 로직 무변경)을 사실로 확인했다",
+          "suggested_action": "축 A가 중첩 저장소(modules/shop-api)의 git을 읽도록 고치거나, 이 가시성 한계를 게이트 산출물에 명시할 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "캐리오버(신규 아님) — 무인증 화면 라우트 GET /order/list?memberId=... 로 타인 주문 이력 열람 성립, 그리고 OrderService.java:72의 offset = Math.max(0,page-1)*size가 int 연산이라 page 극단값에서 오버플로 → 음수 OFFSET 500. 이번 라운드 변경은 사용자 입력을 출력에 넣지 않는 정적 텍스트 2줄이라 신규 공격 표면은 0건(조건식은 비교만 수행). 2026-09-09 11:38 사람 승인에서 후속 SR 추적으로 수용됐으나 코드상 미해소라 pass로 내리지 않는다",
+          "suggested_action": "SR-207 선례대로 evaluateMemberScope 편입 여부를 SR로 확정하고, offset을 long 계산으로 바꾸거나 page 상한·size 범위(1~100)를 강제할 것"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "신규 — SR-224 '조건 있음' 경로가 4개 조건 중 memberId 하나만 테스트된다(orderList_emptyResultWithMemberIdFilter_showsConditionSpecificMessage). orderState/startDate/endDate 단독 케이스가 없어 list.html:80에서 그 3항을 지우고 :79에서 대응 항을 지우는 뮤테이션을 스위트가 잡지 못한다. startDate/endDate는 SR-209 프리셋 버튼(최근 7/30/90일)이 채우는 주 사용 경로라 실사용 노출도가 높다",
+          "suggested_action": "기간 조건(startDate/endDate)만 걸린 0건 케이스 테스트 1건 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "신규 — 서버 기본 기간과 '무조건' 문구의 의미 충돌. 이 화면은 product/cart와 달리 사용자가 조건을 안 넣어도 OrderService.list가 최근 30일 필터를 항상 적용하므로, 31일 이전 주문만 있으면 실제 데이터가 있는데도 '조회 결과가 없습니다'(데이터 자체가 없다는 함의)가 렌더된다. 요구 본문의 '검색 조건'을 사용자 입력 기준으로 읽은 이번 구현이 틀렸다고 보긴 어려우나 확정 문답에 이 케이스가 없다",
+          "suggested_action": "UIS-ORD-001에 '검색 조건 = 사용자 입력 조건(서버 기본 기간 제외)'으로 명문화하거나 요청자에게 기본 기간 적용 시 문구 선택을 확인할 것"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "캐리오버 미해소 — STORY 수용 기준 7번째 항목이 '유효 구간(effectiveStart~effectiveEnd)이'에서 문장 절단되어 객관 검증 문구가 미완(판정은 INF-ORD-003 원문으로 대체 수행)",
+          "suggested_action": "다음 build_story 시 INF-ORD-003 본문으로 AC 문장 복원"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "캐리오버 — order.xml selectOrders의 ORDER BY o.ordered_at DESC에 tie-breaker가 없어 동일 ordered_at 다건이면 페이지 간 행 중복/누락 가능. 같은 매퍼의 selectRecentByMember는 ', o.order_no DESC'를 갖고 있어 도메인 내 규약 불일치. 이번 SR과 무관",
+          "suggested_action": "selectOrders ORDER BY에 , o.order_no DESC 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "shop-api: 기준선에 없는 소스 루트",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        }
+      ],
+      "layer": "baseline"
+    },
+    {
+      "round": 27,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "concerns",
+        "security": "concerns",
+        "regression": "concerns",
+        "baseline": "concerns",
+        "scope": "fail"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "신규 — UIS-ORD-001 spec.md가 SR-224 미반영. 삭제된 옛 문구 '조회 결과 없음'을 §2 시나리오3·시나리오4·§5 표시조건 행에 그대로 기술하고 조건별 2분기(조회 결과가 없습니다 / 조건에 맞는 결과가 없습니다)를 담지 않았다. revision_history도 v1.2(SR-210)에서 멈춤. round7·round13 두 번의 사람 rework 결정이 이 파일의 현행화를 SR 산출물의 일부로 확정한 선례가 있어 scope_freeze '요구 본문 외 제외'에 해당하지 않는다. 함께 라인 앵커도 드리프트: §3 ② list.html:28-44→실제 28-51, ③ 51-65→58-72, ④ 68-70→79-82, §5 그리드 :51→58, 배송상태 :62→69, 빈결과 문구 :68→79-80, 전체N건 :70→82",
+          "suggested_action": "spec.md §2 시나리오3·4와 §5 표시조건을 2분기 문구로 갱신하고 라인 앵커를 현행 소스로 정정한 뒤 revision_history v1.3(SR-224)을 추가할 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "캐리오버 미해소 — AC①(del_yn 상시필터)·AC⑥(기간 경계·AND 결합)을 실DB로 검증하던 OrderListIntegrationTest(6건)가 여전히 소스 트리에 부재. selectOrders/countOrders의 SQL 의미를 실DB로 잠그는 테스트가 0건인 상태가 유지된다(OrderDaoTest 2건은 배송 조회 전용). 이번 라운드는 운영 코드 무변경(템플릿 텍스트 + 테스트 2파일)이라 위험이 증가하지는 않았다",
+          "suggested_action": "OrderListIntegrationTest를 복원하고 시드를 MEMBERS 선삽입으로 FK 위반 없이 고칠 것. 실패한 테스트를 삭제해 스위트를 green으로 만들지 말 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "캐리오버 — 워크스페이스 .gitignore:12가 modules/를 제외하고 대상 소스는 중첩 저장소(modules/shop-api, 자체 git)에 있다. 따라서 scope_verify.py(축 A)는 대상 소스 diff를 구조적으로 볼 수 없고, GATE가 매 라운드 보고하는 '구현 근거 없음(no-changes-classified)'은 변경 부재가 아니라 가시성 부재다. 이번 라운드도 QA가 중첩 저장소에서 git status/diff를 직접 실행해 dev 주장(list.html + OrderViewControllerTest 2파일만 변경, 운영 로직 무변경)을 사실로 확인했다",
+          "suggested_action": "축 A가 중첩 저장소(modules/shop-api)의 git을 읽도록 고치거나, 이 가시성 한계를 게이트 산출물에 명시할 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "캐리오버(신규 아님) — 무인증 화면 라우트 GET /order/list?memberId=... 로 타인 주문 이력 열람 성립, 그리고 OrderService.java:72의 offset = Math.max(0,page-1)*size가 int 연산이라 page 극단값에서 오버플로 → 음수 OFFSET 500. 이번 라운드 변경은 사용자 입력을 출력에 넣지 않는 정적 텍스트 2줄이라 신규 공격 표면은 0건(조건식은 비교만 수행). 2026-09-09 11:38 사람 승인에서 후속 SR 추적으로 수용됐으나 코드상 미해소라 pass로 내리지 않는다",
+          "suggested_action": "SR-207 선례대로 evaluateMemberScope 편입 여부를 SR로 확정하고, offset을 long 계산으로 바꾸거나 page 상한·size 범위(1~100)를 강제할 것"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "신규 — SR-224 '조건 있음' 경로가 4개 조건 중 memberId 하나만 테스트된다(orderList_emptyResultWithMemberIdFilter_showsConditionSpecificMessage). orderState/startDate/endDate 단독 케이스가 없어 list.html:80에서 그 3항을 지우고 :79에서 대응 항을 지우는 뮤테이션을 스위트가 잡지 못한다. startDate/endDate는 SR-209 프리셋 버튼(최근 7/30/90일)이 채우는 주 사용 경로라 실사용 노출도가 높다",
+          "suggested_action": "기간 조건(startDate/endDate)만 걸린 0건 케이스 테스트 1건 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "신규 — 서버 기본 기간과 '무조건' 문구의 의미 충돌. 이 화면은 product/cart와 달리 사용자가 조건을 안 넣어도 OrderService.list가 최근 30일 필터를 항상 적용하므로, 31일 이전 주문만 있으면 실제 데이터가 있는데도 '조회 결과가 없습니다'(데이터 자체가 없다는 함의)가 렌더된다. 요구 본문의 '검색 조건'을 사용자 입력 기준으로 읽은 이번 구현이 틀렸다고 보긴 어려우나 확정 문답에 이 케이스가 없다",
+          "suggested_action": "UIS-ORD-001에 '검색 조건 = 사용자 입력 조건(서버 기본 기간 제외)'으로 명문화하거나 요청자에게 기본 기간 적용 시 문구 선택을 확인할 것"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "캐리오버 미해소 — STORY 수용 기준 7번째 항목이 '유효 구간(effectiveStart~effectiveEnd)이'에서 문장 절단되어 객관 검증 문구가 미완(판정은 INF-ORD-003 원문으로 대체 수행)",
+          "suggested_action": "다음 build_story 시 INF-ORD-003 본문으로 AC 문장 복원"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "캐리오버 — order.xml selectOrders의 ORDER BY o.ordered_at DESC에 tie-breaker가 없어 동일 ordered_at 다건이면 페이지 간 행 중복/누락 가능. 같은 매퍼의 selectRecentByMember는 ', o.order_no DESC'를 갖고 있어 도메인 내 규약 불일치. 이번 SR과 무관",
+          "suggested_action": "selectOrders ORDER BY에 , o.order_no DESC 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "shop-api: 기준선에 없는 소스 루트",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .gitignore (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .understand-anything/linked-func-cache.json (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        }
+      ],
+      "layer": "scope"
+    },
+    {
+      "round": 28,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "concerns",
+        "security": "concerns",
+        "regression": "concerns",
+        "baseline": "concerns",
+        "scope": "fail",
+        "rules": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "신규 — UIS-ORD-001 spec.md가 SR-224 미반영. 삭제된 옛 문구 '조회 결과 없음'을 §2 시나리오3·시나리오4·§5 표시조건 행에 그대로 기술하고 조건별 2분기(조회 결과가 없습니다 / 조건에 맞는 결과가 없습니다)를 담지 않았다. revision_history도 v1.2(SR-210)에서 멈춤. round7·round13 두 번의 사람 rework 결정이 이 파일의 현행화를 SR 산출물의 일부로 확정한 선례가 있어 scope_freeze '요구 본문 외 제외'에 해당하지 않는다. 함께 라인 앵커도 드리프트: §3 ② list.html:28-44→실제 28-51, ③ 51-65→58-72, ④ 68-70→79-82, §5 그리드 :51→58, 배송상태 :62→69, 빈결과 문구 :68→79-80, 전체N건 :70→82",
+          "suggested_action": "spec.md §2 시나리오3·4와 §5 표시조건을 2분기 문구로 갱신하고 라인 앵커를 현행 소스로 정정한 뒤 revision_history v1.3(SR-224)을 추가할 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "캐리오버 미해소 — AC①(del_yn 상시필터)·AC⑥(기간 경계·AND 결합)을 실DB로 검증하던 OrderListIntegrationTest(6건)가 여전히 소스 트리에 부재. selectOrders/countOrders의 SQL 의미를 실DB로 잠그는 테스트가 0건인 상태가 유지된다(OrderDaoTest 2건은 배송 조회 전용). 이번 라운드는 운영 코드 무변경(템플릿 텍스트 + 테스트 2파일)이라 위험이 증가하지는 않았다",
+          "suggested_action": "OrderListIntegrationTest를 복원하고 시드를 MEMBERS 선삽입으로 FK 위반 없이 고칠 것. 실패한 테스트를 삭제해 스위트를 green으로 만들지 말 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "캐리오버 — 워크스페이스 .gitignore:12가 modules/를 제외하고 대상 소스는 중첩 저장소(modules/shop-api, 자체 git)에 있다. 따라서 scope_verify.py(축 A)는 대상 소스 diff를 구조적으로 볼 수 없고, GATE가 매 라운드 보고하는 '구현 근거 없음(no-changes-classified)'은 변경 부재가 아니라 가시성 부재다. 이번 라운드도 QA가 중첩 저장소에서 git status/diff를 직접 실행해 dev 주장(list.html + OrderViewControllerTest 2파일만 변경, 운영 로직 무변경)을 사실로 확인했다",
+          "suggested_action": "축 A가 중첩 저장소(modules/shop-api)의 git을 읽도록 고치거나, 이 가시성 한계를 게이트 산출물에 명시할 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "캐리오버(신규 아님) — 무인증 화면 라우트 GET /order/list?memberId=... 로 타인 주문 이력 열람 성립, 그리고 OrderService.java:72의 offset = Math.max(0,page-1)*size가 int 연산이라 page 극단값에서 오버플로 → 음수 OFFSET 500. 이번 라운드 변경은 사용자 입력을 출력에 넣지 않는 정적 텍스트 2줄이라 신규 공격 표면은 0건(조건식은 비교만 수행). 2026-09-09 11:38 사람 승인에서 후속 SR 추적으로 수용됐으나 코드상 미해소라 pass로 내리지 않는다",
+          "suggested_action": "SR-207 선례대로 evaluateMemberScope 편입 여부를 SR로 확정하고, offset을 long 계산으로 바꾸거나 page 상한·size 범위(1~100)를 강제할 것"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "신규 — SR-224 '조건 있음' 경로가 4개 조건 중 memberId 하나만 테스트된다(orderList_emptyResultWithMemberIdFilter_showsConditionSpecificMessage). orderState/startDate/endDate 단독 케이스가 없어 list.html:80에서 그 3항을 지우고 :79에서 대응 항을 지우는 뮤테이션을 스위트가 잡지 못한다. startDate/endDate는 SR-209 프리셋 버튼(최근 7/30/90일)이 채우는 주 사용 경로라 실사용 노출도가 높다",
+          "suggested_action": "기간 조건(startDate/endDate)만 걸린 0건 케이스 테스트 1건 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "신규 — 서버 기본 기간과 '무조건' 문구의 의미 충돌. 이 화면은 product/cart와 달리 사용자가 조건을 안 넣어도 OrderService.list가 최근 30일 필터를 항상 적용하므로, 31일 이전 주문만 있으면 실제 데이터가 있는데도 '조회 결과가 없습니다'(데이터 자체가 없다는 함의)가 렌더된다. 요구 본문의 '검색 조건'을 사용자 입력 기준으로 읽은 이번 구현이 틀렸다고 보긴 어려우나 확정 문답에 이 케이스가 없다",
+          "suggested_action": "UIS-ORD-001에 '검색 조건 = 사용자 입력 조건(서버 기본 기간 제외)'으로 명문화하거나 요청자에게 기본 기간 적용 시 문구 선택을 확인할 것"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "캐리오버 미해소 — STORY 수용 기준 7번째 항목이 '유효 구간(effectiveStart~effectiveEnd)이'에서 문장 절단되어 객관 검증 문구가 미완(판정은 INF-ORD-003 원문으로 대체 수행)",
+          "suggested_action": "다음 build_story 시 INF-ORD-003 본문으로 AC 문장 복원"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "캐리오버 — order.xml selectOrders의 ORDER BY o.ordered_at DESC에 tie-breaker가 없어 동일 ordered_at 다건이면 페이지 간 행 중복/누락 가능. 같은 매퍼의 selectRecentByMember는 ', o.order_no DESC'를 갖고 있어 도메인 내 규약 불일치. 이번 SR과 무관",
+          "suggested_action": "selectOrders ORDER BY에 , o.order_no DESC 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "shop-api: 기준선에 없는 소스 루트",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .gitignore (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .understand-anything/linked-func-cache.json (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        }
+      ],
+      "layer": "rules"
+    },
+    {
+      "round": 29,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "concerns",
+        "security": "concerns",
+        "regression": "concerns",
+        "baseline": "concerns",
+        "scope": "fail",
+        "rules": "pass",
+        "conformance": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "신규 — UIS-ORD-001 spec.md가 SR-224 미반영. 삭제된 옛 문구 '조회 결과 없음'을 §2 시나리오3·시나리오4·§5 표시조건 행에 그대로 기술하고 조건별 2분기(조회 결과가 없습니다 / 조건에 맞는 결과가 없습니다)를 담지 않았다. revision_history도 v1.2(SR-210)에서 멈춤. round7·round13 두 번의 사람 rework 결정이 이 파일의 현행화를 SR 산출물의 일부로 확정한 선례가 있어 scope_freeze '요구 본문 외 제외'에 해당하지 않는다. 함께 라인 앵커도 드리프트: §3 ② list.html:28-44→실제 28-51, ③ 51-65→58-72, ④ 68-70→79-82, §5 그리드 :51→58, 배송상태 :62→69, 빈결과 문구 :68→79-80, 전체N건 :70→82",
+          "suggested_action": "spec.md §2 시나리오3·4와 §5 표시조건을 2분기 문구로 갱신하고 라인 앵커를 현행 소스로 정정한 뒤 revision_history v1.3(SR-224)을 추가할 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "캐리오버 미해소 — AC①(del_yn 상시필터)·AC⑥(기간 경계·AND 결합)을 실DB로 검증하던 OrderListIntegrationTest(6건)가 여전히 소스 트리에 부재. selectOrders/countOrders의 SQL 의미를 실DB로 잠그는 테스트가 0건인 상태가 유지된다(OrderDaoTest 2건은 배송 조회 전용). 이번 라운드는 운영 코드 무변경(템플릿 텍스트 + 테스트 2파일)이라 위험이 증가하지는 않았다",
+          "suggested_action": "OrderListIntegrationTest를 복원하고 시드를 MEMBERS 선삽입으로 FK 위반 없이 고칠 것. 실패한 테스트를 삭제해 스위트를 green으로 만들지 말 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "캐리오버 — 워크스페이스 .gitignore:12가 modules/를 제외하고 대상 소스는 중첩 저장소(modules/shop-api, 자체 git)에 있다. 따라서 scope_verify.py(축 A)는 대상 소스 diff를 구조적으로 볼 수 없고, GATE가 매 라운드 보고하는 '구현 근거 없음(no-changes-classified)'은 변경 부재가 아니라 가시성 부재다. 이번 라운드도 QA가 중첩 저장소에서 git status/diff를 직접 실행해 dev 주장(list.html + OrderViewControllerTest 2파일만 변경, 운영 로직 무변경)을 사실로 확인했다",
+          "suggested_action": "축 A가 중첩 저장소(modules/shop-api)의 git을 읽도록 고치거나, 이 가시성 한계를 게이트 산출물에 명시할 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "캐리오버(신규 아님) — 무인증 화면 라우트 GET /order/list?memberId=... 로 타인 주문 이력 열람 성립, 그리고 OrderService.java:72의 offset = Math.max(0,page-1)*size가 int 연산이라 page 극단값에서 오버플로 → 음수 OFFSET 500. 이번 라운드 변경은 사용자 입력을 출력에 넣지 않는 정적 텍스트 2줄이라 신규 공격 표면은 0건(조건식은 비교만 수행). 2026-09-09 11:38 사람 승인에서 후속 SR 추적으로 수용됐으나 코드상 미해소라 pass로 내리지 않는다",
+          "suggested_action": "SR-207 선례대로 evaluateMemberScope 편입 여부를 SR로 확정하고, offset을 long 계산으로 바꾸거나 page 상한·size 범위(1~100)를 강제할 것"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "신규 — SR-224 '조건 있음' 경로가 4개 조건 중 memberId 하나만 테스트된다(orderList_emptyResultWithMemberIdFilter_showsConditionSpecificMessage). orderState/startDate/endDate 단독 케이스가 없어 list.html:80에서 그 3항을 지우고 :79에서 대응 항을 지우는 뮤테이션을 스위트가 잡지 못한다. startDate/endDate는 SR-209 프리셋 버튼(최근 7/30/90일)이 채우는 주 사용 경로라 실사용 노출도가 높다",
+          "suggested_action": "기간 조건(startDate/endDate)만 걸린 0건 케이스 테스트 1건 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "신규 — 서버 기본 기간과 '무조건' 문구의 의미 충돌. 이 화면은 product/cart와 달리 사용자가 조건을 안 넣어도 OrderService.list가 최근 30일 필터를 항상 적용하므로, 31일 이전 주문만 있으면 실제 데이터가 있는데도 '조회 결과가 없습니다'(데이터 자체가 없다는 함의)가 렌더된다. 요구 본문의 '검색 조건'을 사용자 입력 기준으로 읽은 이번 구현이 틀렸다고 보긴 어려우나 확정 문답에 이 케이스가 없다",
+          "suggested_action": "UIS-ORD-001에 '검색 조건 = 사용자 입력 조건(서버 기본 기간 제외)'으로 명문화하거나 요청자에게 기본 기간 적용 시 문구 선택을 확인할 것"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "캐리오버 미해소 — STORY 수용 기준 7번째 항목이 '유효 구간(effectiveStart~effectiveEnd)이'에서 문장 절단되어 객관 검증 문구가 미완(판정은 INF-ORD-003 원문으로 대체 수행)",
+          "suggested_action": "다음 build_story 시 INF-ORD-003 본문으로 AC 문장 복원"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "캐리오버 — order.xml selectOrders의 ORDER BY o.ordered_at DESC에 tie-breaker가 없어 동일 ordered_at 다건이면 페이지 간 행 중복/누락 가능. 같은 매퍼의 selectRecentByMember는 ', o.order_no DESC'를 갖고 있어 도메인 내 규약 불일치. 이번 SR과 무관",
+          "suggested_action": "selectOrders ORDER BY에 , o.order_no DESC 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "shop-api: 기준선에 없는 소스 루트",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .gitignore (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .understand-anything/linked-func-cache.json (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "medium",
+          "layer": "conformance",
+          "finding": "축A(scope_verify.py)가 out_of_scope 2건(.gitignore, .understand-anything/linked-func-cache.json)을 보고 — 사용자 확정 규칙상 스코프 불일치는 그 자체로 게이트를 FAIL시킨다. 단, 실제 diff 내용을 직접 확인한 결과 두 파일 모두 이번 FUNC-order-001의 SR-224 작업(빈 목록 안내 문구 분기)과 무관: (1) .gitignore diff는 `.speclinker/job_logs/`·`app_process.json`·`app_*.log` 무시 패턴 3줄 추가뿐(워크스페이스 운영 로그 관리, 화면/API와 무관), (2) linked-func-cache.json diff는 전체 키의 경로 접두어를 `_src/shop-api/`→`modules/shop-api/`로 일괄 치환한 캐시 재생성 산출물이며 FUNC-order-001 관련 라인은 값 변경 없음(다른 FUNC 항목 추가/재정렬만 존재). round16 GATE 이력에서도 동일 2파일이 동일 사유로 waiver 처리된 전례와 일치.",
+          "suggested_action": "사람 승인권자가 이전 round16과 동일하게 waiver 처리(무관한 워크스페이스 공용 파일 변경으로 확인됨)하거나, 정책상 매 라운드 별도 확인이 필요하면 명시적으로 재승인.",
+          "confidence": "high"
+        }
+      ],
+      "layer": "conformance"
+    },
+    {
+      "round": 30,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "concerns",
+        "security": "concerns",
+        "regression": "concerns",
+        "baseline": "concerns",
+        "scope": "fail",
+        "rules": "pass",
+        "conformance": "pass",
+        "stories": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "신규 — UIS-ORD-001 spec.md가 SR-224 미반영. 삭제된 옛 문구 '조회 결과 없음'을 §2 시나리오3·시나리오4·§5 표시조건 행에 그대로 기술하고 조건별 2분기(조회 결과가 없습니다 / 조건에 맞는 결과가 없습니다)를 담지 않았다. revision_history도 v1.2(SR-210)에서 멈춤. round7·round13 두 번의 사람 rework 결정이 이 파일의 현행화를 SR 산출물의 일부로 확정한 선례가 있어 scope_freeze '요구 본문 외 제외'에 해당하지 않는다. 함께 라인 앵커도 드리프트: §3 ② list.html:28-44→실제 28-51, ③ 51-65→58-72, ④ 68-70→79-82, §5 그리드 :51→58, 배송상태 :62→69, 빈결과 문구 :68→79-80, 전체N건 :70→82",
+          "suggested_action": "spec.md §2 시나리오3·4와 §5 표시조건을 2분기 문구로 갱신하고 라인 앵커를 현행 소스로 정정한 뒤 revision_history v1.3(SR-224)을 추가할 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "캐리오버 미해소 — AC①(del_yn 상시필터)·AC⑥(기간 경계·AND 결합)을 실DB로 검증하던 OrderListIntegrationTest(6건)가 여전히 소스 트리에 부재. selectOrders/countOrders의 SQL 의미를 실DB로 잠그는 테스트가 0건인 상태가 유지된다(OrderDaoTest 2건은 배송 조회 전용). 이번 라운드는 운영 코드 무변경(템플릿 텍스트 + 테스트 2파일)이라 위험이 증가하지는 않았다",
+          "suggested_action": "OrderListIntegrationTest를 복원하고 시드를 MEMBERS 선삽입으로 FK 위반 없이 고칠 것. 실패한 테스트를 삭제해 스위트를 green으로 만들지 말 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "캐리오버 — 워크스페이스 .gitignore:12가 modules/를 제외하고 대상 소스는 중첩 저장소(modules/shop-api, 자체 git)에 있다. 따라서 scope_verify.py(축 A)는 대상 소스 diff를 구조적으로 볼 수 없고, GATE가 매 라운드 보고하는 '구현 근거 없음(no-changes-classified)'은 변경 부재가 아니라 가시성 부재다. 이번 라운드도 QA가 중첩 저장소에서 git status/diff를 직접 실행해 dev 주장(list.html + OrderViewControllerTest 2파일만 변경, 운영 로직 무변경)을 사실로 확인했다",
+          "suggested_action": "축 A가 중첩 저장소(modules/shop-api)의 git을 읽도록 고치거나, 이 가시성 한계를 게이트 산출물에 명시할 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "캐리오버(신규 아님) — 무인증 화면 라우트 GET /order/list?memberId=... 로 타인 주문 이력 열람 성립, 그리고 OrderService.java:72의 offset = Math.max(0,page-1)*size가 int 연산이라 page 극단값에서 오버플로 → 음수 OFFSET 500. 이번 라운드 변경은 사용자 입력을 출력에 넣지 않는 정적 텍스트 2줄이라 신규 공격 표면은 0건(조건식은 비교만 수행). 2026-09-09 11:38 사람 승인에서 후속 SR 추적으로 수용됐으나 코드상 미해소라 pass로 내리지 않는다",
+          "suggested_action": "SR-207 선례대로 evaluateMemberScope 편입 여부를 SR로 확정하고, offset을 long 계산으로 바꾸거나 page 상한·size 범위(1~100)를 강제할 것"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "신규 — SR-224 '조건 있음' 경로가 4개 조건 중 memberId 하나만 테스트된다(orderList_emptyResultWithMemberIdFilter_showsConditionSpecificMessage). orderState/startDate/endDate 단독 케이스가 없어 list.html:80에서 그 3항을 지우고 :79에서 대응 항을 지우는 뮤테이션을 스위트가 잡지 못한다. startDate/endDate는 SR-209 프리셋 버튼(최근 7/30/90일)이 채우는 주 사용 경로라 실사용 노출도가 높다",
+          "suggested_action": "기간 조건(startDate/endDate)만 걸린 0건 케이스 테스트 1건 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "신규 — 서버 기본 기간과 '무조건' 문구의 의미 충돌. 이 화면은 product/cart와 달리 사용자가 조건을 안 넣어도 OrderService.list가 최근 30일 필터를 항상 적용하므로, 31일 이전 주문만 있으면 실제 데이터가 있는데도 '조회 결과가 없습니다'(데이터 자체가 없다는 함의)가 렌더된다. 요구 본문의 '검색 조건'을 사용자 입력 기준으로 읽은 이번 구현이 틀렸다고 보긴 어려우나 확정 문답에 이 케이스가 없다",
+          "suggested_action": "UIS-ORD-001에 '검색 조건 = 사용자 입력 조건(서버 기본 기간 제외)'으로 명문화하거나 요청자에게 기본 기간 적용 시 문구 선택을 확인할 것"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "캐리오버 미해소 — STORY 수용 기준 7번째 항목이 '유효 구간(effectiveStart~effectiveEnd)이'에서 문장 절단되어 객관 검증 문구가 미완(판정은 INF-ORD-003 원문으로 대체 수행)",
+          "suggested_action": "다음 build_story 시 INF-ORD-003 본문으로 AC 문장 복원"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "캐리오버 — order.xml selectOrders의 ORDER BY o.ordered_at DESC에 tie-breaker가 없어 동일 ordered_at 다건이면 페이지 간 행 중복/누락 가능. 같은 매퍼의 selectRecentByMember는 ', o.order_no DESC'를 갖고 있어 도메인 내 규약 불일치. 이번 SR과 무관",
+          "suggested_action": "selectOrders ORDER BY에 , o.order_no DESC 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "shop-api: 기준선에 없는 소스 루트",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .gitignore (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .understand-anything/linked-func-cache.json (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "medium",
+          "layer": "conformance",
+          "finding": "축A(scope_verify.py)가 out_of_scope 2건(.gitignore, .understand-anything/linked-func-cache.json)을 보고 — 사용자 확정 규칙상 스코프 불일치는 그 자체로 게이트를 FAIL시킨다. 단, 실제 diff 내용을 직접 확인한 결과 두 파일 모두 이번 FUNC-order-001의 SR-224 작업(빈 목록 안내 문구 분기)과 무관: (1) .gitignore diff는 `.speclinker/job_logs/`·`app_process.json`·`app_*.log` 무시 패턴 3줄 추가뿐(워크스페이스 운영 로그 관리, 화면/API와 무관), (2) linked-func-cache.json diff는 전체 키의 경로 접두어를 `_src/shop-api/`→`modules/shop-api/`로 일괄 치환한 캐시 재생성 산출물이며 FUNC-order-001 관련 라인은 값 변경 없음(다른 FUNC 항목 추가/재정렬만 존재). round16 GATE 이력에서도 동일 2파일이 동일 사유로 waiver 처리된 전례와 일치.",
+          "suggested_action": "사람 승인권자가 이전 round16과 동일하게 waiver 처리(무관한 워크스페이스 공용 파일 변경으로 확인됨)하거나, 정책상 매 라운드 별도 확인이 필요하면 명시적으로 재승인.",
+          "confidence": "high"
+        }
+      ],
+      "layer": "stories"
+    },
+    {
+      "round": 31,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "concerns",
+        "security": "concerns",
+        "regression": "concerns",
+        "baseline": "concerns",
+        "scope": "fail",
+        "rules": "pass",
+        "conformance": "pass",
+        "stories": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "신규 — UIS-ORD-001 spec.md가 SR-224 미반영. 삭제된 옛 문구 '조회 결과 없음'을 §2 시나리오3·시나리오4·§5 표시조건 행에 그대로 기술하고 조건별 2분기(조회 결과가 없습니다 / 조건에 맞는 결과가 없습니다)를 담지 않았다. revision_history도 v1.2(SR-210)에서 멈춤. round7·round13 두 번의 사람 rework 결정이 이 파일의 현행화를 SR 산출물의 일부로 확정한 선례가 있어 scope_freeze '요구 본문 외 제외'에 해당하지 않는다. 함께 라인 앵커도 드리프트: §3 ② list.html:28-44→실제 28-51, ③ 51-65→58-72, ④ 68-70→79-82, §5 그리드 :51→58, 배송상태 :62→69, 빈결과 문구 :68→79-80, 전체N건 :70→82",
+          "suggested_action": "spec.md §2 시나리오3·4와 §5 표시조건을 2분기 문구로 갱신하고 라인 앵커를 현행 소스로 정정한 뒤 revision_history v1.3(SR-224)을 추가할 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "캐리오버 미해소 — AC①(del_yn 상시필터)·AC⑥(기간 경계·AND 결합)을 실DB로 검증하던 OrderListIntegrationTest(6건)가 여전히 소스 트리에 부재. selectOrders/countOrders의 SQL 의미를 실DB로 잠그는 테스트가 0건인 상태가 유지된다(OrderDaoTest 2건은 배송 조회 전용). 이번 라운드는 운영 코드 무변경(템플릿 텍스트 + 테스트 2파일)이라 위험이 증가하지는 않았다",
+          "suggested_action": "OrderListIntegrationTest를 복원하고 시드를 MEMBERS 선삽입으로 FK 위반 없이 고칠 것. 실패한 테스트를 삭제해 스위트를 green으로 만들지 말 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "캐리오버 — 워크스페이스 .gitignore:12가 modules/를 제외하고 대상 소스는 중첩 저장소(modules/shop-api, 자체 git)에 있다. 따라서 scope_verify.py(축 A)는 대상 소스 diff를 구조적으로 볼 수 없고, GATE가 매 라운드 보고하는 '구현 근거 없음(no-changes-classified)'은 변경 부재가 아니라 가시성 부재다. 이번 라운드도 QA가 중첩 저장소에서 git status/diff를 직접 실행해 dev 주장(list.html + OrderViewControllerTest 2파일만 변경, 운영 로직 무변경)을 사실로 확인했다",
+          "suggested_action": "축 A가 중첩 저장소(modules/shop-api)의 git을 읽도록 고치거나, 이 가시성 한계를 게이트 산출물에 명시할 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "캐리오버(신규 아님) — 무인증 화면 라우트 GET /order/list?memberId=... 로 타인 주문 이력 열람 성립, 그리고 OrderService.java:72의 offset = Math.max(0,page-1)*size가 int 연산이라 page 극단값에서 오버플로 → 음수 OFFSET 500. 이번 라운드 변경은 사용자 입력을 출력에 넣지 않는 정적 텍스트 2줄이라 신규 공격 표면은 0건(조건식은 비교만 수행). 2026-09-09 11:38 사람 승인에서 후속 SR 추적으로 수용됐으나 코드상 미해소라 pass로 내리지 않는다",
+          "suggested_action": "SR-207 선례대로 evaluateMemberScope 편입 여부를 SR로 확정하고, offset을 long 계산으로 바꾸거나 page 상한·size 범위(1~100)를 강제할 것"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "신규 — SR-224 '조건 있음' 경로가 4개 조건 중 memberId 하나만 테스트된다(orderList_emptyResultWithMemberIdFilter_showsConditionSpecificMessage). orderState/startDate/endDate 단독 케이스가 없어 list.html:80에서 그 3항을 지우고 :79에서 대응 항을 지우는 뮤테이션을 스위트가 잡지 못한다. startDate/endDate는 SR-209 프리셋 버튼(최근 7/30/90일)이 채우는 주 사용 경로라 실사용 노출도가 높다",
+          "suggested_action": "기간 조건(startDate/endDate)만 걸린 0건 케이스 테스트 1건 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "신규 — 서버 기본 기간과 '무조건' 문구의 의미 충돌. 이 화면은 product/cart와 달리 사용자가 조건을 안 넣어도 OrderService.list가 최근 30일 필터를 항상 적용하므로, 31일 이전 주문만 있으면 실제 데이터가 있는데도 '조회 결과가 없습니다'(데이터 자체가 없다는 함의)가 렌더된다. 요구 본문의 '검색 조건'을 사용자 입력 기준으로 읽은 이번 구현이 틀렸다고 보긴 어려우나 확정 문답에 이 케이스가 없다",
+          "suggested_action": "UIS-ORD-001에 '검색 조건 = 사용자 입력 조건(서버 기본 기간 제외)'으로 명문화하거나 요청자에게 기본 기간 적용 시 문구 선택을 확인할 것"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "캐리오버 미해소 — STORY 수용 기준 7번째 항목이 '유효 구간(effectiveStart~effectiveEnd)이'에서 문장 절단되어 객관 검증 문구가 미완(판정은 INF-ORD-003 원문으로 대체 수행)",
+          "suggested_action": "다음 build_story 시 INF-ORD-003 본문으로 AC 문장 복원"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "캐리오버 — order.xml selectOrders의 ORDER BY o.ordered_at DESC에 tie-breaker가 없어 동일 ordered_at 다건이면 페이지 간 행 중복/누락 가능. 같은 매퍼의 selectRecentByMember는 ', o.order_no DESC'를 갖고 있어 도메인 내 규약 불일치. 이번 SR과 무관",
+          "suggested_action": "selectOrders ORDER BY에 , o.order_no DESC 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "shop-api: 기준선에 없는 소스 루트",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .gitignore (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .understand-anything/linked-func-cache.json (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "medium",
+          "layer": "conformance",
+          "finding": "축A(scope_verify.py)가 out_of_scope 2건(.gitignore, .understand-anything/linked-func-cache.json)을 보고 — 사용자 확정 규칙상 스코프 불일치는 그 자체로 게이트를 FAIL시킨다. 단, 실제 diff 내용을 직접 확인한 결과 두 파일 모두 이번 FUNC-order-001의 SR-224 작업(빈 목록 안내 문구 분기)과 무관: (1) .gitignore diff는 `.speclinker/job_logs/`·`app_process.json`·`app_*.log` 무시 패턴 3줄 추가뿐(워크스페이스 운영 로그 관리, 화면/API와 무관), (2) linked-func-cache.json diff는 전체 키의 경로 접두어를 `_src/shop-api/`→`modules/shop-api/`로 일괄 치환한 캐시 재생성 산출물이며 FUNC-order-001 관련 라인은 값 변경 없음(다른 FUNC 항목 추가/재정렬만 존재). round16 GATE 이력에서도 동일 2파일이 동일 사유로 waiver 처리된 전례와 일치.",
+          "suggested_action": "사람 승인권자가 이전 round16과 동일하게 waiver 처리(무관한 워크스페이스 공용 파일 변경으로 확인됨)하거나, 정책상 매 라운드 별도 확인이 필요하면 명시적으로 재승인.",
+          "confidence": "high"
+        }
+      ],
+      "layer": "stories"
+    },
+    {
+      "round": 32,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "concerns",
+        "security": "concerns",
+        "regression": "concerns",
+        "baseline": "concerns",
+        "scope": "fail",
+        "rules": "pass",
+        "conformance": "pass",
+        "stories": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "신규 — UIS-ORD-001 spec.md가 SR-224 미반영. 삭제된 옛 문구 '조회 결과 없음'을 §2 시나리오3·시나리오4·§5 표시조건 행에 그대로 기술하고 조건별 2분기(조회 결과가 없습니다 / 조건에 맞는 결과가 없습니다)를 담지 않았다. revision_history도 v1.2(SR-210)에서 멈춤. round7·round13 두 번의 사람 rework 결정이 이 파일의 현행화를 SR 산출물의 일부로 확정한 선례가 있어 scope_freeze '요구 본문 외 제외'에 해당하지 않는다. 함께 라인 앵커도 드리프트: §3 ② list.html:28-44→실제 28-51, ③ 51-65→58-72, ④ 68-70→79-82, §5 그리드 :51→58, 배송상태 :62→69, 빈결과 문구 :68→79-80, 전체N건 :70→82",
+          "suggested_action": "spec.md §2 시나리오3·4와 §5 표시조건을 2분기 문구로 갱신하고 라인 앵커를 현행 소스로 정정한 뒤 revision_history v1.3(SR-224)을 추가할 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "캐리오버 미해소 — AC①(del_yn 상시필터)·AC⑥(기간 경계·AND 결합)을 실DB로 검증하던 OrderListIntegrationTest(6건)가 여전히 소스 트리에 부재. selectOrders/countOrders의 SQL 의미를 실DB로 잠그는 테스트가 0건인 상태가 유지된다(OrderDaoTest 2건은 배송 조회 전용). 이번 라운드는 운영 코드 무변경(템플릿 텍스트 + 테스트 2파일)이라 위험이 증가하지는 않았다",
+          "suggested_action": "OrderListIntegrationTest를 복원하고 시드를 MEMBERS 선삽입으로 FK 위반 없이 고칠 것. 실패한 테스트를 삭제해 스위트를 green으로 만들지 말 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "캐리오버 — 워크스페이스 .gitignore:12가 modules/를 제외하고 대상 소스는 중첩 저장소(modules/shop-api, 자체 git)에 있다. 따라서 scope_verify.py(축 A)는 대상 소스 diff를 구조적으로 볼 수 없고, GATE가 매 라운드 보고하는 '구현 근거 없음(no-changes-classified)'은 변경 부재가 아니라 가시성 부재다. 이번 라운드도 QA가 중첩 저장소에서 git status/diff를 직접 실행해 dev 주장(list.html + OrderViewControllerTest 2파일만 변경, 운영 로직 무변경)을 사실로 확인했다",
+          "suggested_action": "축 A가 중첩 저장소(modules/shop-api)의 git을 읽도록 고치거나, 이 가시성 한계를 게이트 산출물에 명시할 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "캐리오버(신규 아님) — 무인증 화면 라우트 GET /order/list?memberId=... 로 타인 주문 이력 열람 성립, 그리고 OrderService.java:72의 offset = Math.max(0,page-1)*size가 int 연산이라 page 극단값에서 오버플로 → 음수 OFFSET 500. 이번 라운드 변경은 사용자 입력을 출력에 넣지 않는 정적 텍스트 2줄이라 신규 공격 표면은 0건(조건식은 비교만 수행). 2026-09-09 11:38 사람 승인에서 후속 SR 추적으로 수용됐으나 코드상 미해소라 pass로 내리지 않는다",
+          "suggested_action": "SR-207 선례대로 evaluateMemberScope 편입 여부를 SR로 확정하고, offset을 long 계산으로 바꾸거나 page 상한·size 범위(1~100)를 강제할 것"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "신규 — SR-224 '조건 있음' 경로가 4개 조건 중 memberId 하나만 테스트된다(orderList_emptyResultWithMemberIdFilter_showsConditionSpecificMessage). orderState/startDate/endDate 단독 케이스가 없어 list.html:80에서 그 3항을 지우고 :79에서 대응 항을 지우는 뮤테이션을 스위트가 잡지 못한다. startDate/endDate는 SR-209 프리셋 버튼(최근 7/30/90일)이 채우는 주 사용 경로라 실사용 노출도가 높다",
+          "suggested_action": "기간 조건(startDate/endDate)만 걸린 0건 케이스 테스트 1건 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "신규 — 서버 기본 기간과 '무조건' 문구의 의미 충돌. 이 화면은 product/cart와 달리 사용자가 조건을 안 넣어도 OrderService.list가 최근 30일 필터를 항상 적용하므로, 31일 이전 주문만 있으면 실제 데이터가 있는데도 '조회 결과가 없습니다'(데이터 자체가 없다는 함의)가 렌더된다. 요구 본문의 '검색 조건'을 사용자 입력 기준으로 읽은 이번 구현이 틀렸다고 보긴 어려우나 확정 문답에 이 케이스가 없다",
+          "suggested_action": "UIS-ORD-001에 '검색 조건 = 사용자 입력 조건(서버 기본 기간 제외)'으로 명문화하거나 요청자에게 기본 기간 적용 시 문구 선택을 확인할 것"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "캐리오버 미해소 — STORY 수용 기준 7번째 항목이 '유효 구간(effectiveStart~effectiveEnd)이'에서 문장 절단되어 객관 검증 문구가 미완(판정은 INF-ORD-003 원문으로 대체 수행)",
+          "suggested_action": "다음 build_story 시 INF-ORD-003 본문으로 AC 문장 복원"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "캐리오버 — order.xml selectOrders의 ORDER BY o.ordered_at DESC에 tie-breaker가 없어 동일 ordered_at 다건이면 페이지 간 행 중복/누락 가능. 같은 매퍼의 selectRecentByMember는 ', o.order_no DESC'를 갖고 있어 도메인 내 규약 불일치. 이번 SR과 무관",
+          "suggested_action": "selectOrders ORDER BY에 , o.order_no DESC 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "shop-api: 기준선에 없는 소스 루트",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .gitignore (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .understand-anything/linked-func-cache.json (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "medium",
+          "layer": "conformance",
+          "finding": "축A(scope_verify.py)가 out_of_scope 2건(.gitignore, .understand-anything/linked-func-cache.json)을 보고 — 사용자 확정 규칙상 스코프 불일치는 그 자체로 게이트를 FAIL시킨다. 단, 실제 diff 내용을 직접 확인한 결과 두 파일 모두 이번 FUNC-order-001의 SR-224 작업(빈 목록 안내 문구 분기)과 무관: (1) .gitignore diff는 `.speclinker/job_logs/`·`app_process.json`·`app_*.log` 무시 패턴 3줄 추가뿐(워크스페이스 운영 로그 관리, 화면/API와 무관), (2) linked-func-cache.json diff는 전체 키의 경로 접두어를 `_src/shop-api/`→`modules/shop-api/`로 일괄 치환한 캐시 재생성 산출물이며 FUNC-order-001 관련 라인은 값 변경 없음(다른 FUNC 항목 추가/재정렬만 존재). round16 GATE 이력에서도 동일 2파일이 동일 사유로 waiver 처리된 전례와 일치.",
+          "suggested_action": "사람 승인권자가 이전 round16과 동일하게 waiver 처리(무관한 워크스페이스 공용 파일 변경으로 확인됨)하거나, 정책상 매 라운드 별도 확인이 필요하면 명시적으로 재승인.",
+          "confidence": "high"
+        },
+        {
+          "severity": "low",
+          "layer": "stories",
+          "finding": "고친 화면 부품에 스토리가 없습니다: src/components/OrderSummaryCard.tsx",
+          "suggested_action": "그 부품의 상태를 스토리로 남기세요 — 없으면 다음 사람이 그 상태를 볼 방법이 없습니다. 차단하려면 하네스 규칙 `story-per-component`(pair 검사)를 채택하세요(/rules 제안 탭) — 축 C가 must로 막습니다"
+        },
+        {
+          "severity": "low",
+          "layer": "stories",
+          "finding": "고친 화면 부품에 스토리가 없습니다: src/pages/OrderListPage.tsx",
+          "suggested_action": "그 부품의 상태를 스토리로 남기세요 — 없으면 다음 사람이 그 상태를 볼 방법이 없습니다. 차단하려면 하네스 규칙 `story-per-component`(pair 검사)를 채택하세요(/rules 제안 탭) — 축 C가 must로 막습니다"
+        }
+      ],
+      "layer": "stories"
+    },
+    {
+      "round": 33,
+      "gate": "FAIL",
+      "human": null,
+      "layers": {
+        "spec": "concerns",
+        "security": "concerns",
+        "regression": "concerns",
+        "baseline": "concerns",
+        "scope": "fail",
+        "rules": "fail",
+        "conformance": "pass",
+        "stories": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "신규 — UIS-ORD-001 spec.md가 SR-224 미반영. 삭제된 옛 문구 '조회 결과 없음'을 §2 시나리오3·시나리오4·§5 표시조건 행에 그대로 기술하고 조건별 2분기(조회 결과가 없습니다 / 조건에 맞는 결과가 없습니다)를 담지 않았다. revision_history도 v1.2(SR-210)에서 멈춤. round7·round13 두 번의 사람 rework 결정이 이 파일의 현행화를 SR 산출물의 일부로 확정한 선례가 있어 scope_freeze '요구 본문 외 제외'에 해당하지 않는다. 함께 라인 앵커도 드리프트: §3 ② list.html:28-44→실제 28-51, ③ 51-65→58-72, ④ 68-70→79-82, §5 그리드 :51→58, 배송상태 :62→69, 빈결과 문구 :68→79-80, 전체N건 :70→82",
+          "suggested_action": "spec.md §2 시나리오3·4와 §5 표시조건을 2분기 문구로 갱신하고 라인 앵커를 현행 소스로 정정한 뒤 revision_history v1.3(SR-224)을 추가할 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "캐리오버 미해소 — AC①(del_yn 상시필터)·AC⑥(기간 경계·AND 결합)을 실DB로 검증하던 OrderListIntegrationTest(6건)가 여전히 소스 트리에 부재. selectOrders/countOrders의 SQL 의미를 실DB로 잠그는 테스트가 0건인 상태가 유지된다(OrderDaoTest 2건은 배송 조회 전용). 이번 라운드는 운영 코드 무변경(템플릿 텍스트 + 테스트 2파일)이라 위험이 증가하지는 않았다",
+          "suggested_action": "OrderListIntegrationTest를 복원하고 시드를 MEMBERS 선삽입으로 FK 위반 없이 고칠 것. 실패한 테스트를 삭제해 스위트를 green으로 만들지 말 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "캐리오버 — 워크스페이스 .gitignore:12가 modules/를 제외하고 대상 소스는 중첩 저장소(modules/shop-api, 자체 git)에 있다. 따라서 scope_verify.py(축 A)는 대상 소스 diff를 구조적으로 볼 수 없고, GATE가 매 라운드 보고하는 '구현 근거 없음(no-changes-classified)'은 변경 부재가 아니라 가시성 부재다. 이번 라운드도 QA가 중첩 저장소에서 git status/diff를 직접 실행해 dev 주장(list.html + OrderViewControllerTest 2파일만 변경, 운영 로직 무변경)을 사실로 확인했다",
+          "suggested_action": "축 A가 중첩 저장소(modules/shop-api)의 git을 읽도록 고치거나, 이 가시성 한계를 게이트 산출물에 명시할 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "캐리오버(신규 아님) — 무인증 화면 라우트 GET /order/list?memberId=... 로 타인 주문 이력 열람 성립, 그리고 OrderService.java:72의 offset = Math.max(0,page-1)*size가 int 연산이라 page 극단값에서 오버플로 → 음수 OFFSET 500. 이번 라운드 변경은 사용자 입력을 출력에 넣지 않는 정적 텍스트 2줄이라 신규 공격 표면은 0건(조건식은 비교만 수행). 2026-09-09 11:38 사람 승인에서 후속 SR 추적으로 수용됐으나 코드상 미해소라 pass로 내리지 않는다",
+          "suggested_action": "SR-207 선례대로 evaluateMemberScope 편입 여부를 SR로 확정하고, offset을 long 계산으로 바꾸거나 page 상한·size 범위(1~100)를 강제할 것"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "신규 — SR-224 '조건 있음' 경로가 4개 조건 중 memberId 하나만 테스트된다(orderList_emptyResultWithMemberIdFilter_showsConditionSpecificMessage). orderState/startDate/endDate 단독 케이스가 없어 list.html:80에서 그 3항을 지우고 :79에서 대응 항을 지우는 뮤테이션을 스위트가 잡지 못한다. startDate/endDate는 SR-209 프리셋 버튼(최근 7/30/90일)이 채우는 주 사용 경로라 실사용 노출도가 높다",
+          "suggested_action": "기간 조건(startDate/endDate)만 걸린 0건 케이스 테스트 1건 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "신규 — 서버 기본 기간과 '무조건' 문구의 의미 충돌. 이 화면은 product/cart와 달리 사용자가 조건을 안 넣어도 OrderService.list가 최근 30일 필터를 항상 적용하므로, 31일 이전 주문만 있으면 실제 데이터가 있는데도 '조회 결과가 없습니다'(데이터 자체가 없다는 함의)가 렌더된다. 요구 본문의 '검색 조건'을 사용자 입력 기준으로 읽은 이번 구현이 틀렸다고 보긴 어려우나 확정 문답에 이 케이스가 없다",
+          "suggested_action": "UIS-ORD-001에 '검색 조건 = 사용자 입력 조건(서버 기본 기간 제외)'으로 명문화하거나 요청자에게 기본 기간 적용 시 문구 선택을 확인할 것"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "캐리오버 미해소 — STORY 수용 기준 7번째 항목이 '유효 구간(effectiveStart~effectiveEnd)이'에서 문장 절단되어 객관 검증 문구가 미완(판정은 INF-ORD-003 원문으로 대체 수행)",
+          "suggested_action": "다음 build_story 시 INF-ORD-003 본문으로 AC 문장 복원"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "캐리오버 — order.xml selectOrders의 ORDER BY o.ordered_at DESC에 tie-breaker가 없어 동일 ordered_at 다건이면 페이지 간 행 중복/누락 가능. 같은 매퍼의 selectRecentByMember는 ', o.order_no DESC'를 갖고 있어 도메인 내 규약 불일치. 이번 SR과 무관",
+          "suggested_action": "selectOrders ORDER BY에 , o.order_no DESC 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "shop-api: 기준선에 없는 소스 루트",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .gitignore (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .understand-anything/linked-func-cache.json (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "medium",
+          "layer": "conformance",
+          "finding": "축A(scope_verify.py)가 out_of_scope 2건(.gitignore, .understand-anything/linked-func-cache.json)을 보고 — 사용자 확정 규칙상 스코프 불일치는 그 자체로 게이트를 FAIL시킨다. 단, 실제 diff 내용을 직접 확인한 결과 두 파일 모두 이번 FUNC-order-001의 SR-224 작업(빈 목록 안내 문구 분기)과 무관: (1) .gitignore diff는 `.speclinker/job_logs/`·`app_process.json`·`app_*.log` 무시 패턴 3줄 추가뿐(워크스페이스 운영 로그 관리, 화면/API와 무관), (2) linked-func-cache.json diff는 전체 키의 경로 접두어를 `_src/shop-api/`→`modules/shop-api/`로 일괄 치환한 캐시 재생성 산출물이며 FUNC-order-001 관련 라인은 값 변경 없음(다른 FUNC 항목 추가/재정렬만 존재). round16 GATE 이력에서도 동일 2파일이 동일 사유로 waiver 처리된 전례와 일치.",
+          "suggested_action": "사람 승인권자가 이전 round16과 동일하게 waiver 처리(무관한 워크스페이스 공용 파일 변경으로 확인됨)하거나, 정책상 매 라운드 별도 확인이 필요하면 명시적으로 재승인.",
+          "confidence": "high"
+        },
+        {
+          "severity": "low",
+          "layer": "stories",
+          "finding": "고친 화면 부품에 스토리가 없습니다: src/components/OrderSummaryCard.tsx",
+          "suggested_action": "그 부품의 상태를 스토리로 남기세요 — 없으면 다음 사람이 그 상태를 볼 방법이 없습니다. 차단하려면 하네스 규칙 `story-per-component`(pair 검사)를 채택하세요(/rules 제안 탭) — 축 C가 must로 막습니다"
+        },
+        {
+          "severity": "low",
+          "layer": "stories",
+          "finding": "고친 화면 부품에 스토리가 없습니다: src/pages/OrderListPage.tsx",
+          "suggested_action": "그 부품의 상태를 스토리로 남기세요 — 없으면 다음 사람이 그 상태를 볼 방법이 없습니다. 차단하려면 하네스 규칙 `story-per-component`(pair 검사)를 채택하세요(/rules 제안 탭) — 축 C가 must로 막습니다"
+        },
+        {
+          "severity": "high",
+          "layer": "rules",
+          "finding": "규칙 위반 [lab/story-per-component/story-per-component] modules/shop-web/src/components/OrderSummaryCard.tsx:0 — 화면 부품에는 상태 스토리가 있어야 한다",
+          "suggested_action": "규칙을 지키도록 고치거나, 규칙이 틀렸으면 SpecLens /rules에서 규칙을 고치세요"
+        },
+        {
+          "severity": "high",
+          "layer": "rules",
+          "finding": "규칙 위반 [lab/story-per-component/story-per-component] modules/shop-web/src/pages/OrderListPage.tsx:0 — 화면 부품에는 상태 스토리가 있어야 한다",
+          "suggested_action": "규칙을 지키도록 고치거나, 규칙이 틀렸으면 SpecLens /rules에서 규칙을 고치세요"
+        }
+      ],
+      "layer": "rules"
+    },
+    {
+      "round": 34,
+      "gate": "FAIL",
+      "human": null,
+      "layers": {
+        "spec": "concerns",
+        "security": "concerns",
+        "regression": "concerns",
+        "baseline": "concerns",
+        "scope": "fail",
+        "rules": "fail",
+        "conformance": "pass",
+        "stories": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "신규 — UIS-ORD-001 spec.md가 SR-224 미반영. 삭제된 옛 문구 '조회 결과 없음'을 §2 시나리오3·시나리오4·§5 표시조건 행에 그대로 기술하고 조건별 2분기(조회 결과가 없습니다 / 조건에 맞는 결과가 없습니다)를 담지 않았다. revision_history도 v1.2(SR-210)에서 멈춤. round7·round13 두 번의 사람 rework 결정이 이 파일의 현행화를 SR 산출물의 일부로 확정한 선례가 있어 scope_freeze '요구 본문 외 제외'에 해당하지 않는다. 함께 라인 앵커도 드리프트: §3 ② list.html:28-44→실제 28-51, ③ 51-65→58-72, ④ 68-70→79-82, §5 그리드 :51→58, 배송상태 :62→69, 빈결과 문구 :68→79-80, 전체N건 :70→82",
+          "suggested_action": "spec.md §2 시나리오3·4와 §5 표시조건을 2분기 문구로 갱신하고 라인 앵커를 현행 소스로 정정한 뒤 revision_history v1.3(SR-224)을 추가할 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "캐리오버 미해소 — AC①(del_yn 상시필터)·AC⑥(기간 경계·AND 결합)을 실DB로 검증하던 OrderListIntegrationTest(6건)가 여전히 소스 트리에 부재. selectOrders/countOrders의 SQL 의미를 실DB로 잠그는 테스트가 0건인 상태가 유지된다(OrderDaoTest 2건은 배송 조회 전용). 이번 라운드는 운영 코드 무변경(템플릿 텍스트 + 테스트 2파일)이라 위험이 증가하지는 않았다",
+          "suggested_action": "OrderListIntegrationTest를 복원하고 시드를 MEMBERS 선삽입으로 FK 위반 없이 고칠 것. 실패한 테스트를 삭제해 스위트를 green으로 만들지 말 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "캐리오버 — 워크스페이스 .gitignore:12가 modules/를 제외하고 대상 소스는 중첩 저장소(modules/shop-api, 자체 git)에 있다. 따라서 scope_verify.py(축 A)는 대상 소스 diff를 구조적으로 볼 수 없고, GATE가 매 라운드 보고하는 '구현 근거 없음(no-changes-classified)'은 변경 부재가 아니라 가시성 부재다. 이번 라운드도 QA가 중첩 저장소에서 git status/diff를 직접 실행해 dev 주장(list.html + OrderViewControllerTest 2파일만 변경, 운영 로직 무변경)을 사실로 확인했다",
+          "suggested_action": "축 A가 중첩 저장소(modules/shop-api)의 git을 읽도록 고치거나, 이 가시성 한계를 게이트 산출물에 명시할 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "캐리오버(신규 아님) — 무인증 화면 라우트 GET /order/list?memberId=... 로 타인 주문 이력 열람 성립, 그리고 OrderService.java:72의 offset = Math.max(0,page-1)*size가 int 연산이라 page 극단값에서 오버플로 → 음수 OFFSET 500. 이번 라운드 변경은 사용자 입력을 출력에 넣지 않는 정적 텍스트 2줄이라 신규 공격 표면은 0건(조건식은 비교만 수행). 2026-09-09 11:38 사람 승인에서 후속 SR 추적으로 수용됐으나 코드상 미해소라 pass로 내리지 않는다",
+          "suggested_action": "SR-207 선례대로 evaluateMemberScope 편입 여부를 SR로 확정하고, offset을 long 계산으로 바꾸거나 page 상한·size 범위(1~100)를 강제할 것"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "신규 — SR-224 '조건 있음' 경로가 4개 조건 중 memberId 하나만 테스트된다(orderList_emptyResultWithMemberIdFilter_showsConditionSpecificMessage). orderState/startDate/endDate 단독 케이스가 없어 list.html:80에서 그 3항을 지우고 :79에서 대응 항을 지우는 뮤테이션을 스위트가 잡지 못한다. startDate/endDate는 SR-209 프리셋 버튼(최근 7/30/90일)이 채우는 주 사용 경로라 실사용 노출도가 높다",
+          "suggested_action": "기간 조건(startDate/endDate)만 걸린 0건 케이스 테스트 1건 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "신규 — 서버 기본 기간과 '무조건' 문구의 의미 충돌. 이 화면은 product/cart와 달리 사용자가 조건을 안 넣어도 OrderService.list가 최근 30일 필터를 항상 적용하므로, 31일 이전 주문만 있으면 실제 데이터가 있는데도 '조회 결과가 없습니다'(데이터 자체가 없다는 함의)가 렌더된다. 요구 본문의 '검색 조건'을 사용자 입력 기준으로 읽은 이번 구현이 틀렸다고 보긴 어려우나 확정 문답에 이 케이스가 없다",
+          "suggested_action": "UIS-ORD-001에 '검색 조건 = 사용자 입력 조건(서버 기본 기간 제외)'으로 명문화하거나 요청자에게 기본 기간 적용 시 문구 선택을 확인할 것"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "캐리오버 미해소 — STORY 수용 기준 7번째 항목이 '유효 구간(effectiveStart~effectiveEnd)이'에서 문장 절단되어 객관 검증 문구가 미완(판정은 INF-ORD-003 원문으로 대체 수행)",
+          "suggested_action": "다음 build_story 시 INF-ORD-003 본문으로 AC 문장 복원"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "캐리오버 — order.xml selectOrders의 ORDER BY o.ordered_at DESC에 tie-breaker가 없어 동일 ordered_at 다건이면 페이지 간 행 중복/누락 가능. 같은 매퍼의 selectRecentByMember는 ', o.order_no DESC'를 갖고 있어 도메인 내 규약 불일치. 이번 SR과 무관",
+          "suggested_action": "selectOrders ORDER BY에 , o.order_no DESC 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "shop-api: 기준선에 없는 소스 루트",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .gitignore (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .understand-anything/linked-func-cache.json (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "medium",
+          "layer": "conformance",
+          "finding": "축A(scope_verify.py)가 out_of_scope 2건(.gitignore, .understand-anything/linked-func-cache.json)을 보고 — 사용자 확정 규칙상 스코프 불일치는 그 자체로 게이트를 FAIL시킨다. 단, 실제 diff 내용을 직접 확인한 결과 두 파일 모두 이번 FUNC-order-001의 SR-224 작업(빈 목록 안내 문구 분기)과 무관: (1) .gitignore diff는 `.speclinker/job_logs/`·`app_process.json`·`app_*.log` 무시 패턴 3줄 추가뿐(워크스페이스 운영 로그 관리, 화면/API와 무관), (2) linked-func-cache.json diff는 전체 키의 경로 접두어를 `_src/shop-api/`→`modules/shop-api/`로 일괄 치환한 캐시 재생성 산출물이며 FUNC-order-001 관련 라인은 값 변경 없음(다른 FUNC 항목 추가/재정렬만 존재). round16 GATE 이력에서도 동일 2파일이 동일 사유로 waiver 처리된 전례와 일치.",
+          "suggested_action": "사람 승인권자가 이전 round16과 동일하게 waiver 처리(무관한 워크스페이스 공용 파일 변경으로 확인됨)하거나, 정책상 매 라운드 별도 확인이 필요하면 명시적으로 재승인.",
+          "confidence": "high"
+        },
+        {
+          "severity": "high",
+          "layer": "rules",
+          "finding": "규칙 위반 [lab/story-per-component/story-per-component] modules/shop-web/src/components/OrderSummaryCard.tsx:0 — 화면 부품에는 상태 스토리가 있어야 한다",
+          "suggested_action": "규칙을 지키도록 고치거나, 규칙이 틀렸으면 SpecLens /rules에서 규칙을 고치세요"
+        },
+        {
+          "severity": "high",
+          "layer": "rules",
+          "finding": "규칙 위반 [lab/story-per-component/story-per-component] modules/shop-web/src/pages/OrderListPage.tsx:0 — 화면 부품에는 상태 스토리가 있어야 한다",
+          "suggested_action": "규칙을 지키도록 고치거나, 규칙이 틀렸으면 SpecLens /rules에서 규칙을 고치세요"
+        },
+        {
+          "severity": "low",
+          "layer": "stories",
+          "finding": "고친 화면 부품에 스토리가 없습니다: src/components/OrderSummaryCard.tsx",
+          "suggested_action": "그 부품의 상태를 스토리로 남기세요 — 없으면 다음 사람이 그 상태를 볼 방법이 없습니다. 차단하려면 하네스 규칙 `story-per-component`(pair 검사)를 채택하세요(/rules 제안 탭) — 축 C가 must로 막습니다"
+        },
+        {
+          "severity": "low",
+          "layer": "stories",
+          "finding": "고친 화면 부품에 스토리가 없습니다: src/pages/OrderListPage.tsx",
+          "suggested_action": "그 부품의 상태를 스토리로 남기세요 — 없으면 다음 사람이 그 상태를 볼 방법이 없습니다. 차단하려면 하네스 규칙 `story-per-component`(pair 검사)를 채택하세요(/rules 제안 탭) — 축 C가 must로 막습니다"
+        }
+      ],
+      "layer": "stories"
+    },
+    {
+      "round": 35,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "concerns",
+        "security": "concerns",
+        "regression": "concerns",
+        "baseline": "concerns",
+        "scope": "fail",
+        "rules": "pass",
+        "conformance": "pass",
+        "stories": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "신규 — UIS-ORD-001 spec.md가 SR-224 미반영. 삭제된 옛 문구 '조회 결과 없음'을 §2 시나리오3·시나리오4·§5 표시조건 행에 그대로 기술하고 조건별 2분기(조회 결과가 없습니다 / 조건에 맞는 결과가 없습니다)를 담지 않았다. revision_history도 v1.2(SR-210)에서 멈춤. round7·round13 두 번의 사람 rework 결정이 이 파일의 현행화를 SR 산출물의 일부로 확정한 선례가 있어 scope_freeze '요구 본문 외 제외'에 해당하지 않는다. 함께 라인 앵커도 드리프트: §3 ② list.html:28-44→실제 28-51, ③ 51-65→58-72, ④ 68-70→79-82, §5 그리드 :51→58, 배송상태 :62→69, 빈결과 문구 :68→79-80, 전체N건 :70→82",
+          "suggested_action": "spec.md §2 시나리오3·4와 §5 표시조건을 2분기 문구로 갱신하고 라인 앵커를 현행 소스로 정정한 뒤 revision_history v1.3(SR-224)을 추가할 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "캐리오버 미해소 — AC①(del_yn 상시필터)·AC⑥(기간 경계·AND 결합)을 실DB로 검증하던 OrderListIntegrationTest(6건)가 여전히 소스 트리에 부재. selectOrders/countOrders의 SQL 의미를 실DB로 잠그는 테스트가 0건인 상태가 유지된다(OrderDaoTest 2건은 배송 조회 전용). 이번 라운드는 운영 코드 무변경(템플릿 텍스트 + 테스트 2파일)이라 위험이 증가하지는 않았다",
+          "suggested_action": "OrderListIntegrationTest를 복원하고 시드를 MEMBERS 선삽입으로 FK 위반 없이 고칠 것. 실패한 테스트를 삭제해 스위트를 green으로 만들지 말 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "캐리오버 — 워크스페이스 .gitignore:12가 modules/를 제외하고 대상 소스는 중첩 저장소(modules/shop-api, 자체 git)에 있다. 따라서 scope_verify.py(축 A)는 대상 소스 diff를 구조적으로 볼 수 없고, GATE가 매 라운드 보고하는 '구현 근거 없음(no-changes-classified)'은 변경 부재가 아니라 가시성 부재다. 이번 라운드도 QA가 중첩 저장소에서 git status/diff를 직접 실행해 dev 주장(list.html + OrderViewControllerTest 2파일만 변경, 운영 로직 무변경)을 사실로 확인했다",
+          "suggested_action": "축 A가 중첩 저장소(modules/shop-api)의 git을 읽도록 고치거나, 이 가시성 한계를 게이트 산출물에 명시할 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "캐리오버(신규 아님) — 무인증 화면 라우트 GET /order/list?memberId=... 로 타인 주문 이력 열람 성립, 그리고 OrderService.java:72의 offset = Math.max(0,page-1)*size가 int 연산이라 page 극단값에서 오버플로 → 음수 OFFSET 500. 이번 라운드 변경은 사용자 입력을 출력에 넣지 않는 정적 텍스트 2줄이라 신규 공격 표면은 0건(조건식은 비교만 수행). 2026-09-09 11:38 사람 승인에서 후속 SR 추적으로 수용됐으나 코드상 미해소라 pass로 내리지 않는다",
+          "suggested_action": "SR-207 선례대로 evaluateMemberScope 편입 여부를 SR로 확정하고, offset을 long 계산으로 바꾸거나 page 상한·size 범위(1~100)를 강제할 것"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "신규 — SR-224 '조건 있음' 경로가 4개 조건 중 memberId 하나만 테스트된다(orderList_emptyResultWithMemberIdFilter_showsConditionSpecificMessage). orderState/startDate/endDate 단독 케이스가 없어 list.html:80에서 그 3항을 지우고 :79에서 대응 항을 지우는 뮤테이션을 스위트가 잡지 못한다. startDate/endDate는 SR-209 프리셋 버튼(최근 7/30/90일)이 채우는 주 사용 경로라 실사용 노출도가 높다",
+          "suggested_action": "기간 조건(startDate/endDate)만 걸린 0건 케이스 테스트 1건 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "신규 — 서버 기본 기간과 '무조건' 문구의 의미 충돌. 이 화면은 product/cart와 달리 사용자가 조건을 안 넣어도 OrderService.list가 최근 30일 필터를 항상 적용하므로, 31일 이전 주문만 있으면 실제 데이터가 있는데도 '조회 결과가 없습니다'(데이터 자체가 없다는 함의)가 렌더된다. 요구 본문의 '검색 조건'을 사용자 입력 기준으로 읽은 이번 구현이 틀렸다고 보긴 어려우나 확정 문답에 이 케이스가 없다",
+          "suggested_action": "UIS-ORD-001에 '검색 조건 = 사용자 입력 조건(서버 기본 기간 제외)'으로 명문화하거나 요청자에게 기본 기간 적용 시 문구 선택을 확인할 것"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "캐리오버 미해소 — STORY 수용 기준 7번째 항목이 '유효 구간(effectiveStart~effectiveEnd)이'에서 문장 절단되어 객관 검증 문구가 미완(판정은 INF-ORD-003 원문으로 대체 수행)",
+          "suggested_action": "다음 build_story 시 INF-ORD-003 본문으로 AC 문장 복원"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "캐리오버 — order.xml selectOrders의 ORDER BY o.ordered_at DESC에 tie-breaker가 없어 동일 ordered_at 다건이면 페이지 간 행 중복/누락 가능. 같은 매퍼의 selectRecentByMember는 ', o.order_no DESC'를 갖고 있어 도메인 내 규약 불일치. 이번 SR과 무관",
+          "suggested_action": "selectOrders ORDER BY에 , o.order_no DESC 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "shop-api: 기준선에 없는 소스 루트",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .gitignore (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .understand-anything/linked-func-cache.json (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "medium",
+          "layer": "conformance",
+          "finding": "축A(scope_verify.py)가 out_of_scope 2건(.gitignore, .understand-anything/linked-func-cache.json)을 보고 — 사용자 확정 규칙상 스코프 불일치는 그 자체로 게이트를 FAIL시킨다. 단, 실제 diff 내용을 직접 확인한 결과 두 파일 모두 이번 FUNC-order-001의 SR-224 작업(빈 목록 안내 문구 분기)과 무관: (1) .gitignore diff는 `.speclinker/job_logs/`·`app_process.json`·`app_*.log` 무시 패턴 3줄 추가뿐(워크스페이스 운영 로그 관리, 화면/API와 무관), (2) linked-func-cache.json diff는 전체 키의 경로 접두어를 `_src/shop-api/`→`modules/shop-api/`로 일괄 치환한 캐시 재생성 산출물이며 FUNC-order-001 관련 라인은 값 변경 없음(다른 FUNC 항목 추가/재정렬만 존재). round16 GATE 이력에서도 동일 2파일이 동일 사유로 waiver 처리된 전례와 일치.",
+          "suggested_action": "사람 승인권자가 이전 round16과 동일하게 waiver 처리(무관한 워크스페이스 공용 파일 변경으로 확인됨)하거나, 정책상 매 라운드 별도 확인이 필요하면 명시적으로 재승인.",
+          "confidence": "high"
+        },
+        {
+          "severity": "low",
+          "layer": "stories",
+          "finding": "고친 화면 부품에 스토리가 없습니다: src/components/OrderSummaryCard.tsx",
+          "suggested_action": "그 부품의 상태를 스토리로 남기세요 — 없으면 다음 사람이 그 상태를 볼 방법이 없습니다. 차단하려면 하네스 규칙 `story-per-component`(pair 검사)를 채택하세요(/rules 제안 탭) — 축 C가 must로 막습니다"
+        },
+        {
+          "severity": "low",
+          "layer": "stories",
+          "finding": "고친 화면 부품에 스토리가 없습니다: src/pages/OrderListPage.tsx",
+          "suggested_action": "그 부품의 상태를 스토리로 남기세요 — 없으면 다음 사람이 그 상태를 볼 방법이 없습니다. 차단하려면 하네스 규칙 `story-per-component`(pair 검사)를 채택하세요(/rules 제안 탭) — 축 C가 must로 막습니다"
+        }
+      ],
+      "layer": "rules"
+    },
+    {
+      "round": 36,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "concerns",
+        "security": "concerns",
+        "regression": "concerns",
+        "baseline": "concerns",
+        "scope": "fail",
+        "rules": "pass",
+        "conformance": "pass",
+        "stories": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "신규 — UIS-ORD-001 spec.md가 SR-224 미반영. 삭제된 옛 문구 '조회 결과 없음'을 §2 시나리오3·시나리오4·§5 표시조건 행에 그대로 기술하고 조건별 2분기(조회 결과가 없습니다 / 조건에 맞는 결과가 없습니다)를 담지 않았다. revision_history도 v1.2(SR-210)에서 멈춤. round7·round13 두 번의 사람 rework 결정이 이 파일의 현행화를 SR 산출물의 일부로 확정한 선례가 있어 scope_freeze '요구 본문 외 제외'에 해당하지 않는다. 함께 라인 앵커도 드리프트: §3 ② list.html:28-44→실제 28-51, ③ 51-65→58-72, ④ 68-70→79-82, §5 그리드 :51→58, 배송상태 :62→69, 빈결과 문구 :68→79-80, 전체N건 :70→82",
+          "suggested_action": "spec.md §2 시나리오3·4와 §5 표시조건을 2분기 문구로 갱신하고 라인 앵커를 현행 소스로 정정한 뒤 revision_history v1.3(SR-224)을 추가할 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "캐리오버 미해소 — AC①(del_yn 상시필터)·AC⑥(기간 경계·AND 결합)을 실DB로 검증하던 OrderListIntegrationTest(6건)가 여전히 소스 트리에 부재. selectOrders/countOrders의 SQL 의미를 실DB로 잠그는 테스트가 0건인 상태가 유지된다(OrderDaoTest 2건은 배송 조회 전용). 이번 라운드는 운영 코드 무변경(템플릿 텍스트 + 테스트 2파일)이라 위험이 증가하지는 않았다",
+          "suggested_action": "OrderListIntegrationTest를 복원하고 시드를 MEMBERS 선삽입으로 FK 위반 없이 고칠 것. 실패한 테스트를 삭제해 스위트를 green으로 만들지 말 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "캐리오버 — 워크스페이스 .gitignore:12가 modules/를 제외하고 대상 소스는 중첩 저장소(modules/shop-api, 자체 git)에 있다. 따라서 scope_verify.py(축 A)는 대상 소스 diff를 구조적으로 볼 수 없고, GATE가 매 라운드 보고하는 '구현 근거 없음(no-changes-classified)'은 변경 부재가 아니라 가시성 부재다. 이번 라운드도 QA가 중첩 저장소에서 git status/diff를 직접 실행해 dev 주장(list.html + OrderViewControllerTest 2파일만 변경, 운영 로직 무변경)을 사실로 확인했다",
+          "suggested_action": "축 A가 중첩 저장소(modules/shop-api)의 git을 읽도록 고치거나, 이 가시성 한계를 게이트 산출물에 명시할 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "캐리오버(신규 아님) — 무인증 화면 라우트 GET /order/list?memberId=... 로 타인 주문 이력 열람 성립, 그리고 OrderService.java:72의 offset = Math.max(0,page-1)*size가 int 연산이라 page 극단값에서 오버플로 → 음수 OFFSET 500. 이번 라운드 변경은 사용자 입력을 출력에 넣지 않는 정적 텍스트 2줄이라 신규 공격 표면은 0건(조건식은 비교만 수행). 2026-09-09 11:38 사람 승인에서 후속 SR 추적으로 수용됐으나 코드상 미해소라 pass로 내리지 않는다",
+          "suggested_action": "SR-207 선례대로 evaluateMemberScope 편입 여부를 SR로 확정하고, offset을 long 계산으로 바꾸거나 page 상한·size 범위(1~100)를 강제할 것"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "신규 — SR-224 '조건 있음' 경로가 4개 조건 중 memberId 하나만 테스트된다(orderList_emptyResultWithMemberIdFilter_showsConditionSpecificMessage). orderState/startDate/endDate 단독 케이스가 없어 list.html:80에서 그 3항을 지우고 :79에서 대응 항을 지우는 뮤테이션을 스위트가 잡지 못한다. startDate/endDate는 SR-209 프리셋 버튼(최근 7/30/90일)이 채우는 주 사용 경로라 실사용 노출도가 높다",
+          "suggested_action": "기간 조건(startDate/endDate)만 걸린 0건 케이스 테스트 1건 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "신규 — 서버 기본 기간과 '무조건' 문구의 의미 충돌. 이 화면은 product/cart와 달리 사용자가 조건을 안 넣어도 OrderService.list가 최근 30일 필터를 항상 적용하므로, 31일 이전 주문만 있으면 실제 데이터가 있는데도 '조회 결과가 없습니다'(데이터 자체가 없다는 함의)가 렌더된다. 요구 본문의 '검색 조건'을 사용자 입력 기준으로 읽은 이번 구현이 틀렸다고 보긴 어려우나 확정 문답에 이 케이스가 없다",
+          "suggested_action": "UIS-ORD-001에 '검색 조건 = 사용자 입력 조건(서버 기본 기간 제외)'으로 명문화하거나 요청자에게 기본 기간 적용 시 문구 선택을 확인할 것"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "캐리오버 미해소 — STORY 수용 기준 7번째 항목이 '유효 구간(effectiveStart~effectiveEnd)이'에서 문장 절단되어 객관 검증 문구가 미완(판정은 INF-ORD-003 원문으로 대체 수행)",
+          "suggested_action": "다음 build_story 시 INF-ORD-003 본문으로 AC 문장 복원"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "캐리오버 — order.xml selectOrders의 ORDER BY o.ordered_at DESC에 tie-breaker가 없어 동일 ordered_at 다건이면 페이지 간 행 중복/누락 가능. 같은 매퍼의 selectRecentByMember는 ', o.order_no DESC'를 갖고 있어 도메인 내 규약 불일치. 이번 SR과 무관",
+          "suggested_action": "selectOrders ORDER BY에 , o.order_no DESC 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "shop-api: 기준선에 없는 소스 루트",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .gitignore (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .understand-anything/linked-func-cache.json (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "medium",
+          "layer": "conformance",
+          "finding": "축A(scope_verify.py)가 out_of_scope 2건(.gitignore, .understand-anything/linked-func-cache.json)을 보고 — 사용자 확정 규칙상 스코프 불일치는 그 자체로 게이트를 FAIL시킨다. 단, 실제 diff 내용을 직접 확인한 결과 두 파일 모두 이번 FUNC-order-001의 SR-224 작업(빈 목록 안내 문구 분기)과 무관: (1) .gitignore diff는 `.speclinker/job_logs/`·`app_process.json`·`app_*.log` 무시 패턴 3줄 추가뿐(워크스페이스 운영 로그 관리, 화면/API와 무관), (2) linked-func-cache.json diff는 전체 키의 경로 접두어를 `_src/shop-api/`→`modules/shop-api/`로 일괄 치환한 캐시 재생성 산출물이며 FUNC-order-001 관련 라인은 값 변경 없음(다른 FUNC 항목 추가/재정렬만 존재). round16 GATE 이력에서도 동일 2파일이 동일 사유로 waiver 처리된 전례와 일치.",
+          "suggested_action": "사람 승인권자가 이전 round16과 동일하게 waiver 처리(무관한 워크스페이스 공용 파일 변경으로 확인됨)하거나, 정책상 매 라운드 별도 확인이 필요하면 명시적으로 재승인.",
+          "confidence": "high"
+        }
+      ],
+      "layer": "stories"
+    },
+    {
+      "round": 37,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "concerns",
+        "security": "concerns",
+        "regression": "concerns",
+        "baseline": "concerns",
+        "scope": "fail",
+        "rules": "pass",
+        "conformance": "pass",
+        "stories": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "신규 — UIS-ORD-001 spec.md가 SR-224 미반영. 삭제된 옛 문구 '조회 결과 없음'을 §2 시나리오3·시나리오4·§5 표시조건 행에 그대로 기술하고 조건별 2분기(조회 결과가 없습니다 / 조건에 맞는 결과가 없습니다)를 담지 않았다. revision_history도 v1.2(SR-210)에서 멈춤. round7·round13 두 번의 사람 rework 결정이 이 파일의 현행화를 SR 산출물의 일부로 확정한 선례가 있어 scope_freeze '요구 본문 외 제외'에 해당하지 않는다. 함께 라인 앵커도 드리프트: §3 ② list.html:28-44→실제 28-51, ③ 51-65→58-72, ④ 68-70→79-82, §5 그리드 :51→58, 배송상태 :62→69, 빈결과 문구 :68→79-80, 전체N건 :70→82",
+          "suggested_action": "spec.md §2 시나리오3·4와 §5 표시조건을 2분기 문구로 갱신하고 라인 앵커를 현행 소스로 정정한 뒤 revision_history v1.3(SR-224)을 추가할 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "캐리오버 미해소 — AC①(del_yn 상시필터)·AC⑥(기간 경계·AND 결합)을 실DB로 검증하던 OrderListIntegrationTest(6건)가 여전히 소스 트리에 부재. selectOrders/countOrders의 SQL 의미를 실DB로 잠그는 테스트가 0건인 상태가 유지된다(OrderDaoTest 2건은 배송 조회 전용). 이번 라운드는 운영 코드 무변경(템플릿 텍스트 + 테스트 2파일)이라 위험이 증가하지는 않았다",
+          "suggested_action": "OrderListIntegrationTest를 복원하고 시드를 MEMBERS 선삽입으로 FK 위반 없이 고칠 것. 실패한 테스트를 삭제해 스위트를 green으로 만들지 말 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "캐리오버 — 워크스페이스 .gitignore:12가 modules/를 제외하고 대상 소스는 중첩 저장소(modules/shop-api, 자체 git)에 있다. 따라서 scope_verify.py(축 A)는 대상 소스 diff를 구조적으로 볼 수 없고, GATE가 매 라운드 보고하는 '구현 근거 없음(no-changes-classified)'은 변경 부재가 아니라 가시성 부재다. 이번 라운드도 QA가 중첩 저장소에서 git status/diff를 직접 실행해 dev 주장(list.html + OrderViewControllerTest 2파일만 변경, 운영 로직 무변경)을 사실로 확인했다",
+          "suggested_action": "축 A가 중첩 저장소(modules/shop-api)의 git을 읽도록 고치거나, 이 가시성 한계를 게이트 산출물에 명시할 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "캐리오버(신규 아님) — 무인증 화면 라우트 GET /order/list?memberId=... 로 타인 주문 이력 열람 성립, 그리고 OrderService.java:72의 offset = Math.max(0,page-1)*size가 int 연산이라 page 극단값에서 오버플로 → 음수 OFFSET 500. 이번 라운드 변경은 사용자 입력을 출력에 넣지 않는 정적 텍스트 2줄이라 신규 공격 표면은 0건(조건식은 비교만 수행). 2026-09-09 11:38 사람 승인에서 후속 SR 추적으로 수용됐으나 코드상 미해소라 pass로 내리지 않는다",
+          "suggested_action": "SR-207 선례대로 evaluateMemberScope 편입 여부를 SR로 확정하고, offset을 long 계산으로 바꾸거나 page 상한·size 범위(1~100)를 강제할 것"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "신규 — SR-224 '조건 있음' 경로가 4개 조건 중 memberId 하나만 테스트된다(orderList_emptyResultWithMemberIdFilter_showsConditionSpecificMessage). orderState/startDate/endDate 단독 케이스가 없어 list.html:80에서 그 3항을 지우고 :79에서 대응 항을 지우는 뮤테이션을 스위트가 잡지 못한다. startDate/endDate는 SR-209 프리셋 버튼(최근 7/30/90일)이 채우는 주 사용 경로라 실사용 노출도가 높다",
+          "suggested_action": "기간 조건(startDate/endDate)만 걸린 0건 케이스 테스트 1건 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "신규 — 서버 기본 기간과 '무조건' 문구의 의미 충돌. 이 화면은 product/cart와 달리 사용자가 조건을 안 넣어도 OrderService.list가 최근 30일 필터를 항상 적용하므로, 31일 이전 주문만 있으면 실제 데이터가 있는데도 '조회 결과가 없습니다'(데이터 자체가 없다는 함의)가 렌더된다. 요구 본문의 '검색 조건'을 사용자 입력 기준으로 읽은 이번 구현이 틀렸다고 보긴 어려우나 확정 문답에 이 케이스가 없다",
+          "suggested_action": "UIS-ORD-001에 '검색 조건 = 사용자 입력 조건(서버 기본 기간 제외)'으로 명문화하거나 요청자에게 기본 기간 적용 시 문구 선택을 확인할 것"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "캐리오버 미해소 — STORY 수용 기준 7번째 항목이 '유효 구간(effectiveStart~effectiveEnd)이'에서 문장 절단되어 객관 검증 문구가 미완(판정은 INF-ORD-003 원문으로 대체 수행)",
+          "suggested_action": "다음 build_story 시 INF-ORD-003 본문으로 AC 문장 복원"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "캐리오버 — order.xml selectOrders의 ORDER BY o.ordered_at DESC에 tie-breaker가 없어 동일 ordered_at 다건이면 페이지 간 행 중복/누락 가능. 같은 매퍼의 selectRecentByMember는 ', o.order_no DESC'를 갖고 있어 도메인 내 규약 불일치. 이번 SR과 무관",
+          "suggested_action": "selectOrders ORDER BY에 , o.order_no DESC 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "shop-api: 기준선에 없는 소스 루트",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .gitignore (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .understand-anything/linked-func-cache.json (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "medium",
+          "layer": "conformance",
+          "finding": "축A(scope_verify.py)가 out_of_scope 2건(.gitignore, .understand-anything/linked-func-cache.json)을 보고 — 사용자 확정 규칙상 스코프 불일치는 그 자체로 게이트를 FAIL시킨다. 단, 실제 diff 내용을 직접 확인한 결과 두 파일 모두 이번 FUNC-order-001의 SR-224 작업(빈 목록 안내 문구 분기)과 무관: (1) .gitignore diff는 `.speclinker/job_logs/`·`app_process.json`·`app_*.log` 무시 패턴 3줄 추가뿐(워크스페이스 운영 로그 관리, 화면/API와 무관), (2) linked-func-cache.json diff는 전체 키의 경로 접두어를 `_src/shop-api/`→`modules/shop-api/`로 일괄 치환한 캐시 재생성 산출물이며 FUNC-order-001 관련 라인은 값 변경 없음(다른 FUNC 항목 추가/재정렬만 존재). round16 GATE 이력에서도 동일 2파일이 동일 사유로 waiver 처리된 전례와 일치.",
+          "suggested_action": "사람 승인권자가 이전 round16과 동일하게 waiver 처리(무관한 워크스페이스 공용 파일 변경으로 확인됨)하거나, 정책상 매 라운드 별도 확인이 필요하면 명시적으로 재승인.",
+          "confidence": "high"
+        }
+      ],
+      "layer": "rules"
+    },
+    {
+      "round": 38,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "concerns",
+        "security": "concerns",
+        "regression": "concerns",
+        "baseline": "concerns",
+        "scope": "fail",
+        "rules": "pass",
+        "conformance": "pass",
+        "stories": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "신규 — UIS-ORD-001 spec.md가 SR-224 미반영. 삭제된 옛 문구 '조회 결과 없음'을 §2 시나리오3·시나리오4·§5 표시조건 행에 그대로 기술하고 조건별 2분기(조회 결과가 없습니다 / 조건에 맞는 결과가 없습니다)를 담지 않았다. revision_history도 v1.2(SR-210)에서 멈춤. round7·round13 두 번의 사람 rework 결정이 이 파일의 현행화를 SR 산출물의 일부로 확정한 선례가 있어 scope_freeze '요구 본문 외 제외'에 해당하지 않는다. 함께 라인 앵커도 드리프트: §3 ② list.html:28-44→실제 28-51, ③ 51-65→58-72, ④ 68-70→79-82, §5 그리드 :51→58, 배송상태 :62→69, 빈결과 문구 :68→79-80, 전체N건 :70→82",
+          "suggested_action": "spec.md §2 시나리오3·4와 §5 표시조건을 2분기 문구로 갱신하고 라인 앵커를 현행 소스로 정정한 뒤 revision_history v1.3(SR-224)을 추가할 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "캐리오버 미해소 — AC①(del_yn 상시필터)·AC⑥(기간 경계·AND 결합)을 실DB로 검증하던 OrderListIntegrationTest(6건)가 여전히 소스 트리에 부재. selectOrders/countOrders의 SQL 의미를 실DB로 잠그는 테스트가 0건인 상태가 유지된다(OrderDaoTest 2건은 배송 조회 전용). 이번 라운드는 운영 코드 무변경(템플릿 텍스트 + 테스트 2파일)이라 위험이 증가하지는 않았다",
+          "suggested_action": "OrderListIntegrationTest를 복원하고 시드를 MEMBERS 선삽입으로 FK 위반 없이 고칠 것. 실패한 테스트를 삭제해 스위트를 green으로 만들지 말 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "캐리오버 — 워크스페이스 .gitignore:12가 modules/를 제외하고 대상 소스는 중첩 저장소(modules/shop-api, 자체 git)에 있다. 따라서 scope_verify.py(축 A)는 대상 소스 diff를 구조적으로 볼 수 없고, GATE가 매 라운드 보고하는 '구현 근거 없음(no-changes-classified)'은 변경 부재가 아니라 가시성 부재다. 이번 라운드도 QA가 중첩 저장소에서 git status/diff를 직접 실행해 dev 주장(list.html + OrderViewControllerTest 2파일만 변경, 운영 로직 무변경)을 사실로 확인했다",
+          "suggested_action": "축 A가 중첩 저장소(modules/shop-api)의 git을 읽도록 고치거나, 이 가시성 한계를 게이트 산출물에 명시할 것"
+        },
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "캐리오버(신규 아님) — 무인증 화면 라우트 GET /order/list?memberId=... 로 타인 주문 이력 열람 성립, 그리고 OrderService.java:72의 offset = Math.max(0,page-1)*size가 int 연산이라 page 극단값에서 오버플로 → 음수 OFFSET 500. 이번 라운드 변경은 사용자 입력을 출력에 넣지 않는 정적 텍스트 2줄이라 신규 공격 표면은 0건(조건식은 비교만 수행). 2026-09-09 11:38 사람 승인에서 후속 SR 추적으로 수용됐으나 코드상 미해소라 pass로 내리지 않는다",
+          "suggested_action": "SR-207 선례대로 evaluateMemberScope 편입 여부를 SR로 확정하고, offset을 long 계산으로 바꾸거나 page 상한·size 범위(1~100)를 강제할 것"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "신규 — SR-224 '조건 있음' 경로가 4개 조건 중 memberId 하나만 테스트된다(orderList_emptyResultWithMemberIdFilter_showsConditionSpecificMessage). orderState/startDate/endDate 단독 케이스가 없어 list.html:80에서 그 3항을 지우고 :79에서 대응 항을 지우는 뮤테이션을 스위트가 잡지 못한다. startDate/endDate는 SR-209 프리셋 버튼(최근 7/30/90일)이 채우는 주 사용 경로라 실사용 노출도가 높다",
+          "suggested_action": "기간 조건(startDate/endDate)만 걸린 0건 케이스 테스트 1건 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "신규 — 서버 기본 기간과 '무조건' 문구의 의미 충돌. 이 화면은 product/cart와 달리 사용자가 조건을 안 넣어도 OrderService.list가 최근 30일 필터를 항상 적용하므로, 31일 이전 주문만 있으면 실제 데이터가 있는데도 '조회 결과가 없습니다'(데이터 자체가 없다는 함의)가 렌더된다. 요구 본문의 '검색 조건'을 사용자 입력 기준으로 읽은 이번 구현이 틀렸다고 보긴 어려우나 확정 문답에 이 케이스가 없다",
+          "suggested_action": "UIS-ORD-001에 '검색 조건 = 사용자 입력 조건(서버 기본 기간 제외)'으로 명문화하거나 요청자에게 기본 기간 적용 시 문구 선택을 확인할 것"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "캐리오버 미해소 — STORY 수용 기준 7번째 항목이 '유효 구간(effectiveStart~effectiveEnd)이'에서 문장 절단되어 객관 검증 문구가 미완(판정은 INF-ORD-003 원문으로 대체 수행)",
+          "suggested_action": "다음 build_story 시 INF-ORD-003 본문으로 AC 문장 복원"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "캐리오버 — order.xml selectOrders의 ORDER BY o.ordered_at DESC에 tie-breaker가 없어 동일 ordered_at 다건이면 페이지 간 행 중복/누락 가능. 같은 매퍼의 selectRecentByMember는 ', o.order_no DESC'를 갖고 있어 도메인 내 규약 불일치. 이번 SR과 무관",
+          "suggested_action": "selectOrders ORDER BY에 , o.order_no DESC 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "shop-api: 기준선에 없는 소스 루트",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .gitignore (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .understand-anything/linked-func-cache.json (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "medium",
+          "layer": "conformance",
+          "finding": "축A(scope_verify.py)가 out_of_scope 2건(.gitignore, .understand-anything/linked-func-cache.json)을 보고 — 사용자 확정 규칙상 스코프 불일치는 그 자체로 게이트를 FAIL시킨다. 단, 실제 diff 내용을 직접 확인한 결과 두 파일 모두 이번 FUNC-order-001의 SR-224 작업(빈 목록 안내 문구 분기)과 무관: (1) .gitignore diff는 `.speclinker/job_logs/`·`app_process.json`·`app_*.log` 무시 패턴 3줄 추가뿐(워크스페이스 운영 로그 관리, 화면/API와 무관), (2) linked-func-cache.json diff는 전체 키의 경로 접두어를 `_src/shop-api/`→`modules/shop-api/`로 일괄 치환한 캐시 재생성 산출물이며 FUNC-order-001 관련 라인은 값 변경 없음(다른 FUNC 항목 추가/재정렬만 존재). round16 GATE 이력에서도 동일 2파일이 동일 사유로 waiver 처리된 전례와 일치.",
+          "suggested_action": "사람 승인권자가 이전 round16과 동일하게 waiver 처리(무관한 워크스페이스 공용 파일 변경으로 확인됨)하거나, 정책상 매 라운드 별도 확인이 필요하면 명시적으로 재승인.",
+          "confidence": "high"
+        },
+        {
+          "severity": "low",
+          "layer": "stories",
+          "finding": "UIS-ORD-001 §5 행 5개에 스토리가 없습니다: 오류 배너, 주문목록 그리드, 배송상태 열(SR-210), \"조회 결과 없음\" 문구, \"전체 N건\" 라벨",
+          "suggested_action": "그 상태의 스토리를 만들고 행에 `[이름](story:ID)`를 적으세요"
+        }
+      ],
+      "layer": "stories"
+    }
+  ],
+  "waiver": {
+    "active": true,
+    "by": "사람",
+    "reason": "이번 라운드 소스 변경 없음(기존 구현 재검증) — out_of_scope 2건(.gitignore, linked-func-cache.json)은 이 FUNC와 무관한 선행 변경",
+    "at": "2026-09-09T11:06:04",
+    "layer": "scope"
+  },
+  "story_transitions": [
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "SR 승인(SR-205)",
+      "at": "2026-09-07T07:51:31"
+    },
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "SR 승인(SR-205) — TO-BE 기준 재도출",
+      "at": "2026-09-07T09:26:03"
+    },
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "SR 승인(SR-205) — TO-BE 기준 재도출",
+      "at": "2026-09-07T09:27:31"
+    },
+    {
+      "from": "Approved",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-07T09:34:11"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "사람",
+      "at": "2026-09-07T09:41:57"
+    },
+    {
+      "from": "Review",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-07T10:33:06"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "사람",
+      "at": "2026-09-07T10:41:40"
+    },
+    {
+      "from": "Review",
+      "to": "Done",
+      "by": "사람",
+      "at": "2026-09-07T11:08:39"
+    },
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "SR 승인(SR-208)",
+      "at": "2026-09-08T08:27:40"
+    },
+    {
+      "from": "Approved",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-08T08:29:35"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "사람",
+      "at": "2026-09-08T08:36:13"
+    },
+    {
+      "from": "Review",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-08T08:43:41"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "사람",
+      "at": "2026-09-08T08:51:45"
+    },
+    {
+      "from": "Review",
+      "to": "Done",
+      "by": "사람",
+      "at": "2026-09-08T09:09:19"
+    },
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "SR 공간 시드(SR-210)",
+      "at": "2026-09-08T10:42:33"
+    },
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "SR 공간 시드(SR-210)",
+      "at": "2026-09-08T10:43:40"
+    },
+    {
+      "from": "Approved",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-08T10:45:39"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "사람",
+      "at": "2026-09-08T11:49:58"
+    },
+    {
+      "from": "Review",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-08T11:56:02"
+    },
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "SR 승인(SR-213)",
+      "at": "2026-09-09T00:07:30"
+    },
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "SR 승인(SR-215)",
+      "at": "2026-09-09T07:36:03"
+    },
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "SR 승인(SR-219)",
+      "at": "2026-09-09T07:36:18"
+    },
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "SR 승인(SR-221)",
+      "at": "2026-09-09T07:36:26"
+    },
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "SR 승인(SR-222)",
+      "at": "2026-09-09T07:36:29"
+    },
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "SR 승인(SR-224)",
+      "at": "2026-09-09T07:36:37"
+    },
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "SR 승인(SR-225)",
+      "at": "2026-09-09T07:36:42"
+    },
+    {
+      "from": "Approved",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-09T09:41:07"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "사람",
+      "at": "2026-09-09T09:44:57"
+    },
+    {
+      "from": "Review",
+      "to": "Done",
+      "by": "사람",
+      "at": "2026-09-09T10:43:10"
+    },
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "사람",
+      "at": "2026-09-09T10:50:10"
+    },
+    {
+      "from": "Approved",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-09T10:50:15"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "사람",
+      "at": "2026-09-09T10:52:57"
+    },
+    {
+      "from": "Review",
+      "to": "Done",
+      "by": "사람",
+      "at": "2026-09-09T11:38:42"
+    },
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "사람",
+      "at": "2026-09-09T11:39:47"
+    },
+    {
+      "from": "Approved",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-09T11:39:58"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "사람",
+      "at": "2026-09-09T11:46:54"
+    },
+    {
+      "from": "Review",
+      "to": "Done",
+      "by": "사람",
+      "at": "2026-09-09T12:08:47"
+    },
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "사람",
+      "at": "2026-09-09T12:10:29"
+    },
+    {
+      "from": "Approved",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-09T12:10:37"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "사람",
+      "at": "2026-09-09T12:15:09"
+    },
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "SR 승인(SR-226)",
+      "at": "2026-09-11T13:14:42"
+    },
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "SR 승인(SR-227)",
+      "at": "2026-09-11T13:14:46"
+    },
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "SR 승인(SR-228)",
+      "at": "2026-09-11T13:14:50"
+    }
+  ],
+  "escalate": false,
+  "fail_rounds": 1,
+  "max_rounds": 3,
+  "waivers": [
+    {
+      "active": true,
+      "by": "사람",
+      "reason": "scope_verify.py 오분류 수용 — OrderService.java(list():58-72)는 SR-208 AC1을 구현하는 핵심 파일이며 45행에 linked_func: FUNC-order-001 주석도 존재한다. 기본 3줄 diff 컨텍스트가 주석 라인을 포함하지 못해 축A가 out_of_scope로 오분류했고 축B(conformance)는 그 판정을 그대로 병기한 것뿐 — 내용 정합 자체는 문제없음(AC1~9 전건 일치 확인됨). 실diff 확인 완료.",
+      "at": "2026-09-08T09:07:28",
+      "layer": "conformance"
+    },
+    {
+      "active": true,
+      "by": "사람",
+      "reason": "이번 라운드 소스 변경 없음(기존 구현 재검증) — out_of_scope 2건(.gitignore, linked-func-cache.json)은 이 FUNC와 무관한 선행 변경",
+      "at": "2026-09-09T11:06:04",
+      "layer": "scope"
+    }
+  ]
+}

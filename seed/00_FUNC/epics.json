@@ -1,0 +1,683 @@
+{
+  "generated_at": "2026-09-21T09:00:56",
+  "_note": "파생물(재생성 시 덮어씀). 사람입력(status/clarification) 정본은 .speclinker/epic_notes.json — 직접 편집 또는 epic_notes.set_note() API로 수정.",
+  "epics": [
+    {
+      "id": "domain:member",
+      "title": "member (도메인 Epic)",
+      "source": "domain",
+      "stories": [
+        "FUNC-member-002",
+        "FUNC-member-003",
+        "FUNC-member-004",
+        "FUNC-member-005",
+        "FUNC-member-006",
+        "FUNC-member-007",
+        "FUNC-member-008",
+        "FUNC-member-009",
+        "FUNC-member-010",
+        "FUNC-member-011",
+        "FUNC-member-012"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "domain:order",
+      "title": "order (도메인 Epic)",
+      "source": "domain",
+      "stories": [
+        "FUNC-order-001",
+        "FUNC-order-002",
+        "FUNC-order-003",
+        "FUNC-order-004",
+        "FUNC-order-005",
+        "FUNC-order-006",
+        "FUNC-order-007",
+        "FUNC-order-009",
+        "FUNC-order-010",
+        "FUNC-order-011",
+        "FUNC-order-012",
+        "FUNC-order-013"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "LAB-104",
+      "title": "주문 목록 CSV 내보내기",
+      "source": "sr",
+      "origin": "docs/변경관리/LAB-104",
+      "stories": [
+        "FUNC-order-013"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "QUICK-20260915-1",
+      "title": "QUICK-20260915-1",
+      "source": "sr",
+      "origin": "docs/변경관리/QUICK-20260915-1",
+      "stories": [
+        "QUICK-20260915-1.1"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-201",
+      "title": "상품 카탈로그 화면 신설",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-201",
+      "stories": [
+        "FUNC-order-007",
+        "FUNC-order-009",
+        "FUNC-order-010"
+      ],
+      "status": "planned",
+      "clarification": "resolved"
+    },
+    {
+      "id": "SR-202",
+      "title": "장바구니 도입",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-202",
+      "stories": [
+        "FUNC-order-010",
+        "FUNC-order-011"
+      ],
+      "status": "planned",
+      "clarification": "resolved"
+    },
+    {
+      "id": "SR-203",
+      "title": "체크아웃 — 장바구니를 주문으로 전환",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-203",
+      "stories": [
+        "FUNC-order-011",
+        "FUNC-order-012"
+      ],
+      "status": "planned",
+      "clarification": "resolved"
+    },
+    {
+      "id": "SR-204",
+      "title": "API 인증·반출 통제 도입",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-204",
+      "stories": [
+        "FUNC-order-001"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-205",
+      "title": "SR-205",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-205",
+      "stories": [
+        "FUNC-order-001"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-207",
+      "title": "SR-207",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-207",
+      "stories": [
+        "FUNC-order-004"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-208",
+      "title": "SR-208",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-208",
+      "stories": [
+        "FUNC-order-001"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-209",
+      "title": "SR-209",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-209",
+      "stories": [
+        "FUNC-order-001"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-210",
+      "title": "SR-210",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-210",
+      "stories": [
+        "FUNC-order-001"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-211",
+      "title": "SR-211",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-211",
+      "stories": [
+        "FUNC-order-014"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-212",
+      "title": "SR-212",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-212",
+      "stories": [
+        "FUNC-order-010",
+        "FUNC-order-015",
+        "FUNC-order-016"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-213",
+      "title": "SR-213",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-213",
+      "stories": [
+        "FUNC-order-001",
+        "FUNC-order-013"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-214",
+      "title": "SR-214",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-214",
+      "stories": [
+        "FUNC-order-007",
+        "FUNC-order-009"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-215",
+      "title": "SR-215",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-215",
+      "stories": [
+        "FUNC-order-001"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-216",
+      "title": "SR-216",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-216",
+      "stories": [
+        "FUNC-order-010",
+        "FUNC-order-011"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-217",
+      "title": "SR-217",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-217",
+      "stories": [
+        "FUNC-order-017"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-218",
+      "title": "SR-218",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-218",
+      "stories": [
+        "FUNC-order-002"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-219",
+      "title": "SR-219",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-219",
+      "stories": [
+        "FUNC-order-001"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-220",
+      "title": "SR-220",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-220",
+      "stories": [
+        "FUNC-order-007",
+        "FUNC-order-009"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-221",
+      "title": "SR-221",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-221",
+      "stories": [
+        "FUNC-order-001"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-222",
+      "title": "SR-222",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-222",
+      "stories": [
+        "FUNC-order-001",
+        "FUNC-order-002"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-223",
+      "title": "SR-223",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-223",
+      "stories": [
+        "FUNC-order-013"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-224",
+      "title": "SR-224",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-224",
+      "stories": [
+        "FUNC-order-001",
+        "FUNC-order-009",
+        "FUNC-order-011"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-225",
+      "title": "SR-225",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-225",
+      "stories": [
+        "FUNC-order-001",
+        "FUNC-order-002",
+        "FUNC-order-010"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-226",
+      "title": "SR-226",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-226",
+      "stories": [
+        "FUNC-order-001"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-227",
+      "title": "SR-227",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-227",
+      "stories": [
+        "FUNC-order-001"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-228",
+      "title": "SR-228",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-228",
+      "stories": [
+        "FUNC-order-001"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-229",
+      "title": "SR-229",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-229",
+      "stories": [
+        "FUNC-order-002"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-230",
+      "title": "SR-230",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-230",
+      "stories": [
+        "FUNC-order-009"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-231",
+      "title": "SR-231",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-231",
+      "stories": [
+        "FUNC-member-001",
+        "FUNC-member-002",
+        "FUNC-member-003"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-232",
+      "title": "SR-232",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-232",
+      "stories": [
+        "FUNC-member-004",
+        "FUNC-member-005",
+        "FUNC-member-006"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-234",
+      "title": "SR-234",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-234",
+      "stories": [
+        "FUNC-member-007",
+        "FUNC-member-008",
+        "FUNC-member-009"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-235",
+      "title": "SR-235",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-235",
+      "stories": [
+        "SR-235.1",
+        "SR-235.2",
+        "SR-235.3"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-295",
+      "title": "SR-295",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-295",
+      "stories": [
+        "SR-295.1"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-297",
+      "title": "SR-297",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-297",
+      "stories": [
+        "SR-297.1",
+        "SR-297.2"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-298",
+      "title": "SR-298",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-298",
+      "stories": [
+        "SR-298.1",
+        "SR-298.2"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-300",
+      "title": "SR-300",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-300",
+      "stories": [
+        "SR-300.1"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-301",
+      "title": "SR-301",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-301",
+      "stories": [
+        "SR-301.1"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-302",
+      "title": "SR-302",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-302",
+      "stories": [
+        "SR-302.1"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-303",
+      "title": "SR-303",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-303",
+      "stories": [
+        "SR-303.1"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-304",
+      "title": "SR-304",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-304",
+      "stories": [
+        "SR-304.1"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-305",
+      "title": "SR-305",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-305",
+      "stories": [
+        "SR-305.1"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-306",
+      "title": "SR-306",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-306",
+      "stories": [
+        "SR-306.1",
+        "SR-306.2"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-307",
+      "title": "SR-307",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-307",
+      "stories": [
+        "SR-307.1"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-309",
+      "title": "SR-309",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-309",
+      "stories": [
+        "SR-309.1"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-310",
+      "title": "SR-310",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-310",
+      "stories": [
+        "SR-310.1"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-311",
+      "title": "SR-311",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-311",
+      "stories": [
+        "SR-311.1"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-312",
+      "title": "SR-312",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-312",
+      "stories": [
+        "SR-312.1",
+        "SR-312.2"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-313",
+      "title": "SR-313",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-313",
+      "stories": [
+        "SR-313.1",
+        "SR-313.2",
+        "SR-313.3"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-314",
+      "title": "SR-314",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-314",
+      "stories": [
+        "SR-314.1",
+        "SR-314.2"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-349",
+      "title": "SR-349",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-349",
+      "stories": [
+        "SR-349.1",
+        "SR-349.3",
+        "SR-349.5"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    },
+    {
+      "id": "SR-350",
+      "title": "SR-350",
+      "source": "sr",
+      "origin": "docs/변경관리/SR-350",
+      "stories": [
+        "SR-350.1"
+      ],
+      "status": "planned",
+      "clarification": "none"
+    }
+  ],
+  "_meta": {
+    "schema": 1,
+    "generated_at": "2026-09-21T09:00:56",
+    "generator": "build_epics@1",
+    "sources": {
+      "docs/00_FUNC/FUNC_MAP.md": "1789624628000000000:6160|16b42c479189bb92cca56a8fae7600bce0d3f8d0",
+      "docs/변경관리": "dir-sha1:a3294cdd92d57fd8325a6c0ead270902e92d8276",
+      ".speclinker/epic_notes.json": "1787393249000000000:78|7215010a97695509badbb4f977b171dada6219c0"
+    }
+  }
+}

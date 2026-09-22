@@ -1,0 +1,217 @@
+{
+  "func": "FUNC-member-009",
+  "epic": null,
+  "story": "docs/00_FUNC/stories/STORY-FUNC-member-009.md",
+  "gate": "CONCERNS",
+  "reviewer": "qa-agent",
+  "updated": "2026-09-13T10:51:16",
+  "layers": {
+    "spec": "pass",
+    "security": "pass",
+    "regression": "pass",
+    "baseline": "pass",
+    "scope": "pass",
+    "rules": "concerns",
+    "conformance": "pass"
+  },
+  "top_issues": [
+    {
+      "severity": "medium",
+      "layer": "rules",
+      "finding": "규칙 위반 [lab/file-size-cap/java-file-cap] modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java:0 — 자바 파일 450줄 초과 — 책임을 나눈다(필터·핸들러·서비스가 한 파일에 자라면 QA가 스코프를 못 가른다)",
+      "suggested_action": "규칙을 지키도록 고치거나, 규칙이 틀렸으면 SpecLens /rules에서 규칙을 고치세요"
+    }
+  ],
+  "rounds": [
+    {
+      "round": 1,
+      "gate": "CONCERNS",
+      "human": {
+        "decision": "rework",
+        "by": "사람",
+        "at": "2026-09-13T10:33:08",
+        "comment": "[medium 1] MemberPasswordResetConfirmationFlowTest에 회원 API 키 폐기 실측 추가: 재설정 전 발급된 회원 API 키로 보호 API 호출 200 -> 재설정 뒤 같은 키로 401(또는 revoked_at NOT NULL을 DAO로 확인) - 리프레시 401 MBR-4012 케이스와 같은 모양으로 추가.\n[medium 2] MemberPasswordResetConfirmationWriter.applyNewPassword: updatePasswordHash 반환 행수가 0이면 revoke 두 건(리프레시 토큰, 회원 API 키)을 건너뛴다(계획 9단계 및 MemberDao#updatePasswordHash javadoc 그대로 구현). 서비스 테스트에 0행 케이스(revoke가 호출되지 않음을 verify) 추가. STORY Dev 기록의 \"계획과 다르게 간 지점 없음\" 문구를 사실대로(반환값 미체크 -> 수정) 정정한다.\n[완료 조건] mvn test 전량 통과(기존 447 + 신규 2건 이상), 기준선 416/0 유지. 기준선 재기록(447)은 이 SR 커밋 뒤 사람이 별도로 한다 - 이번 라운드에서 baseline 파일을 건드리지 않는다.\n[수용] low 5건은 이번 라운드 수용 - 병렬 버스트 시도상한 우회는 형제 FUNC-003과 동일 패턴이라 후속 SR로 묶는다. LOWER(email) 풀스캔은 회원 수 규모상 수용.",
+        "targets": []
+      },
+      "layers": {
+        "spec": "pass",
+        "security": "concerns",
+        "regression": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "MemberPasswordResetConfirmationFlowTest가 리프레시 토큰 폐기(401 MBR-4012)만 실측하고 회원 API 키 폐기는 전혀 실측하지 않는다 — STORY 완료 조건 '전 기기 로그아웃(리프레시 토큰·회원 API 키 폐기) 실측이 모두 통과'의 절반이 미측정. 동작 자체는 정상(revokeByMemberId가 revoked_at 세팅 + ApiKeyAuthFilter DB 폴백이 revoked_at IS NULL 필터)이지만 회귀를 잡아줄 테스트가 없다.",
+          "suggested_action": "흐름 테스트 (1)에 3줄 추가 — 재설정 전 로그인 응답의 apiKey를 보관하고, 확정 204 뒤 그 키로 인증 필요 엔드포인트(GET /api/members/{memberId})를 호출해 401을 assert"
+        },
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "MemberPasswordResetConfirmationWriter.applyNewPassword가 updatePasswordHash의 반환값을 버린다. 계획 9단계는 '0행이면 다음 단계 스킵'이라 썼고 MemberDao#updatePasswordHash javadoc도 '0행이면 ... 호출부는 이후 단계를 스킵한다'고 단언하는데 실제 코드는 무조건 revoke 2건을 실행한다. 동작 피해는 없으나(탈퇴 회원 토큰·키 폐기는 안전측) 문서가 코드와 반대이고 Dev 기록의 '계획과 다르게 간 지점 없음'도 사실과 다르다.",
+          "suggested_action": "스킵을 구현하거나(권장: 반환값 0이면 early return) javadoc·계획 문구·Dev 기록을 코드에 맞춰 정정 — 둘 중 하나로 일치시킨다"
+        },
+        {
+          "severity": "low",
+          "layer": "security",
+          "finding": "'행 없음'과 '오답'은 단건 응답에서는 바이트 동일하지만 오답 6회 연속 시퀀스로는 구분 가능하다(행이 있으면 6번째가 MBR-4103, 행이 없으면 계속 MBR-4102). 다만 MEMBER_PASSWORD_RESETS 행은 FUNC-008이 회원 여부와 무관하게 누구에게나 만들어 주므로 회원 존재 오라클은 아니다(공격자가 스스로 행을 만들 수 있다).",
+          "suggested_action": "STORY의 '구분 불가' 주장 범위를 '단건 응답'으로 좁혀 기록 — 다음 세션이 시퀀스 구분 가능성을 새 결함으로 재발견하지 않게"
+        },
+        {
+          "severity": "low",
+          "layer": "security",
+          "finding": "시도 상한(5)이 병렬 버스트로 우회 가능 — confirmIfCodeMatches(검사)와 incrementAttemptCount(증가)가 별도 문장이라 동시 N건은 카운터가 오르기 전에 N개 추측이 모두 평가된다. 형제 FUNC-003 verifyCode(markVerifiedIfCodeMatches → selectAttemptCount → incrementAttemptCount)가 완전히 동일한 패턴이라 이 FUNC이 새로 만든 결함은 아니다.",
+          "suggested_action": "코드베이스 공통 후속 SR 후보 — 검사+증가를 단일 문장으로 합치거나 IP 단위 스로틀 도입(이 FUNC 범위 밖)"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "selectMemberIdByResetTarget의 LOWER(email) = #{email}은 uq_members_email 인덱스를 쓸 수 없어 무인증 엔드포인트 호출마다 MEMBERS 풀스캔이 된다(collation에 매칭을 맡기지 않겠다는 계획 의도 자체는 타당).",
+          "suggested_action": "후속 — 생성 컬럼(email_lower) + 인덱스 또는 호출측이 원문 대소문자까지 맞춰 조회. 랩 규모에서는 즉시 영향 없음"
+        },
+        {
+          "severity": "low",
+          "layer": "security",
+          "finding": "application.yml 정적 lab.api-keys의 lab-member-0001-key: M-0001은 MEMBER_API_KEYS 테이블 밖이라 M-0001의 비밀번호 재설정 후에도 계속 필터를 통과한다 — '재설정 후 모든 기기 로그아웃'의 랩 픽스처 예외. 계획은 admin 키만 논했다.",
+          "suggested_action": "랩 픽스처 한계로 KNOWN_ENV_ISSUES 또는 STORY 범위 밖 절에 기록(운영 코드 수정 대상 아님)"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": ".speclinker/test_baseline.json의 shop-api 기준선이 394(git_head 6394f1a)로 stale하다 — STORY 완료 조건은 416을 인용하고 surefire 실측은 447이다. 테스트 손실은 없으나(447 > 394) 다음 FUNC이 대조할 정본이 어긋나 있다.",
+          "suggested_action": "python {{PLUGIN_PATH}}/scripts/test_baseline_ws.py record . --force 로 447/0 재기록"
+        }
+      ],
+      "cause": "impl_bug"
+    },
+    {
+      "round": 2,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass"
+      },
+      "top_issues": [],
+      "cause": "none"
+    },
+    {
+      "round": 3,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "pass"
+      },
+      "top_issues": [],
+      "layer": "baseline"
+    },
+    {
+      "round": 4,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "pass",
+        "scope": "pass"
+      },
+      "top_issues": [],
+      "layer": "scope"
+    },
+    {
+      "round": 5,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "pass",
+        "scope": "pass",
+        "rules": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "rules",
+          "finding": "규칙 위반 [lab/file-size-cap/java-file-cap] modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java:0 — 자바 파일 450줄 초과 — 책임을 나눈다(필터·핸들러·서비스가 한 파일에 자라면 QA가 스코프를 못 가른다)",
+          "suggested_action": "규칙을 지키도록 고치거나, 규칙이 틀렸으면 SpecLens /rules에서 규칙을 고치세요"
+        }
+      ],
+      "layer": "rules"
+    },
+    {
+      "round": 6,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "pass",
+        "scope": "pass",
+        "rules": "concerns",
+        "conformance": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "rules",
+          "finding": "규칙 위반 [lab/file-size-cap/java-file-cap] modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java:0 — 자바 파일 450줄 초과 — 책임을 나눈다(필터·핸들러·서비스가 한 파일에 자라면 QA가 스코프를 못 가른다)",
+          "suggested_action": "규칙을 지키도록 고치거나, 규칙이 틀렸으면 SpecLens /rules에서 규칙을 고치세요"
+        }
+      ],
+      "layer": "conformance"
+    }
+  ],
+  "waiver": {
+    "active": false
+  },
+  "story_transitions": [
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "SR 승인(SR-234)",
+      "at": "2026-09-13T08:39:55"
+    },
+    {
+      "from": "Approved",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-13T10:09:30"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "사람",
+      "at": "2026-09-13T10:24:45"
+    },
+    {
+      "from": "Review",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-13T10:33:08"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "사람",
+      "at": "2026-09-13T10:39:03"
+    },
+    {
+      "from": "Review",
+      "to": "Done",
+      "by": "사람",
+      "at": "2026-09-13T10:56:12"
+    }
+  ],
+  "cause": "none",
+  "escalate": false,
+  "fail_rounds": 0,
+  "max_rounds": 3
+}

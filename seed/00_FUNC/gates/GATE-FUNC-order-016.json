@@ -1,0 +1,22 @@
+{
+  "func": "FUNC-order-016",
+  "epic": null,
+  "story": "docs/00_FUNC/stories/STORY-FUNC-order-016.md",
+  "gate": null,
+  "reviewer": "qa-agent",
+  "updated": null,
+  "layers": {},
+  "top_issues": [],
+  "rounds": [],
+  "waiver": {
+    "active": false
+  },
+  "story_transitions": [
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "SR 승인(SR-212)",
+      "at": "2026-09-08T23:58:47"
+    }
+  ]
+}

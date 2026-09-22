@@ -1,0 +1,351 @@
+{
+  "func": "FUNC-order-012",
+  "epic": "SR-203",
+  "story": "docs/00_FUNC/stories/STORY-FUNC-order-012.md",
+  "gate": "CONCERNS",
+  "reviewer": "qa-agent",
+  "updated": "2026-08-23T07:05:21",
+  "layers": {
+    "spec": "pass",
+    "security": "concerns",
+    "regression": "concerns",
+    "scope": "pass"
+  },
+  "top_issues": [
+    {
+      "severity": "medium",
+      "layer": "regression",
+      "finding": "CheckoutConcurrencyTest가 실패 시 공용 랩 DB를 오염시킨다 — @AfterEach는 createdOrderNos에 담긴 주문만 지우는데 createdOrderNos.add(orderNo)가 성공 단언 '이후'에 실행된다. 이 테스트가 잡으려는 바로 그 회귀가 나면 정리 대상이 비고 주문·재고 차감이 잔류한다. 변이 검증에서 주문 8건 잔류·SKU-1002 40->32 실측(QA가 수동 원복)",
+      "suggested_action": "2xx 응답의 orderNo를 단언 '전에' 전부 수집하거나, @AfterEach가 회원·시각 범위로 정리하도록 수정"
+    },
+    {
+      "severity": "low",
+      "layer": "spec",
+      "finding": "409 메시지 접두어가 사유와 어긋난다 — 판매중지·상품없음도 '재고 부족: SKU-1004(판매중지)'로 나간다(헤드라인 거짓). 아울러 D6의 409 정의는 아직 '재고 부족'뿐이라, 판매중지를 409에 넣은 이번 구현이 계약을 앞서 있다",
+      "suggested_action": "'주문할 수 없는 품목:' 등 중립 접두어로 교체 + D6/INF-ORD-014를 '409 = 주문 불가 품목(재고 부족·판매중지)'로 개정"
+    },
+    {
+      "severity": "low",
+      "layer": "regression",
+      "finding": "사전 스윕(sweepStockIssues)의 productDao.selectBySku가 비잠금 일관읽기라 REPEATABLE-READ 스냅샷 재고를 본다. 다른 회원이 그사이 차감·커밋하면 스윕 통과 후 decreaseStock가 0행 -> r1과 같은 단건 fail-fast 409로 퇴화한다(데이터 정합은 안전, dev가 '최종 진실'로 문서화)",
+      "suggested_action": "스윕을 잠금 읽기로 올리거나 D6에 '경합 구간에서는 단건 통지 가능'을 명문화"
+    },
+    {
+      "severity": "low",
+      "layer": "regression",
+      "finding": "sweepStockIssues가 품목당 1쿼리(N+1)를 CART_ITEMS 행 잠금 보유 중에 수행 — 잠금 보유 시간이 품목 수에 비례해 늘어 동시 처리량이 떨어진다",
+      "suggested_action": "IN절 일괄 조회로 전환"
+    },
+    {
+      "severity": "low",
+      "layer": "security",
+      "finding": "이월 3건(seq 채번 오분류·IDOR·CSRF)의 근거가 story 본문에만 있어 Done 이후 묻힌다. r1 권고 5가 지목한 docs/KNOWN_LIMITATIONS.md는 .lab-ws에 존재하지 않는다",
+      "suggested_action": "SR-202 story의 '## 후속 추적(TODO)' 섹션 선례를 따라 승격하거나 후속 SR 초안으로 등록"
+    },
+    {
+      "severity": "low",
+      "layer": "regression",
+      "finding": "동시 요청 패자가 받는 메시지가 400 '장바구니가 비어 있습니다'라 더블클릭 사용자에게 원인을 오인시킨다(r1 권고 4 잔존). 데이터 정합은 안전해져 등급은 하향",
+      "suggested_action": "중복 제출 전용 문구로 정리"
+    },
+    {
+      "severity": "low",
+      "layer": "spec",
+      "finding": "sweepStockIssues의 '(상품 없음)' 분기는 CART_ITEMS.sku가 PRODUCTS FK라 도달 불가(INSERT IGNORE로 0행 실측). 방어 코드로 무해하나 테스트로 고정 불가한 경로",
+      "suggested_action": "인지만 하고 유지(또는 주석으로 도달 불가 명시)"
+    }
+  ],
+  "rounds": [
+    {
+      "round": 1,
+      "gate": "FAIL",
+      "human": {
+        "decision": "rework",
+        "by": "사람(자기승인-실증)",
+        "at": "2026-08-23T06:33:02",
+        "comment": "필수1: 동시 체크아웃 차단 — checkout에서 장바구니 행 SELECT..FOR UPDATE 잠금(selectItemsForUpdate 신설) → 첫 트랜잭션 커밋 후 후속은 빈 장바구니 400. 8병렬 동시성 테스트(주문 1·나머지 400·재고 정확) 필수. 필수2: 재고 부족 사유를 품목별 '목록'으로 — 사전 스윕으로 부족 품목 전수 수집해 409 본문에 배열(최종 진실은 트랜잭션 차감 유지). 필수3: 판매중지 포함 체크아웃 409 계열 정합. 이월: seq 채번 오분류(선재 in-memory 채번 설계 — 후속 SR 후보 TODO), itemCount 정의는 D6에 추기(문서).",
+        "targets": [
+          "modules/shop-api/src/main/java/com/sm/lab/shop/service/CartService.java",
+          "modules/shop-api/src/main/resources/mapper/cart.xml"
+        ]
+      },
+      "layers": {
+        "spec": "concerns",
+        "security": "concerns",
+        "regression": "fail"
+      },
+      "top_issues": [
+        {
+          "severity": "high",
+          "layer": "regression",
+          "finding": "같은 회원 동시 체크아웃에서 중복 주문 10/10 라운드 재현 — 담긴 수량 1개 장바구니에 동시요청 4건 투입 시 주문 4건 생성·재고 4 차감. checkout이 selectItems→OrderService.create→deleteAllItems의 애플리케이션 read-modify-write이고 REPEATABLE-READ 스냅샷이 서로를 막지 못함. project-context.md Critical Rule #3·금지패턴 1번 위반이며 SR-202 round1 QA FAIL의 재발. 화면 PRG는 F5만 막고 더블클릭·다중탭은 못 막음",
+          "suggested_action": "장바구니 전량 삭제 영향행수를 선점 근거로 삼는 원자 연산(DELETE 먼저, 0행이면 중단) 또는 SELECT ... FOR UPDATE로 대상 라인 선점 후 진행하도록 재작업"
+        },
+        {
+          "severity": "high",
+          "layer": "regression",
+          "finding": "신규 15건에 동시성 테스트가 0건이라 위 결함이 게이트를 그대로 통과했다(CheckoutAtomicityTest는 단일 트랜잭션 롤백만 검증)",
+          "suggested_action": "CheckoutConcurrencyTest 신설 — @SpringBootTest(RANDOM_PORT), N>=4 동시 체크아웃, 주문 1건·재고 1차감만 발생함을 단언(CartConcurrencyTest 관례 준수)"
+        },
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "AC-05/D6는 '부족 품목별 사유 목록'인데 구현은 OrderService.create 루프의 첫 부족 품목 하나만 fail-fast로 전파(라이브 실측: message='재고 부족: SKU-1003'). 다품목 부족 시 사용자가 수량 조정을 반복해야 함",
+          "suggested_action": "전 품목 검사 후 부족 품목 전체를 모아 409로 반환하거나, D6/03_TC를 '첫 부족 품목만 통지'로 개정"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "OrderService.seq가 in-memory AtomicInteger(100 시작)라 같은 날 재기동 시 yyyyMMdd-0101을 재발급 → DuplicateKeyException이 CartController 스코프 ApiExceptionHandler에 걸려 409 '동시 요청이 겹쳤습니다'로 오분류(재현 실측). 같은 결함이 POST /api/orders에서는 500. advice의 전제(CartController의 DuplicateKey = CART_ITEMS 담기 경합)가 체크아웃의 ORDERS 생성으로 깨짐 — Critical Rule #2가 금지한 장애 위장 계열",
+          "suggested_action": "advice의 DuplicateKeyException 매핑 범위를 재점검(서버 채번 결함은 500), 근본은 OrderService.seq를 DB 채번으로 대체"
+        },
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "OrderService.create가 미존재·판매중지(sale_yn='N') 상품에 400을 던지므로, 담은 뒤 판매중지된 상품이 있으면 체크아웃이 400을 반환 — D6의 400은 '빈 장바구니'로만 정의된 계약 밖 응답",
+          "suggested_action": "409로 정규화하거나 D6/INF-ORD-014에 400의 두 번째 사유로 명문화"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "itemCount = 주문 라인 수(distinct SKU, 라이브 실측 2) 결정이 D6에 없고 story Dev 기록에만 존재 — 계약 공백",
+          "suggested_action": "D6/INF-ORD-014에 itemCount 단위를 명문화"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "더블클릭 시 두 번째 요청이 400 '장바구니가 비어 있습니다' flash로 표시되어 성공 직후 실패 안내가 뜬다",
+          "suggested_action": "필수수정 1(선점 처리)과 함께 중복 제출 응답 문구 정리"
+        },
+        {
+          "severity": "low",
+          "layer": "security",
+          "finding": "체크아웃은 재고를 확정 차감하는 금전적 행위인데 인증 없이 본문/폼의 memberId만으로 실행 가능(IDOR). 랩 기존 패턴과 동일해 신규 결함은 아니나 되돌리기 비용이 큰 행위라 위험 등급 상승",
+          "suggested_action": "docs/KNOWN_LIMITATIONS.md에 인증 부재 스코프로 기록"
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "gate": "CONCERNS",
+      "human": {
+        "decision": "track",
+        "by": "사람(자기승인-실증)",
+        "at": "2026-08-23T07:00:15",
+        "comment": "CONCERNS 수용·진행. 필수 3건 해소 실측+변이 검증 인정. 권고 처리: #1(테스트 실패 시 DB 오염)은 SM 즉수정(주문번호 등록을 단언 이전으로), #2 후단(D6 409 계열 개정)은 D9로 문서 추기, #5는 story 후속 추적(TODO) 승격. #2 접두어·#3·#4·#6·#7은 후속 추적 기록만(비차단).",
+        "targets": []
+      },
+      "layers": {
+        "spec": "pass",
+        "security": "concerns",
+        "regression": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "CheckoutConcurrencyTest가 실패 시 공용 랩 DB를 오염시킨다 — @AfterEach는 createdOrderNos에 담긴 주문만 지우는데 createdOrderNos.add(orderNo)가 성공 단언 '이후'에 실행된다. 이 테스트가 잡으려는 바로 그 회귀가 나면 정리 대상이 비고 주문·재고 차감이 잔류한다. 변이 검증에서 주문 8건 잔류·SKU-1002 40->32 실측(QA가 수동 원복)",
+          "suggested_action": "2xx 응답의 orderNo를 단언 '전에' 전부 수집하거나, @AfterEach가 회원·시각 범위로 정리하도록 수정"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "409 메시지 접두어가 사유와 어긋난다 — 판매중지·상품없음도 '재고 부족: SKU-1004(판매중지)'로 나간다(헤드라인 거짓). 아울러 D6의 409 정의는 아직 '재고 부족'뿐이라, 판매중지를 409에 넣은 이번 구현이 계약을 앞서 있다",
+          "suggested_action": "'주문할 수 없는 품목:' 등 중립 접두어로 교체 + D6/INF-ORD-014를 '409 = 주문 불가 품목(재고 부족·판매중지)'로 개정"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "사전 스윕(sweepStockIssues)의 productDao.selectBySku가 비잠금 일관읽기라 REPEATABLE-READ 스냅샷 재고를 본다. 다른 회원이 그사이 차감·커밋하면 스윕 통과 후 decreaseStock가 0행 -> r1과 같은 단건 fail-fast 409로 퇴화한다(데이터 정합은 안전, dev가 '최종 진실'로 문서화)",
+          "suggested_action": "스윕을 잠금 읽기로 올리거나 D6에 '경합 구간에서는 단건 통지 가능'을 명문화"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "sweepStockIssues가 품목당 1쿼리(N+1)를 CART_ITEMS 행 잠금 보유 중에 수행 — 잠금 보유 시간이 품목 수에 비례해 늘어 동시 처리량이 떨어진다",
+          "suggested_action": "IN절 일괄 조회로 전환"
+        },
+        {
+          "severity": "low",
+          "layer": "security",
+          "finding": "이월 3건(seq 채번 오분류·IDOR·CSRF)의 근거가 story 본문에만 있어 Done 이후 묻힌다. r1 권고 5가 지목한 docs/KNOWN_LIMITATIONS.md는 .lab-ws에 존재하지 않는다",
+          "suggested_action": "SR-202 story의 '## 후속 추적(TODO)' 섹션 선례를 따라 승격하거나 후속 SR 초안으로 등록"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "동시 요청 패자가 받는 메시지가 400 '장바구니가 비어 있습니다'라 더블클릭 사용자에게 원인을 오인시킨다(r1 권고 4 잔존). 데이터 정합은 안전해져 등급은 하향",
+          "suggested_action": "중복 제출 전용 문구로 정리"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "sweepStockIssues의 '(상품 없음)' 분기는 CART_ITEMS.sku가 PRODUCTS FK라 도달 불가(INSERT IGNORE로 0행 실측). 방어 코드로 무해하나 테스트로 고정 불가한 경로",
+          "suggested_action": "인지만 하고 유지(또는 주석으로 도달 불가 명시)"
+        }
+      ]
+    },
+    {
+      "round": 3,
+      "gate": "FAIL",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "concerns",
+        "regression": "concerns",
+        "scope": "fail"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "CheckoutConcurrencyTest가 실패 시 공용 랩 DB를 오염시킨다 — @AfterEach는 createdOrderNos에 담긴 주문만 지우는데 createdOrderNos.add(orderNo)가 성공 단언 '이후'에 실행된다. 이 테스트가 잡으려는 바로 그 회귀가 나면 정리 대상이 비고 주문·재고 차감이 잔류한다. 변이 검증에서 주문 8건 잔류·SKU-1002 40->32 실측(QA가 수동 원복)",
+          "suggested_action": "2xx 응답의 orderNo를 단언 '전에' 전부 수집하거나, @AfterEach가 회원·시각 범위로 정리하도록 수정"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "409 메시지 접두어가 사유와 어긋난다 — 판매중지·상품없음도 '재고 부족: SKU-1004(판매중지)'로 나간다(헤드라인 거짓). 아울러 D6의 409 정의는 아직 '재고 부족'뿐이라, 판매중지를 409에 넣은 이번 구현이 계약을 앞서 있다",
+          "suggested_action": "'주문할 수 없는 품목:' 등 중립 접두어로 교체 + D6/INF-ORD-014를 '409 = 주문 불가 품목(재고 부족·판매중지)'로 개정"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "사전 스윕(sweepStockIssues)의 productDao.selectBySku가 비잠금 일관읽기라 REPEATABLE-READ 스냅샷 재고를 본다. 다른 회원이 그사이 차감·커밋하면 스윕 통과 후 decreaseStock가 0행 -> r1과 같은 단건 fail-fast 409로 퇴화한다(데이터 정합은 안전, dev가 '최종 진실'로 문서화)",
+          "suggested_action": "스윕을 잠금 읽기로 올리거나 D6에 '경합 구간에서는 단건 통지 가능'을 명문화"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "sweepStockIssues가 품목당 1쿼리(N+1)를 CART_ITEMS 행 잠금 보유 중에 수행 — 잠금 보유 시간이 품목 수에 비례해 늘어 동시 처리량이 떨어진다",
+          "suggested_action": "IN절 일괄 조회로 전환"
+        },
+        {
+          "severity": "low",
+          "layer": "security",
+          "finding": "이월 3건(seq 채번 오분류·IDOR·CSRF)의 근거가 story 본문에만 있어 Done 이후 묻힌다. r1 권고 5가 지목한 docs/KNOWN_LIMITATIONS.md는 .lab-ws에 존재하지 않는다",
+          "suggested_action": "SR-202 story의 '## 후속 추적(TODO)' 섹션 선례를 따라 승격하거나 후속 SR 초안으로 등록"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "동시 요청 패자가 받는 메시지가 400 '장바구니가 비어 있습니다'라 더블클릭 사용자에게 원인을 오인시킨다(r1 권고 4 잔존). 데이터 정합은 안전해져 등급은 하향",
+          "suggested_action": "중복 제출 전용 문구로 정리"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "sweepStockIssues의 '(상품 없음)' 분기는 CART_ITEMS.sku가 PRODUCTS FK라 도달 불가(INSERT IGNORE로 0행 실측). 방어 코드로 무해하나 테스트로 고정 불가한 경로",
+          "suggested_action": "인지만 하고 유지(또는 주석으로 도달 불가 명시)"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: modules/shop-api/mvnw.cmd (??)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        }
+      ],
+      "layer": "scope"
+    },
+    {
+      "round": 4,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "concerns",
+        "regression": "concerns",
+        "scope": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "CheckoutConcurrencyTest가 실패 시 공용 랩 DB를 오염시킨다 — @AfterEach는 createdOrderNos에 담긴 주문만 지우는데 createdOrderNos.add(orderNo)가 성공 단언 '이후'에 실행된다. 이 테스트가 잡으려는 바로 그 회귀가 나면 정리 대상이 비고 주문·재고 차감이 잔류한다. 변이 검증에서 주문 8건 잔류·SKU-1002 40->32 실측(QA가 수동 원복)",
+          "suggested_action": "2xx 응답의 orderNo를 단언 '전에' 전부 수집하거나, @AfterEach가 회원·시각 범위로 정리하도록 수정"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "409 메시지 접두어가 사유와 어긋난다 — 판매중지·상품없음도 '재고 부족: SKU-1004(판매중지)'로 나간다(헤드라인 거짓). 아울러 D6의 409 정의는 아직 '재고 부족'뿐이라, 판매중지를 409에 넣은 이번 구현이 계약을 앞서 있다",
+          "suggested_action": "'주문할 수 없는 품목:' 등 중립 접두어로 교체 + D6/INF-ORD-014를 '409 = 주문 불가 품목(재고 부족·판매중지)'로 개정"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "사전 스윕(sweepStockIssues)의 productDao.selectBySku가 비잠금 일관읽기라 REPEATABLE-READ 스냅샷 재고를 본다. 다른 회원이 그사이 차감·커밋하면 스윕 통과 후 decreaseStock가 0행 -> r1과 같은 단건 fail-fast 409로 퇴화한다(데이터 정합은 안전, dev가 '최종 진실'로 문서화)",
+          "suggested_action": "스윕을 잠금 읽기로 올리거나 D6에 '경합 구간에서는 단건 통지 가능'을 명문화"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "sweepStockIssues가 품목당 1쿼리(N+1)를 CART_ITEMS 행 잠금 보유 중에 수행 — 잠금 보유 시간이 품목 수에 비례해 늘어 동시 처리량이 떨어진다",
+          "suggested_action": "IN절 일괄 조회로 전환"
+        },
+        {
+          "severity": "low",
+          "layer": "security",
+          "finding": "이월 3건(seq 채번 오분류·IDOR·CSRF)의 근거가 story 본문에만 있어 Done 이후 묻힌다. r1 권고 5가 지목한 docs/KNOWN_LIMITATIONS.md는 .lab-ws에 존재하지 않는다",
+          "suggested_action": "SR-202 story의 '## 후속 추적(TODO)' 섹션 선례를 따라 승격하거나 후속 SR 초안으로 등록"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "동시 요청 패자가 받는 메시지가 400 '장바구니가 비어 있습니다'라 더블클릭 사용자에게 원인을 오인시킨다(r1 권고 4 잔존). 데이터 정합은 안전해져 등급은 하향",
+          "suggested_action": "중복 제출 전용 문구로 정리"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "sweepStockIssues의 '(상품 없음)' 분기는 CART_ITEMS.sku가 PRODUCTS FK라 도달 불가(INSERT IGNORE로 0행 실측). 방어 코드로 무해하나 테스트로 고정 불가한 경로",
+          "suggested_action": "인지만 하고 유지(또는 주석으로 도달 불가 명시)"
+        }
+      ],
+      "layer": "scope"
+    }
+  ],
+  "waiver": {
+    "active": false
+  },
+  "story_transitions": [
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "사람(자기승인-실증)",
+      "at": "2026-08-23T06:08:24"
+    },
+    {
+      "from": "Approved",
+      "to": "InProgress",
+      "by": "사람(자기승인-실증)",
+      "at": "2026-08-23T06:08:25"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "dev-agent",
+      "at": "2026-08-23T06:19:58"
+    },
+    {
+      "from": "Review",
+      "to": "InProgress",
+      "by": "사람(자기승인-실증)",
+      "at": "2026-08-23T06:33:02"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "사람(자기승인-실증)",
+      "at": "2026-08-23T07:00:43"
+    },
+    {
+      "from": "Review",
+      "to": "Done",
+      "by": "사람(자기승인-실증)",
+      "at": "2026-08-23T07:08:51"
+    }
+  ],
+  "escalate": false,
+  "fail_rounds": 1,
+  "max_rounds": 3
+}

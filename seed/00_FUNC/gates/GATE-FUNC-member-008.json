@@ -1,0 +1,388 @@
+{
+  "func": "FUNC-member-008",
+  "epic": null,
+  "story": "docs/00_FUNC/stories/STORY-FUNC-member-008.md",
+  "gate": "CONCERNS",
+  "reviewer": "qa-agent",
+  "updated": "2026-09-13T09:42:18",
+  "layers": {
+    "spec": "concerns",
+    "security": "pass",
+    "regression": "pass",
+    "baseline": "pass",
+    "scope": "pass",
+    "rules": "concerns",
+    "conformance": "pass"
+  },
+  "top_issues": [
+    {
+      "severity": "medium",
+      "layer": "spec",
+      "finding": "STORY '계약' 절 line 86이 구현과 모순 — '010-1234-5678 → 01012345678' 정규화 예시가 남아 있으나 round2 이후 하이픈 표기는 400 MBR-4100이다. 이 절이 /sl-recon-inf의 INF-MBR-006 역생성 원문이자 FUNC-007(화면, 아직 Approved·구현 전)·FUNC-009가 읽을 계약이라 방치하면 다음 FUNC이 하이픈을 보내도록 구현한 뒤 400을 맞는다.",
+      "suggested_action": "line 86의 하이픈 예시를 '하이픈·공백 포함 표기는 400 MBR-4100(형제 가입 API와 동일)'로 정정하고 정규화 예시는 이메일만 남긴다. 재작업 지시 4가 요구한 '화면이 어느 표기를 보내도 되는가'를 STORY-FUNC-member-007.md에 한 줄로 못 박는다(코드 변경 0)."
+    },
+    {
+      "severity": "low",
+      "layer": "regression",
+      "finding": "round2가 도입한 재조회(dao.selectByTarget)가 실패하면 쓰기는 이미 커밋됐는데 발송 로그는 없이 500 MBR-5000이 나가고, 즉시 재시도해도 쿨다운이 새 코드를 버려 60초간 어떤 코드도 전달되지 않는다.",
+      "suggested_action": "응답 분기는 금지(오라클)이므로 재조회 실패를 catch해 '발송 미확정' 경고 로그만 남기거나, 수용한 위험으로 decisions.all.md에 기록하고 SR-297에 묶는다."
+    },
+    {
+      "severity": "low",
+      "layer": "spec",
+      "finding": "새 쿨다운 테스트의 마지막 assert(서비스 테스트 line 244, dao.selectByTarget(target).getCodeHash()==previousHash)는 목이 스텁된 값을 되돌려주는지만 확인하는 tautology다 — 하중을 지는 것은 logAppender.list 비어 있음 하나이고 DB 불변은 DaoTest 59초 케이스가 증명한다.",
+      "suggested_action": "해당 assert를 지우거나 '목 스텁 확인용, 실증은 MemberPasswordResetDaoTest 소관'임을 주석으로 명시한다."
+    },
+    {
+      "severity": "low",
+      "layer": "spec",
+      "finding": "재작업 지시 3(expiresInSeconds 상수 600이 쿨다운 무시 요청에 최대 60초 과대 표기)의 decisions.all.md 기록이 없다 — 사람이 코드는 '그대로(설계상 허용)'로 확정했으나 FUNC-007 화면이 이 값을 절대 잔여시간으로 신뢰하면 표시가 틀린다.",
+      "suggested_action": "권고 1의 STORY-FUNC-member-007 한 줄에 '남은 유효시간은 이 값을 절대 기준으로 신뢰하지 않는다'를 같이 적는다."
+    },
+    {
+      "severity": "medium",
+      "layer": "rules",
+      "finding": "규칙 위반 [lab/file-size-cap/java-file-cap] modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java:0 — 자바 파일 450줄 초과 — 책임을 나눈다(필터·핸들러·서비스가 한 파일에 자라면 QA가 스코프를 못 가른다)",
+      "suggested_action": "규칙을 지키도록 고치거나, 규칙이 틀렸으면 SpecLens /rules에서 규칙을 고치세요"
+    },
+    {
+      "severity": "low",
+      "layer": "conformance",
+      "finding": "STORY '구현 계획 > 계약' 절(현재 파일 기준 line 90)은 이미 r2 정정 문구('하이픈 표기는 400 MBR-4100')로 갱신되어 있어 코드와 일치한다 — round2 QA가 지적한 'line 86 예시가 여전히 하이픈 200을 암시한다'는 갭은 verify 시점 재확인 결과 이미 해소된 상태였다(사실 기록, 결함 아님).",
+      "suggested_action": "조치 불필요 — 관찰 기록만",
+      "confidence": "high"
+    },
+    {
+      "severity": "low",
+      "layer": "conformance",
+      "finding": "일일 요청 상한 미도입은 QA round1 medium 권고에 따라 harness/decisions.all.md:27-28에 '수용한 위험 + 후속 SR(SR-297) 이월'로 기록되어 있음을 diff 밖에서 직접 확인 — STORY '범위 밖' 절과 일치, 축A(unimplemented)에도 안 잡힘.",
+      "suggested_action": "조치 불필요 — SR-297 접수 시 재확인",
+      "confidence": "high"
+    }
+  ],
+  "rounds": [
+    {
+      "round": 1,
+      "gate": "FAIL",
+      "human": {
+        "decision": "rework",
+        "by": "사람",
+        "at": "2026-09-13T09:17:13",
+        "comment": "[결정 요약] 필수 1건 재작업 + low 2건은 같은 라운드에서 같이(싸고 같은 파일). medium(일일 상한)은 SR 범위 밖 — decisions.all.md에 수용 기록하고 후속 SR로 이월. [구현 방식] (1) 순서: 코드 생성→해시→touchRequest(UPSERT)→dao.selectByTarget으로 저장된 code_hash가 방금 만든 해시와 같을 때만 발송 로그(SR-231 r5 last_token 대조 기법). 쿨다운으로 버려졌으면 로그 없음. 응답은 어느 경우든 202·상수 바디. (2) PHONE_PATTERN·normalize는 새로 두지 않고 형제 가입 API의 상수·메서드(MemberRegistrationService.normalizePhone과 그 검증 정규식)를 그대로 재사용해 같은 입력이 한쪽 202·한쪽 400이 되는 일을 없앤다. (3) DAO 동시성 테스트 target에 UUID 접미(계획대로). (4) expiresInSeconds 상수 600과 공백 분기는 그대로(설계상 허용). [테스트·완료 조건] 서비스 테스트에 60초 안 재요청 시 발송 로그 0건·DB 해시 불변 케이스 추가(로그 어펜더 캡처). mvn test 전량 통과, 기준선 394/0 유지. [후속 SR·이월] 일일 상한·만료 정리 배치 → 후속 SR 접수(SR-297 예정), decisions.all.md 5줄.",
+        "targets": [
+          "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberPasswordResetService.java"
+        ]
+      },
+      "layers": {
+        "spec": "fail",
+        "security": "concerns",
+        "regression": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "high",
+          "layer": "spec",
+          "finding": "MemberPasswordResetService:105 — '발송' 로그가 쿨다운 판정(dao.touchRequest, :108)보다 앞에서 무조건 실행된다. 60초 안 재요청도 발송 이벤트를 또 남기므로 SR 확정 요건 '재전송은 60초 쿨다운'이 DB 행에만 걸리고 발송 경로에는 전혀 안 걸린다. 게다가 방금 생성·발송한 코드 B는 UPSERT가 버리고 DB엔 코드 A의 해시가 남아, 발송된 코드와 저장된 해시가 갈린다(DAO 테스트 59초 케이스가 code_hash 불변을 실증하므로 확정). 사람이 재사용 대상으로 지목한 MemberSignupService.requestVerificationCode는 반대 순서다 — 레이트리밋 통과 → writeCode → 그 다음 발송 로그.",
+          "suggested_action": "touchRequest 뒤 이미 존재하는 dao.selectByTarget으로 저장된 code_hash가 방금 만든 codeHash와 같은지 확인해 같을 때만 발송 로그를 남긴다(SR-231 round5 last_token 대조와 동일 기법). 응답은 여전히 무조건 202·상수 바디이므로 오라클은 새지 않는다. 서비스 테스트에 '쿨다운으로 버려진 경우 발송 로그 없음' 케이스 추가."
+        },
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "무인증 쓰기 경로에 target별 60초 쿨다운뿐이고, 신규 target은 매 요청 새 행을 만든다. 형식만 맞는 임의 target을 무제한 POST하면 MEMBER_PASSWORD_RESETS가 무한 증식하고(만료행 정리 배치는 범위 밖), 위 high 이슈와 겹치면 임의 대상에게 무제한 발송이 된다. 형제 API(MemberSignupService)는 target별 일일 5회 상한 + MemberSignupMaintenanceScheduler purge를 둘 다 가진다.",
+          "suggested_action": "① 형제 API와 같은 target별 일일 상한 추가(응답은 여전히 202 — 차등 응답 금지), 또는 ② harness/decisions.all.md에 '수용한 위험 + 반증 조건' 5줄로 기록하고 후속 SR로 이월. 둘 중 하나를 이번 라운드에 정한다."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "expiresInSeconds가 항상 600이라 쿨다운으로 무시된 요청에는 실제 잔여 유효시간을 최대 60초 과대 표기한다. 상수 유지 자체는 옳다(실제 잔여를 돌려주면 '최근에 재설정을 요청했는가' 활동 오라클이 된다).",
+          "suggested_action": "트레이드오프를 decisions.all.md에 기록하고, FUNC-007 화면의 '남은 유효시간'이 이 값을 절대 기준으로 신뢰하지 않도록 STORY에 명시."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "PHONE_PATTERN을 형제 가입 API(^01[016789][0-9]{7,8}$)보다 넓혀 하이픈을 허용해, 같은 입력 '010-1234-5678'이 재설정에서는 202·가입 인증코드에서는 400이 된다(자릿수 범위는 동일, dev가 근거 명시).",
+          "suggested_action": "두 API 중 어느 쪽 형식이 정본인지 결정하고, FUNC-007 화면이 어느 표기를 보내도 되는지 STORY/INF에 남긴다."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "DAO 동시성 테스트 target이 계획의 UUID 접미가 아니라 고정 접미(TARGET + \"-concurrency\")다. @AfterEach 정리가 있어 사례집 SR-232 r2는 충족하나 surefire 병렬화 시 충돌한다.",
+          "suggested_action": "계획대로 UUID 접미로 바꾸거나, 병렬화하지 않는다는 전제를 테스트 주석에 남긴다."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "MemberPasswordResetService.normalize의 \\s 제거 분기는 PHONE_PATTERN이 내부 공백을 허용하지 않아 도달 불가(사문화 코드).",
+          "suggested_action": "참조 구현(normalizePhone)과의 문자 단위 동일성 유지가 목적이면 그 의도를 주석 한 줄로 명시."
+        }
+      ],
+      "cause": "plan_gap"
+    },
+    {
+      "round": 2,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "concerns",
+        "security": "pass",
+        "regression": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "STORY '계약' 절 line 86이 구현과 모순 — '010-1234-5678 → 01012345678' 정규화 예시가 남아 있으나 round2 이후 하이픈 표기는 400 MBR-4100이다. 이 절이 /sl-recon-inf의 INF-MBR-006 역생성 원문이자 FUNC-007(화면, 아직 Approved·구현 전)·FUNC-009가 읽을 계약이라 방치하면 다음 FUNC이 하이픈을 보내도록 구현한 뒤 400을 맞는다.",
+          "suggested_action": "line 86의 하이픈 예시를 '하이픈·공백 포함 표기는 400 MBR-4100(형제 가입 API와 동일)'로 정정하고 정규화 예시는 이메일만 남긴다. 재작업 지시 4가 요구한 '화면이 어느 표기를 보내도 되는가'를 STORY-FUNC-member-007.md에 한 줄로 못 박는다(코드 변경 0)."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "round2가 도입한 재조회(dao.selectByTarget)가 실패하면 쓰기는 이미 커밋됐는데 발송 로그는 없이 500 MBR-5000이 나가고, 즉시 재시도해도 쿨다운이 새 코드를 버려 60초간 어떤 코드도 전달되지 않는다.",
+          "suggested_action": "응답 분기는 금지(오라클)이므로 재조회 실패를 catch해 '발송 미확정' 경고 로그만 남기거나, 수용한 위험으로 decisions.all.md에 기록하고 SR-297에 묶는다."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "새 쿨다운 테스트의 마지막 assert(서비스 테스트 line 244, dao.selectByTarget(target).getCodeHash()==previousHash)는 목이 스텁된 값을 되돌려주는지만 확인하는 tautology다 — 하중을 지는 것은 logAppender.list 비어 있음 하나이고 DB 불변은 DaoTest 59초 케이스가 증명한다.",
+          "suggested_action": "해당 assert를 지우거나 '목 스텁 확인용, 실증은 MemberPasswordResetDaoTest 소관'임을 주석으로 명시한다."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "재작업 지시 3(expiresInSeconds 상수 600이 쿨다운 무시 요청에 최대 60초 과대 표기)의 decisions.all.md 기록이 없다 — 사람이 코드는 '그대로(설계상 허용)'로 확정했으나 FUNC-007 화면이 이 값을 절대 잔여시간으로 신뢰하면 표시가 틀린다.",
+          "suggested_action": "권고 1의 STORY-FUNC-member-007 한 줄에 '남은 유효시간은 이 값을 절대 기준으로 신뢰하지 않는다'를 같이 적는다."
+        }
+      ],
+      "cause": "spec_gap"
+    },
+    {
+      "round": 3,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "concerns",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "STORY '계약' 절 line 86이 구현과 모순 — '010-1234-5678 → 01012345678' 정규화 예시가 남아 있으나 round2 이후 하이픈 표기는 400 MBR-4100이다. 이 절이 /sl-recon-inf의 INF-MBR-006 역생성 원문이자 FUNC-007(화면, 아직 Approved·구현 전)·FUNC-009가 읽을 계약이라 방치하면 다음 FUNC이 하이픈을 보내도록 구현한 뒤 400을 맞는다.",
+          "suggested_action": "line 86의 하이픈 예시를 '하이픈·공백 포함 표기는 400 MBR-4100(형제 가입 API와 동일)'로 정정하고 정규화 예시는 이메일만 남긴다. 재작업 지시 4가 요구한 '화면이 어느 표기를 보내도 되는가'를 STORY-FUNC-member-007.md에 한 줄로 못 박는다(코드 변경 0)."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "round2가 도입한 재조회(dao.selectByTarget)가 실패하면 쓰기는 이미 커밋됐는데 발송 로그는 없이 500 MBR-5000이 나가고, 즉시 재시도해도 쿨다운이 새 코드를 버려 60초간 어떤 코드도 전달되지 않는다.",
+          "suggested_action": "응답 분기는 금지(오라클)이므로 재조회 실패를 catch해 '발송 미확정' 경고 로그만 남기거나, 수용한 위험으로 decisions.all.md에 기록하고 SR-297에 묶는다."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "새 쿨다운 테스트의 마지막 assert(서비스 테스트 line 244, dao.selectByTarget(target).getCodeHash()==previousHash)는 목이 스텁된 값을 되돌려주는지만 확인하는 tautology다 — 하중을 지는 것은 logAppender.list 비어 있음 하나이고 DB 불변은 DaoTest 59초 케이스가 증명한다.",
+          "suggested_action": "해당 assert를 지우거나 '목 스텁 확인용, 실증은 MemberPasswordResetDaoTest 소관'임을 주석으로 명시한다."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "재작업 지시 3(expiresInSeconds 상수 600이 쿨다운 무시 요청에 최대 60초 과대 표기)의 decisions.all.md 기록이 없다 — 사람이 코드는 '그대로(설계상 허용)'로 확정했으나 FUNC-007 화면이 이 값을 절대 잔여시간으로 신뢰하면 표시가 틀린다.",
+          "suggested_action": "권고 1의 STORY-FUNC-member-007 한 줄에 '남은 유효시간은 이 값을 절대 기준으로 신뢰하지 않는다'를 같이 적는다."
+        }
+      ],
+      "layer": "baseline"
+    },
+    {
+      "round": 4,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "concerns",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "pass",
+        "scope": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "STORY '계약' 절 line 86이 구현과 모순 — '010-1234-5678 → 01012345678' 정규화 예시가 남아 있으나 round2 이후 하이픈 표기는 400 MBR-4100이다. 이 절이 /sl-recon-inf의 INF-MBR-006 역생성 원문이자 FUNC-007(화면, 아직 Approved·구현 전)·FUNC-009가 읽을 계약이라 방치하면 다음 FUNC이 하이픈을 보내도록 구현한 뒤 400을 맞는다.",
+          "suggested_action": "line 86의 하이픈 예시를 '하이픈·공백 포함 표기는 400 MBR-4100(형제 가입 API와 동일)'로 정정하고 정규화 예시는 이메일만 남긴다. 재작업 지시 4가 요구한 '화면이 어느 표기를 보내도 되는가'를 STORY-FUNC-member-007.md에 한 줄로 못 박는다(코드 변경 0)."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "round2가 도입한 재조회(dao.selectByTarget)가 실패하면 쓰기는 이미 커밋됐는데 발송 로그는 없이 500 MBR-5000이 나가고, 즉시 재시도해도 쿨다운이 새 코드를 버려 60초간 어떤 코드도 전달되지 않는다.",
+          "suggested_action": "응답 분기는 금지(오라클)이므로 재조회 실패를 catch해 '발송 미확정' 경고 로그만 남기거나, 수용한 위험으로 decisions.all.md에 기록하고 SR-297에 묶는다."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "새 쿨다운 테스트의 마지막 assert(서비스 테스트 line 244, dao.selectByTarget(target).getCodeHash()==previousHash)는 목이 스텁된 값을 되돌려주는지만 확인하는 tautology다 — 하중을 지는 것은 logAppender.list 비어 있음 하나이고 DB 불변은 DaoTest 59초 케이스가 증명한다.",
+          "suggested_action": "해당 assert를 지우거나 '목 스텁 확인용, 실증은 MemberPasswordResetDaoTest 소관'임을 주석으로 명시한다."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "재작업 지시 3(expiresInSeconds 상수 600이 쿨다운 무시 요청에 최대 60초 과대 표기)의 decisions.all.md 기록이 없다 — 사람이 코드는 '그대로(설계상 허용)'로 확정했으나 FUNC-007 화면이 이 값을 절대 잔여시간으로 신뢰하면 표시가 틀린다.",
+          "suggested_action": "권고 1의 STORY-FUNC-member-007 한 줄에 '남은 유효시간은 이 값을 절대 기준으로 신뢰하지 않는다'를 같이 적는다."
+        }
+      ],
+      "layer": "scope"
+    },
+    {
+      "round": 5,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "concerns",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "pass",
+        "scope": "pass",
+        "rules": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "STORY '계약' 절 line 86이 구현과 모순 — '010-1234-5678 → 01012345678' 정규화 예시가 남아 있으나 round2 이후 하이픈 표기는 400 MBR-4100이다. 이 절이 /sl-recon-inf의 INF-MBR-006 역생성 원문이자 FUNC-007(화면, 아직 Approved·구현 전)·FUNC-009가 읽을 계약이라 방치하면 다음 FUNC이 하이픈을 보내도록 구현한 뒤 400을 맞는다.",
+          "suggested_action": "line 86의 하이픈 예시를 '하이픈·공백 포함 표기는 400 MBR-4100(형제 가입 API와 동일)'로 정정하고 정규화 예시는 이메일만 남긴다. 재작업 지시 4가 요구한 '화면이 어느 표기를 보내도 되는가'를 STORY-FUNC-member-007.md에 한 줄로 못 박는다(코드 변경 0)."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "round2가 도입한 재조회(dao.selectByTarget)가 실패하면 쓰기는 이미 커밋됐는데 발송 로그는 없이 500 MBR-5000이 나가고, 즉시 재시도해도 쿨다운이 새 코드를 버려 60초간 어떤 코드도 전달되지 않는다.",
+          "suggested_action": "응답 분기는 금지(오라클)이므로 재조회 실패를 catch해 '발송 미확정' 경고 로그만 남기거나, 수용한 위험으로 decisions.all.md에 기록하고 SR-297에 묶는다."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "새 쿨다운 테스트의 마지막 assert(서비스 테스트 line 244, dao.selectByTarget(target).getCodeHash()==previousHash)는 목이 스텁된 값을 되돌려주는지만 확인하는 tautology다 — 하중을 지는 것은 logAppender.list 비어 있음 하나이고 DB 불변은 DaoTest 59초 케이스가 증명한다.",
+          "suggested_action": "해당 assert를 지우거나 '목 스텁 확인용, 실증은 MemberPasswordResetDaoTest 소관'임을 주석으로 명시한다."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "재작업 지시 3(expiresInSeconds 상수 600이 쿨다운 무시 요청에 최대 60초 과대 표기)의 decisions.all.md 기록이 없다 — 사람이 코드는 '그대로(설계상 허용)'로 확정했으나 FUNC-007 화면이 이 값을 절대 잔여시간으로 신뢰하면 표시가 틀린다.",
+          "suggested_action": "권고 1의 STORY-FUNC-member-007 한 줄에 '남은 유효시간은 이 값을 절대 기준으로 신뢰하지 않는다'를 같이 적는다."
+        },
+        {
+          "severity": "medium",
+          "layer": "rules",
+          "finding": "규칙 위반 [lab/file-size-cap/java-file-cap] modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java:0 — 자바 파일 450줄 초과 — 책임을 나눈다(필터·핸들러·서비스가 한 파일에 자라면 QA가 스코프를 못 가른다)",
+          "suggested_action": "규칙을 지키도록 고치거나, 규칙이 틀렸으면 SpecLens /rules에서 규칙을 고치세요"
+        }
+      ],
+      "layer": "rules"
+    },
+    {
+      "round": 6,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "concerns",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "pass",
+        "scope": "pass",
+        "rules": "concerns",
+        "conformance": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "STORY '계약' 절 line 86이 구현과 모순 — '010-1234-5678 → 01012345678' 정규화 예시가 남아 있으나 round2 이후 하이픈 표기는 400 MBR-4100이다. 이 절이 /sl-recon-inf의 INF-MBR-006 역생성 원문이자 FUNC-007(화면, 아직 Approved·구현 전)·FUNC-009가 읽을 계약이라 방치하면 다음 FUNC이 하이픈을 보내도록 구현한 뒤 400을 맞는다.",
+          "suggested_action": "line 86의 하이픈 예시를 '하이픈·공백 포함 표기는 400 MBR-4100(형제 가입 API와 동일)'로 정정하고 정규화 예시는 이메일만 남긴다. 재작업 지시 4가 요구한 '화면이 어느 표기를 보내도 되는가'를 STORY-FUNC-member-007.md에 한 줄로 못 박는다(코드 변경 0)."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "round2가 도입한 재조회(dao.selectByTarget)가 실패하면 쓰기는 이미 커밋됐는데 발송 로그는 없이 500 MBR-5000이 나가고, 즉시 재시도해도 쿨다운이 새 코드를 버려 60초간 어떤 코드도 전달되지 않는다.",
+          "suggested_action": "응답 분기는 금지(오라클)이므로 재조회 실패를 catch해 '발송 미확정' 경고 로그만 남기거나, 수용한 위험으로 decisions.all.md에 기록하고 SR-297에 묶는다."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "새 쿨다운 테스트의 마지막 assert(서비스 테스트 line 244, dao.selectByTarget(target).getCodeHash()==previousHash)는 목이 스텁된 값을 되돌려주는지만 확인하는 tautology다 — 하중을 지는 것은 logAppender.list 비어 있음 하나이고 DB 불변은 DaoTest 59초 케이스가 증명한다.",
+          "suggested_action": "해당 assert를 지우거나 '목 스텁 확인용, 실증은 MemberPasswordResetDaoTest 소관'임을 주석으로 명시한다."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "재작업 지시 3(expiresInSeconds 상수 600이 쿨다운 무시 요청에 최대 60초 과대 표기)의 decisions.all.md 기록이 없다 — 사람이 코드는 '그대로(설계상 허용)'로 확정했으나 FUNC-007 화면이 이 값을 절대 잔여시간으로 신뢰하면 표시가 틀린다.",
+          "suggested_action": "권고 1의 STORY-FUNC-member-007 한 줄에 '남은 유효시간은 이 값을 절대 기준으로 신뢰하지 않는다'를 같이 적는다."
+        },
+        {
+          "severity": "medium",
+          "layer": "rules",
+          "finding": "규칙 위반 [lab/file-size-cap/java-file-cap] modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java:0 — 자바 파일 450줄 초과 — 책임을 나눈다(필터·핸들러·서비스가 한 파일에 자라면 QA가 스코프를 못 가른다)",
+          "suggested_action": "규칙을 지키도록 고치거나, 규칙이 틀렸으면 SpecLens /rules에서 규칙을 고치세요"
+        },
+        {
+          "severity": "low",
+          "layer": "conformance",
+          "finding": "STORY '구현 계획 > 계약' 절(현재 파일 기준 line 90)은 이미 r2 정정 문구('하이픈 표기는 400 MBR-4100')로 갱신되어 있어 코드와 일치한다 — round2 QA가 지적한 'line 86 예시가 여전히 하이픈 200을 암시한다'는 갭은 verify 시점 재확인 결과 이미 해소된 상태였다(사실 기록, 결함 아님).",
+          "suggested_action": "조치 불필요 — 관찰 기록만",
+          "confidence": "high"
+        },
+        {
+          "severity": "low",
+          "layer": "conformance",
+          "finding": "일일 요청 상한 미도입은 QA round1 medium 권고에 따라 harness/decisions.all.md:27-28에 '수용한 위험 + 후속 SR(SR-297) 이월'로 기록되어 있음을 diff 밖에서 직접 확인 — STORY '범위 밖' 절과 일치, 축A(unimplemented)에도 안 잡힘.",
+          "suggested_action": "조치 불필요 — SR-297 접수 시 재확인",
+          "confidence": "high"
+        }
+      ],
+      "layer": "conformance"
+    }
+  ],
+  "waiver": {
+    "active": false
+  },
+  "story_transitions": [
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "SR 승인(SR-234)",
+      "at": "2026-09-13T08:39:54"
+    },
+    {
+      "from": "Approved",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-13T08:57:08"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "사람",
+      "at": "2026-09-13T09:08:05"
+    },
+    {
+      "from": "Review",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-13T09:17:13"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "사람",
+      "at": "2026-09-13T09:26:23"
+    },
+    {
+      "from": "Review",
+      "to": "Done",
+      "by": "사람",
+      "at": "2026-09-13T09:46:35"
+    }
+  ],
+  "cause": "spec_gap",
+  "escalate": false,
+  "fail_rounds": 1,
+  "max_rounds": 3
+}

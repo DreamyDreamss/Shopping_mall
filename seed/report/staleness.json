@@ -1,0 +1,1643 @@
+{
+  "generated_at": "2026-09-21T12:44:39",
+  "baseline_at": "2026-09-19T21:37:15",
+  "baselined": true,
+  "baseline_sources": [
+    {
+      "root": "{{SRC_SHOP_API}}",
+      "git_branch": null,
+      "git_head": null
+    },
+    {
+      "root": "{{SRC_SHOP_WEB}}",
+      "git_branch": null,
+      "git_head": null
+    }
+  ],
+  "source_roots": [
+    "{{SRC_SHOP_API}}",
+    "{{SRC_SHOP_WEB}}"
+  ],
+  "total": 62,
+  "counts": {
+    "stale": 39,
+    "unbaselined": 12,
+    "fresh": 11
+  },
+  "fresh_rate": 0.22,
+  "fresh_denominator": 50,
+  "fresh_excluded": 12,
+  "total_specs": 62,
+  "by_kind": {
+    "inf": 26,
+    "sch": 16,
+    "uis": 20
+  },
+  "items": [
+    {
+      "id": "INF-MBR-001",
+      "kind": "inf",
+      "file": "docs/05_설계서/member/INF/INF-MBR-001.md",
+      "status": "stale",
+      "changed": [
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/controller/MemberSignupController.java:28-45",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberSignupService.java:107-196",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberSignupApiException.java:1-32",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/web/MemberSignupExceptionHandler.java:33-57",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberSignupVerificationDao.java:12-42",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberSignupRateLimitDao.java:18-60",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/resources/mapper/memberSignupVerification.xml:11-19",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/resources/mapper/memberSignupRateLimit.xml:33-48",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/controller/MemberSignupController.java:38-42",
+          "line_hit": true
+        }
+      ],
+      "missing": [],
+      "next": "/sl-recon-inf"
+    },
+    {
+      "id": "INF-MBR-002",
+      "kind": "inf",
+      "file": "docs/05_설계서/member/INF/INF-MBR-002.md",
+      "status": "stale",
+      "changed": [
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/controller/MemberRegistrationController.java:25-43",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberRegistrationService.java:92-332",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberSignupCompletionWriter.java:31-70",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberRegistrationApiException.java:14-43",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/web/MemberRegistrationExceptionHandler.java:32-61",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberSignupCompletionDao.java:39-76",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/resources/mapper/memberSignupCompletion.xml:6-70",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberDao.java:15-77",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/resources/mapper/member.xml:21-63",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberSignedUpEvent.java:11-27",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberSignedUpEventLogger.java:15-31",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/controller/MemberRegistrationController.java:34-40",
+          "line_hit": true
+        }
+      ],
+      "missing": [],
+      "next": "/sl-recon-inf"
+    },
+    {
+      "id": "INF-MBR-003",
+      "kind": "inf",
+      "file": "docs/05_설계서/member/INF/INF-MBR-003.md",
+      "status": "stale",
+      "changed": [
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/controller/MemberLoginController.java:22-38",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberLoginService.java:56-207",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberLoginApiException.java:13-42",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/web/MemberLoginExceptionHandler.java:25-54",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/domain/MemberCredential.java:16-33",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/domain/MemberLoginAttempt.java:12-26",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberDao.java:79-91",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/resources/mapper/member.xml:66-70",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberLoginAttemptDao.java:17-40",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/resources/mapper/memberLoginAttempt.xml:6-31",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberRefreshTokenDao.java:28-49",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/resources/mapper/memberRefreshToken.xml:6-40",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberApiKeyDao.java:17-44",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/resources/mapper/memberApiKey.xml:6-36",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java:136-200",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java:218-255",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/controller/MemberLoginController.java:32-35",
+          "line_hit": true
+        }
+      ],
+      "missing": [],
+      "next": "/sl-recon-inf"
+    },
+    {
+      "id": "INF-MBR-004",
+      "kind": "inf",
+      "file": "docs/05_설계서/member/INF/INF-MBR-004.md",
+      "status": "stale",
+      "changed": [
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/controller/MemberSessionController.java:28-43",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberSessionService.java:64-93",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberSessionService.java:95-116",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/web/MemberSessionExceptionHandler.java:41-48",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberApiKeyDao.java:44-61",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/resources/mapper/memberApiKey.xml:36-58",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberRefreshTokenDao.java:62-67",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/resources/mapper/memberRefreshToken.xml:51-58",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java:227-244",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java:365-370",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/controller/MemberSessionController.java:39-43",
+          "line_hit": true
+        }
+      ],
+      "missing": [],
+      "next": "/sl-recon-inf"
+    },
+    {
+      "id": "INF-MBR-005",
+      "kind": "inf",
+      "file": "docs/05_설계서/member/INF/INF-MBR-005.md",
+      "status": "stale",
+      "changed": [
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/controller/MemberSessionController.java:28-36",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/controller/MemberSessionController.java:45-52",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberSessionService.java:64-93",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberSessionService.java:118-149",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberSessionService.java:151-165",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberSessionService.java:167-169",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberSessionApiException.java:17-35",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/web/MemberSessionExceptionHandler.java:28-48",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberApiKeyDao.java:20-42",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/resources/mapper/memberApiKey.xml:8-34",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberRefreshTokenDao.java:30-60",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberRefreshTokenDao.java:69-75",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/resources/mapper/memberRefreshToken.xml:8-49",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/resources/mapper/memberRefreshToken.xml:60-67",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberDao.java:12-14",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/resources/mapper/member.xml:14-19",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java:144-149",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java:197-209",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/controller/MemberSessionController.java:46-49",
+          "line_hit": true
+        },
+        {
+          "anchor": "memberApiKey.xml",
+          "line_hit": true
+        }
+      ],
+      "missing": [],
+      "next": "/sl-recon-inf"
+    },
+    {
+      "id": "INF-MBR-006",
+      "kind": "inf",
+      "file": "docs/05_설계서/member/INF/INF-MBR-006.md",
+      "status": "stale",
+      "changed": [
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/controller/MemberPasswordResetController.java:13-28",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/controller/MemberPasswordResetController.java:38-44",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberPasswordResetService.java:108-139",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberPasswordResetService.java:141-171",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberPasswordResetApiException.java:12-30",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/web/MemberPasswordResetExceptionHandler.java:28-49",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberPasswordResetDao.java:16-40",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/resources/mapper/memberPasswordReset.xml:13-22",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/resources/mapper/memberPasswordReset.xml:24-28",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java:152-155",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java:203-216",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberPasswordResetRateLimitDao.java",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/resources/mapper/memberPasswordResetRateLimit.xml",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/domain/MemberPasswordResetRateLimit.java",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/controller/MemberPasswordResetController.java:39-44",
+          "line_hit": true
+        },
+        {
+          "anchor": "memberPasswordReset.xml",
+          "line_hit": true
+        }
+      ],
+      "missing": [],
+      "next": "/sl-recon-inf"
+    },
+    {
+      "id": "INF-MBR-007",
+      "kind": "inf",
+      "file": "docs/05_설계서/member/INF/INF-MBR-007.md",
+      "status": "stale",
+      "changed": [
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/controller/MemberPasswordResetConfirmationController.java:13-29",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/controller/MemberPasswordResetConfirmationController.java:40-45",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberPasswordResetConfirmationService.java:85-137",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberPasswordResetConfirmationService.java:139-171",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberPasswordResetConfirmationWriter.java:44-65",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberPasswordResetConfirmationApiException.java:16-34",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/web/MemberPasswordResetConfirmationExceptionHandler.java:28-49",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberPasswordResetDao.java:41-65",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberDao.java:93-118",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/resources/mapper/memberPasswordReset.xml:35-60",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/resources/mapper/member.xml:72-90",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java:157-161",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java:209-223",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/controller/MemberPasswordResetConfirmationController.java:41-45",
+          "line_hit": true
+        }
+      ],
+      "missing": [],
+      "next": "/sl-recon-inf"
+    },
+    {
+      "id": "INF-MBR-008",
+      "kind": "inf",
+      "file": "docs/05_설계서/member/INF/INF-MBR-008.md",
+      "status": "stale",
+      "changed": [
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/controller/MemberAddressController.java:36-51",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/controller/MemberAddressController.java:53-97",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/controller/MemberAddressController.java:99-113",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberAddressService.java:82-128",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberAddressService.java:130-148",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberAddressService.java:150-190",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberAddressService.java:192-260",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberAddressApiException.java:13-31",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/web/MemberAddressExceptionHandler.java:27-48",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberAddressDao.java:20-71",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/resources/mapper/memberAddress.xml:8-92",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/domain/MemberAddress.java:17-61",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java:173-179",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java:301-307",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/controller/MemberAddressController.java:36-113",
+          "line_hit": true
+        }
+      ],
+      "missing": [],
+      "next": "/sl-recon-inf"
+    },
+    {
+      "id": "INF-MBR-010",
+      "kind": "inf",
+      "file": "docs/05_설계서/member/INF/INF-MBR-010.md",
+      "status": "unbaselined",
+      "changed": [],
+      "missing": [],
+      "next": "/sl-recon-inf"
+    },
+    {
+      "id": "INF-ORD-001",
+      "kind": "inf",
+      "file": "docs/05_설계서/order/INF/INF-ORD-001.md",
+      "status": "stale",
+      "changed": [
+        {
+          "anchor": "src/main/java/com/sm/lab/shop/controller/MemberController.java:21-25",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/java/com/sm/lab/shop/service/MemberService.java:24-26",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/java/com/sm/lab/shop/dao/MemberDao.java:11",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/resources/mapper/member.xml:7-12",
+          "line_hit": true
+        }
+      ],
+      "missing": [],
+      "next": "/sl-recon-inf"
+    },
+    {
+      "id": "INF-ORD-002",
+      "kind": "inf",
+      "file": "docs/05_설계서/order/INF/INF-ORD-002.md",
+      "status": "stale",
+      "changed": [
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/controller/MemberController.java:27-31",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberService.java:28-36",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberDao.java:12",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/dao/OrderDao.java:32",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/resources/mapper/member.xml:14-19",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/resources/mapper/order.xml:62-71",
+          "line_hit": true
+        }
+      ],
+      "missing": [],
+      "next": "/sl-recon-inf"
+    },
+    {
+      "id": "INF-ORD-003",
+      "kind": "inf",
+      "file": "docs/05_설계서/order/INF/INF-ORD-003.md",
+      "status": "fresh",
+      "changed": [],
+      "missing": [],
+      "next": "/sl-recon-inf"
+    },
+    {
+      "id": "INF-ORD-004",
+      "kind": "inf",
+      "file": "docs/05_설계서/order/INF/INF-ORD-004.md",
+      "status": "stale",
+      "changed": [
+        {
+          "anchor": "src/main/java/com/sm/lab/shop/controller/OrderController.java:46-50",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/java/com/sm/lab/shop/service/OrderService.java:127-135",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/java/com/sm/lab/shop/dao/OrderDao.java:30,33,35",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/resources/mapper/order.xml:54-60,73-79,83-88",
+          "line_hit": true
+        }
+      ],
+      "missing": [],
+      "next": "/sl-recon-inf"
+    },
+    {
+      "id": "INF-ORD-005",
+      "kind": "inf",
+      "file": "docs/05_설계서/order/INF/INF-ORD-005.md",
+      "status": "stale",
+      "changed": [
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/controller/OrderController.java:52-56",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/service/OrderService.java:137-166",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/dao/ProductDao.java:15-16",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/dao/OrderDao.java:30,33,35-37",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/resources/mapper/product.xml:18-29",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/resources/mapper/order.xml:54-60,73-98",
+          "line_hit": true
+        }
+      ],
+      "missing": [],
+      "next": "/sl-recon-inf"
+    },
+    {
+      "id": "INF-ORD-006",
+      "kind": "inf",
+      "file": "docs/05_설계서/order/INF/INF-ORD-006.md",
+      "status": "stale",
+      "changed": [
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/controller/OrderController.java:59-61",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/service/OrderService.java:169-188",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/dao/OrderDao.java:30-38",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/dao/ProductDao.java:15-18",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/resources/mapper/order.xml:54-60,73-79,83-88,100-107",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/resources/mapper/product.xml:32-36",
+          "line_hit": true
+        }
+      ],
+      "missing": [],
+      "next": "/sl-recon-inf"
+    },
+    {
+      "id": "INF-ORD-007",
+      "kind": "inf",
+      "file": "docs/05_설계서/order/INF/INF-ORD-007.md",
+      "status": "stale",
+      "changed": [
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/controller/OrderController.java:64-68",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/service/OrderService.java:127-135",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/dao/OrderDao.java:30,33,34-35",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/resources/mapper/order.xml:54-60,73-79,81-88",
+          "line_hit": true
+        }
+      ],
+      "missing": [],
+      "next": "/sl-recon-inf"
+    },
+    {
+      "id": "INF-ORD-008",
+      "kind": "inf",
+      "file": "docs/05_설계서/order/INF/INF-ORD-008.md",
+      "status": "stale",
+      "changed": [
+        {
+          "anchor": "src/main/java/com/sm/lab/shop/controller/ProductController.java:24-31",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/java/com/sm/lab/shop/service/ProductService.java:19-22",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/java/com/sm/lab/shop/dao/ProductDao.java:11",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/resources/mapper/product.xml:7-16",
+          "line_hit": true
+        }
+      ],
+      "missing": [],
+      "next": "/sl-recon-inf"
+    },
+    {
+      "id": "INF-ORD-009",
+      "kind": "inf",
+      "file": "docs/05_설계서/order/INF/INF-ORD-009.md",
+      "status": "stale",
+      "changed": [
+        {
+          "anchor": "src/main/java/com/sm/lab/shop/controller/ProductController.java:27-31",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/java/com/sm/lab/shop/service/ProductService.java:23-29",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/java/com/sm/lab/shop/dao/ProductDao.java:12",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/resources/mapper/product.xml:14-18",
+          "line_hit": true
+        }
+      ],
+      "missing": [],
+      "next": "/sl-recon-inf"
+    },
+    {
+      "id": "INF-ORD-010",
+      "kind": "inf",
+      "file": "docs/05_설계서/order/INF/INF-ORD-010.md",
+      "status": "stale",
+      "changed": [
+        {
+          "anchor": "src/main/java/com/sm/lab/shop/controller/CartController.java:22-26",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/java/com/sm/lab/shop/service/CartService.java:43-64",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/java/com/sm/lab/shop/dao/CartDao.java:13-14",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/java/com/sm/lab/shop/dao/CartDao.java:21-26",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/java/com/sm/lab/shop/dao/MemberDao.java:12",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/java/com/sm/lab/shop/dao/ProductDao.java:15",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/resources/mapper/cart.xml:6-13",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/resources/mapper/cart.xml:29-36",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/resources/mapper/member.xml:14-19",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/resources/mapper/product.xml:18-22",
+          "line_hit": true
+        }
+      ],
+      "missing": [],
+      "next": "/sl-recon-inf"
+    },
+    {
+      "id": "INF-ORD-011",
+      "kind": "inf",
+      "file": "docs/05_설계서/order/INF/INF-ORD-011.md",
+      "status": "stale",
+      "changed": [
+        {
+          "anchor": "src/main/java/com/sm/lab/shop/controller/CartController.java:28-32",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/java/com/sm/lab/shop/service/CartService.java:66-72",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/java/com/sm/lab/shop/dao/CartDao.java:16-17",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/java/com/sm/lab/shop/dao/MemberDao.java:12",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/resources/mapper/cart.xml:15-22",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/resources/mapper/member.xml:14-19",
+          "line_hit": true
+        }
+      ],
+      "missing": [],
+      "next": "/sl-recon-inf"
+    },
+    {
+      "id": "INF-ORD-012",
+      "kind": "inf",
+      "file": "docs/05_설계서/order/INF/INF-ORD-012.md",
+      "status": "stale",
+      "changed": [
+        {
+          "anchor": "src/main/java/com/sm/lab/shop/controller/CartController.java:34-39",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/java/com/sm/lab/shop/service/CartService.java:74-84",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/java/com/sm/lab/shop/dao/CartDao.java:13-14",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/java/com/sm/lab/shop/dao/CartDao.java:28",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/java/com/sm/lab/shop/dao/ProductDao.java:15",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/resources/mapper/cart.xml:6-13",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/resources/mapper/cart.xml:38-44",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/resources/mapper/product.xml:18-22",
+          "line_hit": true
+        }
+      ],
+      "missing": [],
+      "next": "/sl-recon-inf"
+    },
+    {
+      "id": "INF-ORD-013",
+      "kind": "inf",
+      "file": "docs/05_설계서/order/INF/INF-ORD-013.md",
+      "status": "stale",
+      "changed": [
+        {
+          "anchor": "src/main/java/com/sm/lab/shop/controller/CartController.java:41-46",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/java/com/sm/lab/shop/service/CartService.java:86-91",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/java/com/sm/lab/shop/dao/CartDao.java:13-14",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/java/com/sm/lab/shop/dao/CartDao.java:30",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/resources/mapper/cart.xml:6-13",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/resources/mapper/cart.xml:46-50",
+          "line_hit": true
+        }
+      ],
+      "missing": [],
+      "next": "/sl-recon-inf"
+    },
+    {
+      "id": "INF-ORD-014",
+      "kind": "inf",
+      "file": "docs/05_설계서/order/INF/INF-ORD-014.md",
+      "status": "stale",
+      "changed": [
+        {
+          "anchor": "src/main/java/com/sm/lab/shop/controller/CartController.java:53-56",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/java/com/sm/lab/shop/service/CartService.java:130-158",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/java/com/sm/lab/shop/service/CartService.java:166-179",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/java/com/sm/lab/shop/service/OrderService.java:137-166",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/java/com/sm/lab/shop/dao/CartDao.java:32-40",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/java/com/sm/lab/shop/dao/MemberDao.java:12",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/java/com/sm/lab/shop/dao/ProductDao.java:15-16",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/java/com/sm/lab/shop/dao/OrderDao.java:36-37",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/resources/mapper/cart.xml:54-71",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/resources/mapper/member.xml:14-19",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/resources/mapper/product.xml:18-29",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/resources/mapper/order.xml:90-98",
+          "line_hit": true
+        }
+      ],
+      "missing": [],
+      "next": "/sl-recon-inf"
+    },
+    {
+      "id": "INF-ORD-015",
+      "kind": "inf",
+      "file": "docs/05_설계서/order/INF/INF-ORD-015.md",
+      "status": "stale",
+      "changed": [
+        {
+          "anchor": "src/main/java/com/sm/lab/shop/controller/OrderController.java:79-90",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/java/com/sm/lab/shop/service/OrderService.java:77-104",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/java/com/sm/lab/shop/dao/OrderDao.java:25-27",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/resources/mapper/order.xml:15-34",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java:180-183",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/java/com/sm/lab/shop/web/OrderApiExceptionHandler.java:24-30",
+          "line_hit": true
+        }
+      ],
+      "missing": [],
+      "next": "/sl-recon-inf"
+    },
+    {
+      "id": "INF-ORD-016",
+      "kind": "inf",
+      "file": "docs/05_설계서/order/INF/INF-ORD-016.md",
+      "status": "fresh",
+      "changed": [],
+      "missing": [],
+      "next": "/sl-recon-inf"
+    },
+    {
+      "id": "INF-ORD-017",
+      "kind": "inf",
+      "file": "docs/05_설계서/order/INF/INF-ORD-017.md",
+      "status": "stale",
+      "changed": [
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/web/ShopStaticResourceConfig.java:75-95",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/controller/ShopIndexController.java:46-56",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java:230",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/pom.xml:93-119",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-web/vite.config.ts",
+          "line_hit": true
+        },
+        {
+          "anchor": "modules/shop-api/.../ApiKeyAuthFilter.java:230",
+          "line_hit": true
+        },
+        {
+          "anchor": "vite.config.ts",
+          "line_hit": true
+        },
+        {
+          "anchor": "pom.xml:93-119",
+          "line_hit": true
+        }
+      ],
+      "missing": [],
+      "next": "/sl-recon-inf"
+    },
+    {
+      "id": "SCH-MBR-001",
+      "kind": "sch",
+      "file": "docs/05_설계서/member/SCH/SCH-MBR-001.md",
+      "status": "unbaselined",
+      "changed": [],
+      "missing": [],
+      "next": "/sl-recon-sch"
+    },
+    {
+      "id": "SCH-MBR-002",
+      "kind": "sch",
+      "file": "docs/05_설계서/member/SCH/SCH-MBR-002.md",
+      "status": "unbaselined",
+      "changed": [],
+      "missing": [],
+      "next": "/sl-recon-sch"
+    },
+    {
+      "id": "SCH-MBR-003",
+      "kind": "sch",
+      "file": "docs/05_설계서/member/SCH/SCH-MBR-003.md",
+      "status": "unbaselined",
+      "changed": [],
+      "missing": [],
+      "next": "/sl-recon-sch"
+    },
+    {
+      "id": "SCH-MBR-004",
+      "kind": "sch",
+      "file": "docs/05_설계서/member/SCH/SCH-MBR-004.md",
+      "status": "unbaselined",
+      "changed": [],
+      "missing": [],
+      "next": "/sl-recon-sch"
+    },
+    {
+      "id": "SCH-MBR-005",
+      "kind": "sch",
+      "file": "docs/05_설계서/member/SCH/SCH-MBR-005.md",
+      "status": "stale",
+      "changed": [
+        {
+          "anchor": "memberPasswordReset.xml",
+          "line_hit": true
+        }
+      ],
+      "missing": [],
+      "next": "/sl-recon-sch"
+    },
+    {
+      "id": "SCH-MBR-006",
+      "kind": "sch",
+      "file": "docs/05_설계서/member/SCH/SCH-MBR-006.md",
+      "status": "unbaselined",
+      "changed": [],
+      "missing": [],
+      "next": "/sl-recon-sch"
+    },
+    {
+      "id": "SCH-MBR-007",
+      "kind": "sch",
+      "file": "docs/05_설계서/member/SCH/SCH-MBR-007.md",
+      "status": "unbaselined",
+      "changed": [],
+      "missing": [],
+      "next": "/sl-recon-sch"
+    },
+    {
+      "id": "SCH-MBR-008",
+      "kind": "sch",
+      "file": "docs/05_설계서/member/SCH/SCH-MBR-008.md",
+      "status": "unbaselined",
+      "changed": [],
+      "missing": [],
+      "next": "/sl-recon-sch"
+    },
+    {
+      "id": "SCH-MBR-009",
+      "kind": "sch",
+      "file": "docs/05_설계서/member/SCH/SCH-MBR-009.md",
+      "status": "stale",
+      "changed": [
+        {
+          "anchor": "memberPasswordResetRateLimit.xml",
+          "line_hit": true
+        }
+      ],
+      "missing": [],
+      "next": "/sl-recon-sch"
+    },
+    {
+      "id": "SCH-ORD-001",
+      "kind": "sch",
+      "file": "docs/05_설계서/order/SCH/SCH-ORD-001.md",
+      "status": "fresh",
+      "changed": [],
+      "missing": [],
+      "next": "/sl-recon-sch"
+    },
+    {
+      "id": "SCH-ORD-002",
+      "kind": "sch",
+      "file": "docs/05_설계서/order/SCH/SCH-ORD-002.md",
+      "status": "fresh",
+      "changed": [],
+      "missing": [],
+      "next": "/sl-recon-sch"
+    },
+    {
+      "id": "SCH-ORD-003",
+      "kind": "sch",
+      "file": "docs/05_설계서/order/SCH/SCH-ORD-003.md",
+      "status": "fresh",
+      "changed": [],
+      "missing": [],
+      "next": "/sl-recon-sch"
+    },
+    {
+      "id": "SCH-ORD-004",
+      "kind": "sch",
+      "file": "docs/05_설계서/order/SCH/SCH-ORD-004.md",
+      "status": "fresh",
+      "changed": [],
+      "missing": [],
+      "next": "/sl-recon-sch"
+    },
+    {
+      "id": "SCH-ORD-005",
+      "kind": "sch",
+      "file": "docs/05_설계서/order/SCH/SCH-ORD-005.md",
+      "status": "fresh",
+      "changed": [],
+      "missing": [],
+      "next": "/sl-recon-sch"
+    },
+    {
+      "id": "SCH-ORD-006",
+      "kind": "sch",
+      "file": "docs/05_설계서/order/SCH/SCH-ORD-006.md",
+      "status": "stale",
+      "changed": [
+        {
+          "anchor": "src/main/java/com/sm/lab/shop/controller/CartController.java",
+          "line_hit": true
+        },
+        {
+          "anchor": "src/main/resources/mapper/cart.xml",
+          "line_hit": true
+        }
+      ],
+      "missing": [],
+      "next": "/sl-recon-sch"
+    },
+    {
+      "id": "SCH-ORD-007",
+      "kind": "sch",
+      "file": "docs/05_설계서/order/SCH/SCH-ORD-007.md",
+      "status": "fresh",
+      "changed": [],
+      "missing": [],
+      "next": "/sl-recon-sch"
+    },
+    {
+      "id": "UIS-CMN-001",
+      "kind": "uis",
+      "file": "docs/05_설계서/common/UIS/UIS-CMN-001_디자인토큰/spec.md",
+      "status": "fresh",
+      "changed": [],
+      "missing": [],
+      "next": "/sl-recon-uis"
+    },
+    {
+      "id": "UIS-CMN-002",
+      "kind": "uis",
+      "file": "docs/05_설계서/common/UIS/UIS-CMN-002_공통컴포넌트/spec.md",
+      "status": "fresh",
+      "changed": [],
+      "missing": [],
+      "next": "/sl-recon-uis"
+    },
+    {
+      "id": "UIS-CMN-003",
+      "kind": "uis",
+      "file": "docs/05_설계서/common/UIS/UIS-CMN-003_앱셸/spec.md",
+      "status": "fresh",
+      "changed": [],
+      "missing": [],
+      "next": "/sl-recon-uis"
+    },
+    {
+      "id": "UIS-MBR-002",
+      "kind": "uis",
+      "file": "docs/05_설계서/member/UIS/UIS-MBR-002_로그인/spec.md",
+      "status": "stale",
+      "changed": [
+        {
+          "anchor": "\"modules/shop-web/src/pages/LoginPage.tsx:11-46\"",
+          "line_hit": true
+        },
+        {
+          "anchor": "\"modules/shop-web/src/App.tsx:32-53\"",
+          "line_hit": true
+        },
+        {
+          "anchor": "\"modules/shop-web/src/api.ts:41-49\"",
+          "line_hit": true
+        }
+      ],
+      "missing": [],
+      "next": "/sl-recon-uis"
+    },
+    {
+      "id": "UIS-MBR-003",
+      "kind": "uis",
+      "file": "docs/05_설계서/member/UIS/UIS-MBR-003_비밀번호재설정/spec.md",
+      "status": "stale",
+      "changed": [
+        {
+          "anchor": "\"modules/shop-web/src/pages/PasswordResetPage.tsx:37-226\"",
+          "line_hit": true
+        },
+        {
+          "anchor": "\"modules/shop-web/src/pages/LoginPage.tsx:45-47\"",
+          "line_hit": true
+        },
+        {
+          "anchor": "\"modules/shop-web/src/App.tsx:9,52\"",
+          "line_hit": true
+        },
+        {
+          "anchor": "\"modules/shop-web/src/api.ts:102-117\"",
+          "line_hit": true
+        }
+      ],
+      "missing": [],
+      "next": "/sl-recon-uis"
+    },
+    {
+      "id": "UIS-MBR-004",
+      "kind": "uis",
+      "file": "docs/05_설계서/member/UIS/UIS-MBR-004_shop_mypage_addresses/spec.md",
+      "status": "stale",
+      "changed": [
+        {
+          "anchor": "\"modules/shop-web/src/pages/MyAddressesPage.tsx\"",
+          "line_hit": true
+        },
+        {
+          "anchor": "\"modules/shop-web/src/features/shop/Gnb.tsx:54-57\"",
+          "line_hit": true
+        }
+      ],
+      "missing": [],
+      "next": "/sl-recon-uis"
+    },
+    {
+      "id": "UIS-MBR-005",
+      "kind": "uis",
+      "file": "docs/05_설계서/member/UIS/UIS-MBR-005_member_signup/spec.md",
+      "status": "unbaselined",
+      "changed": [],
+      "missing": [],
+      "next": "/sl-recon-uis"
+    },
+    {
+      "id": "UIS-MBR-006",
+      "kind": "uis",
+      "file": "docs/05_설계서/member/UIS/UIS-MBR-006_member_상세/spec.md",
+      "status": "unbaselined",
+      "changed": [],
+      "missing": [],
+      "next": "/sl-recon-uis"
+    },
+    {
+      "id": "UIS-ORD-001",
+      "kind": "uis",
+      "file": "docs/05_설계서/order/UIS/UIS-ORD-001_주문목록/spec.md",
+      "status": "stale",
+      "changed": [
+        {
+          "anchor": "\"src/main/resources/templates/order/list.html\"",
+          "line_hit": true
+        },
+        {
+          "anchor": "\"src/main/java/com/sm/lab/shop/controller/OrderViewController.java:47-76\"",
+          "line_hit": true
+        }
+      ],
+      "missing": [],
+      "next": "/sl-recon-uis"
+    },
+    {
+      "id": "UIS-ORD-002",
+      "kind": "uis",
+      "file": "docs/05_설계서/order/UIS/UIS-ORD-002_주문상세/spec.md",
+      "status": "stale",
+      "changed": [
+        {
+          "anchor": "\"src/main/java/com/sm/lab/shop/controller/OrderViewController.java:31-35\"",
+          "line_hit": true
+        }
+      ],
+      "missing": [],
+      "next": "/sl-recon-uis"
+    },
+    {
+      "id": "UIS-ORD-003",
+      "kind": "uis",
+      "file": "docs/05_설계서/order/UIS/UIS-ORD-003_상품목록/spec.md",
+      "status": "stale",
+      "changed": [
+        {
+          "anchor": "\"src/main/java/com/sm/lab/shop/controller/ProductViewController.java:32-37\"",
+          "line_hit": true
+        }
+      ],
+      "missing": [],
+      "next": "/sl-recon-uis"
+    },
+    {
+      "id": "UIS-ORD-004",
+      "kind": "uis",
+      "file": "docs/05_설계서/order/UIS/UIS-ORD-004_상품상세/spec.md",
+      "status": "stale",
+      "changed": [
+        {
+          "anchor": "\"src/main/java/com/sm/lab/shop/controller/ProductViewController.java:56-60\"",
+          "line_hit": true
+        },
+        {
+          "anchor": "\"src/main/java/com/sm/lab/shop/controller/ProductViewController.java:74-96\"",
+          "line_hit": true
+        },
+        {
+          "anchor": "\"src/main/java/com/sm/lab/shop/controller/ProductViewController.java:102-118\"",
+          "line_hit": true
+        },
+        {
+          "anchor": "\"src/main/java/com/sm/lab/shop/service/ProductService.java:26-32\"",
+          "line_hit": true
+        },
+        {
+          "anchor": "\"src/main/java/com/sm/lab/shop/service/CartService.java:44-64\"",
+          "line_hit": true
+        }
+      ],
+      "missing": [],
+      "next": "/sl-recon-uis"
+    },
+    {
+      "id": "UIS-ORD-005",
+      "kind": "uis",
+      "file": "docs/05_설계서/order/UIS/UIS-ORD-005_장바구니/spec.md",
+      "status": "stale",
+      "changed": [
+        {
+          "anchor": "\"src/main/java/com/sm/lab/shop/controller/CartViewController.java:40-53\"",
+          "line_hit": true
+        },
+        {
+          "anchor": "\"src/main/java/com/sm/lab/shop/controller/CartViewController.java:56-60\"",
+          "line_hit": true
+        },
+        {
+          "anchor": "\"src/main/java/com/sm/lab/shop/controller/CartViewController.java:63-67\"",
+          "line_hit": true
+        },
+        {
+          "anchor": "\"src/main/java/com/sm/lab/shop/controller/CartViewController.java:78-91\"",
+          "line_hit": true
+        },
+        {
+          "anchor": "\"src/main/java/com/sm/lab/shop/service/CartService.java:130-179\"",
+          "line_hit": true
+        }
+      ],
+      "missing": [],
+      "next": "/sl-recon-uis"
+    },
+    {
+      "id": "UIS-ORD-006",
+      "kind": "uis",
+      "file": "docs/05_설계서/order/UIS/UIS-ORD-006_home/spec.md",
+      "status": "unbaselined",
+      "changed": [],
+      "missing": [],
+      "next": "/sl-recon-uis"
+    },
+    {
+      "id": "UIS-ORD-007",
+      "kind": "uis",
+      "file": "docs/05_설계서/order/UIS/UIS-ORD-007_orders_상세/spec.md",
+      "status": "unbaselined",
+      "changed": [],
+      "missing": [],
+      "next": "/sl-recon-uis"
+    },
+    {
+      "id": "UIS-ORD-008",
+      "kind": "uis",
+      "file": "docs/05_설계서/order/UIS/UIS-ORD-008_shop/spec.md",
+      "status": "stale",
+      "changed": [
+        {
+          "anchor": "\"modules/shop-web/src/App.tsx:93\"",
+          "line_hit": true
+        }
+      ],
+      "missing": [],
+      "next": "/sl-recon-uis"
+    },
+    {
+      "id": "UIS-ORD-009",
+      "kind": "uis",
+      "file": "docs/05_설계서/order/UIS/UIS-ORD-009_shop_products/spec.md",
+      "status": "stale",
+      "changed": [
+        {
+          "anchor": "\"modules/shop-web/src/pages/ProductListPage.tsx\"",
+          "line_hit": true
+        },
+        {
+          "anchor": "\"modules/shop-web/src/App.tsx:97\"",
+          "line_hit": true
+        }
+      ],
+      "missing": [],
+      "next": "/sl-recon-uis"
+    },
+    {
+      "id": "UIS-ORD-010",
+      "kind": "uis",
+      "file": "docs/05_설계서/order/UIS/UIS-ORD-010_shop_products_상세/spec.md",
+      "status": "stale",
+      "changed": [
+        {
+          "anchor": "\"modules/shop-web/src/App.tsx:102\"",
+          "line_hit": true
+        },
+        {
+          "anchor": "\"modules/shop-web/src/pages/ProductDetailPage.tsx\"",
+          "line_hit": true
+        },
+        {
+          "anchor": "\"modules/shop-web/src/api.ts:181-219\"",
+          "line_hit": true
+        }
+      ],
+      "missing": [],
+      "next": "/sl-recon-uis"
+    },
+    {
+      "id": "UIS-ORD-011",
+      "kind": "uis",
+      "file": "docs/05_설계서/order/UIS/UIS-ORD-011_shop_order/spec.md",
+      "status": "stale",
+      "changed": [
+        {
+          "anchor": "\"modules/shop-web/src/App.tsx:109\"",
+          "line_hit": true
+        },
+        {
+          "anchor": "\"modules/shop-web/src/pages/OrderPage.tsx\"",
+          "line_hit": true
+        },
+        {
+          "anchor": "\"modules/shop-web/src/features/shop/httpErrorMessage.ts\"",
+          "line_hit": true
+        },
+        {
+          "anchor": "\"modules/shop-web/src/api.ts:261-284\"",
+          "line_hit": true
+        }
+      ],
+      "missing": [],
+      "next": "/sl-recon-uis"
+    },
+    {
+      "id": "UIS-ORD-012",
+      "kind": "uis",
+      "file": "docs/05_설계서/order/UIS/UIS-ORD-012_shop_cart/spec.md",
+      "status": "stale",
+      "changed": [
+        {
+          "anchor": "\"modules/shop-web/src/App.tsx:108\"",
+          "line_hit": true
+        },
+        {
+          "anchor": "\"modules/shop-web/src/pages/CartPage.tsx\"",
+          "line_hit": true
+        },
+        {
+          "anchor": "\"modules/shop-web/src/features/shop/httpErrorMessage.ts\"",
+          "line_hit": true
+        },
+        {
+          "anchor": "\"modules/shop-web/src/features/shop/Gnb.tsx:36-49\"",
+          "line_hit": true
+        },
+        {
+          "anchor": "\"modules/shop-web/src/api.ts:230-259\"",
+          "line_hit": true
+        },
+        {
+          "anchor": "\"modules/shop-web/src/types.ts:105-111\"",
+          "line_hit": true
+        },
+        {
+          "anchor": "\"docs/변경관리/SR-305/STORY-1.md\"",
+          "line_hit": true
+        }
+      ],
+      "missing": [],
+      "next": "/sl-recon-uis"
+    }
+  ]
+}

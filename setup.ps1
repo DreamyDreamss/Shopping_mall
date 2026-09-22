@@ -104,11 +104,17 @@ function Copy-Tree([string]$From, [string]$To) {
     if ($LASTEXITCODE -ge 8) { throw "[shop] 복사 실패: $From → $To (robocopy $LASTEXITCODE)" }
     $global:LASTEXITCODE = 0
 }
-Copy-Tree "$Repo\seed\변경관리"     "$Ws\docs\변경관리"
-Copy-Tree "$Repo\seed\09_납품"      "$Ws\docs\09_납품"
-Copy-Tree "$Repo\seed\_lab\catalog" "$Ws\_lab\catalog"
-Copy-Tree "$Repo\seed\.speclinker"  "$Ws\.speclinker"
-Copy-Tree "$Repo\seed\ws"           $Ws
+# seed 전개는 **규칙**이다(이름 목록이 아니다) — 목록으로 두면 seed에 담고도 전개를 빠뜨린다
+# (2026-09-22 실측: docs\05_설계서를 담고 전개하지 않아 워크스페이스 설계서가 0건이었다).
+foreach ($src in (Get-ChildItem (Join-Path $Repo 'seed') -Directory -Force)) {
+    $dst = switch ($src.Name) {
+        'ws'          { $Ws }
+        '_lab'        { Join-Path $Ws '_lab' }
+        '.speclinker' { Join-Path $Ws '.speclinker' }
+        default       { Join-Path $Ws "docs\$($src.Name)" }
+    }
+    Copy-Tree $src.FullName $dst
+}
 $srCount = (Get-ChildItem "$Ws\docs\변경관리" -Directory -Filter 'SR-*' -ErrorAction SilentlyContinue).Count
 Write-Host "  OK seed 전개: SR $srCount건"
 

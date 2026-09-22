@@ -1,0 +1,733 @@
+{
+  "func": "FUNC-member-003",
+  "epic": null,
+  "story": "docs/00_FUNC/stories/STORY-FUNC-member-003.md",
+  "gate": "CONCERNS",
+  "reviewer": "qa-agent",
+  "updated": "2026-09-12T07:51:03",
+  "layers": {
+    "spec": "concerns",
+    "security": "pass",
+    "regression": "pass",
+    "baseline": "concerns",
+    "scope": "fail",
+    "rules": "pass",
+    "conformance": "pass"
+  },
+  "top_issues": [
+    {
+      "severity": "medium",
+      "layer": "spec",
+      "finding": "AC 3번(중복 이메일 -> 409 MBR-4092 + login_url)이 가입 직후 재시도 구간에서 조건부로만 성립한다(consumed_at 비리셋). 사람이 보안 우선으로 명시 수용한 supersession이지만 STORY AC 문면과 INF-MBR-002 오류 계약에 아직 기록되지 않았다. 자가치유는 코드 만료(5분)+정리배치(10분) 후 다음 발송분부터.",
+      "suggested_action": "STEP 5.5 INF-MBR-002.md 재동기화 시 조건부 동작을 사실대로 등재하고 AC 문면을 정정"
+    },
+    {
+      "severity": "medium",
+      "layer": "spec",
+      "finding": "SR-295 요구 본문이 attempt_count 리셋만 다뤄, round4가 되살린 AC 파손의 실제 원인인 consumed_at 비리셋을 범위에서 놓친다. 현 상태로 SR-295를 구현해도 이 결함은 남는다.",
+      "suggested_action": "SR-295 요구 본문에 재발송 시 consumed_at 동시 리셋(또는 이전 행 삭제 후 신규 INSERT)을 명시하거나 별도 SR로 분리"
+    },
+    {
+      "severity": "low",
+      "layer": "security",
+      "finding": "POST /api/members/signup에 레이트리밋이 없다. 존재 오라클은 닫혔으나 가입 진행 중 target의 시도 5회를 제3자가 대신 소진시키는 경로는 남는다(일일 발송 상한 5회로 영향 제한).",
+      "suggested_action": "후속 SR에서 IP/target 단위 레이트리밋 검토"
+    },
+    {
+      "severity": "low",
+      "layer": "spec",
+      "finding": "문면 불일치 이월 — AC2 '최근 30분 이내 verified_at'(제거됨), AC3 '선조회 금지'의 STEP 0 대체 미기록, MBR-4093/MBR-4094 오류 계약 미등재, MemberRegistrationController#signUp javadoc의 동일 stale 문구.",
+      "suggested_action": "STEP 5.5에서 일괄 정정"
+    },
+    {
+      "severity": "low",
+      "layer": "spec",
+      "finding": "login_url='/login'이 실재하지 않는 라우트(4라운드 연속 이월). 탈퇴 회원 del_yn='Y'의 email/phone_norm UNIQUE 점유로 재가입 영구 불가(이월).",
+      "suggested_action": "SR-231/UIS 미해결 가정 등록 및 백로그 유지(사람/PM 조치)"
+    },
+    {
+      "severity": "low",
+      "layer": "regression",
+      "finding": "MemberSignupCompletionDao#selectVerifiedAt/#selectConsumedAt이 운영 경로에서 호출되지 않는 죽은 코드로 남아 있다(round3 권고6 미처리). 부수로 target/surefire-reports/에 이전 라운드 프로브 클래스 XML 4개가 잔존해 테스트 수가 310으로 오독될 수 있다(실제 306).",
+      "suggested_action": "죽은 코드 정리 여부 판단 + surefire-reports 잔여 XML 정리"
+    },
+    {
+      "severity": "low",
+      "layer": "baseline",
+      "finding": "shop-web: 기준선에 없는 소스 루트",
+      "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+    },
+    {
+      "severity": "high",
+      "layer": "scope",
+      "finding": "스코프 밖 변경: .understand-anything/linked-func-cache.json (M)",
+      "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+    },
+    {
+      "severity": "medium",
+      "layer": "conformance",
+      "finding": "AC-3 '중복 이메일/휴대폰 거부'가 실사용 재가입 경로에서 조건부로만 성립한다 — round4에서 STEP1(코드 검증)을 STEP0(존재 판정)보다 먼저 실행하도록 순서를 바꾼 결과, 가입 성공 직후 verification 행이 아직 consumed_at IS NOT NULL 상태인 동안 같은 target이 재발송받은 새 코드로 재시도하면 STEP1(verifyCode)에서 먼저 거부돼 409 MBR-4092가 아니라 MBR-4091이 반환된다(STORY round4 QA 실측·기록, Dev도 인지). 사람이 '보안(존재 오라클 차단) > 스펙(AC 문구)'로 명시 수용했고 근본 해결은 SR-295(범위 확장 완료 — consumed_at도 리셋)로 접수돼 있어 새로 발견한 결함은 아니지만, 이 FUNC의 diff만 놓고 보면 AC-3 문면은 아직 무조건 충족되지 않는다.",
+      "suggested_action": "STEP 5.5 INF-MBR-002.md 재동기화 시 AC-3에 이 조건부 동작(재가입 직후 재발송 구간에서는 4091)과 SR-295 의존관계를 명시. 근본 해결까지는 STORY AC 문구를 실제 동작에 맞게 정정 필요",
+      "confidence": "high",
+      "file": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberRegistrationService.java",
+      "line": 182
+    },
+    {
+      "severity": "low",
+      "layer": "conformance",
+      "finding": "AC-2 문구 '같은 target으로 최근 30분 이내 verified_at 행이 없으면 409'가 실제 구현(제출된 code를 그 자리에서 즉시 대조·소비하는 단일 단계, 30분 신선도 창 없음)과 다르다. 이 재해석(INF-MBR-002가 code 자체를 검증)은 STORY Dev 기록(1)에서 사람이 재승인했고(round1 QA 필수5 재작업에서 명시 승인 확인) 기능적으로는 '미인증 시 가입 불가'를 충족하지만, STORY AC 원문은 아직 정정되지 않았다(QA가 round2~4에 걸쳐 반복 지적, STEP 5.5 대기 항목으로 이미 등재됨).",
+      "suggested_action": "STEP 5.5에서 STORY AC-2 문구를 '제출된 code를 이 API가 직접 검증'으로 정정",
+      "confidence": "high",
+      "file": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberRegistrationService.java",
+      "line": 264
+    },
+    {
+      "severity": "low",
+      "layer": "conformance",
+      "finding": "STORY '승인된 설계 확정' 원문의 '선조회(select→분기→insert) 패턴 금지'가 round3/4 사람 결정으로 도입된 STEP0 사전 판정(memberDao.selectMemberIdByEmailOrPhoneNorm, 명백한 선조회)으로 사실상 대체됐다. 최종 원자성 보장은 여전히 STEP2의 UNIQUE 위반 catch가 맡고 있어(precheckDuplicate는 안내용 빠른 실패일 뿐) 동시성 안전 자체는 깨지지 않았지만, 원 설계 문구와 실제 구현이 어긋난 채로 STORY 문서에는 반영되지 않았다(QA가 이미 round3 권고3ⓑ/round4 권고4ⓑ로 동일 항목을 지적, STEP 5.5 대기).",
+      "suggested_action": "STEP 5.5 INF-MBR-002.md에 이 supersession(선조회 금지 → STEP0 사전판정으로 대체, 최종 보장은 UNIQUE catch)을 근거와 함께 기록",
+      "confidence": "high",
+      "file": "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberDao.java",
+      "line": 0
+    }
+  ],
+  "rounds": [
+    {
+      "round": 1,
+      "gate": "FAIL",
+      "human": {
+        "decision": "rework",
+        "by": "사람",
+        "at": "2026-09-12T06:10:37",
+        "comment": "[개발자 결정 — 필수 3건 + 권고 2건, 방식까지 지정] (1) 코드 검증 무제한: 검증은 단일 문장으로 — UPDATE member_signup_verifications SET verified_at=NOW(3) WHERE target=? AND code=? AND expires_at>NOW(3) AND consumed_at IS NULL AND verified_at IS NULL AND attempt_count<5; affected=1이면 통과. 0이면 UPDATE ... SET attempt_count=attempt_count+1 WHERE target=? AND consumed_at IS NULL AND verified_at IS NULL (별도 문장, 조건부) 후 409 MBR-4091(남은 횟수 노출 금지). attempt_count>=5는 그 코드 폐기(재발송만 가능). 가입 성공 트랜잭션 안에서 consumed_at=NOW(3) 로 소비 — 재사용 불가. (2) 휴대폰: 입력을 숫자만으로 정규화하고 MEMBERS에 phone_norm VARCHAR(20) 컬럼 + UNIQUE uq_members_phone_norm 을 V3 마이그레이션으로 추가, 기존 행은 같은 마이그레이션에서 UPDATE MEMBERS SET phone_norm=REPLACE(REPLACE(phone,'-',''),' ','') 로 채운다(기존 phone 컬럼·값·응답은 불변). 중복 판정은 이 인덱스로. (3) member_id 채번: AtomicInteger 삭제. ID_SEQUENCES(name PK, next_val) 테이블(V3)에 INSERT ... ON DUPLICATE KEY UPDATE next_val=LAST_INSERT_ID(next_val+1) 후 SELECT LAST_INSERT_ID() — 원자·재기동 안전. 초기값은 마이그레이션에서 SELECT MAX(CAST(SUBSTRING(member_id,3) AS UNSIGNED)) FROM MEMBERS 로 시드. 형식 M-%04d 유지. DuplicateKeyException은 메시지의 제약 이름으로 분기: uq_members_email→409 MBR-4092(login_url), uq_members_phone_norm→409 MBR-4094, 그 외(PK)→1회 재채번 재시도 후 500 MBR-5000. (4) 권고: signup 요청에 code 필드를 흡수한 설계는 받아들인다 — 단 02_변경명세 §INF-MBR-002 요청 계약에 code(6자리) 필드와 위 검증·소비 규칙을 적고, STORY Dev 기록에 '설계 이탈: 단일 호출 흐름 채택, 사람 승인(이 게이트)'을 남겨라. name null/50자 초과는 400 MBR-4001. 테스트 추가: 코드 5회 오답 후 정답도 거부 · 성공 후 같은 코드 재사용 거부 · 하이픈 번호 중복 409 · 재기동 시뮬(시퀀스 테이블만으로 2회 연속 가입 ID 증가) · 기존 회원 조회 응답 불변. mvnw test 전체.",
+        "targets": []
+      },
+      "layers": {
+        "spec": "fail",
+        "security": "fail",
+        "regression": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "high",
+          "layer": "security",
+          "finding": "무인증 엔드포인트 POST /api/members/signup에서 6자리 인증코드 대입 시도가 무제한 — MEMBER_SIGNUP_VERIFICATIONS.attempt_count(FUNC-member-003 소유로 예약된 컬럼)가 미사용이고, FUNC-member-002의 레이트리밋은 코드 발송만 덮는다. 타인 명의 계정 생성 가능",
+          "suggested_action": "조건부 UPDATE 안에서 attempt_count를 증가시키고 상한 초과 행은 매치되지 않게 하거나, 코드 검증 자체를 INF-MBR-001로 되돌린다(설계 재승인 필요)"
+        },
+        {
+          "severity": "high",
+          "layer": "spec",
+          "finding": "휴대폰 중복 판정이 형식 불일치로 무력 — 기존 MEMBERS.phone은 하이픈 포함('010-1111-2222', DB 실측), 신규 가입은 숫자만 저장하므로 uq_members_phone이 같은 번호의 재가입을 막지 못한다(AC '중복 휴대폰 거부' 불성립)",
+          "suggested_action": "저장 전 숫자만 정규화 + 기존 행 백필을 같은 마이그레이션에 포함하거나 정규화 컬럼에 UNIQUE를 건다"
+        },
+        {
+          "severity": "high",
+          "layer": "regression",
+          "finding": "member_id를 JVM 기동마다 리셋되는 in-memory AtomicInteger(1000 시작)로 채번하는데 member_id는 PK — 재기동 후 PK 위반 DuplicateKeyException이 catch(DuplicateKeyException)에 걸려 409 MBR-4092 '이미 가입된 이메일'로 오보고되고 신규 가입이 막힌다. Dev 기록 (3)의 'OrderService와 동일한 한계' 주장은 부정확(orderNo는 날짜 접두가 있고 업무 409로 변환되지도 않음)",
+          "suggested_action": "DB 채번(시퀀스/AUTO_INCREMENT/기동 시 max 조회) 또는 UUID로 교체하고, catch를 uq_members_email/uq_members_phone 위반으로 한정한다"
+        },
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "AC·승인설계의 'verification 행 consumed_at 갱신'(코드 1회 소비)이 미구현 — verified_at 재해석은 수긍 가능하나 소비 동작 자체가 빠져, 가입 성공 후에도 코드가 만료까지 유효하고 verified_at이 신선한 동안에는 제출된 code가 검증되지 않는다",
+          "suggested_action": "INSERT 성공 후 같은 트랜잭션에서 verification 행을 무효화(code=NULL 또는 삭제)한다 — 두 문장 예산 안에서 가능"
+        },
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "승인 설계 이탈(코드 검증을 INF-MBR-002로 흡수 + 요청 계약에 승인된 적 없는 code 필드 신설)을 게이트 질문이 아니라 코드로 먼저 실행 — STORY '벗어나야 하면 코드 대신 게이트 질문으로 먼저 물을 것' 위반. 원설계가 문면대로는 구현 불가였다는 진단 자체는 실측상 맞다(INF-MBR-001에 verify 엔드포인트 없음, writeCode는 항상 verified_at=NULL)",
+          "suggested_action": "STEP 5.5가 INF-MBR-002.md에 계약을 굳히기 전에 사람 재승인 — ⓐ 검증을 여기 두고 보완 / ⓑ INF-MBR-001에 verify 엔드포인트 신설"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "BCrypt 해시(수십~백 ms)가 verification 행 락을 쥔 @Transactional 안에서 실행 — 승인설계 '이 두 문장만, 짧게 유지' 위반. 무인증 엔드포인트라 락·커넥션 점유 증폭이 쉽고, 같은 SR의 FUNC-member-002 round3가 '긴 트랜잭션 + 부수 작업'으로 InnoDB 데드락을 낸 전력이 있다",
+          "suggested_action": "passwordEncoder.encode() 호출을 트랜잭션 진입 전(최소한 조건부 UPDATE 이전)으로 이동"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "중복 응답 메시지가 채널과 무관하게 '이미 가입된 이메일입니다' — SMS 채널 중복에도 동일 문구. login_url '/login'은 존재하지 않는 라우트(404). name 무검증으로 null·50자 초과 시 무인증 엔드포인트에서 500 MBR-5000",
+          "suggested_action": "채널별 메시지 분기, login_url을 SR/UIS에 미해결 가정으로 등록, name 검증을 400으로 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "테스트 맹점 — 서비스 단위 테스트가 selectVerifiedAt을 직접 스텁해 '코드 미검증 통과'를, 단일 JVM 내 연속 채번이 '재기동 PK 충돌'을 구조적으로 숨긴다(전체 스위트 35클래스 실패 0/에러 0은 실측 확인)",
+          "suggested_action": "재기동·누적 상태를 재현하는 케이스와 stale verified_at + 틀린 code 케이스를 추가"
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "gate": "FAIL",
+      "human": {
+        "decision": "rework",
+        "by": "사람",
+        "at": "2026-09-12T06:44:55",
+        "comment": "[개발자 결정 — 마지막 라운드다. 아래 순서와 경계를 그대로] 흐름을 3단계로 분리하고 트랜잭션 경계를 명시한다. (0) 사전 판정(비트랜잭션, 읽기): SELECT member_id FROM MEMBERS WHERE email=? OR phone_norm=? → 있으면 즉시 409 MBR-4092(login_url). 이 조회는 안내용이고 최종 보장은 UNIQUE(기존 catch 분기 유지). (1) 코드 검증(비트랜잭션 — @Transactional 없는 서비스 메서드, autocommit 단일 문장): UPDATE ... SET verified_at=NOW(3) WHERE target=? AND code=? AND expires_at>NOW(3) AND consumed_at IS NULL AND verified_at IS NULL AND attempt_count<5; affected=0이면 UPDATE ... SET attempt_count=attempt_count+1 WHERE target=? AND consumed_at IS NULL AND verified_at IS NULL — 이 두 문장은 어떤 트랜잭션에도 속하지 않는다(롤백 불가). 그 뒤 409 MBR-4091. attempt_count>=5면 409 MBR-4093 '재발송 필요'. (2) 가입(트랜잭션, 짧게): ID 채번 → INSERT MEMBERS → UPDATE verification SET consumed_at=NOW(3) WHERE target=? AND verified_at IS NOT NULL AND consumed_at IS NULL — 이 세 문장만 @Transactional. 클래스 단위 @Transactional 금지, 메서드마다 명시. 테스트는 HTTP/MockMvc 레벨로: (a) 틀린 코드 5회 → 6회째 정답도 409 MBR-4093, DB attempt_count=5 실측 단언 (b) 성공 후 같은 코드 재사용 409 (c) 이미 가입된 이메일로 재가입 → 409 MBR-4092 + login_url (d) 하이픈 번호 중복 409 MBR-4094 (e) 기존 회원 조회 불변. mvnw test 전체 + STORY Dev 기록에 트랜잭션 경계 표(단계·문장·경계)를 적어라.",
+        "targets": []
+      },
+      "layers": {
+        "spec": "fail",
+        "security": "fail",
+        "regression": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "high",
+          "layer": "security",
+          "finding": "필수1(코드 대입 시도 제한) 런타임 무효 — incrementAttemptCount가 @Transactional 안에서 실행된 직후 RuntimeException(MemberRegistrationApiException)이 던져져 증가분이 매번 롤백된다. 실측 프로브: 무인증 POST /api/members/signup에 틀린 코드 8회 → attempt_count 0 유지 → 정답 제출 시 201 성공. round1 FAIL 필수1(6자리 코드 무제한 대입 → 타인 명의 계정 생성)이 그대로 남아 있고 attempt_count<5 조건절은 죽은 코드다.",
+          "suggested_action": "incrementAttemptCount만 별도 트랜잭션(REQUIRES_NEW)으로 분리하라(자기호출은 프록시를 타지 않으므로 별도 빈 또는 TransactionTemplate). noRollbackFor로 때우면 4092 경로에서 verified_at까지 커밋되어 정당한 재시도가 막히므로 금지."
+        },
+        {
+          "severity": "high",
+          "layer": "spec",
+          "finding": "AC '중복 이메일 거부(MBR-4092 + login_url)'가 실사용 재가입 플로우에서 불성립 — 가입 성공이 기록한 consumed_at을 재발송(writeCode, FUNC-member-002 소유)이 리셋하지 않아, 이미 가입한 사용자가 새 코드로 재시도하면 MBR-4092가 아니라 MBR-4091('인증이 필요합니다')을 받는다(실측 프로브 확인). 사람 결정 (1)의 '5회 초과는 재발송만 가능'이라는 회복 경로 전제도 같은 이유로 성립하지 않아, 필수1을 제대로 고치는 순간 해당 target이 진짜로 잠긴다.",
+          "suggested_action": "재발송이 consumed_at/attempt_count를 리셋하도록 하라 — ⓐ writeCode 수정(파일 경계 예외, 사람 승인 필요) / ⓑ FUNC-member-003 소유 매퍼에 재발송 리셋 문장 추가 / ⓒ 0행일 때 기가입 target을 판별해 MBR-4092로 분기(부분 해소). 필수1과 반드시 같은 라운드에서 함께 처리."
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "테스트 맹점 재발(round1 권고5와 동일 구조) — 필수1·필수4 검증이 DAO 직접 호출(MemberSignupCompletionDaoTest, 롤백 경로 미통과)과 Mockito 단위(MemberRegistrationServiceTest, DB·트랜잭션 없음)에만 있어, 전체 297건이 실패 0인 채로 핵심 보안 수정의 무력화가 드러나지 않았다.",
+          "suggested_action": "TestRestTemplate로 '틀린 코드 N회 요청 후 attempt_count == N' + '상한 초과 후 정답도 거부'를 API 레벨에서 단언하는 회귀 테스트를 추가하라."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "MemberIdSequenceDaoTest가 @Transactional이라 매 실행이 롤백된다 — javadoc이 주장하는 '재기동 안전 증명'이 실제로는 성립하지 않는다(실증은 QA의 DB 실측 ID_SEQUENCES.next_val=10이 대신했다).",
+          "suggested_action": "커밋되는 채번 2회 비교로 테스트를 고치거나 javadoc의 주장을 사실에 맞게 낮출 것."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "STORY AC 2번의 '최근 30분 이내 verified_at' 문구가 구현(30분 창 제거, 사람 결정의 단일 문장 검증)과 어긋난다. login_url='/login' 미해결 가정(round1 권고2)과 탈퇴 회원 UNIQUE 점유(round1 권고4)도 이월됐다.",
+          "suggested_action": "STEP 5.5 INF-MBR-002.md 재동기화 시 AC 문면을 함께 정정하고, login_url/탈퇴 재가입은 SR·UIS 미해결 가정 및 백로그로 등록."
+        }
+      ]
+    },
+    {
+      "round": 3,
+      "gate": "CONCERNS",
+      "human": {
+        "decision": "rework",
+        "by": "사람",
+        "at": "2026-09-12T07:15:46",
+        "comment": "[개발자 결정] (1) 존재 오라클은 내 설계 순서의 결과다 — 고친다. 순서를 바꿔라: STEP 1 코드 검증을 먼저(비트랜잭션, 그대로), 검증 성공 뒤에만 STEP 0 존재 판정(email/phone_norm 조회 → 409 MBR-4092/4094). 코드 검증 실패는 가입 여부와 무관하게 항상 409 MBR-4091(동일 문구·동일 응답 시간대). 이렇게 하면 코드를 못 받는 사람은 존재 여부를 알 수 없다. 테스트: 미검증 상태에서 기존 이메일로 요청 → 4092가 아니라 4091 단언. (2) MBR-4093 회복 경로는 FUNC-member-002 소유라 후속 SR SR-295로 접수했다 — STORY 후속 TODO에 그 ID를 적어라. login_url·탈퇴회원 재가입은 백로그 이월 유지. 운영: 검증 전 8087 앱은 새 jar로 재기동해 쓰고(stale 401), 끝나면 8087만 남겨라. 완료 조건: mvnw test 전체 + HTTP 테스트 갱신.",
+        "targets": []
+      },
+      "layers": {
+        "spec": "pass",
+        "security": "concerns",
+        "regression": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "high",
+          "layer": "security",
+          "finding": "round3 신규 — STEP 0 사전 판정이 코드 검증보다 먼저 돌아, 인증코드를 한 번도 요청하지 않고도 임의 이메일/휴대폰의 가입 여부를 판별할 수 있는 무인증·무제한 오라클이 열렸다(실측: 미가입 MBR-4091 / 기가입 이메일 MBR-4092 / 기가입 휴대폰 MBR-4094). POST /api/members/signup에는 레이트리밋이 전혀 없어 휴대폰 번호 공간 전수 열거가 현실적이다. 사람 결정 '(0) 사전 판정' 지시의 직접 결과로 dev 이탈이 아니다.",
+          "suggested_action": "사람 판단 필요 — waiver로 수용하거나, 이 엔드포인트에 IP/target 레이트리밋을 추가하거나, 사전 판정을 코드 검증 뒤로 옮긴다(판정 근거가 MEMBERS 테이블이라 round2의 MBR-4091 회귀는 되살아나지 않는다)."
+        },
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "MBR-4093 '재발송 필요' 안내가 실제로는 재발송으로 해소되지 않는다 — writeCode(FUNC-member-002 소유)가 attempt_count를 리셋하지 않아, 상한에 걸린 target은 재발송 후에도 계속 4093이다. 회복은 코드 만료(5분)+정리배치(10분)뿐인데 안내대로 재발송하면 expires_at이 밀려 자가치유가 지연된다. 사람 결정이 리셋을 지시하지 않아 dev가 손댈 수 없었고, Dev 기록에 한계로 정직하게 공개돼 있다.",
+          "suggested_action": "후속 SR에서 재발송 시 attempt_count 리셋(FUNC-member-003 소유 매퍼에 리셋 문장 추가 후 발송 경로에서 호출)하거나 안내 문구를 사실에 맞게 정정."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "STORY AC와 구현의 문면 불일치 — AC2 '최근 30분 이내 verified_at'(30분 창 제거됨), AC3·승인설계의 '선조회 패턴 금지'가 사람 결정의 STEP 0 사전 판정으로 대체된 사실, 신설 코드 MBR-4093/MBR-4094 미등재.",
+          "suggested_action": "STEP 5.5 INF-MBR-002.md 재동기화 시 AC 문면 정정 + supersession 근거(최종 보장은 여전히 UNIQUE catch)와 신설 오류 코드를 오류 계약에 등재."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "login_url='/login'이 이 랩에 실재하지 않는 라우트다 — round1 권고2부터 3라운드 연속 미해소(코드 변경 범위 밖). AC의 '로그인 링크'가 404로 이어진다.",
+          "suggested_action": "SR-231/UIS에 미해결 가정으로 등록(사람/PM 조치)."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "탈퇴 회원(del_yn='Y')의 email/phone_norm이 UNIQUE 인덱스를 계속 점유해 재가입이 영구 불가하다(사전 판정도 del_yn을 보지 않아 UNIQUE와 판정은 일치 — 의도적). round1 권고4부터 이월.",
+          "suggested_action": "이 SR 범위 밖 — 백로그 등록."
+        }
+      ]
+    },
+    {
+      "round": 4,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "concerns",
+        "security": "pass",
+        "regression": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "AC 3번(중복 이메일 -> 409 MBR-4092 + login_url)이 가입 직후 재시도 구간에서 조건부로만 성립한다(consumed_at 비리셋). 사람이 보안 우선으로 명시 수용한 supersession이지만 STORY AC 문면과 INF-MBR-002 오류 계약에 아직 기록되지 않았다. 자가치유는 코드 만료(5분)+정리배치(10분) 후 다음 발송분부터.",
+          "suggested_action": "STEP 5.5 INF-MBR-002.md 재동기화 시 조건부 동작을 사실대로 등재하고 AC 문면을 정정"
+        },
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "SR-295 요구 본문이 attempt_count 리셋만 다뤄, round4가 되살린 AC 파손의 실제 원인인 consumed_at 비리셋을 범위에서 놓친다. 현 상태로 SR-295를 구현해도 이 결함은 남는다.",
+          "suggested_action": "SR-295 요구 본문에 재발송 시 consumed_at 동시 리셋(또는 이전 행 삭제 후 신규 INSERT)을 명시하거나 별도 SR로 분리"
+        },
+        {
+          "severity": "low",
+          "layer": "security",
+          "finding": "POST /api/members/signup에 레이트리밋이 없다. 존재 오라클은 닫혔으나 가입 진행 중 target의 시도 5회를 제3자가 대신 소진시키는 경로는 남는다(일일 발송 상한 5회로 영향 제한).",
+          "suggested_action": "후속 SR에서 IP/target 단위 레이트리밋 검토"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "문면 불일치 이월 — AC2 '최근 30분 이내 verified_at'(제거됨), AC3 '선조회 금지'의 STEP 0 대체 미기록, MBR-4093/MBR-4094 오류 계약 미등재, MemberRegistrationController#signUp javadoc의 동일 stale 문구.",
+          "suggested_action": "STEP 5.5에서 일괄 정정"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "login_url='/login'이 실재하지 않는 라우트(4라운드 연속 이월). 탈퇴 회원 del_yn='Y'의 email/phone_norm UNIQUE 점유로 재가입 영구 불가(이월).",
+          "suggested_action": "SR-231/UIS 미해결 가정 등록 및 백로그 유지(사람/PM 조치)"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "MemberSignupCompletionDao#selectVerifiedAt/#selectConsumedAt이 운영 경로에서 호출되지 않는 죽은 코드로 남아 있다(round3 권고6 미처리). 부수로 target/surefire-reports/에 이전 라운드 프로브 클래스 XML 4개가 잔존해 테스트 수가 310으로 오독될 수 있다(실제 306).",
+          "suggested_action": "죽은 코드 정리 여부 판단 + surefire-reports 잔여 XML 정리"
+        }
+      ]
+    },
+    {
+      "round": 5,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "concerns",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "AC 3번(중복 이메일 -> 409 MBR-4092 + login_url)이 가입 직후 재시도 구간에서 조건부로만 성립한다(consumed_at 비리셋). 사람이 보안 우선으로 명시 수용한 supersession이지만 STORY AC 문면과 INF-MBR-002 오류 계약에 아직 기록되지 않았다. 자가치유는 코드 만료(5분)+정리배치(10분) 후 다음 발송분부터.",
+          "suggested_action": "STEP 5.5 INF-MBR-002.md 재동기화 시 조건부 동작을 사실대로 등재하고 AC 문면을 정정"
+        },
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "SR-295 요구 본문이 attempt_count 리셋만 다뤄, round4가 되살린 AC 파손의 실제 원인인 consumed_at 비리셋을 범위에서 놓친다. 현 상태로 SR-295를 구현해도 이 결함은 남는다.",
+          "suggested_action": "SR-295 요구 본문에 재발송 시 consumed_at 동시 리셋(또는 이전 행 삭제 후 신규 INSERT)을 명시하거나 별도 SR로 분리"
+        },
+        {
+          "severity": "low",
+          "layer": "security",
+          "finding": "POST /api/members/signup에 레이트리밋이 없다. 존재 오라클은 닫혔으나 가입 진행 중 target의 시도 5회를 제3자가 대신 소진시키는 경로는 남는다(일일 발송 상한 5회로 영향 제한).",
+          "suggested_action": "후속 SR에서 IP/target 단위 레이트리밋 검토"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "문면 불일치 이월 — AC2 '최근 30분 이내 verified_at'(제거됨), AC3 '선조회 금지'의 STEP 0 대체 미기록, MBR-4093/MBR-4094 오류 계약 미등재, MemberRegistrationController#signUp javadoc의 동일 stale 문구.",
+          "suggested_action": "STEP 5.5에서 일괄 정정"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "login_url='/login'이 실재하지 않는 라우트(4라운드 연속 이월). 탈퇴 회원 del_yn='Y'의 email/phone_norm UNIQUE 점유로 재가입 영구 불가(이월).",
+          "suggested_action": "SR-231/UIS 미해결 가정 등록 및 백로그 유지(사람/PM 조치)"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "MemberSignupCompletionDao#selectVerifiedAt/#selectConsumedAt이 운영 경로에서 호출되지 않는 죽은 코드로 남아 있다(round3 권고6 미처리). 부수로 target/surefire-reports/에 이전 라운드 프로브 클래스 XML 4개가 잔존해 테스트 수가 310으로 오독될 수 있다(실제 306).",
+          "suggested_action": "죽은 코드 정리 여부 판단 + surefire-reports 잔여 XML 정리"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "shop-web: 기준선에 없는 소스 루트",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        }
+      ],
+      "layer": "baseline"
+    },
+    {
+      "round": 6,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "concerns",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "AC 3번(중복 이메일 -> 409 MBR-4092 + login_url)이 가입 직후 재시도 구간에서 조건부로만 성립한다(consumed_at 비리셋). 사람이 보안 우선으로 명시 수용한 supersession이지만 STORY AC 문면과 INF-MBR-002 오류 계약에 아직 기록되지 않았다. 자가치유는 코드 만료(5분)+정리배치(10분) 후 다음 발송분부터.",
+          "suggested_action": "STEP 5.5 INF-MBR-002.md 재동기화 시 조건부 동작을 사실대로 등재하고 AC 문면을 정정"
+        },
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "SR-295 요구 본문이 attempt_count 리셋만 다뤄, round4가 되살린 AC 파손의 실제 원인인 consumed_at 비리셋을 범위에서 놓친다. 현 상태로 SR-295를 구현해도 이 결함은 남는다.",
+          "suggested_action": "SR-295 요구 본문에 재발송 시 consumed_at 동시 리셋(또는 이전 행 삭제 후 신규 INSERT)을 명시하거나 별도 SR로 분리"
+        },
+        {
+          "severity": "low",
+          "layer": "security",
+          "finding": "POST /api/members/signup에 레이트리밋이 없다. 존재 오라클은 닫혔으나 가입 진행 중 target의 시도 5회를 제3자가 대신 소진시키는 경로는 남는다(일일 발송 상한 5회로 영향 제한).",
+          "suggested_action": "후속 SR에서 IP/target 단위 레이트리밋 검토"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "문면 불일치 이월 — AC2 '최근 30분 이내 verified_at'(제거됨), AC3 '선조회 금지'의 STEP 0 대체 미기록, MBR-4093/MBR-4094 오류 계약 미등재, MemberRegistrationController#signUp javadoc의 동일 stale 문구.",
+          "suggested_action": "STEP 5.5에서 일괄 정정"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "login_url='/login'이 실재하지 않는 라우트(4라운드 연속 이월). 탈퇴 회원 del_yn='Y'의 email/phone_norm UNIQUE 점유로 재가입 영구 불가(이월).",
+          "suggested_action": "SR-231/UIS 미해결 가정 등록 및 백로그 유지(사람/PM 조치)"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "MemberSignupCompletionDao#selectVerifiedAt/#selectConsumedAt이 운영 경로에서 호출되지 않는 죽은 코드로 남아 있다(round3 권고6 미처리). 부수로 target/surefire-reports/에 이전 라운드 프로브 클래스 XML 4개가 잔존해 테스트 수가 310으로 오독될 수 있다(실제 306).",
+          "suggested_action": "죽은 코드 정리 여부 판단 + surefire-reports 잔여 XML 정리"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "shop-web: 기준선에 없는 소스 루트",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        }
+      ],
+      "layer": "baseline"
+    },
+    {
+      "round": 7,
+      "gate": "FAIL",
+      "human": null,
+      "layers": {
+        "spec": "concerns",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "concerns",
+        "scope": "fail"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "AC 3번(중복 이메일 -> 409 MBR-4092 + login_url)이 가입 직후 재시도 구간에서 조건부로만 성립한다(consumed_at 비리셋). 사람이 보안 우선으로 명시 수용한 supersession이지만 STORY AC 문면과 INF-MBR-002 오류 계약에 아직 기록되지 않았다. 자가치유는 코드 만료(5분)+정리배치(10분) 후 다음 발송분부터.",
+          "suggested_action": "STEP 5.5 INF-MBR-002.md 재동기화 시 조건부 동작을 사실대로 등재하고 AC 문면을 정정"
+        },
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "SR-295 요구 본문이 attempt_count 리셋만 다뤄, round4가 되살린 AC 파손의 실제 원인인 consumed_at 비리셋을 범위에서 놓친다. 현 상태로 SR-295를 구현해도 이 결함은 남는다.",
+          "suggested_action": "SR-295 요구 본문에 재발송 시 consumed_at 동시 리셋(또는 이전 행 삭제 후 신규 INSERT)을 명시하거나 별도 SR로 분리"
+        },
+        {
+          "severity": "low",
+          "layer": "security",
+          "finding": "POST /api/members/signup에 레이트리밋이 없다. 존재 오라클은 닫혔으나 가입 진행 중 target의 시도 5회를 제3자가 대신 소진시키는 경로는 남는다(일일 발송 상한 5회로 영향 제한).",
+          "suggested_action": "후속 SR에서 IP/target 단위 레이트리밋 검토"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "문면 불일치 이월 — AC2 '최근 30분 이내 verified_at'(제거됨), AC3 '선조회 금지'의 STEP 0 대체 미기록, MBR-4093/MBR-4094 오류 계약 미등재, MemberRegistrationController#signUp javadoc의 동일 stale 문구.",
+          "suggested_action": "STEP 5.5에서 일괄 정정"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "login_url='/login'이 실재하지 않는 라우트(4라운드 연속 이월). 탈퇴 회원 del_yn='Y'의 email/phone_norm UNIQUE 점유로 재가입 영구 불가(이월).",
+          "suggested_action": "SR-231/UIS 미해결 가정 등록 및 백로그 유지(사람/PM 조치)"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "MemberSignupCompletionDao#selectVerifiedAt/#selectConsumedAt이 운영 경로에서 호출되지 않는 죽은 코드로 남아 있다(round3 권고6 미처리). 부수로 target/surefire-reports/에 이전 라운드 프로브 클래스 XML 4개가 잔존해 테스트 수가 310으로 오독될 수 있다(실제 306).",
+          "suggested_action": "죽은 코드 정리 여부 판단 + surefire-reports 잔여 XML 정리"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "shop-web: 기준선에 없는 소스 루트",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .understand-anything/linked-func-cache.json (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        }
+      ],
+      "layer": "scope"
+    },
+    {
+      "round": 8,
+      "gate": "FAIL",
+      "human": null,
+      "layers": {
+        "spec": "concerns",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "concerns",
+        "scope": "fail",
+        "rules": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "AC 3번(중복 이메일 -> 409 MBR-4092 + login_url)이 가입 직후 재시도 구간에서 조건부로만 성립한다(consumed_at 비리셋). 사람이 보안 우선으로 명시 수용한 supersession이지만 STORY AC 문면과 INF-MBR-002 오류 계약에 아직 기록되지 않았다. 자가치유는 코드 만료(5분)+정리배치(10분) 후 다음 발송분부터.",
+          "suggested_action": "STEP 5.5 INF-MBR-002.md 재동기화 시 조건부 동작을 사실대로 등재하고 AC 문면을 정정"
+        },
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "SR-295 요구 본문이 attempt_count 리셋만 다뤄, round4가 되살린 AC 파손의 실제 원인인 consumed_at 비리셋을 범위에서 놓친다. 현 상태로 SR-295를 구현해도 이 결함은 남는다.",
+          "suggested_action": "SR-295 요구 본문에 재발송 시 consumed_at 동시 리셋(또는 이전 행 삭제 후 신규 INSERT)을 명시하거나 별도 SR로 분리"
+        },
+        {
+          "severity": "low",
+          "layer": "security",
+          "finding": "POST /api/members/signup에 레이트리밋이 없다. 존재 오라클은 닫혔으나 가입 진행 중 target의 시도 5회를 제3자가 대신 소진시키는 경로는 남는다(일일 발송 상한 5회로 영향 제한).",
+          "suggested_action": "후속 SR에서 IP/target 단위 레이트리밋 검토"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "문면 불일치 이월 — AC2 '최근 30분 이내 verified_at'(제거됨), AC3 '선조회 금지'의 STEP 0 대체 미기록, MBR-4093/MBR-4094 오류 계약 미등재, MemberRegistrationController#signUp javadoc의 동일 stale 문구.",
+          "suggested_action": "STEP 5.5에서 일괄 정정"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "login_url='/login'이 실재하지 않는 라우트(4라운드 연속 이월). 탈퇴 회원 del_yn='Y'의 email/phone_norm UNIQUE 점유로 재가입 영구 불가(이월).",
+          "suggested_action": "SR-231/UIS 미해결 가정 등록 및 백로그 유지(사람/PM 조치)"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "MemberSignupCompletionDao#selectVerifiedAt/#selectConsumedAt이 운영 경로에서 호출되지 않는 죽은 코드로 남아 있다(round3 권고6 미처리). 부수로 target/surefire-reports/에 이전 라운드 프로브 클래스 XML 4개가 잔존해 테스트 수가 310으로 오독될 수 있다(실제 306).",
+          "suggested_action": "죽은 코드 정리 여부 판단 + surefire-reports 잔여 XML 정리"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "shop-web: 기준선에 없는 소스 루트",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .understand-anything/linked-func-cache.json (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        }
+      ],
+      "layer": "rules"
+    },
+    {
+      "round": 9,
+      "gate": "FAIL",
+      "human": {
+        "decision": "waiver",
+        "by": "개발자(이커머스)",
+        "at": "2026-09-12T08:02:22",
+        "comment": "축 A out_of_scope는 도구 캐시(.understand-anything/linked-func-cache.json) 1건 — 소스 변경 아님(v4.108.0에서 tool_state로 제외됨)",
+        "targets": []
+      },
+      "layers": {
+        "spec": "concerns",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "concerns",
+        "scope": "fail",
+        "rules": "pass",
+        "conformance": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "AC 3번(중복 이메일 -> 409 MBR-4092 + login_url)이 가입 직후 재시도 구간에서 조건부로만 성립한다(consumed_at 비리셋). 사람이 보안 우선으로 명시 수용한 supersession이지만 STORY AC 문면과 INF-MBR-002 오류 계약에 아직 기록되지 않았다. 자가치유는 코드 만료(5분)+정리배치(10분) 후 다음 발송분부터.",
+          "suggested_action": "STEP 5.5 INF-MBR-002.md 재동기화 시 조건부 동작을 사실대로 등재하고 AC 문면을 정정"
+        },
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "SR-295 요구 본문이 attempt_count 리셋만 다뤄, round4가 되살린 AC 파손의 실제 원인인 consumed_at 비리셋을 범위에서 놓친다. 현 상태로 SR-295를 구현해도 이 결함은 남는다.",
+          "suggested_action": "SR-295 요구 본문에 재발송 시 consumed_at 동시 리셋(또는 이전 행 삭제 후 신규 INSERT)을 명시하거나 별도 SR로 분리"
+        },
+        {
+          "severity": "low",
+          "layer": "security",
+          "finding": "POST /api/members/signup에 레이트리밋이 없다. 존재 오라클은 닫혔으나 가입 진행 중 target의 시도 5회를 제3자가 대신 소진시키는 경로는 남는다(일일 발송 상한 5회로 영향 제한).",
+          "suggested_action": "후속 SR에서 IP/target 단위 레이트리밋 검토"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "문면 불일치 이월 — AC2 '최근 30분 이내 verified_at'(제거됨), AC3 '선조회 금지'의 STEP 0 대체 미기록, MBR-4093/MBR-4094 오류 계약 미등재, MemberRegistrationController#signUp javadoc의 동일 stale 문구.",
+          "suggested_action": "STEP 5.5에서 일괄 정정"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "login_url='/login'이 실재하지 않는 라우트(4라운드 연속 이월). 탈퇴 회원 del_yn='Y'의 email/phone_norm UNIQUE 점유로 재가입 영구 불가(이월).",
+          "suggested_action": "SR-231/UIS 미해결 가정 등록 및 백로그 유지(사람/PM 조치)"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "MemberSignupCompletionDao#selectVerifiedAt/#selectConsumedAt이 운영 경로에서 호출되지 않는 죽은 코드로 남아 있다(round3 권고6 미처리). 부수로 target/surefire-reports/에 이전 라운드 프로브 클래스 XML 4개가 잔존해 테스트 수가 310으로 오독될 수 있다(실제 306).",
+          "suggested_action": "죽은 코드 정리 여부 판단 + surefire-reports 잔여 XML 정리"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "shop-web: 기준선에 없는 소스 루트",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .understand-anything/linked-func-cache.json (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "medium",
+          "layer": "conformance",
+          "finding": "AC-3 '중복 이메일/휴대폰 거부'가 실사용 재가입 경로에서 조건부로만 성립한다 — round4에서 STEP1(코드 검증)을 STEP0(존재 판정)보다 먼저 실행하도록 순서를 바꾼 결과, 가입 성공 직후 verification 행이 아직 consumed_at IS NOT NULL 상태인 동안 같은 target이 재발송받은 새 코드로 재시도하면 STEP1(verifyCode)에서 먼저 거부돼 409 MBR-4092가 아니라 MBR-4091이 반환된다(STORY round4 QA 실측·기록, Dev도 인지). 사람이 '보안(존재 오라클 차단) > 스펙(AC 문구)'로 명시 수용했고 근본 해결은 SR-295(범위 확장 완료 — consumed_at도 리셋)로 접수돼 있어 새로 발견한 결함은 아니지만, 이 FUNC의 diff만 놓고 보면 AC-3 문면은 아직 무조건 충족되지 않는다.",
+          "suggested_action": "STEP 5.5 INF-MBR-002.md 재동기화 시 AC-3에 이 조건부 동작(재가입 직후 재발송 구간에서는 4091)과 SR-295 의존관계를 명시. 근본 해결까지는 STORY AC 문구를 실제 동작에 맞게 정정 필요",
+          "confidence": "high",
+          "file": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberRegistrationService.java",
+          "line": 182
+        },
+        {
+          "severity": "low",
+          "layer": "conformance",
+          "finding": "AC-2 문구 '같은 target으로 최근 30분 이내 verified_at 행이 없으면 409'가 실제 구현(제출된 code를 그 자리에서 즉시 대조·소비하는 단일 단계, 30분 신선도 창 없음)과 다르다. 이 재해석(INF-MBR-002가 code 자체를 검증)은 STORY Dev 기록(1)에서 사람이 재승인했고(round1 QA 필수5 재작업에서 명시 승인 확인) 기능적으로는 '미인증 시 가입 불가'를 충족하지만, STORY AC 원문은 아직 정정되지 않았다(QA가 round2~4에 걸쳐 반복 지적, STEP 5.5 대기 항목으로 이미 등재됨).",
+          "suggested_action": "STEP 5.5에서 STORY AC-2 문구를 '제출된 code를 이 API가 직접 검증'으로 정정",
+          "confidence": "high",
+          "file": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberRegistrationService.java",
+          "line": 264
+        },
+        {
+          "severity": "low",
+          "layer": "conformance",
+          "finding": "STORY '승인된 설계 확정' 원문의 '선조회(select→분기→insert) 패턴 금지'가 round3/4 사람 결정으로 도입된 STEP0 사전 판정(memberDao.selectMemberIdByEmailOrPhoneNorm, 명백한 선조회)으로 사실상 대체됐다. 최종 원자성 보장은 여전히 STEP2의 UNIQUE 위반 catch가 맡고 있어(precheckDuplicate는 안내용 빠른 실패일 뿐) 동시성 안전 자체는 깨지지 않았지만, 원 설계 문구와 실제 구현이 어긋난 채로 STORY 문서에는 반영되지 않았다(QA가 이미 round3 권고3ⓑ/round4 권고4ⓑ로 동일 항목을 지적, STEP 5.5 대기).",
+          "suggested_action": "STEP 5.5 INF-MBR-002.md에 이 supersession(선조회 금지 → STEP0 사전판정으로 대체, 최종 보장은 UNIQUE catch)을 근거와 함께 기록",
+          "confidence": "high",
+          "file": "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberDao.java",
+          "line": 0
+        }
+      ],
+      "layer": "conformance"
+    }
+  ],
+  "waiver": {
+    "active": true,
+    "by": "개발자(이커머스)",
+    "reason": "축 A out_of_scope는 도구 캐시(.understand-anything/linked-func-cache.json) 1건 — 소스 변경 아님(v4.108.0에서 tool_state로 제외됨)",
+    "at": "2026-09-12T08:02:22",
+    "layer": "scope"
+  },
+  "story_transitions": [
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "SR 승인(SR-231)",
+      "at": "2026-09-12T02:04:32"
+    },
+    {
+      "from": "Approved",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-12T05:43:34"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "사람",
+      "at": "2026-09-12T06:03:16"
+    },
+    {
+      "from": "Review",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-12T06:10:37"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "사람",
+      "at": "2026-09-12T06:35:38"
+    },
+    {
+      "from": "Review",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-12T06:44:55"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "사람",
+      "at": "2026-09-12T07:02:30"
+    },
+    {
+      "from": "Review",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-12T07:15:46"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "사람",
+      "at": "2026-09-12T07:28:14"
+    },
+    {
+      "from": "Review",
+      "to": "Done",
+      "by": "사람",
+      "at": "2026-09-12T07:59:14",
+      "forced": true,
+      "force_reason": "[개발자 확인] 각 게이트에서 이미 승인한 판정(QA CONCERNS 수용 round4·STEP5.3 축A 도구캐시 waiver)을 완료 전이에 반영하는 절차상 force. can_done이 레이어 지정 waiver를 전역 Done 게이트에서 인정하지 않는 것은 플러그인 결함으로 별도 기록(RUN7 #19) — 이 FUNC의 QA/대조검증 자체는 정상적으로 사람 승인을 받았다."
+    }
+  ],
+  "escalate": false,
+  "fail_rounds": 2,
+  "max_rounds": 3,
+  "waivers": [
+    {
+      "active": true,
+      "by": "사람",
+      "reason": "[수용 사유] .understand-anything/linked-func-cache.json은 도구 캐시(자동 재스캔) — 소스 변경이 아니다. scope_verify가 도구 상태 경로를 제외하도록 플러그인에서 고칠 것(RUN7 #18). 축 B partial 2건은 이미 재승인된 정책이며 STEP 5.5에서 문서만 맞춘다.",
+      "at": "2026-09-12T07:52:01",
+      "layer": "conformance"
+    },
+    {
+      "active": true,
+      "by": "개발자(이커머스)",
+      "reason": "축 A out_of_scope는 도구 캐시(.understand-anything/linked-func-cache.json) 1건 — 소스 변경 아님(v4.108.0에서 tool_state로 제외됨)",
+      "at": "2026-09-12T08:02:22",
+      "layer": "scope"
+    }
+  ]
+}

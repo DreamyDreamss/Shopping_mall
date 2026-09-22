@@ -1,0 +1,492 @@
+{
+  "func": "FUNC-member-005",
+  "epic": null,
+  "story": "docs/00_FUNC/stories/STORY-FUNC-member-005.md",
+  "gate": "CONCERNS",
+  "reviewer": "qa-agent",
+  "updated": "2026-09-12T21:16:36",
+  "layers": {
+    "spec": "pass",
+    "security": "pass",
+    "regression": "pass",
+    "baseline": "concerns",
+    "scope": "fail",
+    "rules": "pass",
+    "conformance": "pass"
+  },
+  "top_issues": [
+    {
+      "severity": "high",
+      "layer": "spec",
+      "finding": "폐기된 apiKey를 되살릴 경로가 없다 — 006이 로그아웃에서 MEMBER_API_KEYS.revoked_at을 세팅하면, 그 회원은 재로그인해도 죽은 키를 받아 영구 락아웃된다. issueIfAbsent는 member_id PK 중복이라 no-op(revoked_at 그대로)이고 selectByMemberId에는 revoked 필터가 없어 무효 키를 200 응답으로 되돌려주며, member_id가 PK라 새 행도 재발급 메서드도 없다. 지금은 revoked_at을 세팅하는 운영 코드가 없고 FUNC-006이 미구현(GATE gate:null)이라 차단은 아니지만, STORY-FUNC-member-006에는 MEMBER_API_KEYS/revoked_at 언급이 한 줄도 없어 착수 즉시 밟는다. 이번 라운드 재작업 지시 (2)가 폐기 메커니즘만 정하고 재발급을 정하지 않아 생긴 간극이다.",
+      "suggested_action": "FUNC-006 계획 게이트에서 사람이 택일: (a) 005 로그인 경로가 폐기된 키를 새 키로 교체(UPDATE api_key/issued_at, revoked_at=NULL — 폐기된 키 문자열은 부활 금지), (b) 006이 revoked_at 세팅 대신 행 DELETE(다음 로그인이 자연 신규 발급), (c) apiKey 폐기를 006 범위에서 제외. 결정 결과를 005 경계표와 006 STORY 양쪽에 못박을 것(round1 권고3의 '006 STORY에도 동일하게 못박기'가 아직 미이행)."
+    },
+    {
+      "severity": "low",
+      "layer": "regression",
+      "finding": "enforceActiveCap이 issued_at DESC LIMIT 5 기준이라 동시 로그인 6건 이상이면 방금 발급한 리프레시 토큰이 지워질 수 있다(클라이언트가 이미 죽은 refreshToken 수령). DAO javadoc이 '정확한 상한 강제가 아니라 하우스키핑'으로 스스로 한계를 인정하고 있고 상한 5는 사람이 정한 값이다.",
+      "suggested_action": "후속 TODO — 상한 강제를 발급 이전으로 옮기거나 방금 발급한 token_hash를 삭제 대상에서 제외."
+    },
+    {
+      "severity": "low",
+      "layer": "regression",
+      "finding": "purgeExpiredOrRevoked가 폐기 행을 DELETE하므로 006이 나중에 '폐기된 리프레시 토큰 재사용 탐지(rotation reuse detection)'를 하려 하면 근거가 남지 않는다. SR은 이를 요구하지 않는다.",
+      "suggested_action": "006이 재사용 탐지를 요구하면 그때 purge 정책(보존기간)을 006 STORY에서 정한다."
+    },
+    {
+      "severity": "low",
+      "layer": "regression",
+      "finding": "ApiKeyAuthIntegrationTest의 dbIssuedApiKey_* 3건이 고정 회원 M-0001에 키를 꽂는다. 현재는 M-0001이 정적 맵 키만 쓰므로 안전하지만, M-0001로 실제 로그인하는 테스트가 생기면 issueIfAbsent가 no-op이 되어 조용히 401로 깨진다(사례집 SR-232 r2와 같은 계열의 공유 픽스처 위험).",
+      "suggested_action": "후속 TODO — DB 폴백 회귀 테스트를 전용 회원 ID(테스트가 직접 만들고 지우는)로 분리."
+    },
+    {
+      "severity": "low",
+      "layer": "baseline",
+      "finding": "shop-web: 건수 미상(러너 요약 줄을 못 읽음)",
+      "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+    },
+    {
+      "severity": "high",
+      "layer": "scope",
+      "finding": "스코프 밖 변경: harness/antipatterns.all.md (M)",
+      "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+    },
+    {
+      "severity": "low",
+      "layer": "conformance",
+      "finding": "STORY QA round2가 이미 문서화한 설계 간극(006이 로그아웃에서 MEMBER_API_KEYS.revoked_at을 세팅하면 재로그인 시 issueIfAbsent가 no-op이라 죽은 키를 그대로 반환해 영구 락아웃 가능) — diff에서도 issueIfAbsent(mapper/memberApiKey.xml:15-19)와 selectByMemberId(memberApiKey.xml:8-10)가 revoked_at을 전혀 참조하지 않는 것으로 실측 확인된다. 이 FUNC의 AC14개 어느 것도 이 경로를 요구하지 않고, 사람이 round2에서 FUNC-006 착수 시 처리하기로 확정 결정했으므로 이 FUNC 단독으로는 결함이 아니다.",
+      "suggested_action": "정보성 — FUNC-006 착수 시 STORY-FUNC-member-006에 이 간극(택일 a/b/c)이 실제로 명시됐는지 확인할 것.",
+      "confidence": "high",
+      "file": "modules/shop-api/src/main/resources/mapper/memberApiKey.xml",
+      "line": 15
+    }
+  ],
+  "rounds": [
+    {
+      "round": 1,
+      "gate": "FAIL",
+      "human": {
+        "decision": "rework",
+        "by": "사람",
+        "at": "2026-09-12T20:43:34",
+        "comment": "[결정 요약] high 2건(테스트 플레이키·탈퇴회원 키 무기한 통과)과 medium 3건(콘커런시 테스트 정리·리프레시토큰 누적·006 인터페이스 경계 명시)을 이번 라운드에 함께 고친다.\n\n[구현 방식]\n(1) 테스트 격리: 테스트마다 고유 이메일(UUID 접미)을 쓰고 @AfterEach에서 MEMBER_LOGIN_ATTEMPTS·MEMBER_API_KEYS·MEMBER_REFRESH_TOKENS의 자기 행을 정리한다. 잠금 판정 키는 이메일 원문을 그대로 쓴다(정규화 변경 없음).\n(2) selectMemberIdByApiKey는 MEMBERS 조인으로 del_yn='N'만 통과시킨다. MEMBER_API_KEYS에 revoked_at 컬럼을 ADD COLUMN IF NOT EXISTS로 추가하고 필터는 revoked_at IS NULL인 키만 통과시킨다 — 로그인 시 이 FUNC이 이전 키를 폐기하지는 않는다(폐기는 FUNC-member-006 소관 — 006이 revoked_at을 세팅하는 인터페이스로 못박는다).\n(3) 리프레시 토큰 누적 방지: 로그인 성공 시 같은 회원의 만료·폐기된 토큰을 정리하고, 회원당 활성 토큰 상한 5개로 가장 오래된 것부터 폐기한다.\n(4) STORY '## Dev 기록'에 FUNC-member-006과의 경계(apiKey/refreshToken 폐기 책임·컬럼 소유)를 표로 명시한다.\n\n[보안 순서] 잠금 판정 → 회원 조회 → del_yn 확인 → 비밀번호 검증 순서 유지. 세 실패 경우(미가입/탈퇴/비번오류) 응답 코드·본문·처리 시간을 동일하게 유지한다.\n\n[테스트·완료 조건] mvnw test 355/355 BUILD SUCCESS(단독 재실행으로 재현 확인). 동시성 테스트(MemberLoginConcurrencyTest)는 정리 로직 포함해 단독 3회 연속 통과. 탈퇴 회원 키 401, revoked 키 401, 기존 admin/M-0001 키 200 단언 테스트 추가. 완료 후 test_baseline_ws.py record --force로 기준선 재기록.\n\n[후속 SR·이월] low 2건은 이번 라운드에서 다루지 않는다 — refreshTokenExpiresAt 직렬화 형식 단언은 FUNC-member-004(로그인 화면) 쪽에서, 이메일 정규화·콜레이션 고정은 후속 SR로 넘긴다.",
+        "targets": []
+      },
+      "layers": {
+        "spec": "pass",
+        "security": "fail",
+        "regression": "fail"
+      },
+      "top_issues": [
+        {
+          "severity": "high",
+          "layer": "regression",
+          "finding": "mvnw test 재실행 결과 355건 중 2건 실패(BUILD FAILURE). ApiKeyAuthIntegrationTest.loginRoute_withoutApiKey_* / loginRoute_withMemberApiKey_* 가 401 기대에 429 응답. 두 테스트가 같은 이메일 no-such-member@example.com 으로 매 실행 2회씩 실패시키면서 MEMBER_LOGIN_ATTEMPTS 행을 @AfterEach에서 지우지 않아 카운터가 실행을 가로질러 누적됐다(DB 실측: fail_count=5, locked_until=2026-09-12T20:47:35). 잠금이 풀려도 행이 남아 2~3회 실행마다 빨개지는 영구 플레이키. Dev 기록의 '전부 통과'·'기준선 325건 유지 이상'은 재현되지 않는다.",
+          "suggested_action": "두 테스트의 @AfterEach에 loginAttemptDao.reset(...) 추가, 현재 남은 잠금 행 삭제 후 클린 재실행으로 전건 통과 실측, 그 다음 test_baseline_ws.py record 실행"
+        },
+        {
+          "severity": "high",
+          "layer": "security",
+          "finding": "ApiKeyAuthFilter DB 폴백이 탈퇴·삭제된 회원의 API 키를 그대로 인증시킨다. memberApiKey.xml#selectMemberIdByApiKey가 MEMBER_API_KEYS 단독 조회라 MEMBERS 존재·del_yn을 보지 않고, 테이블에 만료·폐기 컬럼도 없다. 로그인은 del_yn='Y'를 401로 막는데(순서·보안 2) 그 로그인이 발급한 키는 탈퇴 후에도 무기한 통과한다 — FUNC 자신의 보안 규칙과 모순이며 member.xml/order.xml의 del_yn='N' 상시필터 관례에서도 이탈. DB 실물 증거: MEMBER_API_KEYS에 mk_00adc93ca1b243b792dfe1fdacd860ac → M-9003-RACE 가 살아 있으나 MEMBERS에 M-9003-RACE는 0행. 이 키로 GET /api/orders 호출 시 폴백이 스코프를 내주고 evaluateMemberScope가 SCOPE_TO_SELF로 통과시킨다.",
+          "suggested_action": "selectMemberIdByApiKey를 MEMBERS 조인 + del_yn <> 'Y' 로 좁히고(무효 키는 종전과 동일 401), 탈퇴 회원 키가 401이 되는 회귀 테스트를 ApiKeyAuthIntegrationTest에 추가"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "MemberLoginConcurrencyTest의 apiKey 최초발급 레이스가 1회차 이후 아무것도 검증하지 않는다. resetSuccessMember()/cleanUp()이 MEMBERS 행은 지우지만 MEMBER_API_KEYS 행은 지우지 않아 2·3회차에는 issueIfAbsent가 순수 no-op이 되고 hasSize(1)이 무조건 참이 된다. 최초 실행 이후 재실행에서는 3회차 전부가 그렇다(DB 실측: M-9003-RACE 키의 issued_at이 최초 실행 시각 20:29:58에 고정). 사람 확정 결정의 '단독 3회 실행' 완료 조건이 실질 1회(재실행 시 0회).",
+          "suggested_action": "resetSuccessMember()에서 MEMBER_API_KEYS 행도 삭제해 매 회차가 실제 최초발급 레이스가 되게 한다"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "MEMBER_REFRESH_TOKENS가 무한 누적된다 — 현재 M-9003-RACE 한 명 앞으로 60행(실행마다 15~30행, 삭제 주체 없음). 테스트 정리가 없을 뿐 아니라 운영 경로에도 만료 토큰 purge가 전혀 없다(MemberSignupRateLimitDao#purgeOldRows 배치 전례와 대비).",
+          "suggested_action": "테스트 @AfterEach에 정리 추가 + 만료 토큰 purge의 소유(005 vs 006)를 STORY에 명시"
+        },
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "apiKey에 만료·폐기 수단이 없어 FUNC-006의 로그아웃이 세션을 끝내지 못한다. SR 수용 기준 '로그아웃 시 리프레시 토큰 폐기'를 006이 이행해도 실제 접근 자격증명인 apiKey는 그대로 유효하다. MEMBER_API_KEYS는 005 소유이므로 006이 revoked_at/expires_at을 자기 마이그레이션에서 ADD COLUMN IF NOT EXISTS로 붙여야 하는데, STORY '006과의 인터페이스 가정'에는 refreshToken 해시 규칙만 적혀 있다.",
+          "suggested_action": "STORY '006과의 인터페이스 가정'에 MEMBER_API_KEYS 폐기 책임과 컬럼 추가 경계를 명시(006 STORY에도 동일하게 못박기)"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "MemberLoginControllerTest가 refreshTokenExpiresAt 직렬화 형식을 단언하지 않는다 — FUNC-member-004(로그인 화면)가 이 필드를 파싱한다.",
+          "suggested_action": "200 응답 테스트에 refreshTokenExpiresAt ISO-8601 문자열 단언 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "security",
+          "finding": "이메일 정규화가 trim()뿐이라 대소문자 동일시를 DB 콜레이션에 의존한다. 현재는 MEMBERS 조회와 MEMBER_LOGIN_ATTEMPTS PK가 같은 콜레이션이라 일관되지만, 어느 한쪽이 *_bin이 되면 대소문자 변형으로 5회 잠금이 우회된다.",
+          "suggested_action": "후속 TODO — 로그인 경로 email을 toLowerCase 정규화하거나 두 테이블 콜레이션을 명시 고정"
+        }
+      ],
+      "cause": "impl_bug"
+    },
+    {
+      "round": 2,
+      "gate": "CONCERNS",
+      "human": {
+        "decision": "track",
+        "by": "사람",
+        "at": "2026-09-12T21:07:29",
+        "comment": "[결정 요약] round2 CONCERNS(폐기된 apiKey 재발급 간극)을 수용하고 진행 — FUNC-006 계획 게이트에서 (a)005 재로그인 시 키 교체 / (b)006 DELETE 방식 / (c)범위 제외 중 택일하기로 후속 TODO 등록. 사람 선호는 (a) 재로그인 시 새 키 발급 + 이전 키 revoked_at 세팅(005 issueIfAbsent를 rotate로 확장).\nlow 3건(활성토큰 상한 레이스 · purge 후 재사용탐지 근거 소실 · M-0001 공유 픽스처 위험)도 후속 TODO로 등록.\n\n[FUNC-006 착수 시 확인 필요]\n- STORY-FUNC-006 '## 구현 계획'에 MEMBER_API_KEYS.revoked_at · MEMBER_REFRESH_TOKENS 폐기 책임을 표로 명시할 것.\n- 재사용 탐지 근거(폐기 행 보존) 필요 여부는 006에서 purge 정책과 함께 결정.\n\n[완료 조건] 이번 라운드 코드 추가 없음 — mvnw test 361/361 유지, 기준선 재기록 후 완료.",
+        "targets": []
+      },
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "high",
+          "layer": "spec",
+          "finding": "폐기된 apiKey를 되살릴 경로가 없다 — 006이 로그아웃에서 MEMBER_API_KEYS.revoked_at을 세팅하면, 그 회원은 재로그인해도 죽은 키를 받아 영구 락아웃된다. issueIfAbsent는 member_id PK 중복이라 no-op(revoked_at 그대로)이고 selectByMemberId에는 revoked 필터가 없어 무효 키를 200 응답으로 되돌려주며, member_id가 PK라 새 행도 재발급 메서드도 없다. 지금은 revoked_at을 세팅하는 운영 코드가 없고 FUNC-006이 미구현(GATE gate:null)이라 차단은 아니지만, STORY-FUNC-member-006에는 MEMBER_API_KEYS/revoked_at 언급이 한 줄도 없어 착수 즉시 밟는다. 이번 라운드 재작업 지시 (2)가 폐기 메커니즘만 정하고 재발급을 정하지 않아 생긴 간극이다.",
+          "suggested_action": "FUNC-006 계획 게이트에서 사람이 택일: (a) 005 로그인 경로가 폐기된 키를 새 키로 교체(UPDATE api_key/issued_at, revoked_at=NULL — 폐기된 키 문자열은 부활 금지), (b) 006이 revoked_at 세팅 대신 행 DELETE(다음 로그인이 자연 신규 발급), (c) apiKey 폐기를 006 범위에서 제외. 결정 결과를 005 경계표와 006 STORY 양쪽에 못박을 것(round1 권고3의 '006 STORY에도 동일하게 못박기'가 아직 미이행)."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "enforceActiveCap이 issued_at DESC LIMIT 5 기준이라 동시 로그인 6건 이상이면 방금 발급한 리프레시 토큰이 지워질 수 있다(클라이언트가 이미 죽은 refreshToken 수령). DAO javadoc이 '정확한 상한 강제가 아니라 하우스키핑'으로 스스로 한계를 인정하고 있고 상한 5는 사람이 정한 값이다.",
+          "suggested_action": "후속 TODO — 상한 강제를 발급 이전으로 옮기거나 방금 발급한 token_hash를 삭제 대상에서 제외."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "purgeExpiredOrRevoked가 폐기 행을 DELETE하므로 006이 나중에 '폐기된 리프레시 토큰 재사용 탐지(rotation reuse detection)'를 하려 하면 근거가 남지 않는다. SR은 이를 요구하지 않는다.",
+          "suggested_action": "006이 재사용 탐지를 요구하면 그때 purge 정책(보존기간)을 006 STORY에서 정한다."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "ApiKeyAuthIntegrationTest의 dbIssuedApiKey_* 3건이 고정 회원 M-0001에 키를 꽂는다. 현재는 M-0001이 정적 맵 키만 쓰므로 안전하지만, M-0001로 실제 로그인하는 테스트가 생기면 issueIfAbsent가 no-op이 되어 조용히 401로 깨진다(사례집 SR-232 r2와 같은 계열의 공유 픽스처 위험).",
+          "suggested_action": "후속 TODO — DB 폴백 회귀 테스트를 전용 회원 ID(테스트가 직접 만들고 지우는)로 분리."
+        }
+      ],
+      "cause": "human_instruction"
+    },
+    {
+      "round": 3,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "high",
+          "layer": "spec",
+          "finding": "폐기된 apiKey를 되살릴 경로가 없다 — 006이 로그아웃에서 MEMBER_API_KEYS.revoked_at을 세팅하면, 그 회원은 재로그인해도 죽은 키를 받아 영구 락아웃된다. issueIfAbsent는 member_id PK 중복이라 no-op(revoked_at 그대로)이고 selectByMemberId에는 revoked 필터가 없어 무효 키를 200 응답으로 되돌려주며, member_id가 PK라 새 행도 재발급 메서드도 없다. 지금은 revoked_at을 세팅하는 운영 코드가 없고 FUNC-006이 미구현(GATE gate:null)이라 차단은 아니지만, STORY-FUNC-member-006에는 MEMBER_API_KEYS/revoked_at 언급이 한 줄도 없어 착수 즉시 밟는다. 이번 라운드 재작업 지시 (2)가 폐기 메커니즘만 정하고 재발급을 정하지 않아 생긴 간극이다.",
+          "suggested_action": "FUNC-006 계획 게이트에서 사람이 택일: (a) 005 로그인 경로가 폐기된 키를 새 키로 교체(UPDATE api_key/issued_at, revoked_at=NULL — 폐기된 키 문자열은 부활 금지), (b) 006이 revoked_at 세팅 대신 행 DELETE(다음 로그인이 자연 신규 발급), (c) apiKey 폐기를 006 범위에서 제외. 결정 결과를 005 경계표와 006 STORY 양쪽에 못박을 것(round1 권고3의 '006 STORY에도 동일하게 못박기'가 아직 미이행)."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "enforceActiveCap이 issued_at DESC LIMIT 5 기준이라 동시 로그인 6건 이상이면 방금 발급한 리프레시 토큰이 지워질 수 있다(클라이언트가 이미 죽은 refreshToken 수령). DAO javadoc이 '정확한 상한 강제가 아니라 하우스키핑'으로 스스로 한계를 인정하고 있고 상한 5는 사람이 정한 값이다.",
+          "suggested_action": "후속 TODO — 상한 강제를 발급 이전으로 옮기거나 방금 발급한 token_hash를 삭제 대상에서 제외."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "purgeExpiredOrRevoked가 폐기 행을 DELETE하므로 006이 나중에 '폐기된 리프레시 토큰 재사용 탐지(rotation reuse detection)'를 하려 하면 근거가 남지 않는다. SR은 이를 요구하지 않는다.",
+          "suggested_action": "006이 재사용 탐지를 요구하면 그때 purge 정책(보존기간)을 006 STORY에서 정한다."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "ApiKeyAuthIntegrationTest의 dbIssuedApiKey_* 3건이 고정 회원 M-0001에 키를 꽂는다. 현재는 M-0001이 정적 맵 키만 쓰므로 안전하지만, M-0001로 실제 로그인하는 테스트가 생기면 issueIfAbsent가 no-op이 되어 조용히 401로 깨진다(사례집 SR-232 r2와 같은 계열의 공유 픽스처 위험).",
+          "suggested_action": "후속 TODO — DB 폴백 회귀 테스트를 전용 회원 ID(테스트가 직접 만들고 지우는)로 분리."
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "shop-web: 건수 미상(러너 요약 줄을 못 읽음)",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        }
+      ],
+      "cause": "untagged",
+      "layer": "baseline"
+    },
+    {
+      "round": 4,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "high",
+          "layer": "spec",
+          "finding": "폐기된 apiKey를 되살릴 경로가 없다 — 006이 로그아웃에서 MEMBER_API_KEYS.revoked_at을 세팅하면, 그 회원은 재로그인해도 죽은 키를 받아 영구 락아웃된다. issueIfAbsent는 member_id PK 중복이라 no-op(revoked_at 그대로)이고 selectByMemberId에는 revoked 필터가 없어 무효 키를 200 응답으로 되돌려주며, member_id가 PK라 새 행도 재발급 메서드도 없다. 지금은 revoked_at을 세팅하는 운영 코드가 없고 FUNC-006이 미구현(GATE gate:null)이라 차단은 아니지만, STORY-FUNC-member-006에는 MEMBER_API_KEYS/revoked_at 언급이 한 줄도 없어 착수 즉시 밟는다. 이번 라운드 재작업 지시 (2)가 폐기 메커니즘만 정하고 재발급을 정하지 않아 생긴 간극이다.",
+          "suggested_action": "FUNC-006 계획 게이트에서 사람이 택일: (a) 005 로그인 경로가 폐기된 키를 새 키로 교체(UPDATE api_key/issued_at, revoked_at=NULL — 폐기된 키 문자열은 부활 금지), (b) 006이 revoked_at 세팅 대신 행 DELETE(다음 로그인이 자연 신규 발급), (c) apiKey 폐기를 006 범위에서 제외. 결정 결과를 005 경계표와 006 STORY 양쪽에 못박을 것(round1 권고3의 '006 STORY에도 동일하게 못박기'가 아직 미이행)."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "enforceActiveCap이 issued_at DESC LIMIT 5 기준이라 동시 로그인 6건 이상이면 방금 발급한 리프레시 토큰이 지워질 수 있다(클라이언트가 이미 죽은 refreshToken 수령). DAO javadoc이 '정확한 상한 강제가 아니라 하우스키핑'으로 스스로 한계를 인정하고 있고 상한 5는 사람이 정한 값이다.",
+          "suggested_action": "후속 TODO — 상한 강제를 발급 이전으로 옮기거나 방금 발급한 token_hash를 삭제 대상에서 제외."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "purgeExpiredOrRevoked가 폐기 행을 DELETE하므로 006이 나중에 '폐기된 리프레시 토큰 재사용 탐지(rotation reuse detection)'를 하려 하면 근거가 남지 않는다. SR은 이를 요구하지 않는다.",
+          "suggested_action": "006이 재사용 탐지를 요구하면 그때 purge 정책(보존기간)을 006 STORY에서 정한다."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "ApiKeyAuthIntegrationTest의 dbIssuedApiKey_* 3건이 고정 회원 M-0001에 키를 꽂는다. 현재는 M-0001이 정적 맵 키만 쓰므로 안전하지만, M-0001로 실제 로그인하는 테스트가 생기면 issueIfAbsent가 no-op이 되어 조용히 401로 깨진다(사례집 SR-232 r2와 같은 계열의 공유 픽스처 위험).",
+          "suggested_action": "후속 TODO — DB 폴백 회귀 테스트를 전용 회원 ID(테스트가 직접 만들고 지우는)로 분리."
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "shop-web: 건수 미상(러너 요약 줄을 못 읽음)",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        }
+      ],
+      "cause": "untagged",
+      "layer": "baseline"
+    },
+    {
+      "round": 5,
+      "gate": "FAIL",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "concerns",
+        "scope": "fail"
+      },
+      "top_issues": [
+        {
+          "severity": "high",
+          "layer": "spec",
+          "finding": "폐기된 apiKey를 되살릴 경로가 없다 — 006이 로그아웃에서 MEMBER_API_KEYS.revoked_at을 세팅하면, 그 회원은 재로그인해도 죽은 키를 받아 영구 락아웃된다. issueIfAbsent는 member_id PK 중복이라 no-op(revoked_at 그대로)이고 selectByMemberId에는 revoked 필터가 없어 무효 키를 200 응답으로 되돌려주며, member_id가 PK라 새 행도 재발급 메서드도 없다. 지금은 revoked_at을 세팅하는 운영 코드가 없고 FUNC-006이 미구현(GATE gate:null)이라 차단은 아니지만, STORY-FUNC-member-006에는 MEMBER_API_KEYS/revoked_at 언급이 한 줄도 없어 착수 즉시 밟는다. 이번 라운드 재작업 지시 (2)가 폐기 메커니즘만 정하고 재발급을 정하지 않아 생긴 간극이다.",
+          "suggested_action": "FUNC-006 계획 게이트에서 사람이 택일: (a) 005 로그인 경로가 폐기된 키를 새 키로 교체(UPDATE api_key/issued_at, revoked_at=NULL — 폐기된 키 문자열은 부활 금지), (b) 006이 revoked_at 세팅 대신 행 DELETE(다음 로그인이 자연 신규 발급), (c) apiKey 폐기를 006 범위에서 제외. 결정 결과를 005 경계표와 006 STORY 양쪽에 못박을 것(round1 권고3의 '006 STORY에도 동일하게 못박기'가 아직 미이행)."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "enforceActiveCap이 issued_at DESC LIMIT 5 기준이라 동시 로그인 6건 이상이면 방금 발급한 리프레시 토큰이 지워질 수 있다(클라이언트가 이미 죽은 refreshToken 수령). DAO javadoc이 '정확한 상한 강제가 아니라 하우스키핑'으로 스스로 한계를 인정하고 있고 상한 5는 사람이 정한 값이다.",
+          "suggested_action": "후속 TODO — 상한 강제를 발급 이전으로 옮기거나 방금 발급한 token_hash를 삭제 대상에서 제외."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "purgeExpiredOrRevoked가 폐기 행을 DELETE하므로 006이 나중에 '폐기된 리프레시 토큰 재사용 탐지(rotation reuse detection)'를 하려 하면 근거가 남지 않는다. SR은 이를 요구하지 않는다.",
+          "suggested_action": "006이 재사용 탐지를 요구하면 그때 purge 정책(보존기간)을 006 STORY에서 정한다."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "ApiKeyAuthIntegrationTest의 dbIssuedApiKey_* 3건이 고정 회원 M-0001에 키를 꽂는다. 현재는 M-0001이 정적 맵 키만 쓰므로 안전하지만, M-0001로 실제 로그인하는 테스트가 생기면 issueIfAbsent가 no-op이 되어 조용히 401로 깨진다(사례집 SR-232 r2와 같은 계열의 공유 픽스처 위험).",
+          "suggested_action": "후속 TODO — DB 폴백 회귀 테스트를 전용 회원 ID(테스트가 직접 만들고 지우는)로 분리."
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "shop-web: 건수 미상(러너 요약 줄을 못 읽음)",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: harness/antipatterns.all.md (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        }
+      ],
+      "cause": "untagged",
+      "layer": "scope"
+    },
+    {
+      "round": 6,
+      "gate": "FAIL",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "concerns",
+        "scope": "fail",
+        "rules": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "high",
+          "layer": "spec",
+          "finding": "폐기된 apiKey를 되살릴 경로가 없다 — 006이 로그아웃에서 MEMBER_API_KEYS.revoked_at을 세팅하면, 그 회원은 재로그인해도 죽은 키를 받아 영구 락아웃된다. issueIfAbsent는 member_id PK 중복이라 no-op(revoked_at 그대로)이고 selectByMemberId에는 revoked 필터가 없어 무효 키를 200 응답으로 되돌려주며, member_id가 PK라 새 행도 재발급 메서드도 없다. 지금은 revoked_at을 세팅하는 운영 코드가 없고 FUNC-006이 미구현(GATE gate:null)이라 차단은 아니지만, STORY-FUNC-member-006에는 MEMBER_API_KEYS/revoked_at 언급이 한 줄도 없어 착수 즉시 밟는다. 이번 라운드 재작업 지시 (2)가 폐기 메커니즘만 정하고 재발급을 정하지 않아 생긴 간극이다.",
+          "suggested_action": "FUNC-006 계획 게이트에서 사람이 택일: (a) 005 로그인 경로가 폐기된 키를 새 키로 교체(UPDATE api_key/issued_at, revoked_at=NULL — 폐기된 키 문자열은 부활 금지), (b) 006이 revoked_at 세팅 대신 행 DELETE(다음 로그인이 자연 신규 발급), (c) apiKey 폐기를 006 범위에서 제외. 결정 결과를 005 경계표와 006 STORY 양쪽에 못박을 것(round1 권고3의 '006 STORY에도 동일하게 못박기'가 아직 미이행)."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "enforceActiveCap이 issued_at DESC LIMIT 5 기준이라 동시 로그인 6건 이상이면 방금 발급한 리프레시 토큰이 지워질 수 있다(클라이언트가 이미 죽은 refreshToken 수령). DAO javadoc이 '정확한 상한 강제가 아니라 하우스키핑'으로 스스로 한계를 인정하고 있고 상한 5는 사람이 정한 값이다.",
+          "suggested_action": "후속 TODO — 상한 강제를 발급 이전으로 옮기거나 방금 발급한 token_hash를 삭제 대상에서 제외."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "purgeExpiredOrRevoked가 폐기 행을 DELETE하므로 006이 나중에 '폐기된 리프레시 토큰 재사용 탐지(rotation reuse detection)'를 하려 하면 근거가 남지 않는다. SR은 이를 요구하지 않는다.",
+          "suggested_action": "006이 재사용 탐지를 요구하면 그때 purge 정책(보존기간)을 006 STORY에서 정한다."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "ApiKeyAuthIntegrationTest의 dbIssuedApiKey_* 3건이 고정 회원 M-0001에 키를 꽂는다. 현재는 M-0001이 정적 맵 키만 쓰므로 안전하지만, M-0001로 실제 로그인하는 테스트가 생기면 issueIfAbsent가 no-op이 되어 조용히 401로 깨진다(사례집 SR-232 r2와 같은 계열의 공유 픽스처 위험).",
+          "suggested_action": "후속 TODO — DB 폴백 회귀 테스트를 전용 회원 ID(테스트가 직접 만들고 지우는)로 분리."
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "shop-web: 건수 미상(러너 요약 줄을 못 읽음)",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: harness/antipatterns.all.md (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        }
+      ],
+      "cause": "untagged",
+      "layer": "rules"
+    },
+    {
+      "round": 7,
+      "gate": "FAIL",
+      "human": {
+        "decision": "waiver",
+        "by": "사람",
+        "at": "2026-09-12T21:17:33",
+        "comment": "harness/antipatterns.all.md 갱신은 DoD 요구사항(결함 기록)이며 실제 소스 스코프 위반이 아님 — scope_verify.py ARTIFACT_PREFIXES가 harness/를 미포함하는 알려진 스크립트 갭(플러그인 쪽 후속 수정 필요, 이 FUNC 범위 밖)",
+        "targets": []
+      },
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "concerns",
+        "scope": "fail",
+        "rules": "pass",
+        "conformance": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "high",
+          "layer": "spec",
+          "finding": "폐기된 apiKey를 되살릴 경로가 없다 — 006이 로그아웃에서 MEMBER_API_KEYS.revoked_at을 세팅하면, 그 회원은 재로그인해도 죽은 키를 받아 영구 락아웃된다. issueIfAbsent는 member_id PK 중복이라 no-op(revoked_at 그대로)이고 selectByMemberId에는 revoked 필터가 없어 무효 키를 200 응답으로 되돌려주며, member_id가 PK라 새 행도 재발급 메서드도 없다. 지금은 revoked_at을 세팅하는 운영 코드가 없고 FUNC-006이 미구현(GATE gate:null)이라 차단은 아니지만, STORY-FUNC-member-006에는 MEMBER_API_KEYS/revoked_at 언급이 한 줄도 없어 착수 즉시 밟는다. 이번 라운드 재작업 지시 (2)가 폐기 메커니즘만 정하고 재발급을 정하지 않아 생긴 간극이다.",
+          "suggested_action": "FUNC-006 계획 게이트에서 사람이 택일: (a) 005 로그인 경로가 폐기된 키를 새 키로 교체(UPDATE api_key/issued_at, revoked_at=NULL — 폐기된 키 문자열은 부활 금지), (b) 006이 revoked_at 세팅 대신 행 DELETE(다음 로그인이 자연 신규 발급), (c) apiKey 폐기를 006 범위에서 제외. 결정 결과를 005 경계표와 006 STORY 양쪽에 못박을 것(round1 권고3의 '006 STORY에도 동일하게 못박기'가 아직 미이행)."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "enforceActiveCap이 issued_at DESC LIMIT 5 기준이라 동시 로그인 6건 이상이면 방금 발급한 리프레시 토큰이 지워질 수 있다(클라이언트가 이미 죽은 refreshToken 수령). DAO javadoc이 '정확한 상한 강제가 아니라 하우스키핑'으로 스스로 한계를 인정하고 있고 상한 5는 사람이 정한 값이다.",
+          "suggested_action": "후속 TODO — 상한 강제를 발급 이전으로 옮기거나 방금 발급한 token_hash를 삭제 대상에서 제외."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "purgeExpiredOrRevoked가 폐기 행을 DELETE하므로 006이 나중에 '폐기된 리프레시 토큰 재사용 탐지(rotation reuse detection)'를 하려 하면 근거가 남지 않는다. SR은 이를 요구하지 않는다.",
+          "suggested_action": "006이 재사용 탐지를 요구하면 그때 purge 정책(보존기간)을 006 STORY에서 정한다."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "ApiKeyAuthIntegrationTest의 dbIssuedApiKey_* 3건이 고정 회원 M-0001에 키를 꽂는다. 현재는 M-0001이 정적 맵 키만 쓰므로 안전하지만, M-0001로 실제 로그인하는 테스트가 생기면 issueIfAbsent가 no-op이 되어 조용히 401로 깨진다(사례집 SR-232 r2와 같은 계열의 공유 픽스처 위험).",
+          "suggested_action": "후속 TODO — DB 폴백 회귀 테스트를 전용 회원 ID(테스트가 직접 만들고 지우는)로 분리."
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "shop-web: 건수 미상(러너 요약 줄을 못 읽음)",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: harness/antipatterns.all.md (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "low",
+          "layer": "conformance",
+          "finding": "STORY QA round2가 이미 문서화한 설계 간극(006이 로그아웃에서 MEMBER_API_KEYS.revoked_at을 세팅하면 재로그인 시 issueIfAbsent가 no-op이라 죽은 키를 그대로 반환해 영구 락아웃 가능) — diff에서도 issueIfAbsent(mapper/memberApiKey.xml:15-19)와 selectByMemberId(memberApiKey.xml:8-10)가 revoked_at을 전혀 참조하지 않는 것으로 실측 확인된다. 이 FUNC의 AC14개 어느 것도 이 경로를 요구하지 않고, 사람이 round2에서 FUNC-006 착수 시 처리하기로 확정 결정했으므로 이 FUNC 단독으로는 결함이 아니다.",
+          "suggested_action": "정보성 — FUNC-006 착수 시 STORY-FUNC-member-006에 이 간극(택일 a/b/c)이 실제로 명시됐는지 확인할 것.",
+          "confidence": "high",
+          "file": "modules/shop-api/src/main/resources/mapper/memberApiKey.xml",
+          "line": 15
+        }
+      ],
+      "cause": "untagged",
+      "layer": "conformance"
+    }
+  ],
+  "waiver": {
+    "active": true,
+    "by": "사람",
+    "reason": "harness/antipatterns.all.md 갱신은 DoD 요구사항(결함 기록)이며 실제 소스 스코프 위반이 아님 — scope_verify.py ARTIFACT_PREFIXES가 harness/를 미포함하는 알려진 스크립트 갭(플러그인 쪽 후속 수정 필요, 이 FUNC 범위 밖)",
+    "at": "2026-09-12T21:17:33",
+    "layer": "scope"
+  },
+  "story_transitions": [
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "SR 승인(SR-232)",
+      "at": "2026-09-12T19:59:27"
+    },
+    {
+      "from": "Approved",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-12T20:11:42"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "사람",
+      "at": "2026-09-12T20:34:10"
+    },
+    {
+      "from": "Review",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-12T20:43:34"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "사람",
+      "at": "2026-09-12T20:59:57"
+    },
+    {
+      "from": "Review",
+      "to": "Done",
+      "by": "사람",
+      "at": "2026-09-12T21:07:29"
+    }
+  ],
+  "cause": "untagged",
+  "escalate": false,
+  "fail_rounds": 1,
+  "max_rounds": 3,
+  "waivers": [
+    {
+      "active": true,
+      "by": "사람",
+      "reason": "harness/antipatterns.all.md 갱신은 DoD 요구사항(결함 기록)이며 실제 소스 스코프 위반이 아님 — scope_verify.py ARTIFACT_PREFIXES가 harness/를 미포함하는 알려진 스크립트 갭(플러그인 쪽 후속 수정 필요, 이 FUNC 범위 밖)",
+      "at": "2026-09-12T21:17:33",
+      "layer": "scope"
+    }
+  ]
+}

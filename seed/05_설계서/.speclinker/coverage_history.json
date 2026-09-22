@@ -1,0 +1,15 @@
+[
+ {
+  "date": "2026-09-09",
+  "totals": {
+   "inf": 0,
+   "uis": 0,
+   "sch": 0,
+   "bat": 1,
+   "sch_tables": 0
+  },
+  "expected": 0,
+  "generated": 0,
+  "pct": null
+ }
+]

@@ -109,3 +109,39 @@ def test_setup_substitutes_every_token_the_seed_uses():
         src = _read(script)
         for tok in sorted(used):
             assert tok in src, f'{script}: {tok} 를 치환하지 않는다'
+
+
+def test_seed_carries_the_core_artifacts():
+    """설계서가 seed에 없으면 SpecLens 화면이 **비어서 뜬다** — 테스트베드의 존재 이유가 사라진다.
+
+    2026-09-22 실측: 분리 1차에서 `docs/05_설계서`·`00_FUNC`·테스트 산출물을 통째로 빠뜨렸고,
+    서버에 올리고 나서야 `docs/05_설계서` 0건으로 드러났다. 건수까지 본다 — 디렉토리만 있고
+    비어 있으면 같은 증상이기 때문이다."""
+    seed = os.path.join(REPO, 'seed')
+    need = {
+        '05_설계서': 20,          # INF·SCH·UIS spec.md (common 3 · member 5 · order 12)
+        '00_FUNC': 1,
+        '09_납품': 21,
+        '변경관리': 1,
+        'ws': 1,
+    }
+    for name, least in need.items():
+        d = os.path.join(seed, name)
+        assert os.path.isdir(d), f'seed/{name} 이 없다'
+        n = sum(len(fs) for _r, _d, fs in os.walk(d))
+        assert n >= least, f'seed/{name} 파일 {n}건 — {least}건 이상이어야 한다'
+    specs = [f for _r, _d, fs in os.walk(os.path.join(seed, '05_설계서')) for f in fs if f == 'spec.md']
+    assert len(specs) >= 20, f'설계서 spec.md {len(specs)}건'
+
+
+def test_setup_expands_seed_by_rule_not_by_a_name_list():
+    """전개를 이름 목록으로 두면 seed에 담고도 빠뜨린다(실제로 그랬다) — 규칙으로 돈다."""
+    for name in ('setup-linux.sh', 'setup.ps1'):
+        s = _read(name)
+        assert 'seed' in s
+        # 이름을 하나씩 적은 복사문이 남아 있으면 안 된다
+        assert '09_납품"' not in s.replace('docs/09_납품', ''), f'{name}: 이름 목록 복사가 남아 있다'
+    sh = _read('setup-linux.sh')
+    assert 'for src in' in sh and 'basename' in sh, 'setup-linux.sh 가 규칙으로 돌지 않는다'
+    ps = _read('setup.ps1')
+    assert 'Get-ChildItem' in ps and 'switch ($src.Name)' in ps, 'setup.ps1 이 규칙으로 돌지 않는다'

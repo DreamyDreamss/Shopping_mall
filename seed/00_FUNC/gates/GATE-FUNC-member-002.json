@@ -1,0 +1,698 @@
+{
+  "func": "FUNC-member-002",
+  "epic": null,
+  "story": "docs/00_FUNC/stories/STORY-FUNC-member-002.md",
+  "gate": "CONCERNS",
+  "reviewer": "qa-agent",
+  "updated": "2026-09-12T05:31:53",
+  "layers": {
+    "spec": "pass",
+    "security": "pass",
+    "regression": "pass",
+    "baseline": "concerns",
+    "scope": "fail",
+    "rules": "pass",
+    "conformance": "pass"
+  },
+  "top_issues": [
+    {
+      "severity": "low",
+      "layer": "regression",
+      "finding": "레이트리밋 UPSERT의 실패 방향은 여전히 fail-open이다. round6은 round5의 '사용자 변수 대입/읽기'(매뉴얼상 명시적 미정의)를 'UPDATE SET 목록 좌→우 평가'(문서화된 동작)로 바꿔 의존 등급을 실질적으로 낮췄고, QA가 드라이버 prepare 모드 4종·1,200요청 동시성으로 안정성을 확증했다. 다만 MySQL 매뉴얼 서술에 'generally'라는 유보어가 있고 ON DUPLICATE KEY UPDATE에 이를 재명시하지 않는다. QA가 SET 목록을 역순으로 쓴 문장으로 실패 방향을 실측한 결과, 쿨다운 경과 61초 간격 12연타가 12/12 허용에 daily_count 1 고정 — 평가 순서가 뒤집히면 레이트리밋이 통째로 무력화된다. 안전망은 이미 존재한다(MemberSignupRateLimitDaoTest의 afterCooldownPassed dailyCount==2·lastRequestedAt==second, atDailyLimit dailyCount==5 어서션이 이 회귀를 잡는다 — round5 SET-순서 결함을 실제로 잡아낸 전례와 동일).",
+      "suggested_action": "비용 0의 경화가 가능함만 기록. 서비스가 이미 selectRateLimit으로 last_requested_at을 함께 읽으므로 MemberSignupService의 admitted 조건에 '&& now.equals(rateLimit.getLastRequestedAt())'를 한 항 더하면 이 가설적 fail-open이 fail-closed로 바뀐다. 지금 조치할 근거는 없다 — 후속 TODO 성격."
+    },
+    {
+      "severity": "low",
+      "layer": "spec",
+      "finding": "spring.task.scheduling.enabled는 공식 Spring Boot 프로퍼티가 아닌데(TaskSchedulingProperties에 해당 필드 없음 — dev가 스스로 실측·명시) 공식 키처럼 보인다. 이 키를 해석하는 것은 MemberSignupSchedulingConfig의 @ConditionalOnProperty 하나뿐이며, shop-api/pom.xml surefire가 이 값을 모듈 전체 테스트 JVM에 건다. 현재 앱의 @Scheduled가 이 FUNC 1개뿐(@Async 0건, 전수 grep)이라 영향 반경은 0이고 설정 클래스 javadoc·pom 주석 양쪽에 정확히 문서화돼 있다.",
+      "suggested_action": "다른 FUNC이 나중에 테스트에서 살아 있어야 하는 @Scheduled를 추가하면 이 모듈 전역 설정이 조용히 끈다는 사실을 STORY 후속 추적(TODO)에 한 줄 남길 것."
+    },
+    {
+      "severity": "low",
+      "layer": "baseline",
+      "finding": "shop-web: 기준선에 없는 소스 루트",
+      "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+    },
+    {
+      "severity": "high",
+      "layer": "scope",
+      "finding": "스코프 밖 변경: .understand-anything/linked-func-cache.json (M)",
+      "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+    },
+    {
+      "severity": "high",
+      "layer": "scope",
+      "finding": "스코프 밖 변경: out.log (M)",
+      "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+    },
+    {
+      "severity": "high",
+      "layer": "scope",
+      "finding": "스코프 밖 변경: modules/shop-api/src/test/resources/sql/insert-out-of-stock.sql (??)",
+      "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+    },
+    {
+      "severity": "low",
+      "layer": "conformance",
+      "finding": "STORY AC-1의 test-agent 재확인 근거 문장이 'MemberSignupControllerTest 2건'이라 적었으나 실제 파일(modules/shop-api/src/test/java/com/sm/lab/shop/controller/MemberSignupControllerTest.java)에는 @Test 4개(sendVerificationCode_validEmail_returns200WithoutApiKey, _invalidFormat_returns400WithCodeMessageEnvelope, _cooldownViolation_returns429WithCodeMessageEnvelope, _dataAccessException_returns500WithGenericEnvelopeOnly)가 있다. AC 텍스트가 명시한 합계 66건도 실제로는 68건(4+9+4+6+1+1+3+39+1)이다. 구현 자체는 오히려 더 넓은 케이스(429·500 경로 포함)를 커버하므로 기능 결함은 아니지만, 게이트 근거 문서의 test-count 서술이 부정확하다.",
+      "suggested_action": "STORY AC-1 근거 문장의 MemberSignupControllerTest 건수(2→4)와 합계(66→68)를 실측대로 정정",
+      "confidence": "high",
+      "file": "modules/shop-api/src/test/java/com/sm/lab/shop/controller/MemberSignupControllerTest.java",
+      "line": 42
+    }
+  ],
+  "rounds": [
+    {
+      "round": 1,
+      "gate": "FAIL",
+      "human": {
+        "decision": "rework",
+        "by": "사람",
+        "at": "2026-09-12T02:26:03",
+        "comment": "[결정: 역할 교체를 받아들인다 — 구현 순서상 인증코드 발송이 먼저다]\nFUNC-member-002 = INF-MBR-002 역할(인증코드 발송/확인)로 확정. FUNC-member-003 = INF-MBR-001 역할(가입 요청: 회원 생성·이메일 중복 409·인증완료 서버측 강제·환영쿠폰 이벤트)로 문서상 재배정.\n\n이 잡(FUNC-member-002)에서 할 일:\n(1) docs/변경관리/SR-231/02_변경명세.md 의 FUNC-member-002/003 절 제목·본문을 위 역할대로 교체(ID 예약분이라 스펙 본문은 없다 — 변경명세만이 정본).\n(2) docs/00_FUNC/stories/STORY-FUNC-member-003.md 제목/요약 한 줄을 '가입 요청 API'로 정정(status는 건드리지 않는다).\n    -- (1)(2)는 같은 SR-231 산출물이라 스코프 위반이 아니라고 사람이 명시적으로 승인함.\n\n기술 결함 3건 수정:\n(a) DDL 적용 경로: shop-api 모듈 내부에 두고 애플리케이션 기동 시 적용되게 한다(Flyway 없음 확인됨 — spring.sql.init 스키마 파일 방식 등 이 프로젝트 관례에 맞는 방법으로). 랩 시드 lab/db/schema.sql(워크스페이스 밖)은 건드리지 말고, 적용 경로를 STORY Dev 기록에 남긴다.\n(b) target 길이 상한(100) 검증 → 400 응답을 {code, message} 형태로 통일(기존 ORD-4001류 오류 계약과 같은 봉투 사용 — OrderApiExceptionHandler/ApiExceptionHandler 참고).\n(c) 레이트리밋: target당 60초 쿨다운 + 하루 5회 제한. 만료 코드 purge는 별도 스케줄 대신 발송 시점에 만료분 삭제로 단순화.\n\n권고 중 반영할 것: 인증코드 평문 로그 제거(마스킹), 통합테스트가 남긴 DB 행 정리, 주석 사실오류 정정(화이트리스트 근거).\nattempt_count 컬럼은 이번 DDL에 포함(FUNC-member-003이 사용).\n\n테스트: DaoTest·통합테스트 전부 통과시키고 mvn test 실행 결과를 STORY Dev 기록에 남긴다.",
+        "targets": []
+      },
+      "layers": {
+        "spec": "fail",
+        "security": "concerns",
+        "regression": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "high",
+          "layer": "spec",
+          "finding": "SR 정본 02_변경명세.md는 FUNC-member-002(INF-MBR-001)=가입 요청 API(회원 생성·중복검사·인증완료 강제·환영쿠폰 이벤트), FUNC-member-003(INF-MBR-002)=인증코드 발송/확인으로 배정했는데 구현은 정확히 반대다. AC2('SR 정본 계약 충족 — 02_변경명세.md') 미충족. 게다가 이 반전이 STORY-FUNC-member-003.md에 기록되지 않아(status=Approved·Dev 기록 공란, 링크된 정본은 여전히 'INF-MBR-002=인증코드 발송') 독립 컨텍스트의 member-003 dev-agent가 인증코드 발송을 중복 구현하거나 가입완료를 영구 누락한다.",
+          "suggested_action": "정본이 스스로 '추정 역할'이라 적었으므로 코드 재작성이 아니라 문서 정합화로 닫는다 — 02_변경명세.md의 002/003 TO-BE 절을 실제 분할로 수정하고, STORY-FUNC-member-003.md에 분할 + 'MEMBERS.email 컬럼 추가·유니크 제약·중복 판정은 003 소유' 결정을 명시한다."
+        },
+        {
+          "severity": "high",
+          "layer": "regression",
+          "finding": "lab/db/schema.sql에 MEMBER_SIGNUP_VERIFICATIONS DDL이 없다(실측 확인). 랩 DB를 재생성하면 테이블이 사라져 DaoTest 3건·ApiKeyAuthIntegrationTest 2건이 실패하고 엔드포인트가 500이 된다. dev가 '워크스페이스 밖'이라 보류한 채 미해결.",
+          "suggested_action": "lab/db/schema.sql에 member_signup_verifications.sql의 DDL을 반영한다."
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "target 길이 검증이 없는데 컬럼은 VARCHAR(100)이고 랩 DB sql_mode에 STRICT_TRANS_TABLES가 켜져 있다(실측). EMAIL_PATTERN은 길이 상한이 없어 101자 이상 이메일형 target이 통과한 뒤 INSERT에서 Error 1406 → DataAccessException → 500. MemberSignupController에는 @RestControllerAdvice가 없다(기존 advice 2개는 CartController/OrderController 한정).",
+          "suggested_action": "서비스에 target 길이 상한(100) 검증을 추가해 400으로 거부한다."
+        },
+        {
+          "severity": "high",
+          "layer": "security",
+          "finding": "무인증 화이트리스트 엔드포인트에 레이트리밋·쿨다운·purge가 전무하다. 임의 target마다 PK행 1개가 무제한 생성되고 정리되지 않아 저장소 고갈 DoS가 가능하며, 피해자 대상 인증코드 폭탄도 막을 장치가 없다.",
+          "suggested_action": "동일 target 재발송 쿨다운(예: 60초) + IP 단위 상한 + 만료행 purge를 추가하거나 SR 후속 항목으로 등록한다."
+        },
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "인증코드를 INFO 로그에 평문 기록한다(MemberSignupService 61~62행). 로그 열람자가 임의 target의 코드를 획득해 인증을 탈취할 수 있다. 랩에서는 유일한 전달 수단이라 수용 가능하나 운영 전환 시 잔존하면 그대로 취약점이 된다.",
+          "suggested_action": "실 게이트웨이 연동 시 이 로그를 제거한다 — 코드 라인에 제거 조건을 TODO로 못박는다."
+        },
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "시도횟수 컬럼(attempt_count)이 없어 10^6 공간의 6자리 코드를 5분 내 무제한 대입할 수 있는 구조를 FUNC-member-003에 넘긴다. 이 테이블의 스키마 소유자는 이 FUNC다.",
+          "suggested_action": "attempt_count 컬럼을 이 FUNC의 DDL에 미리 포함해 003의 추가 DDL 변경을 피한다."
+        },
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "02_변경명세 §오류 응답 계약 표(code/HTTP/message)를 따르지 않는다 — 400이 ResponseStatusException 기본 바디로 나가 code 필드가 없다. 확정 문답 '오류 응답 계약은? — 추천해줘'에 대한 정본 답이 그 표다. 수용 기준 체크박스 2개도 미체크 상태다.",
+          "suggested_action": "400 응답을 {code, message} 형태로 통일하고 형식 오류용 코드(예: MEMBER_TARGET_INVALID)를 정본 표에 추가한다."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "ApiKeyAuthIntegrationTest 신규 2건이 실 DB에 행(newbie@example.com, 01099998888)을 남기고 정리하지 않는다(MemberSignupVerificationDaoTest는 @AfterEach로 정리). 반복 실행 시 랩 DB 오염이 누적된다.",
+          "suggested_action": "두 테스트에 정리 훅(deleteByChannelAndTarget)을 추가한다."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "주석 사실오류 — 'MEMBERS_ITEM_PATH 정규식이 signup을 memberId로 오인한다'는 서술(ApiKeyAuthFilter 100~102행, 컨트롤러·테스트 주석에 복제)은 틀렸다. ^/api/members/([^/]+)$ 는 세그먼트 1개만 매치하므로 3세그먼트 경로에는 애초에 매치되지 않는다. 화이트리스트가 필요한 진짜 이유는 default-deny(무키 401) 하나뿐이며, 틀린 근거는 다음 유지보수자가 화이트리스트를 잘못 확장하게 만든다.",
+          "suggested_action": "주석 3곳의 근거를 'default-deny라 무키 요청이 401이 되므로'로 정정한다."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "expires_at은 앱 시계(LocalDateTime.now())로, requested_at은 DB 시계(CURRENT_TIMESTAMP)로 기록된다. FUNC-member-003이 만료 판정을 SQL NOW()로 수행하면 JVM/DB 타임존 차이만큼 만료가 왜곡된다(항상 만료 또는 영원히 유효).",
+          "suggested_action": "만료 판정 시계를 앱·DB 한쪽으로 고정하고 그 결정을 003 story에 함께 기록한다."
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "gate": "CONCERNS",
+      "human": {
+        "decision": "rework",
+        "by": "사람",
+        "at": "2026-09-12T02:51:35",
+        "comment": "[개발자 결정 — round 2 CONCERNS, 주요 3건만 지금 고친다. 나머지 low 5건은 후속 TODO로만 남긴다]\n\n(1) 레이트리밋 무력화: purgeExpired가 카운터 행을 지우면 안 된다 — 코드 만료(expires_at)와 일일 카운터(daily_count, day_key=요청일)를 분리한다. 카운터는 target+day_key 단위로 유지하고(같은 행의 별도 컬럼이든 분리 행이든), 만료 purge 대상에서 제외한다.\n\n(2) 동시성(read-modify-write 금지, project-context.md Critical Rule 3): 카운터 증가는 `INSERT ... ON DUPLICATE KEY UPDATE daily_count = daily_count + 1, last_requested_at = NOW()` 한 문장으로 원자화하고, 그 갱신 결과값(증가 후 count·last_requested_at)만으로 쿨다운/일일상한을 판정한다. select→분기→update 순서를 쓰지 않는다. 상한 초과 시 429를 내되 count는 이미 증가된 채로 둔다(트랜잭션 롤백하지 않음).\n\n(3) INF-ID 라벨: ID 레지스트리(.speclinker/func_registry.json)가 정본이다 — INF-MBR-001→FUNC-member-002, INF-MBR-002→FUNC-member-003 매핑을 유지한다. round2에서 뒤집었던 02_변경명세.md·STORY-FUNC-member-003.md·소스 javadoc의 INF-ID 표기를 레지스트리대로 되돌린다(역할 설명 문구는 그대로 유지): FUNC-member-002 = INF-MBR-001 = 인증코드 발송/확인, FUNC-member-003 = INF-MBR-002 = 가입 요청(회원 생성·중복 409·인증완료 강제·환영쿠폰).\n\n나머지 round2 권고 low 5건(STORY 본문 라벨 잔여 불일치·AC 체크박스, DDL 주석 DB호환성 오서술, spring.sql.init data-locations 기본값, 400 메시지 입력 원문 반사, purgeExpired 전체스캔)은 지금 고치지 않는다 — STORY 하단 '## 후속 추적(TODO)'에 목록만 남긴다.\n\n회귀 테스트 추가: (a) 5분 1초 간격으로 6회 요청 시 6번째가 429(일일상한이 실제로 걸리는지), (b) 동시 요청 5건 중 정확히 1건만 코드가 실제 발송되고 나머지는 429(쿨다운)인지.\n\nmvnw test 전체 통과 결과를 STORY Dev 기록에 남긴다(round2에 이어 append, 덮어쓰지 말 것).",
+        "targets": []
+      },
+      "layers": {
+        "spec": "concerns",
+        "security": "concerns",
+        "regression": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "1일 5회 상한이 사실상 무력하다. requestVerificationCode가 purgeExpired(now) → selectByChannelAndTarget 순서로 동작하는데 expires_at = requested_at + 5분이라, 마지막 요청이 5분보다 오래된 target의 행은 조회 직전에 삭제되고 existing==null → nextDailyCount=1이 된다. 5분 1초 간격으로 요청하면 영원히 1회차이며 하루 상한에 걸리지 않는다(시간당 ~12건 코드 폭탄 가능). 60초 쿨다운만 실효.",
+          "suggested_action": "purge를 select 이후로 옮기고 자기 (channel,target) 행은 제외하거나, 일일 카운트를 코드 만료와 분리된 컬럼(daily_count_date 등)으로 유지한다."
+        },
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "레이트리밋 판정이 select→계산→upsert(read-modify-write)라 docs/project-context.md Critical Rule 3(동시 갱신은 DB 원자 연산/행 잠금, select→분기→update 금지) 위반. 동시 요청 N건이 같은 기존 행을 읽으면 전부 쿨다운·일일 상한을 통과하고 daily_count는 1만 증가한다(버스트 증폭). dev는 upsertCode에는 같은 규칙을 적용했으면서 새 카운터 경로에는 적용하지 않았다.",
+          "suggested_action": "조건부 원자 UPDATE(ON DUPLICATE KEY UPDATE ... IF(...) 후 affected rows로 판정) 또는 SELECT ... FOR UPDATE로 교체한다."
+        },
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "INF-ID 라벨이 ID 정본과 반대다. .speclinker/func_registry.json은 inf:INF-MBR-001→FUNC-member-002, inf:INF-MBR-002→FUNC-member-003이고 FUNC_MAP.md 20~21행도 동일한데, round2 문서 정정은 02_변경명세.md·소스 javadoc·STORY-003 제목에서 FUNC-member-002=INF-MBR-002로 뒤집었다. 역할 배정은 전 문서 일치라 당장의 구현 혼선은 없으나, /sl-recon-inf가 레지스트리를 따라 INF 스펙을 역생성하면 'INF-MBR-001=인증코드 발송'이 나와 정본·코드 주석과 다시 어긋난다.",
+          "suggested_action": "레지스트리 두 항목을 교체하고 build_func_map.py로 FUNC_MAP을 재생성하거나, INF-ID 라벨 정정을 되돌리고 역할 문구만 교체한다. SR 종결 전에 한쪽으로 확정할 것."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "두 STORY 본문에 라벨 잔여 불일치 — STORY-002의 제목·AC·Dev Notes는 여전히 INF-MBR-001, STORY-003의 AC·Dev Notes는 INF-MBR-002로 제목(INF-MBR-001 역할)과 반대다. STORY-002의 수용 기준 체크박스 2개도 미체크. 사람이 지시한 편집 범위(제목/요약 한 줄)를 좁게 지킨 결과라 규칙 위반은 아니다.",
+          "suggested_action": "INF-ID 라벨 방향을 확정할 때(위 항목) 두 STORY 본문도 함께 정리하고 AC 체크박스를 갱신한다."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "member_signup_verifications.sql 32행 주석이 ADD COLUMN IF NOT EXISTS를 'MariaDB(10.0.2+)/MySQL(8.0.29+) 문법'이라 적었으나 MySQL은 버전 무관 미지원(MariaDB 전용)이다. spring.sql.init은 continue-on-error 기본 false라 스크립트 실패 시 shop-api 전체가 기동 실패하므로, 잘못된 호환성 주석의 blast radius가 이 FUNC을 넘는다. 랩은 MariaDB 11.4.5(실측)라 현재는 무해.",
+          "suggested_action": "주석을 'MariaDB 전용 문법'으로 정정하고, 타 엔진 이식 시 대체 경로(조건부 ALTER 또는 마이그레이션 엔진 도입)를 함께 적는다."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "spring.sql.init.mode: always는 schema-locations만 재지정했고 data-locations는 기본값(optional:classpath*:data.sql)이 살아 있다. 현재 shop-api 리소스에 data.sql이 없어(실측) 무해하지만, 추가되는 순간 모든 기동과 모든 @SpringBootTest 컨텍스트에서 자동 실행된다.",
+          "suggested_action": "data-locations를 빈 값으로 명시하거나 application.yml 주석으로 금지 사항을 못박는다."
+        },
+        {
+          "severity": "low",
+          "layer": "security",
+          "finding": "MemberSignupService 136행이 400 메시지에 입력 target 원문(최대 100자 미검증 문자열)을 그대로 반사한다. API 응답은 JSON이라 무해하나 FUNC-member-001 화면이 이 message를 DOM에 그대로 렌더하면 반사형 XSS 경로가 된다.",
+          "suggested_action": "원문 에코를 제거하거나, 화면이 텍스트 노드로만 렌더하도록 FUNC-member-001 story에 못박는다."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "purgeExpired가 매 발송 요청마다 전체 스캔 DELETE를 수행한다(인덱스는 PK(channel,target)뿐이라 expires_at 조건은 인덱스를 타지 않음). 무인증 엔드포인트라 요청이 몰리면 DB 부하가 증폭된다.",
+          "suggested_action": "expires_at 인덱스를 추가하거나 purge 호출 빈도를 제한한다(확률적/주기적 실행)."
+        }
+      ]
+    },
+    {
+      "round": 3,
+      "gate": "FAIL",
+      "human": {
+        "decision": "rework",
+        "by": "사람",
+        "at": "2026-09-12T03:28:06",
+        "comment": "[개발자 결정 — 설계를 단순화해서 데드락 원인을 없앤다. 다음 FAIL은 escalate이므로 아래를 그대로 따른다]\n\n(A) 요청 경로에서 @Transactional 제거. 카운터 갱신은 autocommit 단일 문장으로만:\nINSERT INTO member_signup_rate (target, day_key, daily_count, last_requested_at) VALUES (?, CURDATE(), 1, NOW(3))\nON DUPLICATE KEY UPDATE\n  daily_count = IF(last_requested_at <= NOW(3) - INTERVAL 60 SECOND AND daily_count < 5, daily_count + 1, daily_count),\n  last_requested_at = IF(last_requested_at <= NOW(3) - INTERVAL 60 SECOND AND daily_count < 5, NOW(3), last_requested_at)\n— 즉 쿨다운/상한에 걸린 요청은 행을 바꾸지 않는다(쿼터 미소비). 그 뒤 SELECT daily_count, last_requested_at 한 번으로 판정: 이번 요청이 last_requested_at를 갱신했으면(=NOW와 200ms 이내) 200 발송, 아니면 daily_count>=5면 429 상한, 그 외 429 쿨다운. 별도 테이블(target+day_key PK)이라 코드 테이블과 락이 섞이지 않는다.\n\n(B) purgeExpired는 요청 경로에서 제거 — @Scheduled(fixedDelay=10분) 배치로 옮기고 expires_at·last_requested_at에 인덱스를 둔다.\n\n(C) 컨트롤러 스코프 @ExceptionHandler(DataAccessException) → 500 {code: MBR-5000, message: \"일시적인 오류입니다. 잠시 후 다시 시도해 주세요\"} — 경로·SQL·커넥션 정보 미노출, 로그에만 원문.\n\n(D) 테스트: MemberSignupRateLimitConcurrencyTest를 CyclicBarrier(5)로 동시 진입 강제, 단언 200==1 · 429==4 · 500==0, 같은 클래스에서 3회 반복 실행(for 루프, 각 반복 전 행 삭제). 5분1초 간격 테스트(Clock.fixed)는 유지.\n\n(E) 완료 조건: mvnw test 전체 통과 + 동시성 테스트 단독 실행 3회 통과 결과를 STORY Dev 기록에 붙인다.",
+        "targets": []
+      },
+      "layers": {
+        "spec": "concerns",
+        "security": "fail",
+        "regression": "fail"
+      },
+      "top_issues": [
+        {
+          "severity": "high",
+          "layer": "security",
+          "finding": "사람 지정 주요 2건(동시성) 미이행 — 동시 5요청 시 나머지 4건이 429가 아니라 HTTP 500(InnoDB Deadlock)으로 떨어진다. QA가 MemberSignupRateLimitConcurrencyTest를 단독 재실행해 3회 모두 FAIL을 실측(응답 분포 200 1건 + 500 4건, 429 0건). 원인 2축: (a) 같은 비존재 PK에 대한 다중 동시 INSERT..ON DUPLICATE KEY UPDATE의 S락→X락 승격 데드락, (b) 같은 트랜잭션 직전에 도는 purgeExpired가 last_requested_at 무인덱스 풀스캔 DELETE라 REPEATABLE-READ에서 테이블 전역 next-key 락을 커밋까지 보유(round3가 @Transactional을 도입하며 락 범위가 한 행에서 테이블 전체로 확대). 무인증 엔드포인트라 외부에서 임의 유발 가능.",
+          "suggested_action": "purgeExpired를 요청 트랜잭션에서 분리(스케줄러/별도 트랜잭션)하거나 last_requested_at 인덱스를 추가해 풀스캔 락을 제거하고, touchRequestCounter에 데드락 재시도(또는 DeadlockLoserDataAccessException 매핑) 경로를 둔다. 목표 상태: 동시 N요청 → 200 1건 + 429 N-1건, 500 0건."
+        },
+        {
+          "severity": "high",
+          "layer": "regression",
+          "finding": "사람이 명시 요구한 동시성 회귀 테스트가 타이밍 의존 위양성이다. 전체 스위트에서는 녹색(QA가 250건/실패 0/에러 0/스킵 0을 2회 재현, dev 보고는 정확)이나 스위트 내 소요시간이 0.027~0.028s인 반면 단독 실행은 1.2s이며 3/3 실패한다 — 스위트에서는 JVM·드라이버·MyBatis 워밍업 탓에 5개 요청이 사실상 순차 처리돼 겹치지 않는다. 게다가 이 테스트는 완전 직렬화 상태에서도 통과(200 1건 + 429 4건)하므로 round2의 read-modify-write 결함조차 잡지 못한다. 즉 녹색일 때는 동시성을 검증하지 않고, 실제로 검증할 때는 실패한다.",
+          "suggested_action": "요청 직전 CyclicBarrier로 실제 동시 진입을 강제하고 '500 응답 0건'을 명시 단언한다. 완료 조건은 mvnw test -Dtest=MemberSignupRateLimitConcurrencyTest 단독 3회 연속 통과."
+        },
+        {
+          "severity": "high",
+          "layer": "security",
+          "finding": "무인증 엔드포인트의 500 응답 본문에 서버 절대경로(D:\\...\\target\\classes\\mapper\\memberSignupVerification.xml)·매퍼 파일명·SQL 전문·JDBC 커넥션 번호가 그대로 노출된다. application.yml의 server.error.include-message: always와 결합되는데 MemberSignupExceptionHandler는 MemberSignupApiException만 처리하고 DataAccessException 핸들러가 없어 기본 오류 경로로 샌다. docs/project-context.md Critical Rule 2(DB 계층 예외는 정직하게 500, 본문은 정제 메시지, 원본은 서버 로그로만) 위반.",
+          "suggested_action": "MemberSignupController 스코프에 DataAccessException 핸들러를 추가해 정제 메시지만 응답하고 원본은 서버 로그로만 남긴다."
+        },
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "round3가 카운터를 항상 먼저 증가시키도록 바꾸면서, 쿨다운(429)으로 거부된 요청까지 daily_count를 소비한다. 6회 급속 요청이면 해당 target은 코드를 1건만 받은 채 당일 상한(5회)에 도달해, 피해자 이메일/번호의 가입을 6초 만에 당일 차단할 수 있다(계정 선점형 DoS). round2는 거부된 요청이 카운트를 소비하지 않았다. 사람 결정은 '상한 초과 시 롤백하지 않는다'였지 '쿨다운 거부도 일일 쿼터를 태운다'는 아니었다.",
+          "suggested_action": "쿨다운 위반은 일일 카운트에서 제외하도록 ODKU를 조건 분기하거나, 상한 값을 그에 맞게 재설정한다."
+        },
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "purge가 전날 이전 행만 삭제하므로 서로 다른 target으로 요청하면 당일 내내 행이 무제한 누적된다(round2는 5분 내 회수했다). 그 누적이 무인덱스 풀스캔 DELETE의 비용과 락 보유 시간을 선형으로 키워 위 데드락·가용성 문제를 증폭시킨다. 카운터 보존은 사람이 승인한 설계지만 정리 주기가 함께 설계되지 않았다.",
+          "suggested_action": "last_requested_at 인덱스 추가와 함께 일일 정리 주기(스케줄러)나 IP 단위 상한을 후속 SR로 등록한다."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "동시 요청 경로에서 정본 02_변경명세.md §오류 응답 계약(400/429만 규정)에 없는 500이 발생한다. 또 정본 66~67행 §스키마 소유 컬럼 목록이 round3의 컬럼 분리(last_requested_at/previous_requested_at 신설, requested_at deprecated)를 반영하지 못해 stale하다.",
+          "suggested_action": "500 경로를 없앤 뒤 정본의 스키마 소유 컬럼 목록을 round3 구성으로 갱신한다."
+        }
+      ]
+    },
+    {
+      "round": 4,
+      "gate": "CONCERNS",
+      "human": {
+        "decision": "rework",
+        "by": "사람",
+        "at": "2026-09-12T04:21:52",
+        "comment": "[개발자 결정] 1·2번 지금 고치고 3번은 후속 SR SR-294로 접수했다(STORY 후속 TODO에 그 ID를 적는다).\n\n(1) useAffectedRows=true를 datasource URL에서 제거한다 — 전역 시맨틱 변경은 금지(FUNC-order-002 decreaseStock 회귀). 판정은 affected rows에 기대지 말고 요청 토큰으로: 요청마다 UUID token을 만들고 upsert의 조건부 갱신에 last_token = IF(허용, ?, last_token)을 함께 두고, 갱신 뒤 SELECT last_token, daily_count로 내 토큰이면 200, 아니면 daily_count>=5면 429 상한, 그 외 429 쿨다운. 컬럼 last_token VARCHAR(36) 추가는 이 FUNC의 마이그레이션에. ProductDao/OrderService는 손대지 않는다 — 회귀 확인용으로 qty:0 주문 라인이 종전처럼 동작하는 테스트 1개만 추가(FUNC-order-002 계약 고정).\n\n(2) 02_변경명세.md §FUNC-member-002 갱신: 신규 테이블 MEMBER_SIGNUP_VERIFICATIONS·MEMBER_SIGNUP_RATE_LIMITS(컬럼·인덱스), 오류코드 MBR-5000, purge=스케줄러 10분, 쿨다운 60초·일일 5회·거부는 쿼터 미소비, 토큰 판정 방식 — FUNC-member-003이 읽을 인계 문서다.\n\nlow 3건은 후속 TODO 목록에 남긴다(자정 경계·fail-open 방어 테스트·stale 정리).\n\n완료 조건: mvnw test 전체 + 동시성 단독 3회 통과를 STORY에 기록한다.",
+        "targets": []
+      },
+      "layers": {
+        "spec": "concerns",
+        "security": "concerns",
+        "regression": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "useAffectedRows=true is a datasource-global setting added for this FUNC, so it changes update-count semantics app-wide. QA measured that ProductDao.decreaseStock returns 0 instead of 1 when qty=0, and OrderService.create line 184 turns that into 409 '재고 부족' — POST /api/orders with a qty:0 line changed from 200 to 409 (FUNC-order-002). No qty validation guards it and no test in the 255-test suite covers it, so the suite stays green.",
+          "suggested_action": "Add qty >= 1 validation in OrderService.create, or make the rate-limit rejection a WHERE-filtered conditional UPDATE so the decision does not depend on a global connection property; add a qty=0 order-creation regression test either way."
+        },
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "docs/변경관리/SR-231/02_변경명세.md §FUNC-member-002 is stale against round4 — line 61 still documents the reverted 'purge on every request' design, lines 66-67 schema ownership omits the entire new table MEMBER_SIGNUP_RATE_LIMITS and the deprecated columns, and the error contract table lacks MBR-5000 (500). Round3 rework item 6 explicitly required the schema list update and it was not done.",
+          "suggested_action": "Update the 정본 section: @Scheduled batch purge, add MEMBER_SIGNUP_RATE_LIMITS(target, day_key, daily_count, last_requested_at), mark requested_at/daily_count/previous_requested_at deprecated, register MBR-5000 — required before SR close since FUNC-member-003 inherits this document."
+        },
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "MEMBER_SIGNUP_RATE_LIMITS rows accumulate without bound within a day on an unauthenticated endpoint — one row per distinct target, purged only after day rollover (day_key < today) by the 10-minute batch. QA's HTTP probe alone left 55 rows in minutes. Round3 recommendation 3 asked for this to be registered as a follow-up SR and it was not.",
+          "suggested_action": "Register a follow-up SR for IP/session-level limits or an intra-day cleanup cadence. Scope is storage growth only — PK and day_key index prevent the round3 lock/full-scan escalation."
+        },
+        {
+          "severity": "low",
+          "layer": "security",
+          "finding": "The entire rate limit fails open on one datasource URL query parameter. QA measured that without useAffectedRows=true a no-op ON DUPLICATE KEY UPDATE returns 1, which the service reads as admitted, so every request would return 200 with cooldown and daily limit silently disabled. MemberSignupRateLimitDaoTest is the only guard that would catch the regression.",
+          "suggested_action": "State in MemberSignupRateLimitDaoTest that a broken assertion there means the rate limit is disabled, or assert the connection property at startup."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "STORY '## 후속 추적(TODO)' is stale — it still lists the per-request full-scan purge that round4 fixed, and round3 recommendation 3 (intra-day row accumulation) was never added. The two acceptance-criteria checkboxes also remain unchecked.",
+          "suggested_action": "Close the resolved TODO item, add the accumulation item, and settle the two AC checkboxes."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "The 60-second cooldown is not enforced across midnight — a new day_key makes the statement take the INSERT branch, which never inspects the previous request time, so two sends seconds apart are possible at the day boundary.",
+          "suggested_action": "Decouple cooldown evaluation from day_key or record it as a known limitation (impact is one extra send per target per day)."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "@EnableScheduling is now global, so every @SpringBootTest context starts the maintenance scheduler. initialDelay=10min protects the current suite (tens of seconds) but the dependency lives only in a comment, not in an assertion — a context running past 10 minutes would have its rows purged mid-test.",
+          "suggested_action": "Disable scheduling in the test profile or assert the initialDelay invariant."
+        }
+      ]
+    },
+    {
+      "round": 5,
+      "gate": "CONCERNS",
+      "human": {
+        "decision": "rework",
+        "by": "사람",
+        "at": "2026-09-12T04:56:30",
+        "comment": "[개발자 결정] medium 1건 지금 고친다 — fail-open 방향의 미정의 동작은 지금 안 터져도 두지 않는다.\n\nQA 대안 그대로 적용: 세션 변수를 제거하고, UPDATE의 SET 목록 맨 앞에서\n  last_token = IF(last_requested_at <= NOW(3) - INTERVAL 60 SECOND AND daily_count < 5, ?, last_token)\n을 두고, 이어지는 last_requested_at · daily_count는\n  IF(last_token = ?, NOW(3)/daily_count+1, 기존값)\n로 방금 그 문장에서 기록된 자기 토큰만 조건으로 삼는다(문서화된 UPDATE SET 목록의 좌→우 평가만 의존 — 사용자 변수의 읽기/쓰기 순서에는 의존하지 않는다). 매퍼 주석의 잘못된 서술(\"문서화된 동작\")은 지운다.\n\n같은 김에 low 중 @EnableScheduling은 애플리케이션 전역이 아니라 레이트리밋 정리 스케줄러 설정 클래스에만 두고, 테스트 컨텍스트에서는 spring.task.scheduling 비활성 프로퍼티로 막는다.\n\nAC 체크박스는 실측 근거로 체크한다. DB 왕복 3회·writeCode 실패 시 쿼터 소모 이슈는 후속 TODO로만 남긴다.\n\n완료 조건: 동시성 테스트 단독 3회 연속 통과 + mvnw test 전체 통과 결과를 STORY Dev 기록에 남긴다.",
+        "targets": []
+      },
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "레이트리밋 판정 SQL이 같은 문장 안에서 사용자 변수 @msrl_admit을 대입하고 읽는다. MySQL/MariaDB 매뉴얼은 이 패턴의 평가 순서를 '정의되지 않음'으로 명시 경고한다(매퍼 주석은 이를 '문서화된 동작'이라 적어 부정확). QA가 MariaDB 11.4.5 + 드라이버 prepare 모드 4종(클라이언트/서버/캐시/벌크)에서 경계 시퀀스 7회를 각각 돌려 4종 모두 기대값 동일, 8스레드x150라운드(1,200요청) 동시성에서도 허용 정확히 1건/예외 0건으로 현재는 깨져 있지 않음. 그러나 평가 순서가 바뀌면 직전 문장의 잔존값(1)을 읽어 거부돼야 할 요청이 last_token을 덮어쓰는 fail-open으로 깨진다 — round4가 datasource 전역 설정 하나에 걸려 있던 것과 같은 종류의 취약함.",
+          "suggested_action": "사용자 변수를 제거하고 결정적 대안으로 교체: last_token을 SET 목록 맨 앞에서 갱신(조건식이 아직 미갱신인 last_requested_at/daily_count만 참조)하고, daily_count와 last_requested_at은 IF(last_token = #{token}, ...)로 방금 기록된 토큰 자체를 조건으로 삼는다 — UPDATE SET 목록의 좌→우 평가(실제로 문서화된 동작)만으로 결정적. 매퍼 주석의 '문서화된 동작' 서술도 정정."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "round4 QA 권고7(@EnableScheduling 전역화 — 모든 @SpringBootTest 컨텍스트가 유지보수 스케줄러를 띄우고 initialDelay=10분 불변식이 주석으로만 보장됨)이 TODO에도 결정 기록에도 남지 않았다. 사람 코멘트가 유보 대상 low를 3건만 열거해 dev는 지시를 정확히 따랐으나 결과적으로 QA 지적 1건이 추적에서 소실됐다.",
+          "suggested_action": "STORY 후속 추적(TODO)에 한 줄 추가하거나 '고치지 않기로 함'을 명시 기록"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "STORY 수용 기준 체크박스 2건이 5라운드째 미체크. FUNC 상태 정본이 STORY frontmatter + GATE이므로 미체크 AC가 남으면 커버리지 집계가 이 FUNC을 미완으로 읽는다.",
+          "suggested_action": "SR 종결 전 AC 2건을 확정(충족 체크 또는 범위 밖 명시)"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "요청당 DB 왕복이 3회(touchRateLimit UPSERT → selectRateLimit 재조회 → writeCode)로 round4 대비 1회 증가. 무인증 엔드포인트라 기록. 또한 touchRateLimit이 쿼터를 소비한 뒤 writeCode가 실패하면(500 MBR-5000) 코드는 못 받고 쿼터만 1 소모된다.",
+          "suggested_action": "PK 조회라 비용은 작고 판정 정확성과의 교환으로 타당 — 현재는 기록만. 부하가 문제되면 판정과 코드 기록을 한 문장으로 합치는 설계를 검토"
+        }
+      ]
+    },
+    {
+      "round": 6,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "레이트리밋 UPSERT의 실패 방향은 여전히 fail-open이다. round6은 round5의 '사용자 변수 대입/읽기'(매뉴얼상 명시적 미정의)를 'UPDATE SET 목록 좌→우 평가'(문서화된 동작)로 바꿔 의존 등급을 실질적으로 낮췄고, QA가 드라이버 prepare 모드 4종·1,200요청 동시성으로 안정성을 확증했다. 다만 MySQL 매뉴얼 서술에 'generally'라는 유보어가 있고 ON DUPLICATE KEY UPDATE에 이를 재명시하지 않는다. QA가 SET 목록을 역순으로 쓴 문장으로 실패 방향을 실측한 결과, 쿨다운 경과 61초 간격 12연타가 12/12 허용에 daily_count 1 고정 — 평가 순서가 뒤집히면 레이트리밋이 통째로 무력화된다. 안전망은 이미 존재한다(MemberSignupRateLimitDaoTest의 afterCooldownPassed dailyCount==2·lastRequestedAt==second, atDailyLimit dailyCount==5 어서션이 이 회귀를 잡는다 — round5 SET-순서 결함을 실제로 잡아낸 전례와 동일).",
+          "suggested_action": "비용 0의 경화가 가능함만 기록. 서비스가 이미 selectRateLimit으로 last_requested_at을 함께 읽으므로 MemberSignupService의 admitted 조건에 '&& now.equals(rateLimit.getLastRequestedAt())'를 한 항 더하면 이 가설적 fail-open이 fail-closed로 바뀐다. 지금 조치할 근거는 없다 — 후속 TODO 성격."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "spring.task.scheduling.enabled는 공식 Spring Boot 프로퍼티가 아닌데(TaskSchedulingProperties에 해당 필드 없음 — dev가 스스로 실측·명시) 공식 키처럼 보인다. 이 키를 해석하는 것은 MemberSignupSchedulingConfig의 @ConditionalOnProperty 하나뿐이며, shop-api/pom.xml surefire가 이 값을 모듈 전체 테스트 JVM에 건다. 현재 앱의 @Scheduled가 이 FUNC 1개뿐(@Async 0건, 전수 grep)이라 영향 반경은 0이고 설정 클래스 javadoc·pom 주석 양쪽에 정확히 문서화돼 있다.",
+          "suggested_action": "다른 FUNC이 나중에 테스트에서 살아 있어야 하는 @Scheduled를 추가하면 이 모듈 전역 설정이 조용히 끈다는 사실을 STORY 후속 추적(TODO)에 한 줄 남길 것."
+        }
+      ]
+    },
+    {
+      "round": 7,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "레이트리밋 UPSERT의 실패 방향은 여전히 fail-open이다. round6은 round5의 '사용자 변수 대입/읽기'(매뉴얼상 명시적 미정의)를 'UPDATE SET 목록 좌→우 평가'(문서화된 동작)로 바꿔 의존 등급을 실질적으로 낮췄고, QA가 드라이버 prepare 모드 4종·1,200요청 동시성으로 안정성을 확증했다. 다만 MySQL 매뉴얼 서술에 'generally'라는 유보어가 있고 ON DUPLICATE KEY UPDATE에 이를 재명시하지 않는다. QA가 SET 목록을 역순으로 쓴 문장으로 실패 방향을 실측한 결과, 쿨다운 경과 61초 간격 12연타가 12/12 허용에 daily_count 1 고정 — 평가 순서가 뒤집히면 레이트리밋이 통째로 무력화된다. 안전망은 이미 존재한다(MemberSignupRateLimitDaoTest의 afterCooldownPassed dailyCount==2·lastRequestedAt==second, atDailyLimit dailyCount==5 어서션이 이 회귀를 잡는다 — round5 SET-순서 결함을 실제로 잡아낸 전례와 동일).",
+          "suggested_action": "비용 0의 경화가 가능함만 기록. 서비스가 이미 selectRateLimit으로 last_requested_at을 함께 읽으므로 MemberSignupService의 admitted 조건에 '&& now.equals(rateLimit.getLastRequestedAt())'를 한 항 더하면 이 가설적 fail-open이 fail-closed로 바뀐다. 지금 조치할 근거는 없다 — 후속 TODO 성격."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "spring.task.scheduling.enabled는 공식 Spring Boot 프로퍼티가 아닌데(TaskSchedulingProperties에 해당 필드 없음 — dev가 스스로 실측·명시) 공식 키처럼 보인다. 이 키를 해석하는 것은 MemberSignupSchedulingConfig의 @ConditionalOnProperty 하나뿐이며, shop-api/pom.xml surefire가 이 값을 모듈 전체 테스트 JVM에 건다. 현재 앱의 @Scheduled가 이 FUNC 1개뿐(@Async 0건, 전수 grep)이라 영향 반경은 0이고 설정 클래스 javadoc·pom 주석 양쪽에 정확히 문서화돼 있다.",
+          "suggested_action": "다른 FUNC이 나중에 테스트에서 살아 있어야 하는 @Scheduled를 추가하면 이 모듈 전역 설정이 조용히 끈다는 사실을 STORY 후속 추적(TODO)에 한 줄 남길 것."
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "shop-web: 기준선에 없는 소스 루트",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        }
+      ],
+      "layer": "baseline"
+    },
+    {
+      "round": 8,
+      "gate": "FAIL",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "concerns",
+        "scope": "fail"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "레이트리밋 UPSERT의 실패 방향은 여전히 fail-open이다. round6은 round5의 '사용자 변수 대입/읽기'(매뉴얼상 명시적 미정의)를 'UPDATE SET 목록 좌→우 평가'(문서화된 동작)로 바꿔 의존 등급을 실질적으로 낮췄고, QA가 드라이버 prepare 모드 4종·1,200요청 동시성으로 안정성을 확증했다. 다만 MySQL 매뉴얼 서술에 'generally'라는 유보어가 있고 ON DUPLICATE KEY UPDATE에 이를 재명시하지 않는다. QA가 SET 목록을 역순으로 쓴 문장으로 실패 방향을 실측한 결과, 쿨다운 경과 61초 간격 12연타가 12/12 허용에 daily_count 1 고정 — 평가 순서가 뒤집히면 레이트리밋이 통째로 무력화된다. 안전망은 이미 존재한다(MemberSignupRateLimitDaoTest의 afterCooldownPassed dailyCount==2·lastRequestedAt==second, atDailyLimit dailyCount==5 어서션이 이 회귀를 잡는다 — round5 SET-순서 결함을 실제로 잡아낸 전례와 동일).",
+          "suggested_action": "비용 0의 경화가 가능함만 기록. 서비스가 이미 selectRateLimit으로 last_requested_at을 함께 읽으므로 MemberSignupService의 admitted 조건에 '&& now.equals(rateLimit.getLastRequestedAt())'를 한 항 더하면 이 가설적 fail-open이 fail-closed로 바뀐다. 지금 조치할 근거는 없다 — 후속 TODO 성격."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "spring.task.scheduling.enabled는 공식 Spring Boot 프로퍼티가 아닌데(TaskSchedulingProperties에 해당 필드 없음 — dev가 스스로 실측·명시) 공식 키처럼 보인다. 이 키를 해석하는 것은 MemberSignupSchedulingConfig의 @ConditionalOnProperty 하나뿐이며, shop-api/pom.xml surefire가 이 값을 모듈 전체 테스트 JVM에 건다. 현재 앱의 @Scheduled가 이 FUNC 1개뿐(@Async 0건, 전수 grep)이라 영향 반경은 0이고 설정 클래스 javadoc·pom 주석 양쪽에 정확히 문서화돼 있다.",
+          "suggested_action": "다른 FUNC이 나중에 테스트에서 살아 있어야 하는 @Scheduled를 추가하면 이 모듈 전역 설정이 조용히 끈다는 사실을 STORY 후속 추적(TODO)에 한 줄 남길 것."
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "shop-web: 기준선에 없는 소스 루트",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .understand-anything/linked-func-cache.json (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: out.log (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: modules/shop-api/src/test/resources/sql/insert-out-of-stock.sql (??)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        }
+      ],
+      "layer": "scope"
+    },
+    {
+      "round": 9,
+      "gate": "FAIL",
+      "human": {
+        "decision": "waiver",
+        "by": "사람",
+        "at": "2026-09-12T05:28:45",
+        "comment": "STEP5.3 축A 스코프 불일치 3건 모두 SR-231/FUNC-member-002 작업 이전부터 존재한 무관 상태 — .understand-anything 캐시·out.log는 도구/실행 로그, insert-out-of-stock.sql은 SR-230(09-09) 회귀 픽스처로 그 SR 귀속 누락분(사람이 별도 커밋 예정). FUNC-member-002 변경과 무관하여 waive.",
+        "targets": []
+      },
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "concerns",
+        "scope": "fail",
+        "rules": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "레이트리밋 UPSERT의 실패 방향은 여전히 fail-open이다. round6은 round5의 '사용자 변수 대입/읽기'(매뉴얼상 명시적 미정의)를 'UPDATE SET 목록 좌→우 평가'(문서화된 동작)로 바꿔 의존 등급을 실질적으로 낮췄고, QA가 드라이버 prepare 모드 4종·1,200요청 동시성으로 안정성을 확증했다. 다만 MySQL 매뉴얼 서술에 'generally'라는 유보어가 있고 ON DUPLICATE KEY UPDATE에 이를 재명시하지 않는다. QA가 SET 목록을 역순으로 쓴 문장으로 실패 방향을 실측한 결과, 쿨다운 경과 61초 간격 12연타가 12/12 허용에 daily_count 1 고정 — 평가 순서가 뒤집히면 레이트리밋이 통째로 무력화된다. 안전망은 이미 존재한다(MemberSignupRateLimitDaoTest의 afterCooldownPassed dailyCount==2·lastRequestedAt==second, atDailyLimit dailyCount==5 어서션이 이 회귀를 잡는다 — round5 SET-순서 결함을 실제로 잡아낸 전례와 동일).",
+          "suggested_action": "비용 0의 경화가 가능함만 기록. 서비스가 이미 selectRateLimit으로 last_requested_at을 함께 읽으므로 MemberSignupService의 admitted 조건에 '&& now.equals(rateLimit.getLastRequestedAt())'를 한 항 더하면 이 가설적 fail-open이 fail-closed로 바뀐다. 지금 조치할 근거는 없다 — 후속 TODO 성격."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "spring.task.scheduling.enabled는 공식 Spring Boot 프로퍼티가 아닌데(TaskSchedulingProperties에 해당 필드 없음 — dev가 스스로 실측·명시) 공식 키처럼 보인다. 이 키를 해석하는 것은 MemberSignupSchedulingConfig의 @ConditionalOnProperty 하나뿐이며, shop-api/pom.xml surefire가 이 값을 모듈 전체 테스트 JVM에 건다. 현재 앱의 @Scheduled가 이 FUNC 1개뿐(@Async 0건, 전수 grep)이라 영향 반경은 0이고 설정 클래스 javadoc·pom 주석 양쪽에 정확히 문서화돼 있다.",
+          "suggested_action": "다른 FUNC이 나중에 테스트에서 살아 있어야 하는 @Scheduled를 추가하면 이 모듈 전역 설정이 조용히 끈다는 사실을 STORY 후속 추적(TODO)에 한 줄 남길 것."
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "shop-web: 기준선에 없는 소스 루트",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .understand-anything/linked-func-cache.json (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: out.log (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: modules/shop-api/src/test/resources/sql/insert-out-of-stock.sql (??)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        }
+      ],
+      "layer": "rules"
+    },
+    {
+      "round": 10,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "concerns",
+        "scope": "fail",
+        "rules": "pass",
+        "conformance": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "레이트리밋 UPSERT의 실패 방향은 여전히 fail-open이다. round6은 round5의 '사용자 변수 대입/읽기'(매뉴얼상 명시적 미정의)를 'UPDATE SET 목록 좌→우 평가'(문서화된 동작)로 바꿔 의존 등급을 실질적으로 낮췄고, QA가 드라이버 prepare 모드 4종·1,200요청 동시성으로 안정성을 확증했다. 다만 MySQL 매뉴얼 서술에 'generally'라는 유보어가 있고 ON DUPLICATE KEY UPDATE에 이를 재명시하지 않는다. QA가 SET 목록을 역순으로 쓴 문장으로 실패 방향을 실측한 결과, 쿨다운 경과 61초 간격 12연타가 12/12 허용에 daily_count 1 고정 — 평가 순서가 뒤집히면 레이트리밋이 통째로 무력화된다. 안전망은 이미 존재한다(MemberSignupRateLimitDaoTest의 afterCooldownPassed dailyCount==2·lastRequestedAt==second, atDailyLimit dailyCount==5 어서션이 이 회귀를 잡는다 — round5 SET-순서 결함을 실제로 잡아낸 전례와 동일).",
+          "suggested_action": "비용 0의 경화가 가능함만 기록. 서비스가 이미 selectRateLimit으로 last_requested_at을 함께 읽으므로 MemberSignupService의 admitted 조건에 '&& now.equals(rateLimit.getLastRequestedAt())'를 한 항 더하면 이 가설적 fail-open이 fail-closed로 바뀐다. 지금 조치할 근거는 없다 — 후속 TODO 성격."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "spring.task.scheduling.enabled는 공식 Spring Boot 프로퍼티가 아닌데(TaskSchedulingProperties에 해당 필드 없음 — dev가 스스로 실측·명시) 공식 키처럼 보인다. 이 키를 해석하는 것은 MemberSignupSchedulingConfig의 @ConditionalOnProperty 하나뿐이며, shop-api/pom.xml surefire가 이 값을 모듈 전체 테스트 JVM에 건다. 현재 앱의 @Scheduled가 이 FUNC 1개뿐(@Async 0건, 전수 grep)이라 영향 반경은 0이고 설정 클래스 javadoc·pom 주석 양쪽에 정확히 문서화돼 있다.",
+          "suggested_action": "다른 FUNC이 나중에 테스트에서 살아 있어야 하는 @Scheduled를 추가하면 이 모듈 전역 설정이 조용히 끈다는 사실을 STORY 후속 추적(TODO)에 한 줄 남길 것."
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "shop-web: 기준선에 없는 소스 루트",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .understand-anything/linked-func-cache.json (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: out.log (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: modules/shop-api/src/test/resources/sql/insert-out-of-stock.sql (??)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "low",
+          "layer": "conformance",
+          "finding": "STORY AC-1의 test-agent 재확인 근거 문장이 'MemberSignupControllerTest 2건'이라 적었으나 실제 파일(modules/shop-api/src/test/java/com/sm/lab/shop/controller/MemberSignupControllerTest.java)에는 @Test 4개(sendVerificationCode_validEmail_returns200WithoutApiKey, _invalidFormat_returns400WithCodeMessageEnvelope, _cooldownViolation_returns429WithCodeMessageEnvelope, _dataAccessException_returns500WithGenericEnvelopeOnly)가 있다. AC 텍스트가 명시한 합계 66건도 실제로는 68건(4+9+4+6+1+1+3+39+1)이다. 구현 자체는 오히려 더 넓은 케이스(429·500 경로 포함)를 커버하므로 기능 결함은 아니지만, 게이트 근거 문서의 test-count 서술이 부정확하다.",
+          "suggested_action": "STORY AC-1 근거 문장의 MemberSignupControllerTest 건수(2→4)와 합계(66→68)를 실측대로 정정",
+          "confidence": "high",
+          "file": "modules/shop-api/src/test/java/com/sm/lab/shop/controller/MemberSignupControllerTest.java",
+          "line": 42
+        }
+      ],
+      "layer": "conformance"
+    }
+  ],
+  "waiver": {
+    "active": true,
+    "by": "사람",
+    "reason": "STEP5.3 축A 스코프 불일치 3건 모두 SR-231/FUNC-member-002 작업 이전부터 존재한 무관 상태 — .understand-anything 캐시·out.log는 도구/실행 로그, insert-out-of-stock.sql은 SR-230(09-09) 회귀 픽스처로 그 SR 귀속 누락분(사람이 별도 커밋 예정). FUNC-member-002 변경과 무관하여 waive.",
+    "at": "2026-09-12T05:28:45",
+    "layer": "scope"
+  },
+  "story_transitions": [
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "SR 승인(SR-231)",
+      "at": "2026-09-12T02:04:32"
+    },
+    {
+      "from": "Approved",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-12T02:07:36"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "사람",
+      "at": "2026-09-12T02:18:30"
+    },
+    {
+      "from": "Review",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-12T02:26:03"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "사람",
+      "at": "2026-09-12T02:42:16"
+    },
+    {
+      "from": "Review",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-12T02:51:35"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "사람",
+      "at": "2026-09-12T03:13:28"
+    },
+    {
+      "from": "Review",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-12T03:28:06"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "사람",
+      "at": "2026-09-12T03:53:15"
+    },
+    {
+      "from": "Review",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-12T04:21:52"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "사람",
+      "at": "2026-09-12T04:42:31"
+    },
+    {
+      "from": "Review",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-12T04:56:30"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "사람",
+      "at": "2026-09-12T05:09:46"
+    },
+    {
+      "from": "Review",
+      "to": "Done",
+      "by": "사람",
+      "at": "2026-09-12T05:36:51"
+    }
+  ],
+  "escalate": false,
+  "fail_rounds": 2,
+  "max_rounds": 3,
+  "waivers": [
+    {
+      "active": true,
+      "by": "사람",
+      "reason": "STEP5.3 축A 스코프 불일치 3건 모두 SR-231/FUNC-member-002 작업 이전부터 존재한 무관 상태 — .understand-anything 캐시·out.log는 도구/실행 로그, insert-out-of-stock.sql은 SR-230(09-09) 회귀 픽스처로 그 SR 귀속 누락분(사람이 별도 커밋 예정). FUNC-member-002 변경과 무관하여 waive.",
+      "at": "2026-09-12T05:28:45",
+      "layer": "scope"
+    }
+  ]
+}

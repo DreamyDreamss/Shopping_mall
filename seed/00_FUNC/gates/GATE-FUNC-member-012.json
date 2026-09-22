@@ -1,0 +1,172 @@
+{
+  "func": "FUNC-member-012",
+  "epic": null,
+  "story": "docs/00_FUNC/stories/STORY-FUNC-member-012.md",
+  "gate": "CONCERNS",
+  "reviewer": "qa-agent",
+  "updated": "2026-09-13T21:28:08",
+  "layers": {
+    "spec": "pass",
+    "security": "pass",
+    "regression": "concerns"
+  },
+  "top_issues": [
+    {
+      "severity": "low",
+      "layer": "regression",
+      "finding": "ZIPCODES table_comment가 여전히 mojibake(information_schema 실측 '�싦�렺뷄덼샣 …') — CREATE TABLE IF NOT EXISTS는 기존 테이블에 COMMENT를 재적용하지 않아 데이터만 수렴했다. API/AC/테스트 영향은 없으나 /sl-recon-sch가 이 코멘트를 SCH 본문으로 읽는다",
+      "suggested_action": "V8__zipcodes.sql 끝에 ALTER TABLE ZIPCODES COMMENT='...' 한 줄 추가(멱등, DROP 없음). 형제 테이블의 같은 잔여물은 다른 FUNC 소유라 별도 정리 SR로"
+    },
+    {
+      "severity": "low",
+      "layer": "regression",
+      "finding": "ZipcodeDaoTest D07의 doesNotContain(U+FFFD) 단언은 round1의 실제 손상(MS949 오독 → 유효 한글 쓰레기)을 검출하지 못한다 — 실효 단언은 search(\"강남\"/\"테헤란로\") isNotEmpty 쪽이다",
+      "suggested_action": "U+FFFD 단언은 유지해도 무해하나 '실제 검출은 한글 왕복 검색 단언이 한다'를 주석에 명시해 커버리지 착시를 막는다"
+    },
+    {
+      "severity": "low",
+      "layer": "spec",
+      "finding": "zipcode.xml의 OR 절에 괄호가 없다 — 술어가 둘뿐인 현재는 정확하지만 뒤에 AND 한 줄이 붙으면 조용히 의미가 바뀐다",
+      "suggested_action": "WHERE (road_address LIKE ... <if>OR zipcode LIKE ...</if>)로 괄호 명시(현재 동작 불변)"
+    },
+    {
+      "severity": "low",
+      "layer": "security",
+      "finding": "LIKE 와일드카드 미이스케이프가 그대로다 — 라이브 실측 q=%% → 200 50건(전체 행). 주입은 아니고(#{} 바인딩) 공개 참조데이터 + LIMIT 50이라 피해는 제한적",
+      "suggested_action": "사람 결정대로 product.xml과 같은 변경에서 ESCAPE 절 도입(이월, 이 FUNC 범위 밖)"
+    },
+    {
+      "severity": "low",
+      "layer": "regression",
+      "finding": ".speclinker/test_baseline.json의 shop-api executed=449(HEAD 0d8ddb6)가 완료조건 483·현재 510과 어긋난다 — 이 FUNC이 만든 격차는 아니고 현재 수 > 기준선이라 게이트 위반도 아니다",
+      "suggested_action": "SR-235 종결 시 test_baseline_ws.py record로 shop-api 기준선 510 재기록(이 FUNC 밖 후속)"
+    }
+  ],
+  "rounds": [
+    {
+      "round": 1,
+      "gate": "FAIL",
+      "human": {
+        "decision": "rework",
+        "by": "사람",
+        "at": "2026-09-13T21:13:32",
+        "comment": "[결정 요약] 재작업 3건 전부 + 회귀 우려 2건도 같이. 1번(한글 시드 mojibake)은 이 프로젝트 최초의 한글 시드가 드러낸 환경 결함이라 근본 원인(기동 스크립트 인코딩)을 고친다 — 시드 파일만 ASCII로 우회하지 않는다.\r\n[구현 방식]\r\n(1) application.yml에 spring.sql.init.encoding: UTF-8 명시(스크립트 실행 인코딩을 JVM 기본값에서 뗀다). 기존 V3~V7은 ASCII/영문이라 영향 없음을 확인. DB 커넥션 URL에 characterEncoding=UTF-8·useUnicode=true가 없으면 추가(있으면 그대로).\r\n(2) 시드는 INSERT ... ON DUPLICATE KEY UPDATE road_address=VALUES(road_address), sido=VALUES(sido), sigungu=VALUES(sigungu)로 바꿔 기존 mojibake 행이 재기동 한 번에 수렴하게 한다(멱등 유지).\r\n(3) zipcode.xml: 숫자 검색어는 <choose> 배타가 아니라 OR 추가 — WHERE road_address LIKE '%q%' OR (q가 숫자일 때 zipcode LIKE 'q%'). 서비스에서 isNumeric 플래그를 넘기고 XML은 <if>로 OR 절만 덧붙인다. D04 기대값을 '둘 다 잡힌다'로 고친다.\r\n(4) 시드 내용 단언 테스트: 실DB에서 '강남'·'테헤란로' 검색이 1건 이상, 저장값이 한글 그대로(mojibake 문자 없음)임을 단언 — 인코딩 회귀를 잡는 유일한 테스트.\r\n(5) DaoTest 픽스처 zipcode는 고정 90001~ 대신 테스트별 UUID 기반 6자리(또는 @BeforeEach DELETE 범위 정리)로 잔여행 UNIQUE 충돌을 없앤다.\r\n[보안 순서] 변경 없음 — 필터·인증 그대로. 인코딩 설정은 조회 경로에 영향 없음.\r\n[테스트·완료 조건] 위 (4)·(5) 포함 mvn test 전량 통과, 기준선 483/0 유지. 앱 재기동 뒤 curl /api/zipcodes?q=강남 이 1건 이상(실측)을 STORY Dev 기록에 남긴다.\r\n[후속 SR·이월] 실 우편번호 API 연동은 후속 SR. 다른 시드 파일이 생기면 같은 인코딩 규칙이 적용된다(설정 한 줄로 해결).",
+        "targets": []
+      },
+      "layers": {
+        "spec": "fail",
+        "security": "pass",
+        "regression": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "high",
+          "layer": "spec",
+          "finding": "V8__zipcodes.sql 시드 100건이 실 DB에 mojibake로 저장돼 한글 검색이 전부 0건이다(실측: road_address LIKE '%강남%' → 0, '%테헤란로%' → 0, 저장값 '�꽌�슱�듅蹂꾩떆 媛뺣궓援� …'). spring.sql.init.encoding 미지정으로 Java 17+Windows(ko_KR) 기본 charset(MS949)이 UTF-8 스크립트를 읽었다 — V8이 이 프로젝트 최초로 한글 데이터를 기동 스크립트에 넣은 파일이라 종전엔 주석만 깨져 무해했던 잠재 결함이 데이터 손상으로 드러났다. 사람 수정 (3)이 요구한 시도 5·시군구 10 분포가 DB 사실로는 성립하지 않는다.",
+          "suggested_action": "application.yml에 spring.sql.init.encoding: UTF-8 명시 + 시드를 INSERT … ON DUPLICATE KEY UPDATE로 바꿔 이미 깨진 10000~10099 행을 정본으로 수렴시킨다(INSERT IGNORE는 기존 행을 절대 덮지 않는다)."
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "신규 테스트 26건(24+통합 2)이 전부 통과하고 mvn test 509/0인데도 위 치명 결함을 아무도 잡지 못했다 — 운영 시드 내용을 단언하는 테스트가 없다(ZipcodeDaoTest는 JdbcTemplate으로 자기 행만 삽입·검증, zipcodesRoute_withMemberApiKey_returns200은 상태코드만 단언).",
+          "suggested_action": "실 DB 기준 시드 계약 테스트 추가 — 행 수 ≥100, COUNT(DISTINCT sido) ≥5, COUNT(DISTINCT sigungu) ≥10, dao.search(\"강남\", false) 비어있지 않음(한글 왕복), road_address가 '%로 %길%' 형식. 정확 문구가 아닌 분포·왕복 수준으로만 단언해 '테스트 격리' 원칙과 충돌하지 않게."
+        },
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "사람 수정 (2) \"q가 숫자만이면 zipcode 전방일치로도 검색한다\"(추가)를 zipcode.xml이 <choose>로 배타 구현했다 — numeric이면 road_address를 아예 보지 않는다. 시드 zipcode가 전부 100xx라 q=16이면 '테헤란로 16길 10'이 있어도 0건이다. ZipcodeDaoTest D04가 이 배타 동작을 단언으로 못 박아 두었다.",
+          "suggested_action": "WHERE (zipcode LIKE CONCAT(#{q},'%') OR road_address LIKE CONCAT('%',#{q},'%'))로 정정하고 D04(search_numericTrue_doesNotMatchByRoadAddress)를 함께 고친다(사람 확정 지시가 서술·테스트보다 우선 — SR-232 r3). 배타가 의도였다면 근거를 STORY에 명시."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "ZipcodeDaoTest의 zipcode 채번이 static AtomicInteger(JVM마다 0에서 재시작)라 매 실행 90001…을 재사용하는데 plain INSERT를 쓴다 — 중단된 실행이 남긴 행과 UNIQUE KEY 충돌로 다음 실행이 하드 실패한다(SR-232 r2 계열).",
+          "suggested_action": "@BeforeEach에서 DELETE FROM ZIPCODES WHERE zipcode LIKE '9%'로 선청소하거나 INSERT IGNORE 사용."
+        },
+        {
+          "severity": "low",
+          "layer": "security",
+          "finding": "검색어의 LIKE 와일드카드(%, _)를 이스케이프하지 않는다 — q=\"%%\"(2자, 검증 통과)가 전체 행을 매치한다. 주입은 아니다(#{} 바인딩), 공개 참조 데이터 + LIMIT 50이라 피해는 제한적이고 product.xml도 동일 하우스 패턴이다.",
+          "suggested_action": "고칠 때는 zipcode.xml 단독이 아니라 product.xml과 같은 변경에서 ESCAPE 절을 도입한다(전역 패턴을 한 FUNC 편의로 갈라놓지 않는다 — SR-231 r4 계열)."
+        }
+      ],
+      "cause": "impl_bug"
+    },
+    {
+      "round": 2,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "ZIPCODES table_comment가 여전히 mojibake(information_schema 실측 '�싦�렺뷄덼샣 …') — CREATE TABLE IF NOT EXISTS는 기존 테이블에 COMMENT를 재적용하지 않아 데이터만 수렴했다. API/AC/테스트 영향은 없으나 /sl-recon-sch가 이 코멘트를 SCH 본문으로 읽는다",
+          "suggested_action": "V8__zipcodes.sql 끝에 ALTER TABLE ZIPCODES COMMENT='...' 한 줄 추가(멱등, DROP 없음). 형제 테이블의 같은 잔여물은 다른 FUNC 소유라 별도 정리 SR로"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "ZipcodeDaoTest D07의 doesNotContain(U+FFFD) 단언은 round1의 실제 손상(MS949 오독 → 유효 한글 쓰레기)을 검출하지 못한다 — 실효 단언은 search(\"강남\"/\"테헤란로\") isNotEmpty 쪽이다",
+          "suggested_action": "U+FFFD 단언은 유지해도 무해하나 '실제 검출은 한글 왕복 검색 단언이 한다'를 주석에 명시해 커버리지 착시를 막는다"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "zipcode.xml의 OR 절에 괄호가 없다 — 술어가 둘뿐인 현재는 정확하지만 뒤에 AND 한 줄이 붙으면 조용히 의미가 바뀐다",
+          "suggested_action": "WHERE (road_address LIKE ... <if>OR zipcode LIKE ...</if>)로 괄호 명시(현재 동작 불변)"
+        },
+        {
+          "severity": "low",
+          "layer": "security",
+          "finding": "LIKE 와일드카드 미이스케이프가 그대로다 — 라이브 실측 q=%% → 200 50건(전체 행). 주입은 아니고(#{} 바인딩) 공개 참조데이터 + LIMIT 50이라 피해는 제한적",
+          "suggested_action": "사람 결정대로 product.xml과 같은 변경에서 ESCAPE 절 도입(이월, 이 FUNC 범위 밖)"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": ".speclinker/test_baseline.json의 shop-api executed=449(HEAD 0d8ddb6)가 완료조건 483·현재 510과 어긋난다 — 이 FUNC이 만든 격차는 아니고 현재 수 > 기준선이라 게이트 위반도 아니다",
+          "suggested_action": "SR-235 종결 시 test_baseline_ws.py record로 shop-api 기준선 510 재기록(이 FUNC 밖 후속)"
+        }
+      ],
+      "cause": "env"
+    }
+  ],
+  "waiver": {
+    "active": false
+  },
+  "story_transitions": [
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "SR 승인(SR-235)",
+      "at": "2026-09-13T19:17:15"
+    },
+    {
+      "from": "Approved",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-13T20:54:24"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "사람",
+      "at": "2026-09-13T21:05:20"
+    },
+    {
+      "from": "Review",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-13T21:13:32"
+    }
+  ],
+  "cause": "env",
+  "escalate": false,
+  "fail_rounds": 1,
+  "max_rounds": 3
+}

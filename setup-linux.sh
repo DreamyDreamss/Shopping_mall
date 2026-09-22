@@ -123,14 +123,22 @@ if [ -d "$WS" ] && [ -n "$(ls -A "$WS" 2>/dev/null)" ]; then
   else die "이미 있습니다: $WS — 다시 만들려면 --force, 그대로 쓰려면 이 단계는 필요 없습니다"; fi
 fi
 mkdir -p "$WS/docs" "$WS/_lab"
-cp -a "$REPO/seed/변경관리/."     "$WS/docs/변경관리/"  2>/dev/null || { mkdir -p "$WS/docs/변경관리"; cp -a "$REPO/seed/변경관리/." "$WS/docs/변경관리/"; }
-mkdir -p "$WS/docs/09_납품" "$WS/_lab/catalog" "$WS/.speclinker"
-cp -a "$REPO/seed/09_납품/."      "$WS/docs/09_납품/"
-cp -a "$REPO/seed/_lab/catalog/." "$WS/_lab/catalog/"
-cp -a "$REPO/seed/.speclinker/."  "$WS/.speclinker/"
-cp -a "$REPO/seed/ws/."           "$WS/"                # CLAUDE.md · package.json · tests · harness · .claude
+# seed 전개는 **규칙**이다(이름 목록이 아니다) — 목록으로 두면 seed에 담고도 전개를 빠뜨린다
+#   (2026-09-22 실측: docs/05_설계서를 담고 전개하지 않아 워크스페이스 설계서가 0건이었다).
+for src in "$REPO"/seed/*/ "$REPO"/seed/.speclinker/; do
+  [ -d "$src" ] || continue
+  name="$(basename "$src")"
+  case "$name" in
+    ws)          dst="$WS" ;;                       # CLAUDE.md · package.json · tests · harness · .claude
+    _lab)        dst="$WS/_lab" ;;
+    .speclinker) dst="$WS/.speclinker" ;;
+    *)           dst="$WS/docs/$name" ;;            # 00_FUNC · 05_설계서 · 09_납품 · 변경관리 …
+  esac
+  mkdir -p "$dst"
+  cp -a "$src." "$dst/"
+done
 # 재귀 파일 수로 센다 — `ls | wc -l`은 최상위 항목만 세어 "설계서 139건"을 "6건"으로 보여 준다(2026-09-22 실측)
-ok "seed 전개: SR $(ls -d "$WS"/docs/변경관리/SR-* 2>/dev/null | wc -l)건 · 설계서 $(find "$WS/_lab/catalog" -type f | wc -l)건 · 납품 $(find "$WS/docs/09_납품" -type f | wc -l)건"
+ok "seed 전개: SR $(ls -d "$WS"/docs/변경관리/SR-* 2>/dev/null | wc -l)건 · 설계서 $(find "$WS/docs/05_설계서" -name spec.md 2>/dev/null | wc -l)건 · 카탈로그 $(find "$WS/_lab/catalog" -type f 2>/dev/null | wc -l)건 · 납품 $(find "$WS/docs/09_납품" -type f 2>/dev/null | wc -l)건"
 
 # seed는 절대 경로를 토큰으로 담는다 — 여기서 이 환경의 실제 경로로 되돌린다.
 step "4-b 경로 토큰 치환"

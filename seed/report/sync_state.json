@@ -1,0 +1,623 @@
+{
+  "version": 1,
+  "updated_at": "2026-09-19T21:37:15",
+  "source_roots": {
+    "{{WS}}\\modules\\shop-api": {
+      "git_head": "cef1cd918a0e8b3e16b5a692366777b60bea046f",
+      "git_branch": "main"
+    },
+    "{{WS}}\\modules\\shop-web": {
+      "git_head": "ec29f624e9a0baa2ea068e22a62efa1d8d6ef873",
+      "git_branch": "master"
+    }
+  },
+  "specs": {
+    "INF-MBR-001": {
+      "kind": "inf",
+      "file": "docs/05_설계서/member/INF/INF-MBR-001.md",
+      "anchors": {
+        "modules/shop-api/src/main/java/com/sm/lab/shop/controller/MemberSignupController.java": "a13716a805fc2f056183b961b93dbb0abf7dfea0",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberSignupService.java": "a9833bfe777672b2ecfa6e12fec0c833a4316615",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberSignupApiException.java": "701194d8cb99769f61544718cbd5f9d0204f4aa9",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/web/MemberSignupExceptionHandler.java": "e7ce2ed9e85e58473fde8de6e94a6d56793a13df",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberSignupVerificationDao.java": "63bcb18813e099a3fb908c4261f66ab98b3fb8db",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberSignupRateLimitDao.java": "1918bcc144bdf6e427e6b46fda3b8f5208d15b70",
+        "modules/shop-api/src/main/resources/mapper/memberSignupVerification.xml": "786dc0c740a75afd5088e74717b4b5c92d45dd75",
+        "modules/shop-api/src/main/resources/mapper/memberSignupRateLimit.xml": "abaa9490e1514507b5d0358bd803bd8a7f15a059",
+        "modules/shop-api/src/main/resources/db/member_signup_verifications.sql": "e5fd88e2eaf49d5b133084f58fb1ea48ef7f14e0",
+        "modules/shop-api/src/main/resources/db/member_signup_rate_limits.sql": "3a02b06afc05b6f293a97dd9d86994891388f51d"
+      }
+    },
+    "INF-MBR-002": {
+      "kind": "inf",
+      "file": "docs/05_설계서/member/INF/INF-MBR-002.md",
+      "anchors": {
+        "modules/shop-api/src/main/java/com/sm/lab/shop/controller/MemberRegistrationController.java": "3cc4f00f4ab24378b304b5a76dcf29c83a297561",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberRegistrationService.java": "c79f18254812eb2c7aa35d827936b1b7b0be91c8",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberSignupCompletionWriter.java": "f31d19a31e36a7df81259208ae9982b0d539d60e",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberRegistrationApiException.java": "196ac21d51186fe2a6d07eea3f084816423d8cbd",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/web/MemberRegistrationExceptionHandler.java": "b10afaf8029993dbe31e901dccda6cae413e8f8e",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberSignupCompletionDao.java": "9803934776b916a1e9f26e0f4fcd4ce718e847bc",
+        "modules/shop-api/src/main/resources/mapper/memberSignupCompletion.xml": "0d0500208e65dd41a4ac9e5a0bac388ce55014c1",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberDao.java": "6389a6a7d1c73f1ddbc0d2f87246b6419217e4ad",
+        "modules/shop-api/src/main/resources/mapper/member.xml": "2ec85ccb4ff5236b9a078dd57fb62f0568efbf1f",
+        "modules/shop-api/src/main/resources/db/V3__members_signup.sql": "66913f20692de76b08ba9084da39f4212fc90f71",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberSignedUpEvent.java": "39d160d48f6553a20de590d3346c9a432277d0a4",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberSignedUpEventLogger.java": "e1719a063e15b18477c663ab1f9ec6b8542ebdba"
+      }
+    },
+    "INF-MBR-003": {
+      "kind": "inf",
+      "file": "docs/05_설계서/member/INF/INF-MBR-003.md",
+      "anchors": {
+        "modules/shop-api/src/main/java/com/sm/lab/shop/controller/MemberLoginController.java": "3639e5761b0d758c7bf2f20435d92007e480c6fe",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberLoginService.java": "af6c1aa6ae8476e12f6a18306359ccf42199775c",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberLoginApiException.java": "8203326cfc73f7c033d2542dd0eaa9c4fa89b739",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/web/MemberLoginExceptionHandler.java": "85983780b6f7187a4e8aa608a12e881c036b3cbe",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/domain/MemberCredential.java": "7f97d698e084fd78168434cd464c41e5104dbeb1",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/domain/MemberLoginAttempt.java": "3cbb3e832d41dd2df1c141a6383b62e0d55a7228",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberDao.java": "6389a6a7d1c73f1ddbc0d2f87246b6419217e4ad",
+        "modules/shop-api/src/main/resources/mapper/member.xml": "2ec85ccb4ff5236b9a078dd57fb62f0568efbf1f",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberLoginAttemptDao.java": "1b3b229ec91859fa0be8503bcc0be4851853b09b",
+        "modules/shop-api/src/main/resources/mapper/memberLoginAttempt.xml": "6beef38f564f945d27c6a157306c5983c5588643",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberRefreshTokenDao.java": "c63bf40dec074a47f8966931803a6cacf604f88d",
+        "modules/shop-api/src/main/resources/mapper/memberRefreshToken.xml": "a6e53ba34a23df220f75c16f4ef29f2c1ff74753",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberApiKeyDao.java": "1c85eb829e002d700558adc89cc2bd834b33dd3f",
+        "modules/shop-api/src/main/resources/mapper/memberApiKey.xml": "70acc6170a365c5304a4deefbd63db1c1ab9fadc",
+        "modules/shop-api/src/main/resources/db/V4__members_login.sql": "70a56b8d5ccc5c44682c359e922d2794c92875b7",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java": "6682be3264c07d60d885df510af17c373d3e3116"
+      }
+    },
+    "INF-MBR-004": {
+      "kind": "inf",
+      "file": "docs/05_설계서/member/INF/INF-MBR-004.md",
+      "anchors": {
+        "modules/shop-api/src/main/java/com/sm/lab/shop/controller/MemberSessionController.java": "01aacdec20c65b83c8f5456cd0a8b6f1c9e3be66",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberSessionService.java": "8835e696f496e142bd9ea1c298c585b531e7846b",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/web/MemberSessionExceptionHandler.java": "5fd5e7c903bcec6e02cfbdfd582da4de0398ba1d",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberApiKeyDao.java": "1c85eb829e002d700558adc89cc2bd834b33dd3f",
+        "modules/shop-api/src/main/resources/mapper/memberApiKey.xml": "70acc6170a365c5304a4deefbd63db1c1ab9fadc",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberRefreshTokenDao.java": "c63bf40dec074a47f8966931803a6cacf604f88d",
+        "modules/shop-api/src/main/resources/mapper/memberRefreshToken.xml": "a6e53ba34a23df220f75c16f4ef29f2c1ff74753",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java": "4a2458f5b714392aa5cadf0613e351dafc2aadff"
+      }
+    },
+    "INF-MBR-005": {
+      "kind": "inf",
+      "file": "docs/05_설계서/member/INF/INF-MBR-005.md",
+      "anchors": {
+        "modules/shop-api/src/main/java/com/sm/lab/shop/controller/MemberSessionController.java": "01aacdec20c65b83c8f5456cd0a8b6f1c9e3be66",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberSessionService.java": "8835e696f496e142bd9ea1c298c585b531e7846b",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberSessionApiException.java": "6444bb5fec0ad7cdb95f2a833bfa9e6f1a879093",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/web/MemberSessionExceptionHandler.java": "5fd5e7c903bcec6e02cfbdfd582da4de0398ba1d",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberApiKeyDao.java": "1c85eb829e002d700558adc89cc2bd834b33dd3f",
+        "modules/shop-api/src/main/resources/mapper/memberApiKey.xml": "70acc6170a365c5304a4deefbd63db1c1ab9fadc",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberRefreshTokenDao.java": "c63bf40dec074a47f8966931803a6cacf604f88d",
+        "modules/shop-api/src/main/resources/mapper/memberRefreshToken.xml": "a6e53ba34a23df220f75c16f4ef29f2c1ff74753",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberDao.java": "b50d7145c252a8f72d1f066667c98bdff25cc49d",
+        "modules/shop-api/src/main/resources/mapper/member.xml": "d5e32a17aa7ee2a6df654d5eec060d48de3f4de7",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java": "4a2458f5b714392aa5cadf0613e351dafc2aadff",
+        "memberApiKey.xml": "70acc6170a365c5304a4deefbd63db1c1ab9fadc"
+      }
+    },
+    "INF-ORD-001": {
+      "kind": "inf",
+      "file": "docs/05_설계서/order/INF/INF-ORD-001.md",
+      "anchors": {
+        "src/main/java/com/sm/lab/shop/controller/MemberController.java": "812c2a0d115982ff1f16924f1bbba9dc04ffa0b6",
+        "src/main/java/com/sm/lab/shop/service/MemberService.java": "12226e89be134e7cf4a277e013497d48f13ce3af",
+        "src/main/java/com/sm/lab/shop/dao/MemberDao.java": "b50d7145c252a8f72d1f066667c98bdff25cc49d",
+        "src/main/resources/mapper/member.xml": "d5e32a17aa7ee2a6df654d5eec060d48de3f4de7"
+      }
+    },
+    "INF-ORD-002": {
+      "kind": "inf",
+      "file": "docs/05_설계서/order/INF/INF-ORD-002.md",
+      "anchors": {
+        "modules/shop-api/src/main/java/com/sm/lab/shop/controller/MemberController.java": "812c2a0d115982ff1f16924f1bbba9dc04ffa0b6",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberService.java": "12226e89be134e7cf4a277e013497d48f13ce3af",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberDao.java": "b50d7145c252a8f72d1f066667c98bdff25cc49d",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/dao/OrderDao.java": "003573032abcefa47be5fcf8af0f693563149c3b",
+        "modules/shop-api/src/main/resources/mapper/member.xml": "d5e32a17aa7ee2a6df654d5eec060d48de3f4de7",
+        "modules/shop-api/src/main/resources/mapper/order.xml": "8c51b384ce149427c833599d3404bc4720619283"
+      }
+    },
+    "INF-ORD-003": {
+      "kind": "inf",
+      "file": "docs/05_설계서/order/INF/INF-ORD-003.md",
+      "anchors": {
+        "src/main/java/com/sm/lab/shop/controller/OrderController.java": "93163baec851692cc6858219ae0dc07d98978f56",
+        "src/main/java/com/sm/lab/shop/service/OrderService.java": "2e9b611f5ef6825579e0a2e89e0e9a3933da6a0d",
+        "src/main/java/com/sm/lab/shop/dao/OrderDao.java": "dbcf2b51df47a52ccb40c8b3691710da3c9c56e8",
+        "src/main/resources/mapper/order.xml": "12d51d38d3f996b41faae7a3e9033df38f07c1c3"
+      }
+    },
+    "INF-ORD-004": {
+      "kind": "inf",
+      "file": "docs/05_설계서/order/INF/INF-ORD-004.md",
+      "anchors": {
+        "src/main/java/com/sm/lab/shop/controller/OrderController.java": "ee9e5b1308dd6bee0f770be550e168da857f1986",
+        "src/main/java/com/sm/lab/shop/service/OrderService.java": "3b2de7d1343779da7466cdb5cac8b761e484f57d",
+        "src/main/java/com/sm/lab/shop/dao/OrderDao.java": "003573032abcefa47be5fcf8af0f693563149c3b",
+        "src/main/resources/mapper/order.xml": "8c51b384ce149427c833599d3404bc4720619283"
+      }
+    },
+    "INF-ORD-005": {
+      "kind": "inf",
+      "file": "docs/05_설계서/order/INF/INF-ORD-005.md",
+      "anchors": {
+        "modules/shop-api/src/main/java/com/sm/lab/shop/controller/OrderController.java": "ee9e5b1308dd6bee0f770be550e168da857f1986",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/service/OrderService.java": "3b2de7d1343779da7466cdb5cac8b761e484f57d",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/dao/ProductDao.java": "d552c674bd8143e51f63b6a852ae609a65c30c86",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/dao/OrderDao.java": "003573032abcefa47be5fcf8af0f693563149c3b",
+        "modules/shop-api/src/main/resources/mapper/product.xml": "d0451421d15aa9c1e4c1ef53dd3c8effab3e2a42",
+        "modules/shop-api/src/main/resources/mapper/order.xml": "8c51b384ce149427c833599d3404bc4720619283"
+      }
+    },
+    "INF-ORD-006": {
+      "kind": "inf",
+      "file": "docs/05_설계서/order/INF/INF-ORD-006.md",
+      "anchors": {
+        "modules/shop-api/src/main/java/com/sm/lab/shop/controller/OrderController.java": "ee9e5b1308dd6bee0f770be550e168da857f1986",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/service/OrderService.java": "3b2de7d1343779da7466cdb5cac8b761e484f57d",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/dao/OrderDao.java": "003573032abcefa47be5fcf8af0f693563149c3b",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/dao/ProductDao.java": "d552c674bd8143e51f63b6a852ae609a65c30c86",
+        "modules/shop-api/src/main/resources/mapper/order.xml": "8c51b384ce149427c833599d3404bc4720619283",
+        "modules/shop-api/src/main/resources/mapper/product.xml": "d0451421d15aa9c1e4c1ef53dd3c8effab3e2a42"
+      }
+    },
+    "INF-ORD-007": {
+      "kind": "inf",
+      "file": "docs/05_설계서/order/INF/INF-ORD-007.md",
+      "anchors": {
+        "modules/shop-api/src/main/java/com/sm/lab/shop/controller/OrderController.java": "ee9e5b1308dd6bee0f770be550e168da857f1986",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/service/OrderService.java": "3b2de7d1343779da7466cdb5cac8b761e484f57d",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/dao/OrderDao.java": "003573032abcefa47be5fcf8af0f693563149c3b",
+        "modules/shop-api/src/main/resources/mapper/order.xml": "8c51b384ce149427c833599d3404bc4720619283"
+      }
+    },
+    "INF-ORD-008": {
+      "kind": "inf",
+      "file": "docs/05_설계서/order/INF/INF-ORD-008.md",
+      "anchors": {
+        "src/main/java/com/sm/lab/shop/controller/ProductController.java": "df3af749abd58e359d4caff9fd6233b8f802f249",
+        "src/main/java/com/sm/lab/shop/service/ProductService.java": "60e43b8bd2aea3813af64a0fea2867a11cdeb55b",
+        "src/main/java/com/sm/lab/shop/dao/ProductDao.java": "d552c674bd8143e51f63b6a852ae609a65c30c86",
+        "src/main/resources/mapper/product.xml": "901c15cacde6f33c6fee4cde79fb36092ffef1ac"
+      }
+    },
+    "INF-ORD-009": {
+      "kind": "inf",
+      "file": "docs/05_설계서/order/INF/INF-ORD-009.md",
+      "anchors": {
+        "src/main/java/com/sm/lab/shop/controller/ProductController.java": "df3af749abd58e359d4caff9fd6233b8f802f249",
+        "src/main/java/com/sm/lab/shop/service/ProductService.java": "60e43b8bd2aea3813af64a0fea2867a11cdeb55b",
+        "src/main/java/com/sm/lab/shop/dao/ProductDao.java": "d552c674bd8143e51f63b6a852ae609a65c30c86",
+        "src/main/resources/mapper/product.xml": "901c15cacde6f33c6fee4cde79fb36092ffef1ac"
+      }
+    },
+    "INF-ORD-010": {
+      "kind": "inf",
+      "file": "docs/05_설계서/order/INF/INF-ORD-010.md",
+      "anchors": {
+        "src/main/java/com/sm/lab/shop/controller/CartController.java": "e4587ac44a380f06d4ae30c8ab799df08429352f",
+        "src/main/java/com/sm/lab/shop/service/CartService.java": "82ac562ca3d5621664395be840c21dd4c8ba17d8",
+        "src/main/java/com/sm/lab/shop/dao/CartDao.java": "6910a8bde4f040495a0715711935f02ab365ec1d",
+        "src/main/java/com/sm/lab/shop/dao/MemberDao.java": "b50d7145c252a8f72d1f066667c98bdff25cc49d",
+        "src/main/java/com/sm/lab/shop/dao/ProductDao.java": "d552c674bd8143e51f63b6a852ae609a65c30c86",
+        "src/main/resources/mapper/cart.xml": "242087840d177276e3d5b6657e848811702fd778",
+        "src/main/resources/mapper/member.xml": "d5e32a17aa7ee2a6df654d5eec060d48de3f4de7",
+        "src/main/resources/mapper/product.xml": "d0451421d15aa9c1e4c1ef53dd3c8effab3e2a42"
+      }
+    },
+    "INF-ORD-011": {
+      "kind": "inf",
+      "file": "docs/05_설계서/order/INF/INF-ORD-011.md",
+      "anchors": {
+        "src/main/java/com/sm/lab/shop/controller/CartController.java": "e4587ac44a380f06d4ae30c8ab799df08429352f",
+        "src/main/java/com/sm/lab/shop/service/CartService.java": "82ac562ca3d5621664395be840c21dd4c8ba17d8",
+        "src/main/java/com/sm/lab/shop/dao/CartDao.java": "6910a8bde4f040495a0715711935f02ab365ec1d",
+        "src/main/java/com/sm/lab/shop/dao/MemberDao.java": "b50d7145c252a8f72d1f066667c98bdff25cc49d",
+        "src/main/resources/mapper/cart.xml": "242087840d177276e3d5b6657e848811702fd778",
+        "src/main/resources/mapper/member.xml": "d5e32a17aa7ee2a6df654d5eec060d48de3f4de7"
+      }
+    },
+    "INF-ORD-012": {
+      "kind": "inf",
+      "file": "docs/05_설계서/order/INF/INF-ORD-012.md",
+      "anchors": {
+        "src/main/java/com/sm/lab/shop/controller/CartController.java": "e4587ac44a380f06d4ae30c8ab799df08429352f",
+        "src/main/java/com/sm/lab/shop/service/CartService.java": "82ac562ca3d5621664395be840c21dd4c8ba17d8",
+        "src/main/java/com/sm/lab/shop/dao/CartDao.java": "6910a8bde4f040495a0715711935f02ab365ec1d",
+        "src/main/java/com/sm/lab/shop/dao/ProductDao.java": "d552c674bd8143e51f63b6a852ae609a65c30c86",
+        "src/main/resources/mapper/cart.xml": "242087840d177276e3d5b6657e848811702fd778",
+        "src/main/resources/mapper/product.xml": "d0451421d15aa9c1e4c1ef53dd3c8effab3e2a42"
+      }
+    },
+    "INF-ORD-013": {
+      "kind": "inf",
+      "file": "docs/05_설계서/order/INF/INF-ORD-013.md",
+      "anchors": {
+        "src/main/java/com/sm/lab/shop/controller/CartController.java": "e4587ac44a380f06d4ae30c8ab799df08429352f",
+        "src/main/java/com/sm/lab/shop/service/CartService.java": "82ac562ca3d5621664395be840c21dd4c8ba17d8",
+        "src/main/java/com/sm/lab/shop/dao/CartDao.java": "6910a8bde4f040495a0715711935f02ab365ec1d",
+        "src/main/resources/mapper/cart.xml": "242087840d177276e3d5b6657e848811702fd778"
+      }
+    },
+    "INF-ORD-014": {
+      "kind": "inf",
+      "file": "docs/05_설계서/order/INF/INF-ORD-014.md",
+      "anchors": {
+        "src/main/java/com/sm/lab/shop/controller/CartController.java": "e4587ac44a380f06d4ae30c8ab799df08429352f",
+        "src/main/java/com/sm/lab/shop/service/CartService.java": "82ac562ca3d5621664395be840c21dd4c8ba17d8",
+        "src/main/java/com/sm/lab/shop/service/OrderService.java": "3b2de7d1343779da7466cdb5cac8b761e484f57d",
+        "src/main/java/com/sm/lab/shop/dao/CartDao.java": "6910a8bde4f040495a0715711935f02ab365ec1d",
+        "src/main/java/com/sm/lab/shop/dao/MemberDao.java": "b50d7145c252a8f72d1f066667c98bdff25cc49d",
+        "src/main/java/com/sm/lab/shop/dao/ProductDao.java": "d552c674bd8143e51f63b6a852ae609a65c30c86",
+        "src/main/java/com/sm/lab/shop/dao/OrderDao.java": "003573032abcefa47be5fcf8af0f693563149c3b",
+        "src/main/resources/mapper/cart.xml": "242087840d177276e3d5b6657e848811702fd778",
+        "src/main/resources/mapper/member.xml": "d5e32a17aa7ee2a6df654d5eec060d48de3f4de7",
+        "src/main/resources/mapper/product.xml": "d0451421d15aa9c1e4c1ef53dd3c8effab3e2a42",
+        "src/main/resources/mapper/order.xml": "8c51b384ce149427c833599d3404bc4720619283"
+      }
+    },
+    "INF-ORD-015": {
+      "kind": "inf",
+      "file": "docs/05_설계서/order/INF/INF-ORD-015.md",
+      "anchors": {
+        "src/main/java/com/sm/lab/shop/controller/OrderController.java": "ee9e5b1308dd6bee0f770be550e168da857f1986",
+        "src/main/java/com/sm/lab/shop/service/OrderService.java": "3b2de7d1343779da7466cdb5cac8b761e484f57d",
+        "src/main/java/com/sm/lab/shop/dao/OrderDao.java": "003573032abcefa47be5fcf8af0f693563149c3b",
+        "src/main/resources/mapper/order.xml": "8c51b384ce149427c833599d3404bc4720619283",
+        "src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java": "4a2458f5b714392aa5cadf0613e351dafc2aadff",
+        "src/main/java/com/sm/lab/shop/web/OrderApiExceptionHandler.java": "3a3a167dd92716b064ed8305387ac6a7c177620a"
+      }
+    },
+    "SCH-ORD-001": {
+      "kind": "sch",
+      "file": "docs/05_설계서/order/SCH/SCH-ORD-001.md",
+      "anchors": {}
+    },
+    "SCH-ORD-002": {
+      "kind": "sch",
+      "file": "docs/05_설계서/order/SCH/SCH-ORD-002.md",
+      "anchors": {}
+    },
+    "SCH-ORD-003": {
+      "kind": "sch",
+      "file": "docs/05_설계서/order/SCH/SCH-ORD-003.md",
+      "anchors": {}
+    },
+    "SCH-ORD-004": {
+      "kind": "sch",
+      "file": "docs/05_설계서/order/SCH/SCH-ORD-004.md",
+      "anchors": {}
+    },
+    "SCH-ORD-005": {
+      "kind": "sch",
+      "file": "docs/05_설계서/order/SCH/SCH-ORD-005.md",
+      "anchors": {}
+    },
+    "SCH-ORD-006": {
+      "kind": "sch",
+      "file": "docs/05_설계서/order/SCH/SCH-ORD-006.md",
+      "anchors": {
+        "src/main/java/com/sm/lab/shop/controller/CartController.java": "e4587ac44a380f06d4ae30c8ab799df08429352f",
+        "src/main/resources/mapper/cart.xml": "242087840d177276e3d5b6657e848811702fd778"
+      }
+    },
+    "UIS-ORD-001": {
+      "kind": "uis",
+      "file": "docs/05_설계서/order/UIS/UIS-ORD-001_주문목록/spec.md",
+      "anchors": {
+        "src/main/resources/templates/order/list.html": "5442e251357d5a46e57676cdcb76f9b94286988b",
+        "src/main/java/com/sm/lab/shop/controller/OrderViewController.java": "e16a37e476b952ef6a41d1e5580312ca3426fe37",
+        "{{SRC_SHOP_API}}/src/main/java/com/sm/lab/shop/controller/OrderViewController.java": "e16a37e476b952ef6a41d1e5580312ca3426fe37"
+      }
+    },
+    "UIS-ORD-002": {
+      "kind": "uis",
+      "file": "docs/05_설계서/order/UIS/UIS-ORD-002_주문상세/spec.md",
+      "anchors": {
+        "src/main/resources/templates/order/detail.html": "afb99ec7eaff6d01b4a785d085ac0240640fb7df",
+        "src/main/java/com/sm/lab/shop/controller/OrderViewController.java": "e16a37e476b952ef6a41d1e5580312ca3426fe37",
+        "{{SRC_SHOP_API}}/src/main/java/com/sm/lab/shop/controller/OrderViewController.java": "e16a37e476b952ef6a41d1e5580312ca3426fe37"
+      }
+    },
+    "UIS-ORD-003": {
+      "kind": "uis",
+      "file": "docs/05_설계서/order/UIS/UIS-ORD-003_상품목록/spec.md",
+      "anchors": {
+        "src/main/resources/templates/product/list.html": "a578f59fcfcce78ec9ae035ab1b5f53d936a68f9",
+        "src/main/java/com/sm/lab/shop/controller/ProductViewController.java": "39a7f0e97f08ad5332efd02549a5ec6190959790",
+        "{{SRC_SHOP_API}}/src/main/java/com/sm/lab/shop/controller/ProductViewController.java": "39a7f0e97f08ad5332efd02549a5ec6190959790"
+      }
+    },
+    "UIS-ORD-004": {
+      "kind": "uis",
+      "file": "docs/05_설계서/order/UIS/UIS-ORD-004_상품상세/spec.md",
+      "anchors": {
+        "src/main/resources/templates/product/detail.html": "345cc572da3bcf1158449fd7d4ba88cd4f357ce1",
+        "src/main/java/com/sm/lab/shop/controller/ProductViewController.java": "39a7f0e97f08ad5332efd02549a5ec6190959790",
+        "src/main/java/com/sm/lab/shop/service/ProductService.java": "60e43b8bd2aea3813af64a0fea2867a11cdeb55b",
+        "src/main/java/com/sm/lab/shop/service/CartService.java": "82ac562ca3d5621664395be840c21dd4c8ba17d8",
+        "{{SRC_SHOP_API}}/src/main/java/com/sm/lab/shop/controller/ProductViewController.java": "39a7f0e97f08ad5332efd02549a5ec6190959790"
+      }
+    },
+    "UIS-ORD-005": {
+      "kind": "uis",
+      "file": "docs/05_설계서/order/UIS/UIS-ORD-005_장바구니/spec.md",
+      "anchors": {
+        "src/main/resources/templates/cart/list.html": "29b2b557e33fcdc6ebc1bbb539e30daa1a2e1d09",
+        "src/main/java/com/sm/lab/shop/controller/CartViewController.java": "14f2724d0d89a90349dbcc078c0c0b1ca6601330",
+        "src/main/java/com/sm/lab/shop/service/CartService.java": "82ac562ca3d5621664395be840c21dd4c8ba17d8",
+        "{{SRC_SHOP_API}}/src/main/java/com/sm/lab/shop/controller/CartViewController.java": "14f2724d0d89a90349dbcc078c0c0b1ca6601330"
+      }
+    },
+    "UIS-MBR-002": {
+      "kind": "uis",
+      "file": "docs/05_설계서/member/UIS/UIS-MBR-002_로그인/spec.md",
+      "anchors": {
+        "modules/shop-web/src/pages/LoginPage.tsx": "cc140384d098ad16cb35b0115cea92b65fb7573b",
+        "modules/shop-web/src/components/LoginForm.tsx": "7e54ca18677b4c90be13481c787141e3b00a6e19",
+        "modules/shop-web/src/App.tsx": "80cf152c2d8aeb53413ba95381ffc7370a848b41",
+        "modules/shop-web/src/redirectTarget.ts": "89a4509b7fc5d6c8b3a4433ef538e380bbdea04d",
+        "modules/shop-web/src/refreshOnce.ts": "aa6c9da050624d00e7614bb2c88bf0febea4f971",
+        "modules/shop-web/src/session.ts": "cb31f8a1b74f704c8cc2f8c01b6cfd2b6794ab0a",
+        "modules/shop-web/src/api.ts": "915caf68b1986d6eede14d790d027a6806ea1a4e"
+      }
+    },
+    "INF-MBR-006": {
+      "kind": "inf",
+      "file": "docs/05_설계서/member/INF/INF-MBR-006.md",
+      "anchors": {
+        "modules/shop-api/src/main/java/com/sm/lab/shop/controller/MemberPasswordResetController.java": "0e2c87e969330d71861dd1ed556b4fcad58bcbe0",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberPasswordResetService.java": "b028aeddc5bbb28329347e917935ff944a663b4e",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberPasswordResetApiException.java": "cc841ca4fcfec0500f9265767a3648f554c33bdc",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/web/MemberPasswordResetExceptionHandler.java": "ba086c205fa021cedfdbbebb686d5dc88ee4542e",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberPasswordResetDao.java": "ba7bb98d29b6ac1556691c2c18af4caeef5b114a",
+        "modules/shop-api/src/main/resources/mapper/memberPasswordReset.xml": "028222316af4ec4f7e449d014115057b5a963d33",
+        "modules/shop-api/src/main/resources/db/V5__member_password_resets.sql": "2f417c7b9856377539cda8ce90c8284536f7a2f6",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java": "6682be3264c07d60d885df510af17c373d3e3116",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberPasswordResetRateLimitDao.java": "2a43e7664eaa7afa69af4556527ed2fcfa97dd75",
+        "modules/shop-api/src/main/resources/mapper/memberPasswordResetRateLimit.xml": "e300bdd5a6cf0cc1ea05fd54f6c860bad2285001",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/domain/MemberPasswordResetRateLimit.java": "313a1b0e7f0b011bd237e8b0863733f388c13e03",
+        "memberPasswordReset.xml": "028222316af4ec4f7e449d014115057b5a963d33"
+      }
+    },
+    "INF-MBR-007": {
+      "kind": "inf",
+      "file": "docs/05_설계서/member/INF/INF-MBR-007.md",
+      "anchors": {
+        "modules/shop-api/src/main/java/com/sm/lab/shop/controller/MemberPasswordResetConfirmationController.java": "9f895efc3a5d9c90eec6b29dd9c481c1677f9995",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberPasswordResetConfirmationService.java": "643c6d4b729452501eef2f9955c5a334d53b9748",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberPasswordResetConfirmationWriter.java": "f145aa861c22c7f2ace0da8269d8e1ada73dbb14",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberPasswordResetConfirmationApiException.java": "5bf64ce138b0fae0dbbe5acd64bf49a2a1e4d2ae",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/web/MemberPasswordResetConfirmationExceptionHandler.java": "601238b7a0853484356dcf9b2563d297fb1faa84",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberPasswordResetDao.java": "085389f089005e5f9f8dfedeb0e5f7b0fe8229ba",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberDao.java": "6389a6a7d1c73f1ddbc0d2f87246b6419217e4ad",
+        "modules/shop-api/src/main/resources/mapper/memberPasswordReset.xml": "68e7aa16f685f57f0b90ef5a6d0fb9aacb8ec8b2",
+        "modules/shop-api/src/main/resources/mapper/member.xml": "2ec85ccb4ff5236b9a078dd57fb62f0568efbf1f",
+        "modules/shop-api/src/main/resources/db/V6__member_password_reset_confirmation.sql": "73174342dbd9a134f66e32303e0dede90d46af62",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java": "6682be3264c07d60d885df510af17c373d3e3116"
+      }
+    },
+    "UIS-MBR-003": {
+      "kind": "uis",
+      "file": "docs/05_설계서/member/UIS/UIS-MBR-003_비밀번호재설정/spec.md",
+      "anchors": {
+        "modules/shop-web/src/pages/PasswordResetPage.tsx": "c25e52c6896e7ba9ac91830c7ae39ee1d5bfefca",
+        "modules/shop-web/src/features/member/PasswordResetRequestStep.tsx": "415594f7fd4386f269f422c071add787b4cc2e63",
+        "modules/shop-web/src/features/member/PasswordResetCodeStep.tsx": "e6f2a0588dadd7cd475121dd3f05a5fee3fa614a",
+        "modules/shop-web/src/features/member/PasswordResetPasswordStep.tsx": "a4c4b41d642771292e3664c0187fdf0b9698db2a",
+        "modules/shop-web/src/features/member/PasswordResetDoneStep.tsx": "6bb7af1d083c8d44eff3a978a1cdb718dc4e184f",
+        "modules/shop-web/src/features/member/requestCodeOnce.ts": "799a255614976677df7c007777b16575ea8b535b",
+        "modules/shop-web/src/pages/LoginPage.tsx": "cc140384d098ad16cb35b0115cea92b65fb7573b",
+        "modules/shop-web/src/App.tsx": "80cf152c2d8aeb53413ba95381ffc7370a848b41",
+        "modules/shop-web/src/api.ts": "915caf68b1986d6eede14d790d027a6806ea1a4e"
+      }
+    },
+    "INF-MBR-008": {
+      "kind": "inf",
+      "file": "docs/05_설계서/member/INF/INF-MBR-008.md",
+      "anchors": {
+        "modules/shop-api/src/main/java/com/sm/lab/shop/controller/MemberAddressController.java": "fb1ce589be75980918cc14ef9345d641d23e7642",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberAddressService.java": "e5ef14d69a893bcc8e17485a111873b0153d4d4c",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberAddressApiException.java": "5671bb1cc5f1aecf783fd3d3ec94f45672aaa8ac",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/web/MemberAddressExceptionHandler.java": "030a5c14ba9d99b1bb78594305b864110dfd34aa",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberAddressDao.java": "6156583e8b23a66882d0502af559d635d6e474ff",
+        "modules/shop-api/src/main/resources/mapper/memberAddress.xml": "a6fe104562addc2ce605598f28d609cb5ea21828",
+        "modules/shop-api/src/main/resources/db/V7__member_addresses.sql": "7d3ba25cfd9f140d92c63692cf823ee20970c1b3",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/domain/MemberAddress.java": "5510934df0c4f795f57f3c0508ebf8d2cca39f85",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java": "6682be3264c07d60d885df510af17c373d3e3116"
+      }
+    },
+    "SCH-MBR-005": {
+      "kind": "sch",
+      "file": "docs/05_설계서/member/SCH/SCH-MBR-005.md",
+      "anchors": {
+        "modules/shop-api/src/main/resources/db/V5__member_password_resets.sql": "2f417c7b9856377539cda8ce90c8284536f7a2f6",
+        "memberPasswordReset.xml": "028222316af4ec4f7e449d014115057b5a963d33"
+      }
+    },
+    "SCH-MBR-009": {
+      "kind": "sch",
+      "file": "docs/05_설계서/member/SCH/SCH-MBR-009.md",
+      "anchors": {
+        "modules/shop-api/src/main/resources/db/V9__member_password_reset_rate_limits.sql": "b5c3c05282c0c1e4acc0e72cd8e50bab6fcd3973",
+        "memberPasswordResetRateLimit.xml": "e300bdd5a6cf0cc1ea05fd54f6c860bad2285001"
+      }
+    },
+    "INF-ORD-017": {
+      "kind": "inf",
+      "file": "docs/05_설계서/order/INF/INF-ORD-017.md",
+      "anchors": {
+        "modules/shop-api/src/main/java/com/sm/lab/shop/web/ShopStaticResourceConfig.java": "eaa4c3feca9d64b0be7512e74880515f94dcae06",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/controller/ShopIndexController.java": "08e4c75561808ca7cddc3f367daa33393612cd7c",
+        "modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java": "4b836dd3f2d84240cc5a13cfbed73726ac7b6eb7",
+        "modules/shop-api/pom.xml": "47062c2ba8e113b0e3691cc6d03217d3c4a1c7fc",
+        "modules/shop-web/vite.config.ts": "cd94e4171c6828c13bc6415d12c74044c8cc840e",
+        "modules/shop-api/.../ApiKeyAuthFilter.java": "4b836dd3f2d84240cc5a13cfbed73726ac7b6eb7",
+        "vite.config.ts": "cd94e4171c6828c13bc6415d12c74044c8cc840e",
+        "pom.xml": "47062c2ba8e113b0e3691cc6d03217d3c4a1c7fc"
+      }
+    },
+    "UIS-ORD-008": {
+      "kind": "uis",
+      "file": "docs/05_설계서/order/UIS/UIS-ORD-008_shop/spec.md",
+      "anchors": {
+        "modules/shop-web/src/App.tsx": "ec8c32ffff83235bad696eb1a9a5b5064ad00a0e"
+      }
+    },
+    "UIS-ORD-009": {
+      "kind": "uis",
+      "file": "docs/05_설계서/order/UIS/UIS-ORD-009_shop_products/spec.md",
+      "anchors": {
+        "modules/shop-web/src/pages/ProductListPage.tsx": "31a3f674fa5acaea47683e7b0e9405cbf9dcccc7",
+        "modules/shop-web/src/features/shop/productListFilters.ts": "0b3a395bd48400de2fa4a54319da998e37f0a2d4",
+        "modules/shop-web/src/features/shop/ProductFilterBar.tsx": "ed7158228aa32a68cef6f774988baf4127e42433",
+        "modules/shop-web/src/features/shop/ProductListGrid.tsx": "dc51d94eb4819ca9c3d8b4fe2aa9f13e4b31f1b6",
+        "modules/shop-web/src/features/shop/ProductPagination.tsx": "a9805286d243df064de505ca9ecc252205fb8b6c",
+        "modules/shop-web/src/App.tsx": "ec8c32ffff83235bad696eb1a9a5b5064ad00a0e"
+      }
+    },
+    "UIS-ORD-010": {
+      "kind": "uis",
+      "file": "docs/05_설계서/order/UIS/UIS-ORD-010_shop_products_상세/spec.md",
+      "anchors": {
+        "modules/shop-web/src/App.tsx": "11d838d3318163afd7333f5ca4c4dbe07e28acec",
+        "modules/shop-web/src/pages/ProductDetailPage.tsx": "e689c2ef12f284d0badfe2c2d28dfefcbedbab24",
+        "modules/shop-web/src/features/shop/ProductImageGallery.tsx": "35c9e4007cdbf898d4d92ddf456cd4675b45ab14",
+        "modules/shop-web/src/features/shop/ProductInfoPanel.tsx": "601bd8e8cc6c5638ba1a2122dbb5de53f0b371df",
+        "modules/shop-web/src/features/shop/ProductDetailTabs.tsx": "49d6bee8bd56db5148905ba9ff78bc145a47edba",
+        "modules/shop-web/src/features/shop/ProductNoticeTable.tsx": "4c737ad0347fd09ee1d12c34fafff9337b4f0cd3",
+        "modules/shop-web/src/features/shop/productNoticeItems.ts": "140f055a8aef8957f90c829d5fb1df20f284b11f",
+        "modules/shop-web/src/features/shop/RelatedProducts.tsx": "8221b132bfbfed93efd3f6d77b64b2b5ca2c684d",
+        "modules/shop-web/src/features/shop/relatedProductsPicker.ts": "b3ca35a55b98d0eac54139efcce2496df9552837",
+        "modules/shop-web/src/features/shop/ProductDetailSkeleton.tsx": "8d83c54b1688f25d3e7d20b66f82373b05f29d50",
+        "modules/shop-web/src/features/shop/ProductNotFoundNotice.tsx": "e7eb5f34796684403416ba0c73b4bb025a2b211b",
+        "modules/shop-web/src/api.ts": "dcf72e323a77ef9d26cf2389838dccc7ed0edc3f"
+      }
+    },
+    "UIS-ORD-011": {
+      "kind": "uis",
+      "file": "docs/05_설계서/order/UIS/UIS-ORD-011_shop_order/spec.md",
+      "anchors": {
+        "modules/shop-web/src/App.tsx": "7cfc5db0178a083756da0972db4fa76a4bb15ab8",
+        "modules/shop-web/src/pages/OrderPage.tsx": "61ec1feee2d55813490c3109cc9b8a560e7b810b",
+        "modules/shop-web/src/pages/OrderPage.test.tsx": "fbb8ebc67ec0a43693e6c6e5b7634758d763088d",
+        "modules/shop-web/src/features/shop/DeliveryAddressForm.tsx": "01507f4a1358cc729da7e6a4af020f8986b73616",
+        "modules/shop-web/src/features/shop/ZipcodeSearchModal.tsx": "c379ce0c6a095bc1a339f8dbc7d28354bf1727ae",
+        "modules/shop-web/src/features/shop/PaymentMethodSelect.tsx": "bf953785b7300dcb77a254b26b55713e7b2d6b27",
+        "modules/shop-web/src/features/shop/OrderItemsSummary.tsx": "652618186b13898960c16219eb6e5fea346130b8",
+        "modules/shop-web/src/features/shop/OrderCompleteNotice.tsx": "93ca1893699b9881054cbcdcc02e0c8c45fb03ac",
+        "modules/shop-web/src/features/shop/OrderFailureNotice.tsx": "db56785d1b45dc8698b7b15ac09b488438658104",
+        "modules/shop-web/src/features/shop/deliveryAddressValidation.ts": "80e5a208666a7eca5f48cc09cac47622e67b33f1",
+        "modules/shop-web/src/features/shop/cartTotals.ts": "e90592fc65e3c3b9b7db28e0021f6cf15b6c681b",
+        "modules/shop-web/src/features/shop/httpErrorMessage.ts": "ef9198c78e2cd16233b631e99e496fb7db806d37",
+        "modules/shop-web/src/api.ts": "0e7180f21cc84110631f96a3d61113286c2cf0ae"
+      }
+    },
+    "UIS-ORD-012": {
+      "kind": "uis",
+      "file": "docs/05_설계서/order/UIS/UIS-ORD-012_shop_cart/spec.md",
+      "anchors": {
+        "modules/shop-web/src/App.tsx": "7cfc5db0178a083756da0972db4fa76a4bb15ab8",
+        "modules/shop-web/src/pages/CartPage.tsx": "c27afce3852b175f6bbe3845cfd54f6c12d478e1",
+        "modules/shop-web/src/pages/CartPage.test.tsx": "2597b561b9930e60114205b663078dee4d453895",
+        "modules/shop-web/src/features/shop/CartLineItem.tsx": "6a51b255ee47985872bca7a6d55b0b3b469d8881",
+        "modules/shop-web/src/features/shop/CartEmptyState.tsx": "38c22145c96fe9f84e6dfee8bbf07596cb4057df",
+        "modules/shop-web/src/features/shop/CartSummary.tsx": "9c7821ba5b047bcef7aadac1701c73598a789c6e",
+        "modules/shop-web/src/features/shop/cartTotals.ts": "e90592fc65e3c3b9b7db28e0021f6cf15b6c681b",
+        "modules/shop-web/src/features/shop/httpErrorMessage.ts": "ef9198c78e2cd16233b631e99e496fb7db806d37",
+        "modules/shop-web/src/features/shop/Gnb.tsx": "377c3afe6dc97ca1b86c490bca82ed9b52a829ed",
+        "modules/shop-web/src/api.ts": "0e7180f21cc84110631f96a3d61113286c2cf0ae",
+        "modules/shop-web/src/types.ts": "bf23bb0344112780a6c374a9a38dee4d9d2ba74e",
+        "docs/변경관리/SR-305/STORY-1.md": "3cab986394cbce483a31d6fe35daf028c718bc4a"
+      }
+    },
+    "INF-ORD-016": {
+      "kind": "inf",
+      "file": "docs/05_설계서/order/INF/INF-ORD-016.md",
+      "anchors": {
+        "modules/shop-api/src/main/java/com/sm/lab/shop/controller/ZipcodeController.java": "ecff2f65aa2cd51609c82c1ce20b3ccabf19134a"
+      }
+    },
+    "SCH-ORD-007": {
+      "kind": "sch",
+      "file": "docs/05_설계서/order/SCH/SCH-ORD-007.md",
+      "anchors": {
+        "modules/shop-api/src/main/resources/db/V8__zipcodes.sql": "c7e74e0db01917010ad3a31096bbb923933a30ec"
+      }
+    },
+    "UIS-MBR-004": {
+      "kind": "uis",
+      "file": "docs/05_설계서/member/UIS/UIS-MBR-004_shop_mypage_addresses/spec.md",
+      "anchors": {
+        "modules/shop-web/src/App.tsx": "71af905ee6acd871efb2076cf0e952b1cb29352f",
+        "modules/shop-web/src/pages/MyAddressesPage.tsx": "00ff2434ab398d232c39bbe45317d7b207e0c677",
+        "modules/shop-web/src/pages/useZipcodeSearch.ts": "8fca4c5bc81584fe051f57ddf5864624020b7aa6",
+        "modules/shop-web/src/features/member/AddressList.tsx": "312670f4a36a32900c48d7ed21d667cc14323d0f",
+        "modules/shop-web/src/features/member/AddressForm.tsx": "79f5f4fb67321f9c69e860b61a6df769bc7c78ac",
+        "modules/shop-web/src/features/member/AddressDeleteConfirm.tsx": "a26f63d749fd36a6d9e4fb0643e7a1a995921e37",
+        "modules/shop-web/src/features/shop/ZipcodeSearchModal.tsx": "c379ce0c6a095bc1a339f8dbc7d28354bf1727ae",
+        "modules/shop-web/src/features/shop/deliveryAddressValidation.ts": "80e5a208666a7eca5f48cc09cac47622e67b33f1",
+        "modules/shop-web/src/api.ts": "c7dfd54ff54ba05639e0eae4e64b1954775cdeed",
+        "modules/shop-web/src/types.ts": "1aa26727b8c8ec6041a2c4298747aacd13d73a25",
+        "modules/shop-web/src/features/shop/Gnb.tsx": "4a699e106c858aaedde6b0adbacb832ee91e6de8"
+      }
+    },
+    "UIS-CMN-001": {
+      "kind": "uis",
+      "file": "docs/05_설계서/common/UIS/UIS-CMN-001_디자인토큰/spec.md",
+      "anchors": {
+        "modules/shop-web/src/styles/tokens.css": "fc33c3619b3de099cb7c28fffa72bfd412f5e74f",
+        "modules/shop-web/src/styles/tokenCatalog.ts": "9de0859669b40e51cebaea643cf9aaede1aec8e0",
+        "modules/shop-web/src/styles/contrast.ts": "746f77887b3112fb6b995f26a4d03535012fb6fd",
+        "modules/shop-web/src/styles/DesignTokens.stories.tsx": "9b7c34f6a0ee1bb5795b5555b1f6f391a9359898",
+        "modules/shop-web/src/main.tsx": "7704f6ec7a58e446550e00fe3e0699ab61e1ff50",
+        "modules/shop-web/.storybook/preview.ts": "382b7bef2bcb1b569e6e3229bd179bed01d88168"
+      }
+    },
+    "UIS-CMN-002": {
+      "kind": "uis",
+      "file": "docs/05_설계서/common/UIS/UIS-CMN-002_공통컴포넌트/spec.md",
+      "anchors": {
+        "modules/shop-web/src/components/common/Button.tsx": "9c9a9443e5d64ce9eba3cf7c53e41ed26f47804e",
+        "modules/shop-web/src/components/common/TextInput.tsx": "8abbbe8e3416777a9abd70e7d2d19b10de6d83a8",
+        "modules/shop-web/src/components/common/QuantityStepper.tsx": "12a5b6f99ac66b540f378faaea7d43184a83b2fe",
+        "modules/shop-web/src/components/common/quantityClamp.ts": "3dd8af5b63cc0d5dcdeafc2339588e527c529e30",
+        "modules/shop-web/src/components/common/Badge.tsx": "91f199bc8423178685dda8667c671701e09c217c",
+        "modules/shop-web/src/components/common/Tabs.tsx": "815d297db6206c69c51ff2bd44147e31e80fd8b6",
+        "modules/shop-web/src/components/common/resolveSwipeTab.ts": "8bb8c4d5473d934154ad4d94f9f2c1009b8e1301",
+        "modules/shop-web/src/components/common/useFocusTrap.ts": "716a32296716d64f1917b01f3eb35e03703ceffa",
+        "modules/shop-web/src/components/common/BottomSheet.tsx": "5a4e380267d1fe10825eee8d0c8f4b36e57597ec",
+        "modules/shop-web/src/components/common/PopupCarousel.tsx": "75094a362bf8da82c76eb565257c42f52f533dd5",
+        "modules/shop-web/src/components/common/Toast.tsx": "ac01faf696339cfb7596c31e3c59327e32bbf2df",
+        "modules/shop-web/src/components/common/ToastStack.tsx": "49ef93f2f4fa778727159fe1fc6ac874b6205eb1",
+        "modules/shop-web/src/components/common/toastQueue.ts": "d9a3b6f5a31153c1fc919cf1c9f9867cfa5160dc",
+        "modules/shop-web/src/components/common/Skeleton.tsx": "eb81c15ddb8d6ac6d826c9ba68f2a4e160da6985",
+        "modules/shop-web/src/components/common/EmptyState.tsx": "cb479457fd35e73f9f0dd5c298260cff957bc322",
+        "modules/shop-web/src/components/common/ErrorState.tsx": "f9dc7dbe2da4127bf5bb47d1062564f322ba534b"
+      }
+    },
+    "UIS-CMN-003": {
+      "kind": "uis",
+      "file": "docs/05_설계서/common/UIS/UIS-CMN-003_앱셸/spec.md",
+      "anchors": {
+        "modules/shop-web/src/features/shop/AppShell.tsx": "4f7eaef1345b47cb05f112b5da2da49627187a6f",
+        "modules/shop-web/src/features/shop/AppShell.stories.tsx": "ba085e9eb2321d02ece8fe58d1820ab39291b278",
+        "modules/shop-web/src/features/shop/GnbTabs.tsx": "ecd18323b883338c63e0763fdea9030faceb525c",
+        "modules/shop-web/src/features/shop/QuickBar.tsx": "cb4c1469ac9a85180a80120f36c7f0a6b1eff983",
+        "modules/shop-web/src/features/shop/BottomTabBar.tsx": "1d749c46591abe7049f85abb9a129347dce76000",
+        "modules/shop-web/src/features/shop/RightRail.tsx": "a2f1a67c574ca6f7be71f72d1846640885b5cfa0",
+        "modules/shop-web/src/features/shop/QrPopup.tsx": "64e613e26194ef84a74af3f89648e2801d3f6cae",
+        "modules/shop-web/src/features/shop/breakpoint.ts": "efc3c743ecb7276b6c07a62c6f661c6ebd727b29",
+        "modules/shop-web/src/features/shop/useBreakpoint.ts": "29db7ab05d6227b9a9b5476fdbeb55aeb280b3e0",
+        "modules/shop-web/src/features/shop/shopStatic.ts": "085647ebb317aab4b67e72a271fee0fdb1751e71",
+        "modules/shop-web/src/features/shop/Gnb.tsx": "f19b6f8c098a7d6f3a8cf35314f01ee347c9194e",
+        "modules/shop-web/src/pages/ProductListPage.tsx": "506c4e8eda323cd81dccccb257fc08597a19cf22"
+      }
+    }
+  }
+}

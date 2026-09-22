@@ -1,0 +1,90 @@
+{
+  "generated_at": "2026-09-21T12:44:39",
+  "artifact_counts": {
+    "inf": 26,
+    "sch": 16,
+    "uis": 20,
+    "srs": 10,
+    "bat": 1,
+    "func": 23
+  },
+  "by_domain": {
+    "member": {
+      "inf": 9,
+      "sch": 9,
+      "uis": 0
+    },
+    "order": {
+      "inf": 17,
+      "sch": 7,
+      "uis": 4
+    },
+    "(미분류)": {
+      "inf": 0,
+      "sch": 0,
+      "uis": 16
+    }
+  },
+  "effort": {
+    "inf": {
+      "count": 26,
+      "hours_per_unit": 2.0,
+      "manual_hours": 52.0,
+      "overridden": false
+    },
+    "sch": {
+      "count": 16,
+      "hours_per_unit": 1.5,
+      "manual_hours": 24.0,
+      "overridden": false
+    },
+    "uis": {
+      "count": 20,
+      "hours_per_unit": 4.0,
+      "manual_hours": 80.0,
+      "overridden": false
+    },
+    "srs": {
+      "count": 10,
+      "hours_per_unit": 1.5,
+      "manual_hours": 15.0,
+      "overridden": false
+    },
+    "bat": {
+      "count": 1,
+      "hours_per_unit": 2.0,
+      "manual_hours": 2.0,
+      "overridden": false
+    },
+    "func": {
+      "count": 23,
+      "hours_per_unit": 0.3,
+      "manual_hours": 6.9,
+      "overridden": false
+    }
+  },
+  "manual_hours_total": 179.9,
+  "saving": null,
+  "quality": {
+    "anchor": {
+      "inf_total": 26,
+      "has_controller": 1.0,
+      "has_service": 0.8846153846153846,
+      "has_sql": 0.9230769230769231
+    },
+    "fresh_rate": {
+      "rate": 0.22,
+      "denominator": 50,
+      "excluded": 12,
+      "total_specs": 62,
+      "display": "22.0% (분모 50건 / 전체 62건 · 기준선 밖 12건 제외)",
+      "warn": null
+    },
+    "func_coverage": {
+      "total": 23,
+      "covered": 20,
+      "rate": 0.8696
+    }
+  },
+  "disclaimer": "기준공수(hours_per_unit)는 프로젝트가 설정한 가정값이며 실측이 아니다. manual_hours_total = 수작업으로 동일 산출물을 만들 경우의 환산공수(추정). 절감률(saved_rate)은 --actual-hours(도구 실소요) 입력 시에만 계산된다."
+}

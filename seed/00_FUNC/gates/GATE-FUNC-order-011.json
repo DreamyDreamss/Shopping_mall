@@ -1,0 +1,914 @@
+{
+  "func": "FUNC-order-011",
+  "epic": "SR-202",
+  "story": "docs/00_FUNC/stories/STORY-FUNC-order-011.md",
+  "gate": "CONCERNS",
+  "reviewer": "qa-agent",
+  "updated": "2026-09-09T13:03:36",
+  "layers": {
+    "spec": "pass",
+    "security": "pass",
+    "regression": "pass",
+    "baseline": "concerns",
+    "scope": "fail",
+    "rules": "pass",
+    "conformance": "pass"
+  },
+  "top_issues": [
+    {
+      "severity": "low",
+      "layer": "spec",
+      "finding": "order/list.html:81 주석의 역참조 앵커 'cart/list.html:82-89'가 이번 라운드 cart 주석 확장으로 :82-93으로 밀렸다 — cart 쪽은 서술형으로 전환했으나 반대 방향 참조에 앵커 드리프트가 존속(범위 밖 파일의 주석 1줄, 비차단)",
+      "suggested_action": "다음에 order/list.html을 편집할 때 라인 앵커를 서술형('cart/list.html의 빈 상태 안내 주석 참조')으로 정리"
+    },
+    {
+      "severity": "low",
+      "layer": "spec",
+      "finding": "[이월·판정 제외] UIS-ORD-005/spec.md 90·123·149행이 여전히 '장바구니가 비어 있습니다'이고 소스 앵커도 list.html:82-86/:88(현행 :94-95/:97)로 밀려 있다",
+      "suggested_action": "STEP 5.5 스펙 재동기화에서 문구 3곳 + 라인 앵커를 최신값으로 갱신하고, 빈+checkoutError 상태의 '문구 대신 오류 배너 + 이동 링크' 동작을 명문화"
+    },
+    {
+      "severity": "low",
+      "layer": "baseline",
+      "finding": "shop-api: 기준선에 없는 소스 루트",
+      "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+    },
+    {
+      "severity": "high",
+      "layer": "scope",
+      "finding": "스코프 밖 변경: .gitignore (M)",
+      "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+    },
+    {
+      "severity": "high",
+      "layer": "scope",
+      "finding": "스코프 밖 변경: .understand-anything/linked-func-cache.json (M)",
+      "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+    },
+    {
+      "severity": "low",
+      "layer": "conformance",
+      "finding": "order/list.html:81 주석이 cart/list.html의 빈 상태 주석 위치를 ':82-89'로 참조하나, round8~9 편집으로 실제 주석 블록은 ':82-93'까지 확장됐다(라인 앵커 드리프트) — QA round9 자체도 이미 동일 사실을 권고 1(비차단)로 기록해 둔 상태이며 이번 검증에서 재확인만 됨.",
+      "suggested_action": "다음에 두 파일 중 하나를 편집할 때 서술형 참조로 전환(cart 쪽은 이미 round9에서 서술형으로 전환됨)",
+      "confidence": "high",
+      "file": "modules/shop-api/src/main/resources/templates/order/list.html",
+      "line": 81
+    },
+    {
+      "severity": "low",
+      "layer": "conformance",
+      "finding": "UIS-ORD-005/spec.md 90·123·149행이 여전히 구 문구 '장바구니가 비어 있습니다'와 구 라인 앵커(list.html:82-86/:83/:88)를 유지 — 실제 구현(list.html:94-97, '조회 결과가 없습니다')과 불일치. 사람 코멘트로 STEP 5.5(스펙 재동기화) 처리 대상으로 명시 이월된 항목이라 이 story의 차단 사유는 아니다.",
+      "suggested_action": "STEP 5.5에서 spec.md 문구 3곳 + 라인 앵커를 이번 라운드 최신값으로 갱신",
+      "confidence": "high",
+      "file": "docs/05_설계서/order/UIS/UIS-ORD-005_장바구니/spec.md",
+      "line": 123
+    }
+  ],
+  "rounds": [
+    {
+      "round": 1,
+      "gate": "FAIL",
+      "human": {
+        "decision": "rework",
+        "by": "사람(자기승인-실증)",
+        "at": "2026-08-22T21:03:07",
+        "comment": "필수1: 합산을 DB 원자 UPSERT(ON DUPLICATE KEY UPDATE qty=qty+VALUES(qty))로 교체+동시성 회귀 테스트. 필수2: 500 유출 차단 — DuplicateKey/DataAccess 예외를 D3 계약 내로 흡수(재시도 또는 409/400)하고 include-message 노출 경로 점검. 권고3(CSRF)은 이번 SR 수용 — 후속 TODO(전 화면 폼 일괄 도입 별도 SR). 권고4 중 sale_yn 무필터 담기(판매중지 상품)는 함께 수정(품절과 동급 409).",
+        "targets": [
+          "modules/shop-api/src/main/resources/mapper/cart.xml",
+          "modules/shop-api/src/main/java/com/sm/lab/shop/service/CartService.java"
+        ]
+      },
+      "layers": {
+        "spec": "concerns",
+        "security": "fail",
+        "regression": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "high",
+          "layer": "regression",
+          "finding": "담기 합산이 원자적이지 않음 — selectItem→분기→insert|update의 read-modify-write에 락/원자성 없음. 같은 (member,sku)로 8병렬 POST /api/cart/items qty=1 실행 시 200 5건/500 3건, 최종 qty가 8이 아니라 2(lost update). D2가 확정한 'PK(member_id,sku)로 합산을 UPSERT로 자연 강제' 메커니즘이 애플리케이션 분기로 대체되며 보장이 소실. 브라우저 [담기] 더블클릭만으로 도달 가능.",
+          "suggested_action": "cart.xml의 insertItem을 INSERT ... ON DUPLICATE KEY UPDATE qty = qty + VALUES(qty)로 교정(또는 SELECT ... FOR UPDATE / DuplicateKeyException 포착 후 합산 재시도). 재고 판정은 합산 결과 기준을 유지하되 같은 트랜잭션·원자 구문 안에서 수행. 동시 담기 N건 → 최종 qty = Σqty 및 500 미발생을 검증하는 회귀 테스트 추가."
+        },
+        {
+          "severity": "high",
+          "layer": "security",
+          "finding": "내부 예외·DB 스키마 유출 — 위 동시성 경로에서 HTTP 500 본문에 'SQLIntegrityConstraintViolationException: (conn=162) Duplicate entry M-0001-SKU-1002 for key PRIMARY' 및 MyBatis '### Error updating database' 스택 메시지가 그대로 반환됨(server.error.include-message: always와 결합). D3 오류 계약(400/404/409) 밖의 상태코드이기도 함.",
+          "suggested_action": "@RestControllerAdvice로 미처리 예외를 일반화 메시지로 매핑(DB 드라이버·제약명·SQL 문구를 응답에 싣지 않음). include-message 설정은 409 사유 전달에 필요하므로 설정 대신 핸들러 레벨에서 차단."
+        },
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "신규 상태변경 서버렌더 폼 2종(/cart/items/{sku}/update|delete)에 CSRF 방어 없음 — 앱 전역에 spring-security 미도입. 기존 order/product 화면은 전량 조회 전용이었으므로 이 변경이 앱 최초의 상태변경 POST 폼이며, '기존과 동일 전제'로 넘기기 어려움. 메서드 안전성 자체는 정상(GET 호출 시 405).",
+          "suggested_action": "CSRF 토큰 도입 또는 '랩 스코프 예외'로 명시적 결정을 KNOWN_LIMITATIONS/의사결정 기록에 남길 것."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "AC1의 'qty>=1'이 DB 제약이 아니라 애플리케이션 강제 — 실 DB information_schema.CHECK_CONSTRAINTS 0건(컬럼 코멘트로 고지됨). PK·FK·타입은 D2와 1:1 일치 확인.",
+          "suggested_action": "CART_ITEMS.qty에 CHECK (qty >= 1) 추가 검토(schema.sql 정본 + 실 DB 동시 적용)."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "memberId null/누락 담기 요청이 400이 아니라 404('회원 없음: null')로 응답 — D3는 유효성 오류를 400으로 규정.",
+          "suggested_action": "memberId 공백/누락은 400으로 매핑(요청 유효성 단계에서 선판정)."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "ProductDao.selectBySku가 sale_yn 무필터 → 판매중지(N) 상품이라도 stock>0이면 담기 허용(상품 목록은 sale_yn='Y'만 노출). 현 시드에선 SKU-1004가 stock 0이라 409로 가려져 관측 불가. 02_변경명세는 '품절'만 규정하고 판매중지는 침묵.",
+          "suggested_action": "판매중지 상품 담기 허용 여부를 의사결정으로 확정하고 필요 시 sale_yn 판정을 checkStock에 추가."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "화면 폼 오류 시 Whitelabel 에러 페이지로 이탈해 장바구니 컨텍스트 상실. 단 사유 문구는 실제로 전달됨(브라우저 Accept 재현: 400 '수량은 1 이상이어야 합니다(삭제하려면 삭제 버튼을 사용하세요)', 409 '재고 초과: 가용 40, 요청 999') — dev 고지 내용은 사실이며 D4 안내 요건은 전달 수준에서 충족.",
+          "suggested_action": "폼 오류 경로에서 장바구니 화면 재렌더 + 사유 표시로 개선 검토(수용 가능한 잔여 리스크)."
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "gate": "CONCERNS",
+      "human": {
+        "decision": "rework",
+        "by": "사람(자기승인-실증)",
+        "at": "2026-08-22T22:30:44",
+        "comment": "r2 신규 권고 반영(사람 직접 수정): ApiExceptionHandler를 Cart 컨트롤러로 스코프 한정 + DuplicateKey만 409, 그 외 DataAccess는 500(정제 메시지) — 장애를 클라이언트 귀책으로 위장하지 않기(r1 교훈 일관). 미사용 insertItem 정리.",
+        "targets": [
+          "modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiExceptionHandler.java"
+        ]
+      },
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "ApiExceptionHandler가 selector 없는 전역 @RestControllerAdvice — DataAccessException 전건을 409로 매핑. DB 연결 장애 등 서버측 장애도 클라이언트 귀책(409)으로 표기되고, 적용 범위가 기존 order/product 컨트롤러까지 확대돼 기존 오류 표면이 바뀐다(전역 파급은 코드 수준 판단, 미실측)",
+          "suggested_action": "basePackages/assignableTypes로 범위를 cart에 한정하고, 무결성 위반 계열만 409·그 외는 500/503+일반화 메시지로 분기"
+        },
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "상태변경 폼 2종 CSRF 미방어 — 사람 코멘트로 이번 SR 수용 결정, 다만 결정이 게이트 원장에만 남아 있고 후속 SR/KNOWN_LIMITATIONS 등재는 없음",
+          "suggested_action": "후속 SR 티켓 또는 KNOWN_LIMITATIONS에 수용 결정·해소 계획 등재"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "CART_ITEMS.qty CHECK(qty>=1) 여전히 부재(애플리케이션 강제만, information_schema.CHECK_CONSTRAINTS 0건)",
+          "suggested_action": "schema.sql 정본 + 실 DB에 CHECK 동시 적용 검토"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "memberId null/누락 담기 요청이 여전히 404('회원 없음: null') — D3는 유효성 오류를 400으로 규정",
+          "suggested_action": "요청 유효성 단계에서 선판정해 400 매핑"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "화면 폼 오류 시 Whitelabel 이탈(사유 문구 전달은 정상) — r1 권고 그대로 이월",
+          "suggested_action": "장바구니 화면 재렌더 + 사유 표시"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "cart.xml/CartDao의 insertItem이 UPSERT 도입 후 프로덕션 미사용(DaoTest만 사용)",
+          "suggested_action": "사문화 여부 확정 후 제거 검토"
+        }
+      ]
+    },
+    {
+      "round": 3,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "advice 스코프가 CartController 한정이라 CartViewController(/cart/items/{sku}/update|delete) 경로의 DB 계층 예외는 정제 대상 밖 — Whitelabel로 원문 노출 가능(강제 유발 어려워 미실측, 코드 수준 판단)",
+          "suggested_action": "assignableTypes에 CartViewController 추가하거나 view 전용 @ControllerAdvice로 재렌더+정제 메시지 처리"
+        },
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "앱 전역 오류 유출은 선행 표면 그대로 — GET /api/orders?size=-1 실측 시 SQLSyntaxErrorException 원문 + mapper/order.xml 경로 노출(r3가 만든 것 아님, r2 전역 advice가 잠시 가렸던 것)",
+          "suggested_action": "SR-202 범위 밖 — KNOWN_LIMITATIONS 또는 후속 SR로 등재"
+        },
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "상태변경 폼 2종 CSRF 수용 결정이 게이트 원장에만 존재 — 후속 SR/KNOWN_LIMITATIONS 등재 없음(r2 권고 2 이월)",
+          "suggested_action": "후속 SR 티켓 또는 KNOWN_LIMITATIONS에 수용 결정·해소 계획 등재"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "CART_ITEMS.qty CHECK(qty>=1) 여전히 부재(애플리케이션 강제만)",
+          "suggested_action": "schema.sql 정본 + 실 DB에 CHECK 동시 적용 검토"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "memberId null/누락 담기 요청이 여전히 404('회원 없음: null') — D3는 400 규정",
+          "suggested_action": "요청 유효성 단계에서 선판정해 400 매핑"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "화면 폼 오류 시 Whitelabel 이탈(사유 문구 전달은 정상) — r1/r2 권고 이월",
+          "suggested_action": "장바구니 화면 재렌더 + 사유 표시"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "사람 코멘트의 '미사용 insertItem 정리'는 미수행 — CartDaoTest 픽스처가 5회 사용 중이라 유지(프로덕션 참조 0 실측). 판단은 타당하나 지시-결과가 갈린 지점",
+          "suggested_action": "mapper/DAO 주석에 '테스트 픽스처 전용' 명시로 사문화 오인 방지"
+        }
+      ]
+    },
+    {
+      "round": 4,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "concerns",
+        "scope": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "advice 스코프가 CartController 한정이라 CartViewController(/cart/items/{sku}/update|delete) 경로의 DB 계층 예외는 정제 대상 밖 — Whitelabel로 원문 노출 가능(강제 유발 어려워 미실측, 코드 수준 판단)",
+          "suggested_action": "assignableTypes에 CartViewController 추가하거나 view 전용 @ControllerAdvice로 재렌더+정제 메시지 처리"
+        },
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "앱 전역 오류 유출은 선행 표면 그대로 — GET /api/orders?size=-1 실측 시 SQLSyntaxErrorException 원문 + mapper/order.xml 경로 노출(r3가 만든 것 아님, r2 전역 advice가 잠시 가렸던 것)",
+          "suggested_action": "SR-202 범위 밖 — KNOWN_LIMITATIONS 또는 후속 SR로 등재"
+        },
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "상태변경 폼 2종 CSRF 수용 결정이 게이트 원장에만 존재 — 후속 SR/KNOWN_LIMITATIONS 등재 없음(r2 권고 2 이월)",
+          "suggested_action": "후속 SR 티켓 또는 KNOWN_LIMITATIONS에 수용 결정·해소 계획 등재"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "CART_ITEMS.qty CHECK(qty>=1) 여전히 부재(애플리케이션 강제만)",
+          "suggested_action": "schema.sql 정본 + 실 DB에 CHECK 동시 적용 검토"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "memberId null/누락 담기 요청이 여전히 404('회원 없음: null') — D3는 400 규정",
+          "suggested_action": "요청 유효성 단계에서 선판정해 400 매핑"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "화면 폼 오류 시 Whitelabel 이탈(사유 문구 전달은 정상) — r1/r2 권고 이월",
+          "suggested_action": "장바구니 화면 재렌더 + 사유 표시"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "사람 코멘트의 '미사용 insertItem 정리'는 미수행 — CartDaoTest 픽스처가 5회 사용 중이라 유지(프로덕션 참조 0 실측). 판단은 타당하나 지시-결과가 갈린 지점",
+          "suggested_action": "mapper/DAO 주석에 '테스트 픽스처 전용' 명시로 사문화 오인 방지"
+        }
+      ],
+      "layer": "scope"
+    },
+    {
+      "round": 5,
+      "gate": "CONCERNS",
+      "human": {
+        "decision": "track",
+        "by": "사람(자기승인-실증)",
+        "at": "2026-08-22T22:47:51",
+        "comment": "QA r1 FAIL→r2/r3 해소 실증·대조검증 PASS·테스트 66/66·회귀 20/20. 잔존 low/medium은 TODO 등록(CSRF 후속 SR 등).",
+        "targets": []
+      },
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "concerns",
+        "scope": "pass",
+        "conformance": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "advice 스코프가 CartController 한정이라 CartViewController(/cart/items/{sku}/update|delete) 경로의 DB 계층 예외는 정제 대상 밖 — Whitelabel로 원문 노출 가능(강제 유발 어려워 미실측, 코드 수준 판단)",
+          "suggested_action": "assignableTypes에 CartViewController 추가하거나 view 전용 @ControllerAdvice로 재렌더+정제 메시지 처리"
+        },
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "앱 전역 오류 유출은 선행 표면 그대로 — GET /api/orders?size=-1 실측 시 SQLSyntaxErrorException 원문 + mapper/order.xml 경로 노출(r3가 만든 것 아님, r2 전역 advice가 잠시 가렸던 것)",
+          "suggested_action": "SR-202 범위 밖 — KNOWN_LIMITATIONS 또는 후속 SR로 등재"
+        },
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "상태변경 폼 2종 CSRF 수용 결정이 게이트 원장에만 존재 — 후속 SR/KNOWN_LIMITATIONS 등재 없음(r2 권고 2 이월)",
+          "suggested_action": "후속 SR 티켓 또는 KNOWN_LIMITATIONS에 수용 결정·해소 계획 등재"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "CART_ITEMS.qty CHECK(qty>=1) 여전히 부재(애플리케이션 강제만)",
+          "suggested_action": "schema.sql 정본 + 실 DB에 CHECK 동시 적용 검토"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "memberId null/누락 담기 요청이 여전히 404('회원 없음: null') — D3는 400 규정",
+          "suggested_action": "요청 유효성 단계에서 선판정해 400 매핑"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "화면 폼 오류 시 Whitelabel 이탈(사유 문구 전달은 정상) — r1/r2 권고 이월",
+          "suggested_action": "장바구니 화면 재렌더 + 사유 표시"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "사람 코멘트의 '미사용 insertItem 정리'는 미수행 — CartDaoTest 픽스처가 5회 사용 중이라 유지(프로덕션 참조 0 실측). 판단은 타당하나 지시-결과가 갈린 지점",
+          "suggested_action": "mapper/DAO 주석에 '테스트 픽스처 전용' 명시로 사문화 오인 방지"
+        },
+        {
+          "severity": "low",
+          "layer": "conformance",
+          "finding": "D3 오류 계약은 memberId 유효성 실패를 400으로 규정하나, CartService.requireMember(memberId)는 null/blank도 memberDao.selectById 조회 실패로 처리해 404('회원 없음: null')를 반환한다 — 02_변경명세.md D3 표의 '400(유효성)' 항목과 문자 그대로는 어긋난다.",
+          "suggested_action": "요청 유효성 단계에서 memberId null/blank를 선판정해 400으로 매핑",
+          "confidence": "high",
+          "file": "modules/shop-api/src/main/java/com/sm/lab/shop/service/CartService.java",
+          "line": 100
+        },
+        {
+          "severity": "low",
+          "layer": "conformance",
+          "finding": "ApiExceptionHandler는 @RestControllerAdvice(assignableTypes = CartController.class)로 REST API만 커버 -- CartViewController(/cart/items/{sku}/update|delete)에서 DB 계층 예외가 나면 정제되지 않은 Whitelabel 오류로 노출될 수 있다(미실측 경로).",
+          "suggested_action": "CartViewController도 assignableTypes에 포함하거나 view 전용 정제 처리 추가",
+          "confidence": "high",
+          "file": "modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiExceptionHandler.java",
+          "line": 32
+        },
+        {
+          "severity": "medium",
+          "layer": "conformance",
+          "finding": "cart/list.html의 상태변경 폼 2종(수량변경/삭제)에 CSRF 토큰이 없다 — 앱 최초의 상태변경 서버렌더 폼. 이번 SR 범위에서 사람이 명시적으로 수용(자기승인)했고 story 후속 TODO에 등재돼 있으나, KNOWN_LIMITATIONS/후속 SR 등재는 아직 없다는 사실 자체는 이번 story 정합성 판정에 영향 없음(추적 등록으로 자기승인된 이월 항목).",
+          "suggested_action": "후속 SR 또는 KNOWN_LIMITATIONS에 CSRF 수용 결정·해소 계획 등재",
+          "confidence": "high",
+          "file": "modules/shop-api/src/main/resources/templates/cart/list.html",
+          "line": 49
+        },
+        {
+          "severity": "low",
+          "layer": "conformance",
+          "finding": "CART_ITEMS.qty의 'qty>=1' 제약이 DB CHECK가 아니라 애플리케이션(CartService.requireValidQty) 강제뿐 — schema.sql 컬럼 코멘트로만 고지됨.",
+          "suggested_action": "schema.sql에 CHECK(qty>=1) 추가 검토(실 DB도 동시 반영)",
+          "confidence": "high",
+          "file": "lab/db/schema.sql",
+          "line": 0
+        }
+      ],
+      "layer": "conformance"
+    },
+    {
+      "round": 6,
+      "gate": "CONCERNS",
+      "human": {
+        "decision": "approve",
+        "by": "뷰어",
+        "at": "2026-09-09T08:51:59",
+        "comment": "CONCERNS — SR-216 범위 내 구현 확인, 권고는 별도 SR로",
+        "targets": []
+      },
+      "layers": {
+        "spec": "concerns",
+        "security": "pass",
+        "regression": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "UIS-ORD-005 설계서 정본이 옛 문구 그대로 — spec.md §2 시나리오(90행)·§3 화면구성표(123행)·§5 표시조건(149행)이 '장바구니가 비어 있습니다'로 남아 구현(list.html:87 '조회 결과가 없습니다')과 정면 모순. 빈 상태 블록 라인 참조도 밀림(list.html:82-86→86-89, :83→:87, :88→:91). GATE-FUNC-order-001의 UIS-ORD-001 stale 이슈와 동일 유형",
+          "suggested_action": "SR-224 스펙 현행화 단계에서 UIS-ORD-005 spec.md 3곳 문구 + 소스 라인 참조를 함께 갱신"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "docs/변경관리/SR-202/03_TC.md의 TC-FUNC-order-011-13 기대값이 '장바구니가 비어 있습니다'로 남아 그대로 수행하면 실패한다(TC 정본 TC_v1.0.md는 '빈 상태·링크'로만 기술해 충돌 없음)",
+          "suggested_action": "TC 정본 또는 SR-224 산출물에 'SR-224로 문구 대체됨' supersede 표기"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "'검색 조건' 판정 기준(회원 셀렉트는 필터 아님)이 코드 주석에만 있고 SR 산출물에 없다 — 템플릿의 class=\"searchForm\"·버튼 라벨 '조회'가 반대 해석을 유도하며, 형제 story(FUNC-order-001 주문목록은 실제 필터 존재)가 다른 기준을 쓸 여지",
+          "suggested_action": "판정 근거를 SR-224 산출물(또는 UIS)에 한 줄 명시해 형제 story와 기준 공유"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "동시/중복 체크아웃 패자 경로에서 '체크아웃 실패: 장바구니가 비어 있습니다' 배너와 새 '조회 결과가 없습니다' 안내가 한 화면에 동시 노출(GATE-FUNC-order-012 기록 경로). SR-224가 오류 문구를 명시 제외해 스코프 위반은 아님",
+          "suggested_action": "문구 통일 취지의 후속 정리 대상으로 등재"
+        }
+      ]
+    },
+    {
+      "round": 7,
+      "gate": "CONCERNS",
+      "human": {
+        "decision": "rework",
+        "by": "사람",
+        "at": "2026-09-09T12:40:34",
+        "comment": "QA CONCERNS 권고 4건 중 아래를 함께 고친다: (1) modules/shop-api/src/main/resources/templates/cart/list.html:86 빈 상태 블록에 checkoutError==null 가드 추가 — 형제 order/list.html:79(SR-208)와 동일 패턴으로, 이미 빈 장바구니에서 주문하기 재제출 시 오류 배너와 '조회 결과가 없습니다'가 동시 노출되는 것을 방지(SR-224 요건③ 취지). (2) order/list.html의 'cart/list.html과 동일 컨벤션' 주석이 사실과 다르므로(장바구니는 검색조건이 없어 요건② 미해당) 정정. (3) docs/변경관리/SR-202/03_TC.md:21 TC-FUNC-order-011-13 기대값에 supersede 표기(SR-224로 대체됨을 명시). UIS-ORD-005 spec.md 문구 재동기화는 STEP 5.5에서 별도 처리한다.",
+        "targets": []
+      },
+      "layers": {
+        "spec": "concerns",
+        "security": "pass",
+        "regression": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "UIS-ORD-005 설계서 정본이 옛 문구 그대로(spec.md 90·123·149행 '장바구니가 비어 있습니다') — 구현(list.html:87 '조회 결과가 없습니다')과 정면 모순이고 라인 앵커도 밀림(:82-86→86-89, :83→:87, :88→:91). 같은 SR-224에서 형제 UIS-ORD-003은 rev 1.1로 이미 재동기화돼 화면별 비대칭. r6에서 이월된 뒤 아직 미해소",
+          "suggested_action": "이번 라운드 STEP 5.5 스펙 재동기화에서 UIS-ORD-005 spec.md 3곳 문구 + 소스 라인 앵커를 함께 갱신(별도 SR 이월 금지)"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "'검색 조건' 판정 기준이 화면별로 갈린다 — cart는 memberId를 조회 대상 식별자로 보아 단일 문구, order/list.html:79-80은 동일 memberId를 검색조건으로 보아 '조건에 맞는 결과가 없습니다'. 기준이 코드 주석에만 있고 SR 산출물·UIS에 없음. 더해 order/list.html:76-78 주석은 'cart/list.html과 동일 컨벤션'이라 적어 사실과 불일치",
+          "suggested_action": "판정 근거를 SR-224 산출물(또는 UIS-ORD-005)에 명시하고 order/list.html 주석을 사실에 맞게 정정"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "docs/변경관리/SR-202/03_TC.md:21 TC-FUNC-order-011-13 기대값이 '장바구니가 비어 있습니다'로 남아 그대로 수행하면 실패(TC 정본 TC_v1.0.md는 충돌 없음)",
+          "suggested_action": "해당 TC에 'SR-224로 문구 대체됨' supersede 표기"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "cart/list.html:86 빈 상태 블록에 checkoutError == null 가드가 없어(형제 order/list.html:79는 SR-208로 searchError == null 가드 적용) 이미 비워진 장바구니에서 주문하기 재제출 시 '체크아웃 실패: 장바구니가 비어 있습니다' 배너와 '조회 결과가 없습니다'가 동시 노출. 목록이 실제로 비어 있어 SR 요건 ③ 문언 위반은 아니고 데이터 계약 영향 없음",
+          "suggested_action": "빈 상태 블록에 checkoutError == null 가드를 추가해 SR-208 규약과 정렬(후속 정리 대상 등재)"
+        }
+      ]
+    },
+    {
+      "round": 8,
+      "gate": "CONCERNS",
+      "human": {
+        "decision": "rework",
+        "by": "사람",
+        "at": "2026-09-09T12:48:02",
+        "comment": "QA CONCERNS(round 8) 권고 중 실질 결함 1건을 고친다: modules/shop-api/src/main/resources/templates/cart/list.html:89의 빈 상태 가드(checkoutError==null and #lists.isEmpty(...))가 안내 문구 <p>뿐 아니라 '상품 목록으로' 이동 링크(:94)까지 감싼 div 전체에 걸려 있어, 빈 장바구니+checkoutError 동시 상태에서 화면에 탈출 링크가 하나도 남지 않는다(UIS-ORD-005 spec.md:123의 '문구+이동 링크' 규정과도 불일치). 형제 order/list.html:83처럼 가드를 <p> 한 줄에만 걸고 '상품 목록으로' 링크는 그 div 밖으로 이동해 checkoutError 유무와 무관하게 항상 보이게 한다. 함께: cart/list.html:86 주석의 order/list.html 라인 앵커가 이번 편집(:79→:83)으로 다시 밀렸으니 정정한다(같은 유형 재발 방지).",
+        "targets": []
+      },
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "cart/list.html:89의 checkoutError==null 가드가 안내 문구와 '상품 목록으로' 링크를 함께 감싼 div에 걸려, 빈 장바구니+체크아웃 오류 상태에서 이동 링크가 전부 사라진다(하단 링크 :94와 주문하기 폼 :77은 !isEmpty 조건이라 함께 숨음). 형제 order/list.html:83은 안내 문구 p 한 줄에만 가드를 건다. UIS-ORD-005/spec.md:123의 '문구 + 이동 링크' 규정과도 불일치. 데이터 계약 영향 없음(비차단).",
+          "suggested_action": "가드를 안내 문구 <p>에만 적용하고 '상품 목록으로' 링크는 div 밖으로 빼 항상 노출되게 분리 — 형제 화면의 가드 적용 범위와 정렬"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "cart/list.html:86 주석이 'order/list.html:79 SR-208 searchError == null과 동일 패턴'이라 적었으나, 같은 라운드에 order/list.html에 정정 주석 4줄이 삽입되며 실제 가드는 :83-84로 밀렸다(:79는 현재 주석 줄). r7 권고②가 지적한 '주석이 사실과 어긋남'과 동일 유형의 재발. STORY Dev 기록의 'cart/list.html:86 빈 상태 블록'도 실제로는 :89.",
+          "suggested_action": "cart/list.html:86 주석의 앵커를 order/list.html:83으로 정정하고, 형제 파일을 함께 편집할 때 라인 앵커를 재확인"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "[이월·이번 판정 제외] UIS-ORD-005/spec.md 90·123·149행이 여전히 '장바구니가 비어 있습니다'이고 소스 라인 앵커도 밀렸다(:82-86→:89-92, :83→:90). 사람 코멘트에 따라 STEP 5.5 별도 처리 대상.",
+          "suggested_action": "STEP 5.5 스펙 재동기화에서 문구 3곳 + 라인 앵커를 이번 라운드 최신값으로 갱신"
+        }
+      ]
+    },
+    {
+      "round": 9,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "order/list.html:81 주석의 역참조 앵커 'cart/list.html:82-89'가 이번 라운드 cart 주석 확장으로 :82-93으로 밀렸다 — cart 쪽은 서술형으로 전환했으나 반대 방향 참조에 앵커 드리프트가 존속(범위 밖 파일의 주석 1줄, 비차단)",
+          "suggested_action": "다음에 order/list.html을 편집할 때 라인 앵커를 서술형('cart/list.html의 빈 상태 안내 주석 참조')으로 정리"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "[이월·판정 제외] UIS-ORD-005/spec.md 90·123·149행이 여전히 '장바구니가 비어 있습니다'이고 소스 앵커도 list.html:82-86/:88(현행 :94-95/:97)로 밀려 있다",
+          "suggested_action": "STEP 5.5 스펙 재동기화에서 문구 3곳 + 라인 앵커를 최신값으로 갱신하고, 빈+checkoutError 상태의 '문구 대신 오류 배너 + 이동 링크' 동작을 명문화"
+        }
+      ]
+    },
+    {
+      "round": 10,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "order/list.html:81 주석의 역참조 앵커 'cart/list.html:82-89'가 이번 라운드 cart 주석 확장으로 :82-93으로 밀렸다 — cart 쪽은 서술형으로 전환했으나 반대 방향 참조에 앵커 드리프트가 존속(범위 밖 파일의 주석 1줄, 비차단)",
+          "suggested_action": "다음에 order/list.html을 편집할 때 라인 앵커를 서술형('cart/list.html의 빈 상태 안내 주석 참조')으로 정리"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "[이월·판정 제외] UIS-ORD-005/spec.md 90·123·149행이 여전히 '장바구니가 비어 있습니다'이고 소스 앵커도 list.html:82-86/:88(현행 :94-95/:97)로 밀려 있다",
+          "suggested_action": "STEP 5.5 스펙 재동기화에서 문구 3곳 + 라인 앵커를 최신값으로 갱신하고, 빈+checkoutError 상태의 '문구 대신 오류 배너 + 이동 링크' 동작을 명문화"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "shop-api: 기준선에 없는 소스 루트",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        }
+      ],
+      "layer": "baseline"
+    },
+    {
+      "round": 11,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "order/list.html:81 주석의 역참조 앵커 'cart/list.html:82-89'가 이번 라운드 cart 주석 확장으로 :82-93으로 밀렸다 — cart 쪽은 서술형으로 전환했으나 반대 방향 참조에 앵커 드리프트가 존속(범위 밖 파일의 주석 1줄, 비차단)",
+          "suggested_action": "다음에 order/list.html을 편집할 때 라인 앵커를 서술형('cart/list.html의 빈 상태 안내 주석 참조')으로 정리"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "[이월·판정 제외] UIS-ORD-005/spec.md 90·123·149행이 여전히 '장바구니가 비어 있습니다'이고 소스 앵커도 list.html:82-86/:88(현행 :94-95/:97)로 밀려 있다",
+          "suggested_action": "STEP 5.5 스펙 재동기화에서 문구 3곳 + 라인 앵커를 최신값으로 갱신하고, 빈+checkoutError 상태의 '문구 대신 오류 배너 + 이동 링크' 동작을 명문화"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "shop-api: 기준선에 없는 소스 루트",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        }
+      ],
+      "layer": "baseline"
+    },
+    {
+      "round": 12,
+      "gate": "FAIL",
+      "human": {
+        "decision": "waiver",
+        "by": "사람",
+        "at": "2026-09-09T12:59:45",
+        "comment": "out_of_scope 2건: .gitignore는 세션 시작 전부터 있던 무관 변경(job_logs/app_process 무시목록 추가, SR-224와 무관), linked-func-cache.json은 req_scan.py 자동 재실행으로 갱신되는 인덱스 캐시 파일 — 둘 다 SR-224 작업이 만든 스코프 이탈이 아니므로 수용",
+        "targets": []
+      },
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "concerns",
+        "scope": "fail"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "order/list.html:81 주석의 역참조 앵커 'cart/list.html:82-89'가 이번 라운드 cart 주석 확장으로 :82-93으로 밀렸다 — cart 쪽은 서술형으로 전환했으나 반대 방향 참조에 앵커 드리프트가 존속(범위 밖 파일의 주석 1줄, 비차단)",
+          "suggested_action": "다음에 order/list.html을 편집할 때 라인 앵커를 서술형('cart/list.html의 빈 상태 안내 주석 참조')으로 정리"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "[이월·판정 제외] UIS-ORD-005/spec.md 90·123·149행이 여전히 '장바구니가 비어 있습니다'이고 소스 앵커도 list.html:82-86/:88(현행 :94-95/:97)로 밀려 있다",
+          "suggested_action": "STEP 5.5 스펙 재동기화에서 문구 3곳 + 라인 앵커를 최신값으로 갱신하고, 빈+checkoutError 상태의 '문구 대신 오류 배너 + 이동 링크' 동작을 명문화"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "shop-api: 기준선에 없는 소스 루트",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .gitignore (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .understand-anything/linked-func-cache.json (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        }
+      ],
+      "layer": "scope"
+    },
+    {
+      "round": 13,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "concerns",
+        "scope": "fail",
+        "rules": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "order/list.html:81 주석의 역참조 앵커 'cart/list.html:82-89'가 이번 라운드 cart 주석 확장으로 :82-93으로 밀렸다 — cart 쪽은 서술형으로 전환했으나 반대 방향 참조에 앵커 드리프트가 존속(범위 밖 파일의 주석 1줄, 비차단)",
+          "suggested_action": "다음에 order/list.html을 편집할 때 라인 앵커를 서술형('cart/list.html의 빈 상태 안내 주석 참조')으로 정리"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "[이월·판정 제외] UIS-ORD-005/spec.md 90·123·149행이 여전히 '장바구니가 비어 있습니다'이고 소스 앵커도 list.html:82-86/:88(현행 :94-95/:97)로 밀려 있다",
+          "suggested_action": "STEP 5.5 스펙 재동기화에서 문구 3곳 + 라인 앵커를 최신값으로 갱신하고, 빈+checkoutError 상태의 '문구 대신 오류 배너 + 이동 링크' 동작을 명문화"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "shop-api: 기준선에 없는 소스 루트",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .gitignore (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .understand-anything/linked-func-cache.json (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        }
+      ],
+      "layer": "rules"
+    },
+    {
+      "round": 14,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "concerns",
+        "scope": "fail",
+        "rules": "pass",
+        "conformance": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "order/list.html:81 주석의 역참조 앵커 'cart/list.html:82-89'가 이번 라운드 cart 주석 확장으로 :82-93으로 밀렸다 — cart 쪽은 서술형으로 전환했으나 반대 방향 참조에 앵커 드리프트가 존속(범위 밖 파일의 주석 1줄, 비차단)",
+          "suggested_action": "다음에 order/list.html을 편집할 때 라인 앵커를 서술형('cart/list.html의 빈 상태 안내 주석 참조')으로 정리"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "[이월·판정 제외] UIS-ORD-005/spec.md 90·123·149행이 여전히 '장바구니가 비어 있습니다'이고 소스 앵커도 list.html:82-86/:88(현행 :94-95/:97)로 밀려 있다",
+          "suggested_action": "STEP 5.5 스펙 재동기화에서 문구 3곳 + 라인 앵커를 최신값으로 갱신하고, 빈+checkoutError 상태의 '문구 대신 오류 배너 + 이동 링크' 동작을 명문화"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "shop-api: 기준선에 없는 소스 루트",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .gitignore (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .understand-anything/linked-func-cache.json (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "low",
+          "layer": "conformance",
+          "finding": "order/list.html:81 주석이 cart/list.html의 빈 상태 주석 위치를 ':82-89'로 참조하나, round8~9 편집으로 실제 주석 블록은 ':82-93'까지 확장됐다(라인 앵커 드리프트) — QA round9 자체도 이미 동일 사실을 권고 1(비차단)로 기록해 둔 상태이며 이번 검증에서 재확인만 됨.",
+          "suggested_action": "다음에 두 파일 중 하나를 편집할 때 서술형 참조로 전환(cart 쪽은 이미 round9에서 서술형으로 전환됨)",
+          "confidence": "high",
+          "file": "modules/shop-api/src/main/resources/templates/order/list.html",
+          "line": 81
+        },
+        {
+          "severity": "low",
+          "layer": "conformance",
+          "finding": "UIS-ORD-005/spec.md 90·123·149행이 여전히 구 문구 '장바구니가 비어 있습니다'와 구 라인 앵커(list.html:82-86/:83/:88)를 유지 — 실제 구현(list.html:94-97, '조회 결과가 없습니다')과 불일치. 사람 코멘트로 STEP 5.5(스펙 재동기화) 처리 대상으로 명시 이월된 항목이라 이 story의 차단 사유는 아니다.",
+          "suggested_action": "STEP 5.5에서 spec.md 문구 3곳 + 라인 앵커를 이번 라운드 최신값으로 갱신",
+          "confidence": "high",
+          "file": "docs/05_설계서/order/UIS/UIS-ORD-005_장바구니/spec.md",
+          "line": 123
+        }
+      ],
+      "layer": "conformance"
+    }
+  ],
+  "waiver": {
+    "active": true,
+    "by": "사람",
+    "reason": "out_of_scope 2건: .gitignore는 세션 시작 전부터 있던 무관 변경(job_logs/app_process 무시목록 추가, SR-224와 무관), linked-func-cache.json은 req_scan.py 자동 재실행으로 갱신되는 인덱스 캐시 파일 — 둘 다 SR-224 작업이 만든 스코프 이탈이 아니므로 수용",
+    "at": "2026-09-09T12:59:45",
+    "layer": "scope"
+  },
+  "story_transitions": [
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "사람(자기승인-실증)",
+      "at": "2026-08-22T20:45:43"
+    },
+    {
+      "from": "Approved",
+      "to": "InProgress",
+      "by": "사람(자기승인-실증)",
+      "at": "2026-08-22T20:45:44"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "사람(자기승인-실증)",
+      "at": "2026-08-22T20:54:21"
+    },
+    {
+      "from": "Review",
+      "to": "InProgress",
+      "by": "사람(자기승인-실증)",
+      "at": "2026-08-22T21:03:07"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "사람(자기승인-실증)",
+      "at": "2026-08-22T22:16:21"
+    },
+    {
+      "from": "Review",
+      "to": "InProgress",
+      "by": "사람(자기승인-실증)",
+      "at": "2026-08-22T22:30:44"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "사람(자기승인-실증)",
+      "at": "2026-08-22T22:32:30"
+    },
+    {
+      "from": "Review",
+      "to": "Done",
+      "by": "사람(자기승인-실증)",
+      "at": "2026-08-22T22:47:51"
+    },
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "SR 승인(SR-216)",
+      "at": "2026-09-09T07:36:07"
+    },
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "SR 승인(SR-224)",
+      "at": "2026-09-09T07:36:38"
+    },
+    {
+      "from": "Approved",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-09T08:43:38"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "사람",
+      "at": "2026-09-09T08:47:28"
+    },
+    {
+      "from": "Review",
+      "to": "Done",
+      "by": "뷰어",
+      "at": "2026-09-09T08:51:59"
+    },
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "사람",
+      "at": "2026-09-09T12:31:07"
+    },
+    {
+      "from": "Approved",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-09T12:31:16"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "사람",
+      "at": "2026-09-09T12:34:21"
+    },
+    {
+      "from": "Review",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-09T12:40:34"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "사람",
+      "at": "2026-09-09T12:43:18"
+    },
+    {
+      "from": "Review",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-09T12:48:02"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "사람",
+      "at": "2026-09-09T12:50:22"
+    },
+    {
+      "from": "Review",
+      "to": "Done",
+      "by": "human",
+      "at": "2026-09-13T00:50:30"
+    }
+  ],
+  "escalate": false,
+  "fail_rounds": 1,
+  "max_rounds": 3,
+  "waivers": [
+    {
+      "active": true,
+      "by": "사람",
+      "reason": "out_of_scope 2건: .gitignore는 세션 시작 전부터 있던 무관 변경(job_logs/app_process 무시목록 추가, SR-224와 무관), linked-func-cache.json은 req_scan.py 자동 재실행으로 갱신되는 인덱스 캐시 파일 — 둘 다 SR-224 작업이 만든 스코프 이탈이 아니므로 수용",
+      "at": "2026-09-09T12:59:45",
+      "layer": "scope"
+    }
+  ]
+}

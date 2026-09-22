@@ -1,0 +1,66 @@
+{
+  "joins": [
+    {
+      "table_a": "CART_ITEMS",
+      "col_a": "SKU",
+      "table_b": "PRODUCTS",
+      "col_b": "SKU",
+      "freq": 4,
+      "sources": [
+        "cart.xml"
+      ]
+    },
+    {
+      "table_a": "MEMBERS",
+      "col_a": "MEMBER_ID",
+      "table_b": "ORDERS",
+      "col_b": "MEMBER_ID",
+      "freq": 4,
+      "sources": [
+        "order.xml"
+      ]
+    },
+    {
+      "table_a": "ORDER_ITEMS",
+      "col_a": "SKU",
+      "table_b": "PRODUCTS",
+      "col_b": "SKU",
+      "freq": 2,
+      "sources": [
+        "order.xml"
+      ]
+    }
+  ],
+  "filters": [
+    {
+      "table": "ORDERS",
+      "col": "DEL_YN",
+      "op": "=",
+      "value": "'N'",
+      "freq": 8,
+      "sources": [
+        "order.xml"
+      ]
+    },
+    {
+      "table": "MEMBERS",
+      "col": "DEL_YN",
+      "op": "=",
+      "value": "'N'",
+      "freq": 4,
+      "sources": [
+        "member.xml"
+      ]
+    },
+    {
+      "table": "PRODUCTS",
+      "col": "SALE_YN",
+      "op": "=",
+      "value": "'Y'",
+      "freq": 2,
+      "sources": [
+        "product.xml"
+      ]
+    }
+  ]
+}

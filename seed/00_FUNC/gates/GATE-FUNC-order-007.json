@@ -1,0 +1,751 @@
+{
+  "func": "FUNC-order-007",
+  "epic": "SR-214",
+  "story": "docs/00_FUNC/stories/STORY-FUNC-order-007.md",
+  "gate": "CONCERNS",
+  "reviewer": "qa-agent",
+  "updated": "2026-09-09T15:26:36",
+  "layers": {
+    "spec": "concerns",
+    "security": "pass",
+    "regression": "concerns",
+    "baseline": "concerns",
+    "scope": "fail",
+    "rules": "pass",
+    "conformance": "pass"
+  },
+  "top_issues": [
+    {
+      "severity": "medium",
+      "layer": "regression",
+      "finding": "AC3(inStock) 실효 테스트 부재 — round 4 이월분 미해소. DB 실측(PRODUCTS 4행) 결과 sale_yn='Y'인 3행의 stock_qty가 12/40/7이고 stock_qty=0인 SKU-1004는 이미 sale_yn='N'으로 제외되므로, selectProducts(null,true)와 (null,null)의 결과가 항상 동일하고 ProductDaoTest:68의 allMatch(stockQty>=1)은 항상 참이다. product.xml:17-19의 <if test=\"inStock...\"> 블록을 지워도 Product* 48건이 전부 통과한다. Dev 근거 4의 '기존 수용 기준은 이미 전부 구현·테스트되어 있고'는 AC3에 대해 과장이다.",
+      "suggested_action": "ProductDaoTest에 @Transactional(롤백)+@Sql로 sale_yn='Y' AND stock_qty=0 픽스처 행을 삽입하고 inStock=true 제외 / null·false 포함을 대조하는 테스트 추가"
+    },
+    {
+      "severity": "medium",
+      "layer": "regression",
+      "finding": "FUNC-007이 소유한 상시필터 계약이 이중화되고 이미 갈라졌다 — AC1(sale_yn='Y')·AC2(keyword LIKE)가 FUNC-007 소유 product.xml 안에서 selectProducts(10-21)와 SR-214 신규 selectProductsForList(46-58) 두 곳에 복제됐는데 후자에는 AC3의 inStock 분기가 없다. 현재는 화면이 inStock을 보내지 않아 실동작 결함이 없으나, FUNC-007이 상시필터를 변경하면 복제본이 조용히 갈라지고 이를 잡을 테스트가 없다. 계약 소유자가 FUNC-007이므로 이 FUNC의 회귀 리스크로 재등록.",
+      "suggested_action": "<sql id=\"productListWhere\"> 조각으로 공통 WHERE를 공유하고, selectProductsForList의 inStock 분기 부재가 의도된 것인지 주석·스펙에 명시"
+    },
+    {
+      "severity": "low",
+      "layer": "spec",
+      "finding": "Dev 기록 근거 2·4가 사실과 다르다. 근거2 '정렬 메서드는 ProductViewController 경로에만 존재'는 오류 — normalizeSort/listSorted는 ProductService.java(헤더 linked_func: FUNC-order-007), selectProductsForList는 ProductDao.java·product.xml(동일)에 물리적으로 상주한다. 분리된 것은 파일이 아니라 호출 그래프다. 근거4 'REST API 3파일 무변경 확인'도 오류 — SR-214 정렬 커밋 52a6313이 ProductService.java(+32)·ProductDao.java(+5)·product.xml(+17)을 실제 수정했다. 결론(REST 엔드포인트 동작 무변경)은 유효하나 근거 정정 필요.",
+      "suggested_action": "Dev 기록을 'FUNC-007 소유 파일에 상주하되 호출 그래프 분리' / 'REST 엔드포인트 동작 무변경(파일은 신규 멤버 추가로 변경됨)'으로 정정 — 다음 세션이 '파일 무변경'으로 오독하면 상시필터 이중화 위험을 놓친다"
+    },
+    {
+      "severity": "low",
+      "layer": "spec",
+      "finding": "FUNC-007 소유 ProductService.java:53-56의 list(String) 오버로드 javadoc이 'inStock 미지정 호출부(예: FUNC-order-009 화면 컨트롤러)는 변경 없이 그대로 사용'이라 서술하나 전수 grep상 호출부 0건이다(ProductController→list(keyword,inStock), ProductViewController→listSorted, 테스트 전부 2-arg). 009 QA r5 권고4가 'FUNC-order-007 소유'로 명시 이관한 항목인데 FUNC-007이 열린 이번 라운드 Dev 기록에 언급이 없다 — '내 파일에 SR-214가 남긴 것이 없는가'를 점검하지 않은 스코프 사각지대.",
+      "suggested_action": "javadoc에서 허위 호출부 서술 제거. 메서드 제거는 공개 API 축소라 별도 SR 유지"
+    },
+    {
+      "severity": "low",
+      "layer": "spec",
+      "finding": "커밋 메시지 귀속이 뒤바뀌어 있다 — git log -S 실측상 커밋 607e9bd(제목 'SR-214')의 내용물은 SR-220 inStock 코드이고, 커밋 52a6313(제목 'SR-220')의 내용물이 SR-214 정렬 코드다. 커밋 메시지에 의존하는 하위 귀속 검사(scope_verify)가 두 FUNC 모두에서 오판할 수 있다(FUNC-009가 이미 같은 유형으로 scope waive를 받음).",
+      "suggested_action": "SR 원장 또는 게이트 처리 기록에 귀속 혼선을 한 줄 기록해 후속 scope_verify 오판 예방"
+    },
+    {
+      "severity": "low",
+      "layer": "spec",
+      "finding": "story AC 3건이 모두 미체크(- [ ]) 상태로 status: Review에 진입했다(사촌 STORY-009는 [x]로 갱신). 직전 라운드에서도 동일해 게이트 판정 근거를 AC 체크가 아니라 코드 실측에 의존해야 했다.",
+      "suggested_action": "AC 옆에 'SR-214 무변경 — 정렬은 FUNC-order-009 소유' 한 줄을 남기고 체크박스 갱신"
+    },
+    {
+      "severity": "low",
+      "layer": "baseline",
+      "finding": "shop-api: 기준선에 없는 소스 루트",
+      "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+    },
+    {
+      "severity": "high",
+      "layer": "scope",
+      "finding": "스코프 밖 변경: .gitignore (M)",
+      "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+    },
+    {
+      "severity": "high",
+      "layer": "scope",
+      "finding": "스코프 밖 변경: .understand-anything/linked-func-cache.json (M)",
+      "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+    },
+    {
+      "severity": "high",
+      "layer": "scope",
+      "finding": "스코프 밖 변경: modules/shop-api/src/test/resources/sql/insert-out-of-stock.sql (??)",
+      "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+    },
+    {
+      "severity": "low",
+      "layer": "conformance",
+      "finding": "story STORY-FUNC-order-007.md의 '## 수용 기준' 체크박스 3건이 여전히 '- [ ]' 미체크 상태로 status: Review에 있다 — AC는 실제로 구현·보호되고 있어 문서 갱신 누락일 뿐 코드 결함은 아니다.",
+      "suggested_action": "STEP 5.5에서 AC 체크박스를 [x]로 갱신하고 'SR-214 무변경 — 정렬은 FUNC-order-009 소유' 한 줄을 남길 것 (QA 권고5와 동일).",
+      "confidence": "high",
+      "file": "docs/00_FUNC/stories/STORY-FUNC-order-007.md",
+      "line": 33
+    },
+    {
+      "severity": "low",
+      "layer": "conformance",
+      "finding": "scope_verify가 insert-out-of-stock.sql을 out_of_scope로 분류했으나, 실제로는 AC-3 회귀 테스트의 필수 픽스처이며 이번 라운드 diff에서 FUNC-order-007 소유 테스트(ProductDaoTest)가 유일하게 참조한다 — 분류기가 SQL 픽스처 파일에 linked_func 헤더 관례가 없어 놓친 사각지대. 사람이 이미 waiver 처리했다는 입력을 그대로 신뢰해 병기만 한다(축 A 재판정 아님).",
+      "suggested_action": "scope_verify.py의 SQL 픽스처 분류 휴리스틱 보강을 백로그에 기록(이번 게이트를 막을 사유는 아님).",
+      "confidence": "high",
+      "file": "modules/shop-api/src/test/resources/sql/insert-out-of-stock.sql",
+      "line": 0
+    },
+    {
+      "severity": "low",
+      "layer": "conformance",
+      "finding": "product.xml의 selectProducts(FUNC-007)와 selectProductsForList(FUNC-009)가 sale_yn='Y'+keyword LIKE 조건을 중복 보유하고 selectProductsForList에는 AC-3(inStock) 분기가 없다 — 이번 라운드 diff에는 없는 기결(pre-existing) 구조라 conformance 위반은 아니나, QA가 이미 medium 권고로 등록한 항목과 동일 소견을 재확인.",
+      "suggested_action": "QA 권고2(공통 WHERE 조각화)를 별도 SR/백로그로 유지. 이번 게이트는 차단하지 않음.",
+      "confidence": "high",
+      "file": "modules/shop-api/src/main/resources/mapper/product.xml",
+      "line": 46
+    }
+  ],
+  "rounds": [
+    {
+      "round": 1,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "INF-ORD-008 정본에 '[SR-201 TO-BE, 미구현]' 마커가 3곳(파라미터 표 L34, 비즈니스 규칙 L53, curl 예시 L78)에 남아 코드(구현 완료)와 모순 — 스펙 stale",
+          "suggested_action": "스펙↔코드 재동기화 단계에서 INF-ORD-008의 미구현 마커 제거/구현완료 전환, 문서상 경로 '/api/products/'와 실제 라우트 '/api/products' 표기 정합도 함께 정리"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "TC-SR201-R1(무파라미터 응답 필드 집합 불변)이 자동 단언되지 않음 — ProductControllerTest.list_withoutKeyword_callsServiceWithNull이 status 200과 서비스 호출만 검증",
+          "suggested_action": "jsonPath로 sku/productName/price/stockQty/saleYn 5개 필드 존재를 단언하는 회귀 어서션 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "security",
+          "finding": "keyword의 LIKE 메타문자(%, _)를 이스케이프하지 않고 길이 제한도 없음 — 주입은 아니나(#{} 바인딩) 의도보다 넓은 매칭 및 선행 와일드카드로 인한 인덱스 미사용",
+          "suggested_action": "keyword 최대 길이 검증 + ESCAPE 절 도입 검토(대용량 PRODUCTS 대비)"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "ProductDaoTest가 실 MariaDB(127.0.0.1:3307)와 랩 고정 데이터(SKU-1001~1003 containsExactly)에 결합돼 취약하며, 회귀 TC-SR201-R2~R4(단건 404·재고 차감·주문상세 조인)는 자동 테스트가 없음(해당 운영 코드는 무변경이라 실질 위험 낮음)",
+          "suggested_action": "STEP 5에서 03_TC 회귀 세트를 실행해 R2~R4를 확인하고, DaoTest는 픽스처 독립적(부분집합/조건) 단언으로 완화"
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "concerns",
+        "scope": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "INF-ORD-008 정본에 '[SR-201 TO-BE, 미구현]' 마커가 3곳(파라미터 표 L34, 비즈니스 규칙 L53, curl 예시 L78)에 남아 코드(구현 완료)와 모순 — 스펙 stale",
+          "suggested_action": "스펙↔코드 재동기화 단계에서 INF-ORD-008의 미구현 마커 제거/구현완료 전환, 문서상 경로 '/api/products/'와 실제 라우트 '/api/products' 표기 정합도 함께 정리"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "TC-SR201-R1(무파라미터 응답 필드 집합 불변)이 자동 단언되지 않음 — ProductControllerTest.list_withoutKeyword_callsServiceWithNull이 status 200과 서비스 호출만 검증",
+          "suggested_action": "jsonPath로 sku/productName/price/stockQty/saleYn 5개 필드 존재를 단언하는 회귀 어서션 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "security",
+          "finding": "keyword의 LIKE 메타문자(%, _)를 이스케이프하지 않고 길이 제한도 없음 — 주입은 아니나(#{} 바인딩) 의도보다 넓은 매칭 및 선행 와일드카드로 인한 인덱스 미사용",
+          "suggested_action": "keyword 최대 길이 검증 + ESCAPE 절 도입 검토(대용량 PRODUCTS 대비)"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "ProductDaoTest가 실 MariaDB(127.0.0.1:3307)와 랩 고정 데이터(SKU-1001~1003 containsExactly)에 결합돼 취약하며, 회귀 TC-SR201-R2~R4(단건 404·재고 차감·주문상세 조인)는 자동 테스트가 없음(해당 운영 코드는 무변경이라 실질 위험 낮음)",
+          "suggested_action": "STEP 5에서 03_TC 회귀 세트를 실행해 R2~R4를 확인하고, DaoTest는 픽스처 독립적(부분집합/조건) 단언으로 완화"
+        }
+      ],
+      "layer": "scope"
+    },
+    {
+      "round": 3,
+      "gate": "CONCERNS",
+      "human": {
+        "decision": "track",
+        "by": "사람(자기승인-실증)",
+        "at": "2026-08-22T19:35:55",
+        "comment": "CONCERNS 권고는 후속 TODO 등록(story 참조). 회귀 R3/R4 미실행은 코드 무변경+scope 클린 근거로 명시 수용.",
+        "targets": []
+      },
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "concerns",
+        "scope": "pass",
+        "conformance": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "INF-ORD-008 정본에 '[SR-201 TO-BE, 미구현]' 마커가 3곳(파라미터 표 L34, 비즈니스 규칙 L53, curl 예시 L78)에 남아 코드(구현 완료)와 모순 — 스펙 stale",
+          "suggested_action": "스펙↔코드 재동기화 단계에서 INF-ORD-008의 미구현 마커 제거/구현완료 전환, 문서상 경로 '/api/products/'와 실제 라우트 '/api/products' 표기 정합도 함께 정리"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "TC-SR201-R1(무파라미터 응답 필드 집합 불변)이 자동 단언되지 않음 — ProductControllerTest.list_withoutKeyword_callsServiceWithNull이 status 200과 서비스 호출만 검증",
+          "suggested_action": "jsonPath로 sku/productName/price/stockQty/saleYn 5개 필드 존재를 단언하는 회귀 어서션 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "security",
+          "finding": "keyword의 LIKE 메타문자(%, _)를 이스케이프하지 않고 길이 제한도 없음 — 주입은 아니나(#{} 바인딩) 의도보다 넓은 매칭 및 선행 와일드카드로 인한 인덱스 미사용",
+          "suggested_action": "keyword 최대 길이 검증 + ESCAPE 절 도입 검토(대용량 PRODUCTS 대비)"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "ProductDaoTest가 실 MariaDB(127.0.0.1:3307)와 랩 고정 데이터(SKU-1001~1003 containsExactly)에 결합돼 취약하며, 회귀 TC-SR201-R2~R4(단건 404·재고 차감·주문상세 조인)는 자동 테스트가 없음(해당 운영 코드는 무변경이라 실질 위험 낮음)",
+          "suggested_action": "STEP 5에서 03_TC 회귀 세트를 실행해 R2~R4를 확인하고, DaoTest는 픽스처 독립적(부분집합/조건) 단언으로 완화"
+        },
+        {
+          "severity": "low",
+          "layer": "conformance",
+          "finding": "story 산출물(QA 권고 1)에 이미 기록된 대로 INF-ORD-008 정본 문서(docs/05_설계서/order/INF/INF-ORD-008.md)에 [SR-201 TO-BE, 미구현] 마커가 diff 시점 기준 아직 남아 있음 — 코드는 구현 완료. 계약 위반은 아니고 스펙↔코드 재동기화(STEP 5.5) 대상.",
+          "suggested_action": "STEP 5.5 재동기화에서 마커 제거/구현완료 전환 (verify-agent 소관 아님, 기록만).",
+          "confidence": "high",
+          "file": "docs/05_설계서/order/INF/INF-ORD-008.md",
+          "line": 0
+        },
+        {
+          "severity": "low",
+          "layer": "conformance",
+          "finding": "keyword의 LIKE 메타문자(%, _) 미이스케이프 — TO-BE 계약(부분일치)의 문언 자체는 충족하나 QA가 이미 지적한 기능적 오검색 가능성. AC/계약 위반은 아님.",
+          "suggested_action": "관찰만 — QA 권고 3과 동일, 별도 조치 불필요(추적 TODO에 이미 등록됨).",
+          "confidence": "high",
+          "file": "modules/shop-api/src/main/resources/mapper/product.xml",
+          "line": 13
+        }
+      ],
+      "layer": "conformance"
+    },
+    {
+      "round": 4,
+      "gate": "CONCERNS",
+      "human": {
+        "decision": "approve",
+        "by": "뷰어",
+        "at": "2026-09-09T09:04:45",
+        "comment": "CONCERNS — SR-214 범위 내 구현 확인, 권고는 별도 SR로",
+        "targets": []
+      },
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "inStock=true 필터를 실제로 검증하는 테스트가 없다 — DAO 테스트가 무필터와 동일한 SKU-1001~1003을 단언하고 allMatch(stockQty>=1)은 랩 데이터 전 행이 stock_qty>0이라 항상 참. product.xml의 <if test=\"inStock...\"> 블록을 지워도 191개 전부 통과한다(핵심 동작 무보호). 게이트는 MyBatis 생성 SQL 실측으로 현재 동작 정상은 확인함.",
+          "suggested_action": "ProductDaoTest에 @Transactional(롤백) + @Sql로 sale_yn='Y' AND stock_qty=0 픽스처 행을 삽입하고, inStock=true에서 제외 / null·false에서 포함을 대조하는 테스트 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "INF-ORD-008 스펙 문서에 inStock 요청 파라미터·비즈니스 규칙·curl 예시가 없어 문서가 구현보다 뒤처져 있다",
+          "suggested_action": "sl-aidd STEP 5.5 재동기화에서 SR-201 선례와 동일하게 INF-ORD-008에 inStock 반영"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "화면 /product/list(ProductViewController, FUNC-order-009)는 여전히 품절 상품을 포함해 SR-220 문제 진술이 사용자 관점에서는 해소되지 않는다. 확정 문답 scr_scope상 화면은 범위 밖이라 차단 사유는 아님",
+          "suggested_action": "사람 확인 단계에서 화면 적용 후속 SR 필요 여부 판단"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "inStock에 비-boolean 값(예: abc)이 오면 Spring 바인딩 실패로 400이 된다 — INF 오류표의 400 유효성 실패와 정합하나 명시·테스트가 없다",
+          "suggested_action": "의도된 계약이면 INF-ORD-008 오류 항목에 한 줄 명시"
+        }
+      ]
+    },
+    {
+      "round": 5,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "concerns",
+        "security": "pass",
+        "regression": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "AC3(inStock) 실효 테스트 부재 — round 4 이월분 미해소. DB 실측(PRODUCTS 4행) 결과 sale_yn='Y'인 3행의 stock_qty가 12/40/7이고 stock_qty=0인 SKU-1004는 이미 sale_yn='N'으로 제외되므로, selectProducts(null,true)와 (null,null)의 결과가 항상 동일하고 ProductDaoTest:68의 allMatch(stockQty>=1)은 항상 참이다. product.xml:17-19의 <if test=\"inStock...\"> 블록을 지워도 Product* 48건이 전부 통과한다. Dev 근거 4의 '기존 수용 기준은 이미 전부 구현·테스트되어 있고'는 AC3에 대해 과장이다.",
+          "suggested_action": "ProductDaoTest에 @Transactional(롤백)+@Sql로 sale_yn='Y' AND stock_qty=0 픽스처 행을 삽입하고 inStock=true 제외 / null·false 포함을 대조하는 테스트 추가"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "FUNC-007이 소유한 상시필터 계약이 이중화되고 이미 갈라졌다 — AC1(sale_yn='Y')·AC2(keyword LIKE)가 FUNC-007 소유 product.xml 안에서 selectProducts(10-21)와 SR-214 신규 selectProductsForList(46-58) 두 곳에 복제됐는데 후자에는 AC3의 inStock 분기가 없다. 현재는 화면이 inStock을 보내지 않아 실동작 결함이 없으나, FUNC-007이 상시필터를 변경하면 복제본이 조용히 갈라지고 이를 잡을 테스트가 없다. 계약 소유자가 FUNC-007이므로 이 FUNC의 회귀 리스크로 재등록.",
+          "suggested_action": "<sql id=\"productListWhere\"> 조각으로 공통 WHERE를 공유하고, selectProductsForList의 inStock 분기 부재가 의도된 것인지 주석·스펙에 명시"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "Dev 기록 근거 2·4가 사실과 다르다. 근거2 '정렬 메서드는 ProductViewController 경로에만 존재'는 오류 — normalizeSort/listSorted는 ProductService.java(헤더 linked_func: FUNC-order-007), selectProductsForList는 ProductDao.java·product.xml(동일)에 물리적으로 상주한다. 분리된 것은 파일이 아니라 호출 그래프다. 근거4 'REST API 3파일 무변경 확인'도 오류 — SR-214 정렬 커밋 52a6313이 ProductService.java(+32)·ProductDao.java(+5)·product.xml(+17)을 실제 수정했다. 결론(REST 엔드포인트 동작 무변경)은 유효하나 근거 정정 필요.",
+          "suggested_action": "Dev 기록을 'FUNC-007 소유 파일에 상주하되 호출 그래프 분리' / 'REST 엔드포인트 동작 무변경(파일은 신규 멤버 추가로 변경됨)'으로 정정 — 다음 세션이 '파일 무변경'으로 오독하면 상시필터 이중화 위험을 놓친다"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "FUNC-007 소유 ProductService.java:53-56의 list(String) 오버로드 javadoc이 'inStock 미지정 호출부(예: FUNC-order-009 화면 컨트롤러)는 변경 없이 그대로 사용'이라 서술하나 전수 grep상 호출부 0건이다(ProductController→list(keyword,inStock), ProductViewController→listSorted, 테스트 전부 2-arg). 009 QA r5 권고4가 'FUNC-order-007 소유'로 명시 이관한 항목인데 FUNC-007이 열린 이번 라운드 Dev 기록에 언급이 없다 — '내 파일에 SR-214가 남긴 것이 없는가'를 점검하지 않은 스코프 사각지대.",
+          "suggested_action": "javadoc에서 허위 호출부 서술 제거. 메서드 제거는 공개 API 축소라 별도 SR 유지"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "커밋 메시지 귀속이 뒤바뀌어 있다 — git log -S 실측상 커밋 607e9bd(제목 'SR-214')의 내용물은 SR-220 inStock 코드이고, 커밋 52a6313(제목 'SR-220')의 내용물이 SR-214 정렬 코드다. 커밋 메시지에 의존하는 하위 귀속 검사(scope_verify)가 두 FUNC 모두에서 오판할 수 있다(FUNC-009가 이미 같은 유형으로 scope waive를 받음).",
+          "suggested_action": "SR 원장 또는 게이트 처리 기록에 귀속 혼선을 한 줄 기록해 후속 scope_verify 오판 예방"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "story AC 3건이 모두 미체크(- [ ]) 상태로 status: Review에 진입했다(사촌 STORY-009는 [x]로 갱신). 직전 라운드에서도 동일해 게이트 판정 근거를 AC 체크가 아니라 코드 실측에 의존해야 했다.",
+          "suggested_action": "AC 옆에 'SR-214 무변경 — 정렬은 FUNC-order-009 소유' 한 줄을 남기고 체크박스 갱신"
+        }
+      ]
+    },
+    {
+      "round": 6,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "concerns",
+        "security": "pass",
+        "regression": "concerns",
+        "baseline": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "AC3(inStock) 실효 테스트 부재 — round 4 이월분 미해소. DB 실측(PRODUCTS 4행) 결과 sale_yn='Y'인 3행의 stock_qty가 12/40/7이고 stock_qty=0인 SKU-1004는 이미 sale_yn='N'으로 제외되므로, selectProducts(null,true)와 (null,null)의 결과가 항상 동일하고 ProductDaoTest:68의 allMatch(stockQty>=1)은 항상 참이다. product.xml:17-19의 <if test=\"inStock...\"> 블록을 지워도 Product* 48건이 전부 통과한다. Dev 근거 4의 '기존 수용 기준은 이미 전부 구현·테스트되어 있고'는 AC3에 대해 과장이다.",
+          "suggested_action": "ProductDaoTest에 @Transactional(롤백)+@Sql로 sale_yn='Y' AND stock_qty=0 픽스처 행을 삽입하고 inStock=true 제외 / null·false 포함을 대조하는 테스트 추가"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "FUNC-007이 소유한 상시필터 계약이 이중화되고 이미 갈라졌다 — AC1(sale_yn='Y')·AC2(keyword LIKE)가 FUNC-007 소유 product.xml 안에서 selectProducts(10-21)와 SR-214 신규 selectProductsForList(46-58) 두 곳에 복제됐는데 후자에는 AC3의 inStock 분기가 없다. 현재는 화면이 inStock을 보내지 않아 실동작 결함이 없으나, FUNC-007이 상시필터를 변경하면 복제본이 조용히 갈라지고 이를 잡을 테스트가 없다. 계약 소유자가 FUNC-007이므로 이 FUNC의 회귀 리스크로 재등록.",
+          "suggested_action": "<sql id=\"productListWhere\"> 조각으로 공통 WHERE를 공유하고, selectProductsForList의 inStock 분기 부재가 의도된 것인지 주석·스펙에 명시"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "Dev 기록 근거 2·4가 사실과 다르다. 근거2 '정렬 메서드는 ProductViewController 경로에만 존재'는 오류 — normalizeSort/listSorted는 ProductService.java(헤더 linked_func: FUNC-order-007), selectProductsForList는 ProductDao.java·product.xml(동일)에 물리적으로 상주한다. 분리된 것은 파일이 아니라 호출 그래프다. 근거4 'REST API 3파일 무변경 확인'도 오류 — SR-214 정렬 커밋 52a6313이 ProductService.java(+32)·ProductDao.java(+5)·product.xml(+17)을 실제 수정했다. 결론(REST 엔드포인트 동작 무변경)은 유효하나 근거 정정 필요.",
+          "suggested_action": "Dev 기록을 'FUNC-007 소유 파일에 상주하되 호출 그래프 분리' / 'REST 엔드포인트 동작 무변경(파일은 신규 멤버 추가로 변경됨)'으로 정정 — 다음 세션이 '파일 무변경'으로 오독하면 상시필터 이중화 위험을 놓친다"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "FUNC-007 소유 ProductService.java:53-56의 list(String) 오버로드 javadoc이 'inStock 미지정 호출부(예: FUNC-order-009 화면 컨트롤러)는 변경 없이 그대로 사용'이라 서술하나 전수 grep상 호출부 0건이다(ProductController→list(keyword,inStock), ProductViewController→listSorted, 테스트 전부 2-arg). 009 QA r5 권고4가 'FUNC-order-007 소유'로 명시 이관한 항목인데 FUNC-007이 열린 이번 라운드 Dev 기록에 언급이 없다 — '내 파일에 SR-214가 남긴 것이 없는가'를 점검하지 않은 스코프 사각지대.",
+          "suggested_action": "javadoc에서 허위 호출부 서술 제거. 메서드 제거는 공개 API 축소라 별도 SR 유지"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "커밋 메시지 귀속이 뒤바뀌어 있다 — git log -S 실측상 커밋 607e9bd(제목 'SR-214')의 내용물은 SR-220 inStock 코드이고, 커밋 52a6313(제목 'SR-220')의 내용물이 SR-214 정렬 코드다. 커밋 메시지에 의존하는 하위 귀속 검사(scope_verify)가 두 FUNC 모두에서 오판할 수 있다(FUNC-009가 이미 같은 유형으로 scope waive를 받음).",
+          "suggested_action": "SR 원장 또는 게이트 처리 기록에 귀속 혼선을 한 줄 기록해 후속 scope_verify 오판 예방"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "story AC 3건이 모두 미체크(- [ ]) 상태로 status: Review에 진입했다(사촌 STORY-009는 [x]로 갱신). 직전 라운드에서도 동일해 게이트 판정 근거를 AC 체크가 아니라 코드 실측에 의존해야 했다.",
+          "suggested_action": "AC 옆에 'SR-214 무변경 — 정렬은 FUNC-order-009 소유' 한 줄을 남기고 체크박스 갱신"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "shop-api: 기준선에 없는 소스 루트",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        }
+      ],
+      "layer": "baseline"
+    },
+    {
+      "round": 7,
+      "gate": "FAIL",
+      "human": {
+        "decision": "waiver",
+        "by": "사람",
+        "at": "2026-09-09T15:23:54",
+        "comment": "축A out_of_scope 3건 확인: .gitignore·linked-func-cache.json은 세션 시작 전부터 무관하게 수정된 상태였고, insert-out-of-stock.sql은 STEP5 AC3 회귀 픽스처인데 .sql 파일에 linked_func 주석을 붙일 수 없어 분류기가 오분류함(같은 라운드 ProductDaoTest.java는 정상 분류됨). 실제 스코프 이탈 아님.",
+        "targets": []
+      },
+      "layers": {
+        "spec": "concerns",
+        "security": "pass",
+        "regression": "concerns",
+        "baseline": "concerns",
+        "scope": "fail"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "AC3(inStock) 실효 테스트 부재 — round 4 이월분 미해소. DB 실측(PRODUCTS 4행) 결과 sale_yn='Y'인 3행의 stock_qty가 12/40/7이고 stock_qty=0인 SKU-1004는 이미 sale_yn='N'으로 제외되므로, selectProducts(null,true)와 (null,null)의 결과가 항상 동일하고 ProductDaoTest:68의 allMatch(stockQty>=1)은 항상 참이다. product.xml:17-19의 <if test=\"inStock...\"> 블록을 지워도 Product* 48건이 전부 통과한다. Dev 근거 4의 '기존 수용 기준은 이미 전부 구현·테스트되어 있고'는 AC3에 대해 과장이다.",
+          "suggested_action": "ProductDaoTest에 @Transactional(롤백)+@Sql로 sale_yn='Y' AND stock_qty=0 픽스처 행을 삽입하고 inStock=true 제외 / null·false 포함을 대조하는 테스트 추가"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "FUNC-007이 소유한 상시필터 계약이 이중화되고 이미 갈라졌다 — AC1(sale_yn='Y')·AC2(keyword LIKE)가 FUNC-007 소유 product.xml 안에서 selectProducts(10-21)와 SR-214 신규 selectProductsForList(46-58) 두 곳에 복제됐는데 후자에는 AC3의 inStock 분기가 없다. 현재는 화면이 inStock을 보내지 않아 실동작 결함이 없으나, FUNC-007이 상시필터를 변경하면 복제본이 조용히 갈라지고 이를 잡을 테스트가 없다. 계약 소유자가 FUNC-007이므로 이 FUNC의 회귀 리스크로 재등록.",
+          "suggested_action": "<sql id=\"productListWhere\"> 조각으로 공통 WHERE를 공유하고, selectProductsForList의 inStock 분기 부재가 의도된 것인지 주석·스펙에 명시"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "Dev 기록 근거 2·4가 사실과 다르다. 근거2 '정렬 메서드는 ProductViewController 경로에만 존재'는 오류 — normalizeSort/listSorted는 ProductService.java(헤더 linked_func: FUNC-order-007), selectProductsForList는 ProductDao.java·product.xml(동일)에 물리적으로 상주한다. 분리된 것은 파일이 아니라 호출 그래프다. 근거4 'REST API 3파일 무변경 확인'도 오류 — SR-214 정렬 커밋 52a6313이 ProductService.java(+32)·ProductDao.java(+5)·product.xml(+17)을 실제 수정했다. 결론(REST 엔드포인트 동작 무변경)은 유효하나 근거 정정 필요.",
+          "suggested_action": "Dev 기록을 'FUNC-007 소유 파일에 상주하되 호출 그래프 분리' / 'REST 엔드포인트 동작 무변경(파일은 신규 멤버 추가로 변경됨)'으로 정정 — 다음 세션이 '파일 무변경'으로 오독하면 상시필터 이중화 위험을 놓친다"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "FUNC-007 소유 ProductService.java:53-56의 list(String) 오버로드 javadoc이 'inStock 미지정 호출부(예: FUNC-order-009 화면 컨트롤러)는 변경 없이 그대로 사용'이라 서술하나 전수 grep상 호출부 0건이다(ProductController→list(keyword,inStock), ProductViewController→listSorted, 테스트 전부 2-arg). 009 QA r5 권고4가 'FUNC-order-007 소유'로 명시 이관한 항목인데 FUNC-007이 열린 이번 라운드 Dev 기록에 언급이 없다 — '내 파일에 SR-214가 남긴 것이 없는가'를 점검하지 않은 스코프 사각지대.",
+          "suggested_action": "javadoc에서 허위 호출부 서술 제거. 메서드 제거는 공개 API 축소라 별도 SR 유지"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "커밋 메시지 귀속이 뒤바뀌어 있다 — git log -S 실측상 커밋 607e9bd(제목 'SR-214')의 내용물은 SR-220 inStock 코드이고, 커밋 52a6313(제목 'SR-220')의 내용물이 SR-214 정렬 코드다. 커밋 메시지에 의존하는 하위 귀속 검사(scope_verify)가 두 FUNC 모두에서 오판할 수 있다(FUNC-009가 이미 같은 유형으로 scope waive를 받음).",
+          "suggested_action": "SR 원장 또는 게이트 처리 기록에 귀속 혼선을 한 줄 기록해 후속 scope_verify 오판 예방"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "story AC 3건이 모두 미체크(- [ ]) 상태로 status: Review에 진입했다(사촌 STORY-009는 [x]로 갱신). 직전 라운드에서도 동일해 게이트 판정 근거를 AC 체크가 아니라 코드 실측에 의존해야 했다.",
+          "suggested_action": "AC 옆에 'SR-214 무변경 — 정렬은 FUNC-order-009 소유' 한 줄을 남기고 체크박스 갱신"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "shop-api: 기준선에 없는 소스 루트",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .gitignore (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .understand-anything/linked-func-cache.json (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: modules/shop-api/src/test/resources/sql/insert-out-of-stock.sql (??)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        }
+      ],
+      "layer": "scope"
+    },
+    {
+      "round": 8,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "concerns",
+        "security": "pass",
+        "regression": "concerns",
+        "baseline": "concerns",
+        "scope": "fail",
+        "rules": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "AC3(inStock) 실효 테스트 부재 — round 4 이월분 미해소. DB 실측(PRODUCTS 4행) 결과 sale_yn='Y'인 3행의 stock_qty가 12/40/7이고 stock_qty=0인 SKU-1004는 이미 sale_yn='N'으로 제외되므로, selectProducts(null,true)와 (null,null)의 결과가 항상 동일하고 ProductDaoTest:68의 allMatch(stockQty>=1)은 항상 참이다. product.xml:17-19의 <if test=\"inStock...\"> 블록을 지워도 Product* 48건이 전부 통과한다. Dev 근거 4의 '기존 수용 기준은 이미 전부 구현·테스트되어 있고'는 AC3에 대해 과장이다.",
+          "suggested_action": "ProductDaoTest에 @Transactional(롤백)+@Sql로 sale_yn='Y' AND stock_qty=0 픽스처 행을 삽입하고 inStock=true 제외 / null·false 포함을 대조하는 테스트 추가"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "FUNC-007이 소유한 상시필터 계약이 이중화되고 이미 갈라졌다 — AC1(sale_yn='Y')·AC2(keyword LIKE)가 FUNC-007 소유 product.xml 안에서 selectProducts(10-21)와 SR-214 신규 selectProductsForList(46-58) 두 곳에 복제됐는데 후자에는 AC3의 inStock 분기가 없다. 현재는 화면이 inStock을 보내지 않아 실동작 결함이 없으나, FUNC-007이 상시필터를 변경하면 복제본이 조용히 갈라지고 이를 잡을 테스트가 없다. 계약 소유자가 FUNC-007이므로 이 FUNC의 회귀 리스크로 재등록.",
+          "suggested_action": "<sql id=\"productListWhere\"> 조각으로 공통 WHERE를 공유하고, selectProductsForList의 inStock 분기 부재가 의도된 것인지 주석·스펙에 명시"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "Dev 기록 근거 2·4가 사실과 다르다. 근거2 '정렬 메서드는 ProductViewController 경로에만 존재'는 오류 — normalizeSort/listSorted는 ProductService.java(헤더 linked_func: FUNC-order-007), selectProductsForList는 ProductDao.java·product.xml(동일)에 물리적으로 상주한다. 분리된 것은 파일이 아니라 호출 그래프다. 근거4 'REST API 3파일 무변경 확인'도 오류 — SR-214 정렬 커밋 52a6313이 ProductService.java(+32)·ProductDao.java(+5)·product.xml(+17)을 실제 수정했다. 결론(REST 엔드포인트 동작 무변경)은 유효하나 근거 정정 필요.",
+          "suggested_action": "Dev 기록을 'FUNC-007 소유 파일에 상주하되 호출 그래프 분리' / 'REST 엔드포인트 동작 무변경(파일은 신규 멤버 추가로 변경됨)'으로 정정 — 다음 세션이 '파일 무변경'으로 오독하면 상시필터 이중화 위험을 놓친다"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "FUNC-007 소유 ProductService.java:53-56의 list(String) 오버로드 javadoc이 'inStock 미지정 호출부(예: FUNC-order-009 화면 컨트롤러)는 변경 없이 그대로 사용'이라 서술하나 전수 grep상 호출부 0건이다(ProductController→list(keyword,inStock), ProductViewController→listSorted, 테스트 전부 2-arg). 009 QA r5 권고4가 'FUNC-order-007 소유'로 명시 이관한 항목인데 FUNC-007이 열린 이번 라운드 Dev 기록에 언급이 없다 — '내 파일에 SR-214가 남긴 것이 없는가'를 점검하지 않은 스코프 사각지대.",
+          "suggested_action": "javadoc에서 허위 호출부 서술 제거. 메서드 제거는 공개 API 축소라 별도 SR 유지"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "커밋 메시지 귀속이 뒤바뀌어 있다 — git log -S 실측상 커밋 607e9bd(제목 'SR-214')의 내용물은 SR-220 inStock 코드이고, 커밋 52a6313(제목 'SR-220')의 내용물이 SR-214 정렬 코드다. 커밋 메시지에 의존하는 하위 귀속 검사(scope_verify)가 두 FUNC 모두에서 오판할 수 있다(FUNC-009가 이미 같은 유형으로 scope waive를 받음).",
+          "suggested_action": "SR 원장 또는 게이트 처리 기록에 귀속 혼선을 한 줄 기록해 후속 scope_verify 오판 예방"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "story AC 3건이 모두 미체크(- [ ]) 상태로 status: Review에 진입했다(사촌 STORY-009는 [x]로 갱신). 직전 라운드에서도 동일해 게이트 판정 근거를 AC 체크가 아니라 코드 실측에 의존해야 했다.",
+          "suggested_action": "AC 옆에 'SR-214 무변경 — 정렬은 FUNC-order-009 소유' 한 줄을 남기고 체크박스 갱신"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "shop-api: 기준선에 없는 소스 루트",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .gitignore (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .understand-anything/linked-func-cache.json (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: modules/shop-api/src/test/resources/sql/insert-out-of-stock.sql (??)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        }
+      ],
+      "layer": "rules"
+    },
+    {
+      "round": 9,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "concerns",
+        "security": "pass",
+        "regression": "concerns",
+        "baseline": "concerns",
+        "scope": "fail",
+        "rules": "pass",
+        "conformance": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "AC3(inStock) 실효 테스트 부재 — round 4 이월분 미해소. DB 실측(PRODUCTS 4행) 결과 sale_yn='Y'인 3행의 stock_qty가 12/40/7이고 stock_qty=0인 SKU-1004는 이미 sale_yn='N'으로 제외되므로, selectProducts(null,true)와 (null,null)의 결과가 항상 동일하고 ProductDaoTest:68의 allMatch(stockQty>=1)은 항상 참이다. product.xml:17-19의 <if test=\"inStock...\"> 블록을 지워도 Product* 48건이 전부 통과한다. Dev 근거 4의 '기존 수용 기준은 이미 전부 구현·테스트되어 있고'는 AC3에 대해 과장이다.",
+          "suggested_action": "ProductDaoTest에 @Transactional(롤백)+@Sql로 sale_yn='Y' AND stock_qty=0 픽스처 행을 삽입하고 inStock=true 제외 / null·false 포함을 대조하는 테스트 추가"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "FUNC-007이 소유한 상시필터 계약이 이중화되고 이미 갈라졌다 — AC1(sale_yn='Y')·AC2(keyword LIKE)가 FUNC-007 소유 product.xml 안에서 selectProducts(10-21)와 SR-214 신규 selectProductsForList(46-58) 두 곳에 복제됐는데 후자에는 AC3의 inStock 분기가 없다. 현재는 화면이 inStock을 보내지 않아 실동작 결함이 없으나, FUNC-007이 상시필터를 변경하면 복제본이 조용히 갈라지고 이를 잡을 테스트가 없다. 계약 소유자가 FUNC-007이므로 이 FUNC의 회귀 리스크로 재등록.",
+          "suggested_action": "<sql id=\"productListWhere\"> 조각으로 공통 WHERE를 공유하고, selectProductsForList의 inStock 분기 부재가 의도된 것인지 주석·스펙에 명시"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "Dev 기록 근거 2·4가 사실과 다르다. 근거2 '정렬 메서드는 ProductViewController 경로에만 존재'는 오류 — normalizeSort/listSorted는 ProductService.java(헤더 linked_func: FUNC-order-007), selectProductsForList는 ProductDao.java·product.xml(동일)에 물리적으로 상주한다. 분리된 것은 파일이 아니라 호출 그래프다. 근거4 'REST API 3파일 무변경 확인'도 오류 — SR-214 정렬 커밋 52a6313이 ProductService.java(+32)·ProductDao.java(+5)·product.xml(+17)을 실제 수정했다. 결론(REST 엔드포인트 동작 무변경)은 유효하나 근거 정정 필요.",
+          "suggested_action": "Dev 기록을 'FUNC-007 소유 파일에 상주하되 호출 그래프 분리' / 'REST 엔드포인트 동작 무변경(파일은 신규 멤버 추가로 변경됨)'으로 정정 — 다음 세션이 '파일 무변경'으로 오독하면 상시필터 이중화 위험을 놓친다"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "FUNC-007 소유 ProductService.java:53-56의 list(String) 오버로드 javadoc이 'inStock 미지정 호출부(예: FUNC-order-009 화면 컨트롤러)는 변경 없이 그대로 사용'이라 서술하나 전수 grep상 호출부 0건이다(ProductController→list(keyword,inStock), ProductViewController→listSorted, 테스트 전부 2-arg). 009 QA r5 권고4가 'FUNC-order-007 소유'로 명시 이관한 항목인데 FUNC-007이 열린 이번 라운드 Dev 기록에 언급이 없다 — '내 파일에 SR-214가 남긴 것이 없는가'를 점검하지 않은 스코프 사각지대.",
+          "suggested_action": "javadoc에서 허위 호출부 서술 제거. 메서드 제거는 공개 API 축소라 별도 SR 유지"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "커밋 메시지 귀속이 뒤바뀌어 있다 — git log -S 실측상 커밋 607e9bd(제목 'SR-214')의 내용물은 SR-220 inStock 코드이고, 커밋 52a6313(제목 'SR-220')의 내용물이 SR-214 정렬 코드다. 커밋 메시지에 의존하는 하위 귀속 검사(scope_verify)가 두 FUNC 모두에서 오판할 수 있다(FUNC-009가 이미 같은 유형으로 scope waive를 받음).",
+          "suggested_action": "SR 원장 또는 게이트 처리 기록에 귀속 혼선을 한 줄 기록해 후속 scope_verify 오판 예방"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "story AC 3건이 모두 미체크(- [ ]) 상태로 status: Review에 진입했다(사촌 STORY-009는 [x]로 갱신). 직전 라운드에서도 동일해 게이트 판정 근거를 AC 체크가 아니라 코드 실측에 의존해야 했다.",
+          "suggested_action": "AC 옆에 'SR-214 무변경 — 정렬은 FUNC-order-009 소유' 한 줄을 남기고 체크박스 갱신"
+        },
+        {
+          "severity": "low",
+          "layer": "baseline",
+          "finding": "shop-api: 기준선에 없는 소스 루트",
+          "suggested_action": "기준선을 갱신하거나 러너 출력 형식을 확인하세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .gitignore (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: .understand-anything/linked-func-cache.json (M)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: modules/shop-api/src/test/resources/sql/insert-out-of-stock.sql (??)",
+          "suggested_action": "이 변경이 이 FUNC에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "low",
+          "layer": "conformance",
+          "finding": "story STORY-FUNC-order-007.md의 '## 수용 기준' 체크박스 3건이 여전히 '- [ ]' 미체크 상태로 status: Review에 있다 — AC는 실제로 구현·보호되고 있어 문서 갱신 누락일 뿐 코드 결함은 아니다.",
+          "suggested_action": "STEP 5.5에서 AC 체크박스를 [x]로 갱신하고 'SR-214 무변경 — 정렬은 FUNC-order-009 소유' 한 줄을 남길 것 (QA 권고5와 동일).",
+          "confidence": "high",
+          "file": "docs/00_FUNC/stories/STORY-FUNC-order-007.md",
+          "line": 33
+        },
+        {
+          "severity": "low",
+          "layer": "conformance",
+          "finding": "scope_verify가 insert-out-of-stock.sql을 out_of_scope로 분류했으나, 실제로는 AC-3 회귀 테스트의 필수 픽스처이며 이번 라운드 diff에서 FUNC-order-007 소유 테스트(ProductDaoTest)가 유일하게 참조한다 — 분류기가 SQL 픽스처 파일에 linked_func 헤더 관례가 없어 놓친 사각지대. 사람이 이미 waiver 처리했다는 입력을 그대로 신뢰해 병기만 한다(축 A 재판정 아님).",
+          "suggested_action": "scope_verify.py의 SQL 픽스처 분류 휴리스틱 보강을 백로그에 기록(이번 게이트를 막을 사유는 아님).",
+          "confidence": "high",
+          "file": "modules/shop-api/src/test/resources/sql/insert-out-of-stock.sql",
+          "line": 0
+        },
+        {
+          "severity": "low",
+          "layer": "conformance",
+          "finding": "product.xml의 selectProducts(FUNC-007)와 selectProductsForList(FUNC-009)가 sale_yn='Y'+keyword LIKE 조건을 중복 보유하고 selectProductsForList에는 AC-3(inStock) 분기가 없다 — 이번 라운드 diff에는 없는 기결(pre-existing) 구조라 conformance 위반은 아니나, QA가 이미 medium 권고로 등록한 항목과 동일 소견을 재확인.",
+          "suggested_action": "QA 권고2(공통 WHERE 조각화)를 별도 SR/백로그로 유지. 이번 게이트는 차단하지 않음.",
+          "confidence": "high",
+          "file": "modules/shop-api/src/main/resources/mapper/product.xml",
+          "line": 46
+        }
+      ],
+      "layer": "conformance"
+    }
+  ],
+  "waiver": {
+    "active": true,
+    "by": "사람",
+    "reason": "축A out_of_scope 3건 확인: .gitignore·linked-func-cache.json은 세션 시작 전부터 무관하게 수정된 상태였고, insert-out-of-stock.sql은 STEP5 AC3 회귀 픽스처인데 .sql 파일에 linked_func 주석을 붙일 수 없어 분류기가 오분류함(같은 라운드 ProductDaoTest.java는 정상 분류됨). 실제 스코프 이탈 아님.",
+    "at": "2026-09-09T15:23:54",
+    "layer": "scope"
+  },
+  "story_transitions": [
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "사람(자기승인-실증)",
+      "at": "2026-08-22T19:17:45"
+    },
+    {
+      "from": "Approved",
+      "to": "InProgress",
+      "by": "사람(자기승인-실증)",
+      "at": "2026-08-22T19:17:46"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "사람(자기승인-실증)",
+      "at": "2026-08-22T19:23:08"
+    },
+    {
+      "from": "Review",
+      "to": "Done",
+      "by": "사람(자기승인-실증)",
+      "at": "2026-08-22T19:35:55"
+    },
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "SR 승인(SR-214)",
+      "at": "2026-09-09T07:35:50"
+    },
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "SR 승인(SR-220)",
+      "at": "2026-09-09T07:36:22"
+    },
+    {
+      "from": "Approved",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-09T08:53:31"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "사람",
+      "at": "2026-09-09T08:59:23"
+    },
+    {
+      "from": "Review",
+      "to": "Done",
+      "by": "뷰어",
+      "at": "2026-09-09T09:04:45"
+    },
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "사람",
+      "at": "2026-09-09T15:08:10"
+    },
+    {
+      "from": "Approved",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-09T15:08:20"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "사람",
+      "at": "2026-09-09T15:12:09"
+    },
+    {
+      "from": "Review",
+      "to": "Done",
+      "by": "사람",
+      "at": "2026-09-09T15:27:30"
+    }
+  ],
+  "escalate": false,
+  "fail_rounds": 0,
+  "max_rounds": 3,
+  "waivers": [
+    {
+      "active": true,
+      "by": "사람",
+      "reason": "축A out_of_scope 3건 확인: .gitignore·linked-func-cache.json은 세션 시작 전부터 무관하게 수정된 상태였고, insert-out-of-stock.sql은 STEP5 AC3 회귀 픽스처인데 .sql 파일에 linked_func 주석을 붙일 수 없어 분류기가 오분류함(같은 라운드 ProductDaoTest.java는 정상 분류됨). 실제 스코프 이탈 아님.",
+      "at": "2026-09-09T15:23:54",
+      "layer": "scope"
+    }
+  ]
+}
