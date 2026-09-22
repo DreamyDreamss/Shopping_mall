@@ -129,7 +129,8 @@ cp -a "$REPO/seed/09_납품/."      "$WS/docs/09_납품/"
 cp -a "$REPO/seed/_lab/catalog/." "$WS/_lab/catalog/"
 cp -a "$REPO/seed/.speclinker/."  "$WS/.speclinker/"
 cp -a "$REPO/seed/ws/."           "$WS/"                # CLAUDE.md · package.json · tests · harness · .claude
-ok "seed 전개: SR $(ls -d "$WS"/docs/변경관리/SR-* 2>/dev/null | wc -l)건 · 설계서 $(ls "$WS/_lab/catalog" | wc -l)건 · 납품 $(ls "$WS/docs/09_납품" | wc -l)건"
+# 재귀 파일 수로 센다 — `ls | wc -l`은 최상위 항목만 세어 "설계서 139건"을 "6건"으로 보여 준다(2026-09-22 실측)
+ok "seed 전개: SR $(ls -d "$WS"/docs/변경관리/SR-* 2>/dev/null | wc -l)건 · 설계서 $(find "$WS/_lab/catalog" -type f | wc -l)건 · 납품 $(find "$WS/docs/09_납품" -type f | wc -l)건"
 
 # seed는 절대 경로를 토큰으로 담는다 — 여기서 이 환경의 실제 경로로 되돌린다.
 step "4-b 경로 토큰 치환"
