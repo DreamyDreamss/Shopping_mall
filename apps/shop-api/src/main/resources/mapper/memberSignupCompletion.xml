@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- linked_func: FUNC-member-003 -->
+<!-- spec: docs/00_FUNC/stories/STORY-FUNC-member-003.md -->
+<mapper namespace="com.sm.lab.shop.dao.MemberSignupCompletionDao">
+
+  <!-- round2(SR-231 round1 QA FAIL 재작업, 사람 결정) — 코드 일치+미만료에 더해 미소비·미인증·
+       시도상한 미만까지 조건절 하나에 모은 원자 UPDATE(read-modify-write 아님). NOW(3)은 이
+       문장을 실제로 실행하는 커넥션의 DB 서버 시각(밀리초)이다 — 애플리케이션 Clock을 넘기지
+       않는 이유는 사람 결정이 예시한 SQL을 그대로 따르기 위함이며, expires_at 자체는 이미
+       FUNC-member-002의 writeCode가 앱 Clock으로 기록해 두므로 이 비교는 여전히 결정적이다. -->
+  <update id="markVerifiedIfCodeMatches">
+    UPDATE MEMBER_SIGNUP_VERIFICATIONS
+       SET verified_at = NOW(3)
+     WHERE channel = #{channel}
+       AND target = #{target}
+       AND code = #{code}
+       AND expires_at IS NOT NULL
+       AND expires_at > NOW(3)
+       AND consumed_at IS NULL
+       AND verified_at IS NULL
+       AND attempt_count &lt; #{maxAttempts}
+  </update>
+
+  <!-- SR-298 — read-modify-write 제거: 이 UPDATE 자체가 증가와 상한 판정을 한 문장으로
+       원자화한다. 위 markVerifiedIfCodeMatches가 0행일 때만 서비스가 호출하며, 이미 소비·
+       인증된 행이나 attempt_count가 이미 maxAttempts에 도달한 행은 이 조건절에 걸려 0행을
+       반환한다(더 늘지 않는다) — 호출부는 별도로 현재 값을 먼저 읽어 상한 여부를 판정하지
+       않는다(그 select→분기→update 간극이 동시 버스트에서 상한을 넘겨 증가시키는 레이스의
+       원인이었다). -->
+  <update id="incrementAttemptCount">
+    UPDATE MEMBER_SIGNUP_VERIFICATIONS
+       SET attempt_count = attempt_count + 1
+     WHERE channel = #{channel}
+       AND target = #{target}
+       AND consumed_at IS NULL
+       AND verified_at IS NULL
+       AND attempt_count &lt; #{maxAttempts}
+  </update>
+
+  <!-- 가입 성공 트랜잭션 안에서 호출 — 인증된 적 있고 아직 소비되지 않은 행만 소비 처리한다.
+       이후 같은 코드로 다시 markVerifiedIfCodeMatches를 호출하면 consumed_at IS NOT NULL
+       조건에 걸려 항상 0행이 되어 재사용이 막힌다(QA FAIL 필수4 해소). -->
+  <update id="consumeVerifiedCode">
+    UPDATE MEMBER_SIGNUP_VERIFICATIONS
+       SET consumed_at = NOW(3)
+     WHERE channel = #{channel}
+       AND target = #{target}
+       AND verified_at IS NOT NULL
+       AND consumed_at IS NULL
+  </update>
+
+  <select id="selectVerifiedAt" resultType="java.time.LocalDateTime">
+    SELECT verified_at
+      FROM MEMBER_SIGNUP_VERIFICATIONS
+     WHERE channel = #{channel}
+       AND target = #{target}
+  </select>
+
+  <select id="selectConsumedAt" resultType="java.time.LocalDateTime">
+    SELECT consumed_at
+      FROM MEMBER_SIGNUP_VERIFICATIONS
+     WHERE channel = #{channel}
+       AND target = #{target}
+  </select>
+
+  <select id="selectAttemptCount" resultType="java.lang.Integer">
+    SELECT attempt_count
+      FROM MEMBER_SIGNUP_VERIFICATIONS
+     WHERE channel = #{channel}
+       AND target = #{target}
+  </select>
+
+</mapper>

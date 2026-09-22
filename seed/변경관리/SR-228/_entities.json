@@ -1,0 +1,14 @@
+{
+  "tables": [],
+  "tables_unknown": [],
+  "infs": [],
+  "infs_unmatched": [],
+  "paths": [],
+  "paths_candidate": [],
+  "screens": [],
+  "uis_ids": [
+    "UIS-ORD-001"
+  ],
+  "terms": [],
+  "entities_arg": "UIS-ORD-001"
+}

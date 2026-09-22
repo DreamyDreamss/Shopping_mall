@@ -1,0 +1,503 @@
+{
+  "version": 1,
+  "srs": {
+    "SR-201": {
+      "title": "상품 카탈로그 화면 신설 (상품 목록 + 상품 상세)",
+      "status": "CLOSED",
+      "source": "local",
+      "created_at": "2026-08-22T19:00:45",
+      "updated_at": "2026-08-23T11:25:16",
+      "assignee": null,
+      "requirement_fingerprint": "sha1:71837491524bc5973910272c6e5d8f3376831efc",
+      "claims": [
+        {
+          "spec_id": "INF-ORD-008",
+          "kind": "inf",
+          "path": null,
+          "fingerprint": null,
+          "claimed_at": "2026-08-22T19:03:23",
+          "released_at": "2026-08-22T20:29:55"
+        }
+      ],
+      "funcs": [
+        {
+          "func_id": "FUNC-order-007",
+          "story_baseline_fp": "sha1:f86120f3339560fd2fe28da8a139b187adc2a2f1"
+        },
+        {
+          "func_id": "FUNC-order-009",
+          "story_baseline_fp": "sha1:f86120f3339560fd2fe28da8a139b187adc2a2f1"
+        },
+        {
+          "func_id": "FUNC-order-010",
+          "story_baseline_fp": "sha1:f86120f3339560fd2fe28da8a139b187adc2a2f1"
+        }
+      ],
+      "history": [
+        {
+          "at": "2026-08-22T19:00:45",
+          "from": null,
+          "to": "RECEIVED",
+          "by": "human",
+          "note": null,
+          "kind": "forward",
+          "attempt": 1
+        },
+        {
+          "at": "2026-08-22T19:03:23",
+          "from": "RECEIVED",
+          "to": "ANALYZED",
+          "by": "script",
+          "note": "영향분석 완료",
+          "kind": "forward",
+          "attempt": 1
+        },
+        {
+          "at": "2026-08-22T19:06:46",
+          "from": "ANALYZED",
+          "to": "APPROVED",
+          "by": "human",
+          "note": "변경 승인 [자기승인 — 실증 프로그램]",
+          "kind": "forward",
+          "attempt": 1
+        },
+        {
+          "at": "2026-08-22T19:17:45",
+          "from": "APPROVED",
+          "to": "IN_DEV",
+          "by": "sl-aidd",
+          "note": "STEP2 개발 착수",
+          "kind": "forward",
+          "attempt": 1
+        },
+        {
+          "at": "2026-08-22T19:26:37",
+          "from": "IN_DEV",
+          "to": "IN_QA",
+          "by": "sl-aidd",
+          "note": "STEP5 테스트 착수",
+          "kind": "forward",
+          "attempt": 1
+        },
+        {
+          "at": "2026-08-22T20:29:55",
+          "from": "IN_QA",
+          "to": "DEPLOYED",
+          "by": "human",
+          "note": "운영 반영 완료 — 랩 앱 재기동+스모크 실측(/product/list·상세·검색 200)",
+          "kind": "forward",
+          "attempt": 1
+        },
+        {
+          "at": "2026-08-22T20:29:56",
+          "from": "DEPLOYED",
+          "to": "CLOSED",
+          "by": "human",
+          "note": "스펙 현행화(INF-ORD-008 반영·UIS-ORD-003/004 역생성)·배포 완료",
+          "kind": "forward",
+          "attempt": 1
+        }
+      ]
+    },
+    "SR-202": {
+      "title": "장바구니 도입 (담기·조회·수량변경·삭제)",
+      "status": "CLOSED",
+      "source": "local",
+      "created_at": "2026-08-22T20:38:49",
+      "updated_at": "2026-08-23T11:25:16",
+      "assignee": null,
+      "requirement_fingerprint": "sha1:0988a696d231555eda9e814144b091e97f21e716",
+      "claims": [
+        {
+          "spec_id": "UIS-ORD-004",
+          "kind": "uis",
+          "path": null,
+          "fingerprint": null,
+          "claimed_at": "2026-08-22T20:41:14",
+          "released_at": "2026-08-23T05:33:15"
+        }
+      ],
+      "funcs": [
+        {
+          "func_id": "FUNC-order-010",
+          "story_baseline_fp": "sha1:b35aa9c93c16225407acf2703e7c108173cf422f"
+        },
+        {
+          "func_id": "FUNC-order-011",
+          "story_baseline_fp": "sha1:b35aa9c93c16225407acf2703e7c108173cf422f"
+        }
+      ],
+      "history": [
+        {
+          "at": "2026-08-22T20:38:49",
+          "from": null,
+          "to": "RECEIVED",
+          "by": "human",
+          "note": null,
+          "kind": "forward",
+          "attempt": 1
+        },
+        {
+          "at": "2026-08-22T20:41:13",
+          "from": "RECEIVED",
+          "to": "ANALYZED",
+          "by": "script",
+          "note": "영향분석 완료",
+          "kind": "forward",
+          "attempt": 1
+        },
+        {
+          "at": "2026-08-22T20:44:41",
+          "from": "ANALYZED",
+          "to": "APPROVED",
+          "by": "human",
+          "note": "변경 승인 [자기승인 — 실증]",
+          "kind": "forward",
+          "attempt": 1
+        },
+        {
+          "at": "2026-08-22T20:45:44",
+          "from": "APPROVED",
+          "to": "IN_DEV",
+          "by": "sl-aidd",
+          "note": "STEP2 개발 착수",
+          "kind": "forward",
+          "attempt": 1
+        },
+        {
+          "at": "2026-08-23T05:33:33",
+          "from": "IN_DEV",
+          "to": "IN_QA",
+          "by": "sl-aidd",
+          "note": "테스트 완료(사후 정합 — STEP5 자동 전이 수행 갭 보정)",
+          "kind": "forward",
+          "attempt": 1
+        },
+        {
+          "at": "2026-08-23T05:33:33",
+          "from": "IN_QA",
+          "to": "DEPLOYED",
+          "by": "human",
+          "note": "운영 반영 — 재기동+라이브 스모크(담기·조회·삭제·/cart 200)",
+          "kind": "forward",
+          "attempt": 1
+        },
+        {
+          "at": "2026-08-23T05:33:33",
+          "from": "DEPLOYED",
+          "to": "CLOSED",
+          "by": "human",
+          "note": "역생성 완료(INF 4·SCH CART_ITEMS DB사실·UIS 1+1)·FK 스냅샷 6·배포 완료",
+          "kind": "forward",
+          "attempt": 1
+        }
+      ]
+    },
+    "SR-203": {
+      "title": "체크아웃 — 장바구니를 주문으로 전환",
+      "status": "CLOSED",
+      "source": "local",
+      "created_at": "2026-08-23T06:04:15",
+      "updated_at": "2026-08-23T11:25:16",
+      "assignee": null,
+      "requirement_fingerprint": "sha1:20020a17d176225ff3b86b8c2ab385809214aa5b",
+      "claims": [
+        {
+          "spec_id": "UIS-ORD-005",
+          "kind": "uis",
+          "path": null,
+          "fingerprint": null,
+          "claimed_at": "2026-08-23T06:05:25",
+          "released_at": "2026-08-23T07:34:38"
+        }
+      ],
+      "funcs": [
+        {
+          "func_id": "FUNC-order-011",
+          "story_baseline_fp": "sha1:6ac3aa452ff40cafed804f49d398e1fcf4e94099"
+        },
+        {
+          "func_id": "FUNC-order-012",
+          "story_baseline_fp": "sha1:6ac3aa452ff40cafed804f49d398e1fcf4e94099"
+        }
+      ],
+      "history": [
+        {
+          "at": "2026-08-23T06:04:15",
+          "from": null,
+          "to": "RECEIVED",
+          "by": "human",
+          "note": null,
+          "kind": "forward",
+          "attempt": 1
+        },
+        {
+          "at": "2026-08-23T06:05:24",
+          "from": "RECEIVED",
+          "to": "ANALYZED",
+          "by": "script",
+          "note": "영향분석 완료",
+          "kind": "forward",
+          "attempt": 1
+        },
+        {
+          "at": "2026-08-23T06:08:01",
+          "from": "ANALYZED",
+          "to": "APPROVED",
+          "by": "human",
+          "note": "변경 승인 [자기승인 — 실증]",
+          "kind": "forward",
+          "attempt": 1
+        },
+        {
+          "at": "2026-08-23T06:08:24",
+          "from": "APPROVED",
+          "to": "IN_DEV",
+          "by": "sl-aidd",
+          "note": "STEP2 개발 착수 (FUNC-order-011 story는 D7대로 건너뛰기 — 코드 구현 없음, 문서는 종결 재생성)",
+          "kind": "forward",
+          "attempt": 1
+        },
+        {
+          "at": "2026-08-23T07:09:48",
+          "from": "IN_DEV",
+          "to": "IN_QA",
+          "by": "sl-aidd",
+          "note": "STEP5 QA·테스트 완료(QA r2 CONCERNS[track]·TC 13/13·축A/B PASS) — story Done",
+          "kind": "forward",
+          "attempt": 1
+        },
+        {
+          "at": "2026-08-23T07:11:36",
+          "from": "IN_QA",
+          "to": "DEPLOYED",
+          "by": "human",
+          "note": "배포 재기동+스모크(목록/장바구니 200·checkout 빈장바구니 400 계약) [자기승인-실증]",
+          "kind": "forward",
+          "attempt": 1
+        },
+        {
+          "at": "2026-08-23T07:34:38",
+          "from": "DEPLOYED",
+          "to": "CLOSED",
+          "by": "human",
+          "note": "종결: INF-ORD-014 역생성(IMP-025 수리로 실체화)·UIS-ORD-005 재생성·역링크·인덱스 갱신 [자기승인-실증]",
+          "kind": "forward",
+          "attempt": 1
+        }
+      ]
+    },
+    "LAB-104": {
+      "title": "주문 목록 CSV 내보내기",
+      "status": "CLOSED",
+      "source": "jira",
+      "created_at": "2026-08-23T07:46:04",
+      "updated_at": "2026-08-23T11:25:16",
+      "assignee": null,
+      "requirement_fingerprint": "sha1:f0d915bd765b6a5cc58295b626bc088b398c1bf1",
+      "claims": [],
+      "funcs": [
+        {
+          "func_id": "FUNC-order-013",
+          "story_baseline_fp": "sha1:f0d915bd765b6a5cc58295b626bc088b398c1bf1"
+        }
+      ],
+      "history": [
+        {
+          "at": "2026-08-23T07:46:04",
+          "from": null,
+          "to": "RECEIVED",
+          "by": "human",
+          "note": "지라 인입(스토어 폴백 — MCP 세션 미등록)",
+          "kind": "forward",
+          "attempt": 1
+        },
+        {
+          "at": "2026-08-23T07:48:12",
+          "from": "RECEIVED",
+          "to": "ANALYZED",
+          "by": "script",
+          "note": "영향분석 완료(API_NEW 단일·INF-ORD-015 예약·화면 범위 제외 D10)",
+          "kind": "forward",
+          "attempt": 1
+        },
+        {
+          "at": "2026-08-23T07:48:12",
+          "from": "ANALYZED",
+          "to": "APPROVED",
+          "by": "human",
+          "note": "변경 승인 [자기승인 — 실증]",
+          "kind": "forward",
+          "attempt": 1
+        },
+        {
+          "at": "2026-08-23T07:50:10",
+          "from": "APPROVED",
+          "to": "IN_DEV",
+          "by": "sl-aidd",
+          "note": "STEP2 개발 착수(FUNC-order-013 단일)",
+          "kind": "forward",
+          "attempt": 1
+        },
+        {
+          "at": "2026-08-23T08:25:21",
+          "from": "IN_DEV",
+          "to": "IN_QA",
+          "by": "sl-aidd",
+          "note": "QA·테스트·대조검증 완료 — story Done",
+          "kind": "forward",
+          "attempt": 1
+        },
+        {
+          "at": "2026-08-23T08:26:10",
+          "from": "IN_QA",
+          "to": "DEPLOYED",
+          "by": "human",
+          "note": "배포 재기동+스모크(export orderState=PLACED → PLACED 1행·BOM·attachment 실측) [자기승인-실증]",
+          "kind": "forward",
+          "attempt": 1
+        },
+        {
+          "at": "2026-08-23T08:30:17",
+          "from": "DEPLOYED",
+          "to": "CLOSED",
+          "by": "human",
+          "note": "종결: INF-ORD-015 역생성(IMP-026 발견 — 022 오채번 → 개명 수리·census 채번 수정)·지라 Done·역링크·인덱스 [자기승인-실증]",
+          "kind": "forward",
+          "attempt": 1
+        }
+      ]
+    },
+    "SR-204": {
+      "title": "API 인증·반출 통제 도입 (이월 묶음)",
+      "status": "CLOSED",
+      "source": "local",
+      "created_at": "2026-08-23T08:20:24",
+      "updated_at": "2026-08-23T21:13:27",
+      "assignee": null,
+      "requirement_fingerprint": "sha1:ed37b1c5e174feb59c08e5c1dc410c329dfd2145",
+      "claims": [
+        {
+          "spec_id": "INF-ORD-003",
+          "kind": "inf",
+          "path": null,
+          "fingerprint": null,
+          "claimed_at": "2026-08-23T20:07:36",
+          "released_at": "2026-08-23T21:13:27"
+        }
+      ],
+      "funcs": [],
+      "history": [
+        {
+          "at": "2026-08-23T08:20:24",
+          "from": null,
+          "to": "RECEIVED",
+          "by": "human",
+          "note": "SR-203·LAB-104 이월 실체화(QA r2 권고 #2) — 스텁, 착수 시 전주기",
+          "kind": "forward",
+          "attempt": 1
+        },
+        {
+          "at": "2026-08-23T11:09:04",
+          "from": "RECEIVED",
+          "to": "ON_HOLD",
+          "by": "viewer",
+          "note": "SpecLens 개발 보드 반려",
+          "kind": "hold",
+          "attempt": 1
+        },
+        {
+          "at": "2026-08-23T11:11:56",
+          "from": "ON_HOLD",
+          "to": "ANALYZED",
+          "by": "viewer",
+          "note": "SpecLens 레일 수동 전이",
+          "kind": "forward",
+          "attempt": 1
+        },
+        {
+          "at": "2026-08-23T11:15:43",
+          "from": "ANALYZED",
+          "to": "RECEIVED",
+          "by": "viewer",
+          "note": "P8 검증 실험",
+          "kind": "revert",
+          "attempt": 2,
+          "invalidates": []
+        },
+        {
+          "at": "2026-08-23T15:31:58",
+          "from": "RECEIVED",
+          "to": "ON_HOLD",
+          "by": "viewer",
+          "note": "SpecLens 개발 보드 반려",
+          "kind": "hold",
+          "attempt": 2
+        },
+        {
+          "at": "2026-08-23T15:32:57",
+          "from": "ON_HOLD",
+          "to": "RECEIVED",
+          "by": "viewer",
+          "note": "SpecLens 레일 수동 전이",
+          "kind": "forward",
+          "attempt": 3
+        },
+        {
+          "at": "2026-08-23T20:07:19",
+          "from": "RECEIVED",
+          "to": "ANALYZED",
+          "by": "script",
+          "note": "영향분석 완료(횡단 필터·FUNC-order-013 reopen 방식 — OBS-037)",
+          "kind": "forward",
+          "attempt": 2
+        },
+        {
+          "at": "2026-08-23T20:07:19",
+          "from": "ANALYZED",
+          "to": "APPROVED",
+          "by": "human",
+          "note": "변경 승인 [자기승인 — 실증] (D13/D14)",
+          "kind": "forward",
+          "attempt": 1
+        },
+        {
+          "at": "2026-08-23T20:08:21",
+          "from": "APPROVED",
+          "to": "IN_DEV",
+          "by": "sl-aidd",
+          "note": "reopen 개발 착수(FUNC-order-013 round 5)",
+          "kind": "forward",
+          "attempt": 1
+        },
+        {
+          "at": "2026-08-23T21:09:30",
+          "from": "IN_DEV",
+          "to": "IN_QA",
+          "by": "sl-aidd",
+          "note": "QA r6 PASS·축A/B PASS — story Done",
+          "kind": "forward",
+          "attempt": 1
+        },
+        {
+          "at": "2026-08-23T21:10:07",
+          "from": "IN_QA",
+          "to": "DEPLOYED",
+          "by": "human",
+          "note": "배포 재기동+스모크(화면 무인증 200·무키 API 401·admin 200·우회 %61pi 401 라이브 실측) [자기승인-실증]",
+          "kind": "forward",
+          "attempt": 1
+        },
+        {
+          "at": "2026-08-23T21:13:27",
+          "from": "DEPLOYED",
+          "to": "CLOSED",
+          "by": "human",
+          "note": "종결: 보안 우회 8+13종 차단·IDOR 소유권·144/144·축A/B PASS·배포 스모크(우회 401 라이브)·대표 INF 인증 정책 재동기화·기준선 26/101 [자기승인-실증]",
+          "kind": "forward",
+          "attempt": 1
+        }
+      ]
+    }
+  }
+}

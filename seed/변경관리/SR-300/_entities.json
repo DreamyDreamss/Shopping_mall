@@ -1,0 +1,16 @@
+{
+  "tables": [
+    "ORDERS"
+  ],
+  "tables_unknown": [],
+  "infs": [],
+  "infs_unmatched": [],
+  "paths": [],
+  "paths_candidate": [
+    "/page/items"
+  ],
+  "screens": [],
+  "uis_ids": [],
+  "terms": [],
+  "entities_arg": "ORDERS"
+}

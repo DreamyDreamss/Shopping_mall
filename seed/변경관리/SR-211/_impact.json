@@ -1,0 +1,21 @@
+{
+  "title": "SR-211",
+  "stories": [
+    "FUNC-order-014"
+  ],
+  "clarification": "none",
+  "new_funcs": [
+    {
+      "func_id": "FUNC-order-014",
+      "kind": "bat",
+      "spec_id": "BAT-ORD-001"
+    }
+  ],
+  "affected": {
+    "inf": [],
+    "sch": [],
+    "uis": [],
+    "bat": []
+  },
+  "generated_at": "2026-09-08T23:33:31"
+}

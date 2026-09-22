@@ -1,0 +1,73 @@
+{
+  "schema": 2,
+  "sr": "SR-314",
+  "title": "SR-314",
+  "clarification": "none",
+  "affected": {
+    "inf": [],
+    "sch": [
+      "SCH-ORD-005"
+    ],
+    "uis": [],
+    "bat": []
+  },
+  "new_specs": [
+    {
+      "kind": "INF",
+      "id": "INF-PRD-002",
+      "domain": "product",
+      "name": "카탈로그 적재 관리 명령",
+      "module": "shop-api",
+      "module_path": "{{SRC_SHOP_API}}"
+    },
+    {
+      "kind": "BAT",
+      "id": "BAT-PRD-001",
+      "domain": "product",
+      "name": "카탈로그 매니페스트 적재",
+      "module": "shop-api",
+      "module_path": "{{SRC_SHOP_API}}"
+    }
+  ],
+  "items": [
+    {
+      "n": 1,
+      "title": "카탈로그 적재 관리 명령",
+      "specs": {
+        "uis": [],
+        "inf": [],
+        "sch": [],
+        "bat": []
+      },
+      "new_specs": [
+        "INF-PRD-002"
+      ],
+      "module": "shop-api",
+      "origin": "auto:new"
+    },
+    {
+      "n": 2,
+      "title": "카탈로그 매니페스트 적재(상품·카테고리·브랜드·이미지)",
+      "specs": {
+        "uis": [],
+        "inf": [],
+        "sch": [
+          "SCH-ORD-005"
+        ],
+        "bat": []
+      },
+      "new_specs": [
+        "BAT-PRD-001"
+      ],
+      "module": "shop-api",
+      "origin": "manual"
+    }
+  ],
+  "item_seq": 3,
+  "stories": [
+    "SR-314.1",
+    "SR-314.2"
+  ],
+  "story_files": [],
+  "generated_at": "2026-09-19T16:15:02"
+}

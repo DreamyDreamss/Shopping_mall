@@ -1,0 +1,1887 @@
+{
+  "categories": [
+    {
+      "code": "FA",
+      "name": "패션",
+      "children": [
+        {
+          "code": "FA01",
+          "name": "의류",
+          "children": [
+            {
+              "code": "FA0101",
+              "name": "상의",
+              "children": []
+            },
+            {
+              "code": "FA0102",
+              "name": "아우터",
+              "children": []
+            }
+          ]
+        },
+        {
+          "code": "FA02",
+          "name": "잡화",
+          "children": [
+            {
+              "code": "FA0201",
+              "name": "가방",
+              "children": []
+            },
+            {
+              "code": "FA0202",
+              "name": "신발",
+              "children": []
+            },
+            {
+              "code": "FA0203",
+              "name": "시계·액세서리",
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "BE",
+      "name": "뷰티",
+      "children": [
+        {
+          "code": "BE01",
+          "name": "스킨케어",
+          "children": [
+            {
+              "code": "BE0101",
+              "name": "기초케어",
+              "children": []
+            },
+            {
+              "code": "BE0102",
+              "name": "선케어",
+              "children": []
+            }
+          ]
+        },
+        {
+          "code": "BE02",
+          "name": "메이크업",
+          "children": [
+            {
+              "code": "BE0201",
+              "name": "립",
+              "children": []
+            },
+            {
+              "code": "BE0202",
+              "name": "아이",
+              "children": []
+            },
+            {
+              "code": "BE0203",
+              "name": "네일·도구",
+              "children": []
+            }
+          ]
+        },
+        {
+          "code": "BE03",
+          "name": "바디·헤어",
+          "children": [
+            {
+              "code": "BE0301",
+              "name": "헤어케어",
+              "children": []
+            },
+            {
+              "code": "BE0302",
+              "name": "바디케어",
+              "children": []
+            },
+            {
+              "code": "BE0303",
+              "name": "향수",
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "LV",
+      "name": "리빙",
+      "children": [
+        {
+          "code": "LV01",
+          "name": "가구",
+          "children": [
+            {
+              "code": "LV0101",
+              "name": "책상",
+              "children": []
+            },
+            {
+              "code": "LV0102",
+              "name": "의자·소파",
+              "children": []
+            },
+            {
+              "code": "LV0103",
+              "name": "수납정리",
+              "children": []
+            }
+          ]
+        },
+        {
+          "code": "LV02",
+          "name": "주방",
+          "children": [
+            {
+              "code": "LV0201",
+              "name": "조리도구",
+              "children": []
+            },
+            {
+              "code": "LV0202",
+              "name": "식기",
+              "children": []
+            },
+            {
+              "code": "LV0203",
+              "name": "주방가전",
+              "children": []
+            }
+          ]
+        },
+        {
+          "code": "LV03",
+          "name": "인테리어",
+          "children": [
+            {
+              "code": "LV0301",
+              "name": "조명",
+              "children": []
+            },
+            {
+              "code": "LV0302",
+              "name": "홈데코",
+              "children": []
+            },
+            {
+              "code": "LV0303",
+              "name": "반려식물",
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "DG",
+      "name": "디지털",
+      "children": [
+        {
+          "code": "DG01",
+          "name": "컴퓨터",
+          "children": [
+            {
+              "code": "DG0101",
+              "name": "모니터",
+              "children": []
+            },
+            {
+              "code": "DG0102",
+              "name": "키보드·마우스",
+              "children": []
+            },
+            {
+              "code": "DG0103",
+              "name": "노트북",
+              "children": []
+            }
+          ]
+        },
+        {
+          "code": "DG02",
+          "name": "음향",
+          "children": [
+            {
+              "code": "DG0201",
+              "name": "헤드폰·이어폰",
+              "children": []
+            },
+            {
+              "code": "DG0202",
+              "name": "스피커",
+              "children": []
+            }
+          ]
+        },
+        {
+          "code": "DG03",
+          "name": "카메라·모바일",
+          "children": [
+            {
+              "code": "DG0301",
+              "name": "카메라",
+              "children": []
+            },
+            {
+              "code": "DG0302",
+              "name": "촬영용품",
+              "children": []
+            },
+            {
+              "code": "DG0303",
+              "name": "모바일액세서리",
+              "children": []
+            },
+            {
+              "code": "DG0304",
+              "name": "웨어러블",
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "FD",
+      "name": "식품",
+      "children": [
+        {
+          "code": "FD01",
+          "name": "신선식품",
+          "children": [
+            {
+              "code": "FD0101",
+              "name": "과일",
+              "children": []
+            },
+            {
+              "code": "FD0102",
+              "name": "채소",
+              "children": []
+            },
+            {
+              "code": "FD0103",
+              "name": "정육·수산",
+              "children": []
+            }
+          ]
+        },
+        {
+          "code": "FD02",
+          "name": "가공식품",
+          "children": [
+            {
+              "code": "FD0201",
+              "name": "커피·차",
+              "children": []
+            },
+            {
+              "code": "FD0202",
+              "name": "양곡",
+              "children": []
+            },
+            {
+              "code": "FD0203",
+              "name": "건강·간식",
+              "children": []
+            },
+            {
+              "code": "FD0204",
+              "name": "오일·양념",
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "SP",
+      "name": "스포츠",
+      "children": [
+        {
+          "code": "SP01",
+          "name": "피트니스",
+          "children": [
+            {
+              "code": "SP0101",
+              "name": "요가·홈트",
+              "children": []
+            },
+            {
+              "code": "SP0102",
+              "name": "헬스용품",
+              "children": []
+            }
+          ]
+        },
+        {
+          "code": "SP02",
+          "name": "아웃도어",
+          "children": [
+            {
+              "code": "SP0201",
+              "name": "캠핑",
+              "children": []
+            },
+            {
+              "code": "SP0202",
+              "name": "등산",
+              "children": []
+            }
+          ]
+        },
+        {
+          "code": "SP03",
+          "name": "구기·레저",
+          "children": [
+            {
+              "code": "SP0301",
+              "name": "구기용품",
+              "children": []
+            },
+            {
+              "code": "SP0302",
+              "name": "자전거",
+              "children": []
+            },
+            {
+              "code": "SP0303",
+              "name": "러닝",
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "brands": [
+    {
+      "code": "MONO",
+      "name": "모노하우스"
+    },
+    {
+      "code": "DLCT",
+      "name": "데일리코튼"
+    },
+    {
+      "code": "URBF",
+      "name": "어반핏"
+    },
+    {
+      "code": "CLRS",
+      "name": "클리어스킨"
+    },
+    {
+      "code": "LUMI",
+      "name": "루미에르랩"
+    },
+    {
+      "code": "SODAM",
+      "name": "소담"
+    },
+    {
+      "code": "OBJH",
+      "name": "오브제홈"
+    },
+    {
+      "code": "BRSM",
+      "name": "바람숲"
+    },
+    {
+      "code": "HARU",
+      "name": "하루키친"
+    },
+    {
+      "code": "NOVA",
+      "name": "노바테크"
+    },
+    {
+      "code": "PULS",
+      "name": "펄스기어"
+    },
+    {
+      "code": "FRMS",
+      "name": "팜스프레시"
+    },
+    {
+      "code": "GRTB",
+      "name": "그린테이블"
+    }
+  ],
+  "products": [
+    {
+      "sku": "SKU-2001",
+      "name": "옥스포드 코튼 버튼다운 셔츠",
+      "brand": "DLCT",
+      "category": "FA0101",
+      "price": 39900,
+      "list_price": null,
+      "stock_qty": 120,
+      "sale_yn": "Y",
+      "description": "도톰한 옥스포드 원단으로 만든 기본 버튼다운 셔츠입니다. 세탁 후에도 형태가 잘 유지되며 사계절 이너로 활용하기 좋습니다.",
+      "tags": [
+        "셔츠",
+        "남녀공용",
+        "데일리"
+      ],
+      "image": "images/SKU-2001.jpg",
+      "source_url": "https://www.flickr.com/photos/7393890@N04/3885616973",
+      "author": "A Continuous Lean",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/"
+    },
+    {
+      "sku": "SKU-2002",
+      "name": "노르딕 패턴 울 블렌드 니트",
+      "brand": "DLCT",
+      "category": "FA0101",
+      "price": 69000,
+      "list_price": 89000,
+      "stock_qty": 45,
+      "sale_yn": "Y",
+      "description": "울 30% 블렌드 원사로 짠 노르딕 패턴 니트입니다. 넉넉한 핏으로 겨울철 셔츠 위에 겹쳐 입기 좋습니다. 손세탁 또는 울코스 세탁을 권장합니다.",
+      "tags": [
+        "니트",
+        "겨울",
+        "울"
+      ],
+      "image": "images/SKU-2002.jpg",
+      "source_url": "https://commons.wikimedia.org/w/index.php?curid=357888",
+      "author": "unknown",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/"
+    },
+    {
+      "sku": "SKU-2003",
+      "name": "베이직 코튼 반팔 티셔츠 화이트",
+      "brand": "DLCT",
+      "category": "FA0101",
+      "price": 12900,
+      "list_price": null,
+      "stock_qty": 300,
+      "sale_yn": "Y",
+      "description": "면 100% 20수 싱글 원단의 기본 반팔 티셔츠입니다. 목 늘어남을 줄인 립 넥라인으로 오래 입을 수 있습니다.",
+      "tags": [
+        "티셔츠",
+        "면100",
+        "기본템"
+      ],
+      "image": "images/SKU-2003.jpg",
+      "source_url": "https://www.flickr.com/photos/35754040@N04/8052454047",
+      "author": "Stacie Stacie Stacie",
+      "license": "CC BY-SA 2.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/2.0/"
+    },
+    {
+      "sku": "SKU-2004",
+      "name": "워싱 블랙 데님 트러커 재킷",
+      "brand": "URBF",
+      "category": "FA0102",
+      "price": 79000,
+      "list_price": null,
+      "stock_qty": 30,
+      "sale_yn": "Y",
+      "description": "스티치 디테일을 살린 블랙 데님 트러커 재킷입니다. 가볍게 워싱 처리해 첫 착용부터 부드럽고, 간절기 아우터로 활용도가 높습니다.",
+      "tags": [
+        "데님",
+        "재킷",
+        "간절기"
+      ],
+      "image": "images/SKU-2004.jpg",
+      "source_url": "https://www.flickr.com/photos/48355364@N08/4424409123",
+      "author": "Chase Lindberg Photography",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/"
+    },
+    {
+      "sku": "SKU-2006",
+      "name": "소가죽 투웨이 토트백 브라운",
+      "brand": "MONO",
+      "category": "FA0201",
+      "price": 129000,
+      "list_price": 159000,
+      "stock_qty": 18,
+      "sale_yn": "Y",
+      "description": "부드러운 소가죽으로 만든 투웨이 토트백입니다. 탈부착 스트랩으로 숄더백과 크로스백으로 연출할 수 있습니다. 내부 지퍼 포켓이 있어 소지품 정리가 편리합니다.",
+      "tags": [
+        "가방",
+        "가죽",
+        "토트백"
+      ],
+      "image": "images/SKU-2006.jpg",
+      "source_url": "https://www.flickr.com/photos/198895458@N04/53097411519",
+      "author": "personalgraphic.official",
+      "license": "CC0 1.0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    {
+      "sku": "SKU-2007",
+      "name": "캔버스 롤탑 백팩 카키",
+      "brand": "URBF",
+      "category": "FA0201",
+      "price": 59000,
+      "list_price": null,
+      "stock_qty": 0,
+      "sale_yn": "Y",
+      "description": "왁스 코팅 캔버스 원단의 롤탑 백팩입니다. 생활 방수가 되어 출퇴근과 여행에 두루 쓰기 좋습니다. 15인치 노트북 수납이 가능합니다.",
+      "tags": [
+        "백팩",
+        "캔버스",
+        "노트북가방"
+      ],
+      "image": "images/SKU-2007.jpg",
+      "source_url": "https://www.flickr.com/photos/85546319@N04/8709816111",
+      "author": "Menswear Market",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/"
+    },
+    {
+      "sku": "SKU-2008",
+      "name": "가죽 로우탑 스니커즈 화이트",
+      "brand": "URBF",
+      "category": "FA0202",
+      "price": 89000,
+      "list_price": null,
+      "stock_qty": 60,
+      "sale_yn": "Y",
+      "description": "군더더기 없는 디자인의 화이트 가죽 스니커즈입니다. 쿠션 인솔로 장시간 착용에도 편안합니다.",
+      "tags": [
+        "스니커즈",
+        "화이트",
+        "신발"
+      ],
+      "image": "images/SKU-2008.jpg",
+      "source_url": "https://www.flickr.com/photos/83136374@N05/49688016318",
+      "author": "ajay_suresh",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/"
+    },
+    {
+      "sku": "SKU-2009",
+      "name": "브로그 레더 워커 부츠",
+      "brand": "MONO",
+      "category": "FA0202",
+      "price": 149000,
+      "list_price": 189000,
+      "stock_qty": 12,
+      "sale_yn": "Y",
+      "description": "윙팁 브로그 장식을 더한 레이스업 워커 부츠입니다. 천연 소가죽 갑피와 미끄럼 방지 러버 솔을 사용했습니다. 착용할수록 발에 맞게 길들여집니다.",
+      "tags": [
+        "부츠",
+        "가죽",
+        "가을겨울"
+      ],
+      "image": "images/SKU-2009.jpg",
+      "source_url": "https://www.flickr.com/photos/63415923@N00/3557477668",
+      "author": "andy_carter",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/"
+    },
+    {
+      "sku": "SKU-2010",
+      "name": "클래식 메탈 밴드 손목시계",
+      "brand": "MONO",
+      "category": "FA0203",
+      "price": 99000,
+      "list_price": null,
+      "stock_qty": 25,
+      "sale_yn": "Y",
+      "description": "심플한 실버 다이얼의 클래식 메탈 밴드 시계입니다. 생활방수 3기압을 지원하며 정장과 캐주얼 모두에 어울립니다.",
+      "tags": [
+        "시계",
+        "메탈밴드",
+        "선물"
+      ],
+      "image": "images/SKU-2010.jpg",
+      "source_url": "https://www.flickr.com/photos/51764518@N02/8502835993",
+      "author": "France1978",
+      "license": "CC BY-SA 2.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/2.0/"
+    },
+    {
+      "sku": "SKU-2011",
+      "name": "컬러 프레임 UV400 선글라스",
+      "brand": "URBF",
+      "category": "FA0203",
+      "price": 35000,
+      "list_price": null,
+      "stock_qty": 80,
+      "sale_yn": "Y",
+      "description": "자외선 99% 이상을 차단하는 UV400 렌즈를 사용한 컬러 프레임 선글라스입니다. 6가지 컬러의 가벼운 프레임으로 장시간 착용해도 부담이 적습니다.",
+      "tags": [
+        "선글라스",
+        "자외선차단",
+        "여름"
+      ],
+      "image": "images/SKU-2011.jpg",
+      "source_url": "https://www.flickr.com/photos/21630902@N03/6199401761",
+      "author": "cdrake2",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/"
+    },
+    {
+      "sku": "SKU-2021",
+      "name": "히알루론 수분 크림 50ml",
+      "brand": "CLRS",
+      "category": "BE0101",
+      "price": 28000,
+      "list_price": null,
+      "stock_qty": 150,
+      "sale_yn": "Y",
+      "description": "저분자 히알루론산을 담은 수분 크림입니다. 가볍게 흡수되어 끈적임 없이 촉촉함을 오래 유지합니다. 민감 피부 자극 테스트를 완료했습니다.",
+      "tags": [
+        "수분크림",
+        "보습",
+        "민감피부"
+      ],
+      "image": "images/SKU-2021.jpg",
+      "source_url": "https://clevelandart.org/art/1957.51",
+      "author": "unknown",
+      "license": "CC0 1.0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    {
+      "sku": "SKU-2022",
+      "name": "비타민 C 브라이트닝 세럼 30ml",
+      "brand": "CLRS",
+      "category": "BE0101",
+      "price": 32000,
+      "list_price": null,
+      "stock_qty": 90,
+      "sale_yn": "Y",
+      "description": "안정화 비타민 C 유도체를 담은 브라이트닝 세럼입니다. 스포이드 타입으로 필요한 만큼 덜어 쓸 수 있습니다. 아침저녁 토너 다음 단계에 사용하세요.",
+      "tags": [
+        "세럼",
+        "비타민C",
+        "미백"
+      ],
+      "image": "images/SKU-2022.jpg",
+      "source_url": "https://www.rawpixel.com/image/11515770/dropper-bottle-blank-retro-label",
+      "author": "unknown",
+      "license": "CC0 1.0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    {
+      "sku": "SKU-2023",
+      "name": "데일리 선크림 SPF50+ PA++++",
+      "brand": "CLRS",
+      "category": "BE0102",
+      "price": 18000,
+      "list_price": 22000,
+      "stock_qty": 200,
+      "sale_yn": "Y",
+      "description": "백탁 없이 가볍게 발리는 데일리 선크림입니다. SPF50+ PA++++로 일상 자외선을 차단하고 메이크업 전 베이스로도 좋습니다.",
+      "tags": [
+        "선크림",
+        "자외선차단",
+        "데일리"
+      ],
+      "image": "images/SKU-2023.jpg",
+      "source_url": "https://www.flickr.com/photos/115225894@N07/54234909036",
+      "author": "ccnull.de Bilddatenbank",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/"
+    },
+    {
+      "sku": "SKU-2024",
+      "name": "무향 데오드란트 롤온 50ml",
+      "brand": "CLRS",
+      "category": "BE0302",
+      "price": 9900,
+      "list_price": null,
+      "stock_qty": 0,
+      "sale_yn": "Y",
+      "description": "향료를 넣지 않은 롤온 타입 데오드란트입니다. 빠르게 건조되어 옷에 묻어남이 적습니다.",
+      "tags": [
+        "데오드란트",
+        "무향",
+        "바디케어"
+      ],
+      "image": "images/SKU-2024.jpg",
+      "source_url": "https://www.flickr.com/photos/87481332@N00/157108086",
+      "author": "How can I recycle this",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/"
+    },
+    {
+      "sku": "SKU-2025",
+      "name": "벨벳 매트 립스틱 3종 세트",
+      "brand": "LUMI",
+      "category": "BE0201",
+      "price": 36000,
+      "list_price": 45000,
+      "stock_qty": 70,
+      "sale_yn": "Y",
+      "description": "발색이 선명한 벨벳 매트 립스틱 3종 세트입니다. 레드·로즈·코랄 컬러로 구성되어 데일리부터 포인트 메이크업까지 연출할 수 있습니다.",
+      "tags": [
+        "립스틱",
+        "매트",
+        "세트"
+      ],
+      "image": "images/SKU-2025.jpg",
+      "source_url": "https://www.flickr.com/photos/19517696@N00/54117410",
+      "author": "shawnzrossi",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/"
+    },
+    {
+      "sku": "SKU-2026",
+      "name": "뉴트럴 15색 아이섀도 팔레트",
+      "brand": "LUMI",
+      "category": "BE0202",
+      "price": 29000,
+      "list_price": null,
+      "stock_qty": 55,
+      "sale_yn": "Y",
+      "description": "매트와 시머를 조합한 뉴트럴 톤 15색 아이섀도 팔레트입니다. 가루날림이 적고 밀착력이 좋아 그라데이션이 쉽습니다.",
+      "tags": [
+        "아이섀도",
+        "팔레트",
+        "뉴트럴"
+      ],
+      "image": "images/SKU-2026.jpg",
+      "source_url": "https://www.flickr.com/photos/183111158@N06/48430234987",
+      "author": "crown65",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/"
+    },
+    {
+      "sku": "SKU-2027",
+      "name": "메이크업 브러시 12종 세트",
+      "brand": "LUMI",
+      "category": "BE0203",
+      "price": 24000,
+      "list_price": null,
+      "stock_qty": 40,
+      "sale_yn": "Y",
+      "description": "파운데이션부터 아이 메이크업까지 쓸 수 있는 브러시 12종 세트입니다. 부드러운 합성모를 사용해 세척이 쉽고 털빠짐이 적습니다.",
+      "tags": [
+        "브러시",
+        "메이크업도구",
+        "세트"
+      ],
+      "image": "images/SKU-2027.jpg",
+      "source_url": "https://www.flickr.com/photos/135396164@N05/35675834556",
+      "author": "freestocks.org",
+      "license": "CC0 1.0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    {
+      "sku": "SKU-2028",
+      "name": "퀵드라이 네일 컬러 체리레드",
+      "brand": "LUMI",
+      "category": "BE0203",
+      "price": 8000,
+      "list_price": null,
+      "stock_qty": 130,
+      "sale_yn": "Y",
+      "description": "한 번만 발라도 선명한 발색의 퀵드라이 네일 컬러입니다. 1분 안에 건조되어 바쁜 아침에도 간편합니다.",
+      "tags": [
+        "네일",
+        "매니큐어",
+        "레드"
+      ],
+      "image": "images/SKU-2028.jpg",
+      "source_url": "https://www.flickr.com/photos/63324741@N04/25788709725",
+      "author": "spurekar",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/"
+    },
+    {
+      "sku": "SKU-2029",
+      "name": "약산성 샴푸·컨디셔너 세트",
+      "brand": "CLRS",
+      "category": "BE0301",
+      "price": 25000,
+      "list_price": null,
+      "stock_qty": 75,
+      "sale_yn": "Y",
+      "description": "pH 5.5 약산성 샴푸와 컨디셔너 세트입니다. 두피 자극을 줄이고 모발을 부드럽게 정돈합니다. 온 가족이 함께 사용할 수 있습니다.",
+      "tags": [
+        "샴푸",
+        "약산성",
+        "헤어케어"
+      ],
+      "image": "images/SKU-2029.jpg",
+      "source_url": "https://www.flickr.com/photos/96841228@N00/4804922749",
+      "author": "takot",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/"
+    },
+    {
+      "sku": "SKU-2030",
+      "name": "플로럴 오 드 퍼퓸 50ml",
+      "brand": "LUMI",
+      "category": "BE0303",
+      "price": 68000,
+      "list_price": 85000,
+      "stock_qty": 20,
+      "sale_yn": "Y",
+      "description": "장미와 머스크를 조합한 플로럴 계열 오 드 퍼퓸입니다. 클래식한 크리스털 보틀에 담아 선물용으로도 좋습니다.",
+      "tags": [
+        "향수",
+        "플로럴",
+        "선물"
+      ],
+      "image": "images/SKU-2030.jpg",
+      "source_url": "https://www.flickr.com/photos/51492666@N06/5867056518",
+      "author": "D Anderson2010",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/"
+    },
+    {
+      "sku": "SKU-2031",
+      "name": "수제 올리브 비누 3개입",
+      "brand": "SODAM",
+      "category": "BE0302",
+      "price": 15000,
+      "list_price": null,
+      "stock_qty": 110,
+      "sale_yn": "Y",
+      "description": "저온 숙성 방식으로 만든 수제 올리브 비누입니다. 올리브오일 함량이 높아 세안 후 당김이 적습니다. 얼굴과 바디 모두에 사용할 수 있습니다.",
+      "tags": [
+        "비누",
+        "수제",
+        "올리브"
+      ],
+      "image": "images/SKU-2031.jpg",
+      "source_url": "https://commons.wikimedia.org/w/index.php?curid=90085224",
+      "author": "Malene Thyssen, simplified by HLHJ",
+      "license": "CC BY 2.5",
+      "license_url": "https://creativecommons.org/licenses/by/2.5/"
+    },
+    {
+      "sku": "SKU-1001",
+      "name": "스탠딩 데스크",
+      "brand": "OBJH",
+      "category": "LV0101",
+      "price": 459000,
+      "list_price": 529000,
+      "stock_qty": 15,
+      "sale_yn": "Y",
+      "description": "듀얼 모터로 높이를 조절하는 전동 스탠딩 데스크입니다. 메모리 버튼 3개로 앉은 자세와 선 자세를 빠르게 전환할 수 있습니다. 상판은 1400x700mm입니다.",
+      "tags": [
+        "스탠딩데스크",
+        "전동",
+        "홈오피스"
+      ],
+      "image": "images/SKU-1001.jpg",
+      "source_url": "https://www.flickr.com/photos/24311648@N00/19548033928",
+      "author": "mastermaq",
+      "license": "CC BY-SA 2.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/2.0/"
+    },
+    {
+      "sku": "SKU-2041",
+      "name": "원목 다이닝 체어 2P 세트",
+      "brand": "OBJH",
+      "category": "LV0102",
+      "price": 179000,
+      "list_price": 219000,
+      "stock_qty": 10,
+      "sale_yn": "Y",
+      "description": "고무나무 원목으로 만든 다이닝 체어 2개 세트입니다. 등받이 곡선이 허리를 편안하게 받쳐 줍니다. 조립이 간단한 반조립 상태로 배송됩니다.",
+      "tags": [
+        "의자",
+        "원목",
+        "다이닝"
+      ],
+      "image": "images/SKU-2041.jpg",
+      "source_url": "https://www.flickr.com/photos/36910487@N07/4477051186",
+      "author": "TheLivingRoominKenmore",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/"
+    },
+    {
+      "sku": "SKU-2042",
+      "name": "3인용 패브릭 소파 크림",
+      "brand": "OBJH",
+      "category": "LV0102",
+      "price": 599000,
+      "list_price": null,
+      "stock_qty": 5,
+      "sale_yn": "Y",
+      "description": "부드러운 크림 톤 패브릭의 3인용 소파입니다. 고밀도 폼 쿠션으로 꺼짐이 적고 커버 분리 세탁이 가능합니다.",
+      "tags": [
+        "소파",
+        "패브릭",
+        "거실"
+      ],
+      "image": "images/SKU-2042.jpg",
+      "source_url": "https://www.flickr.com/photos/70681780@N00/3685357058",
+      "author": "kishisaka",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/"
+    },
+    {
+      "sku": "SKU-2043",
+      "name": "5단 원목 책장",
+      "brand": "OBJH",
+      "category": "LV0103",
+      "price": 139000,
+      "list_price": null,
+      "stock_qty": 22,
+      "sale_yn": "Y",
+      "description": "5단 선반으로 구성된 원목 책장입니다. 선반당 최대 20kg까지 수납할 수 있어 책과 소품 정리에 좋습니다.",
+      "tags": [
+        "책장",
+        "원목",
+        "수납"
+      ],
+      "image": "images/SKU-2043.jpg",
+      "source_url": "https://www.flickr.com/photos/83382282@N00/2891286537",
+      "author": "Technofreak",
+      "license": "CC BY-SA 2.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/2.0/"
+    },
+    {
+      "sku": "SKU-2052",
+      "name": "원목 옷걸이 10P 세트",
+      "brand": "OBJH",
+      "category": "LV0103",
+      "price": 19900,
+      "list_price": null,
+      "stock_qty": 160,
+      "sale_yn": "Y",
+      "description": "미끄럼 방지 홈을 낸 원목 옷걸이 10개 세트입니다. 두툼한 어깨 라인이 재킷과 코트의 형태를 잡아 줍니다.",
+      "tags": [
+        "옷걸이",
+        "원목",
+        "수납"
+      ],
+      "image": "images/SKU-2052.jpg",
+      "source_url": "https://www.flickr.com/photos/8176740@N05/5812575392",
+      "author": "garryknight",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/"
+    },
+    {
+      "sku": "SKU-2044",
+      "name": "아르데코 테이블 램프",
+      "brand": "BRSM",
+      "category": "LV0301",
+      "price": 89000,
+      "list_price": null,
+      "stock_qty": 14,
+      "sale_yn": "Y",
+      "description": "부채꼴 셰이드가 돋보이는 아르데코 스타일 테이블 램프입니다. 은은한 간접 조명으로 침실이나 거실 무드등으로 좋습니다. E26 전구를 사용합니다.",
+      "tags": [
+        "조명",
+        "무드등",
+        "인테리어"
+      ],
+      "image": "images/SKU-2044.jpg",
+      "source_url": "https://www.flickr.com/photos/62920259@N03/5771792573",
+      "author": "Artdecodude",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/"
+    },
+    {
+      "sku": "SKU-2045",
+      "name": "코튼 쿠션 커버 2P 세트",
+      "brand": "BRSM",
+      "category": "LV0302",
+      "price": 22000,
+      "list_price": null,
+      "stock_qty": 95,
+      "sale_yn": "Y",
+      "description": "면 100% 원단의 쿠션 커버 2개 세트입니다. 숨은 지퍼 방식으로 깔끔하며 45x45cm 쿠션 솜에 맞습니다.",
+      "tags": [
+        "쿠션",
+        "커버",
+        "홈데코"
+      ],
+      "image": "images/SKU-2045.jpg",
+      "source_url": "https://www.flickr.com/photos/23408922@N07/4298937304",
+      "author": "comedy_nose",
+      "license": "Public Domain Mark 1.0",
+      "license_url": "https://creativecommons.org/publicdomain/mark/1.0/"
+    },
+    {
+      "sku": "SKU-2046",
+      "name": "레트로 무소음 벽시계 레드",
+      "brand": "BRSM",
+      "category": "LV0302",
+      "price": 32000,
+      "list_price": null,
+      "stock_qty": 0,
+      "sale_yn": "Y",
+      "description": "레트로 감성의 레드 프레임 벽시계입니다. 스위프 무브먼트로 초침 소리가 나지 않아 침실에도 적합합니다.",
+      "tags": [
+        "벽시계",
+        "무소음",
+        "레트로"
+      ],
+      "image": "images/SKU-2046.jpg",
+      "source_url": "https://www.flickr.com/photos/26354629@N02/2658021420",
+      "author": "alexkerhead",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/"
+    },
+    {
+      "sku": "SKU-2047",
+      "name": "핸드페인팅 플라워 머그 350ml",
+      "brand": "HARU",
+      "category": "LV0202",
+      "price": 14000,
+      "list_price": null,
+      "stock_qty": 85,
+      "sale_yn": "Y",
+      "description": "꽃 그림을 손으로 그려 넣은 세라믹 머그입니다. 전자레인지와 식기세척기 사용이 가능합니다.",
+      "tags": [
+        "머그",
+        "세라믹",
+        "식기"
+      ],
+      "image": "images/SKU-2047.jpg",
+      "source_url": "https://www.flickr.com/photos/22626756@N03/14983672982",
+      "author": "Cynthia Cranes Art and Pottery",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/"
+    },
+    {
+      "sku": "SKU-2048",
+      "name": "무쇠 스킬렛 26cm",
+      "brand": "HARU",
+      "category": "LV0201",
+      "price": 45000,
+      "list_price": 55000,
+      "stock_qty": 35,
+      "sale_yn": "Y",
+      "description": "열 보존력이 뛰어난 무쇠 스킬렛입니다. 시즈닝을 마친 상태로 출고되어 바로 사용할 수 있습니다. 가스레인지와 오븐, 캠핑 화로에서 쓸 수 있습니다.",
+      "tags": [
+        "프라이팬",
+        "무쇠",
+        "스킬렛"
+      ],
+      "image": "images/SKU-2048.jpg",
+      "source_url": "https://www.flickr.com/photos/45932317@N04/5680133188",
+      "author": "Stockton350",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/"
+    },
+    {
+      "sku": "SKU-2049",
+      "name": "스테인리스 주전자 1.7L",
+      "brand": "HARU",
+      "category": "LV0203",
+      "price": 49000,
+      "list_price": null,
+      "stock_qty": 28,
+      "sale_yn": "Y",
+      "description": "스테인리스 바디의 1.7L 주전자입니다. 넓은 입구로 세척이 쉽고 인덕션과 가스레인지 모두에서 사용할 수 있습니다.",
+      "tags": [
+        "주전자",
+        "스테인리스",
+        "주방"
+      ],
+      "image": "images/SKU-2049.jpg",
+      "source_url": "https://www.flickr.com/photos/27283274@N00/27648573220",
+      "author": "celesteh",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/"
+    },
+    {
+      "sku": "SKU-2050",
+      "name": "엔드그레인 원목 도마 대",
+      "brand": "HARU",
+      "category": "LV0201",
+      "price": 59000,
+      "list_price": null,
+      "stock_qty": 40,
+      "sale_yn": "Y",
+      "description": "나뭇결 단면을 모자이크처럼 이어 붙인 엔드그레인 도마입니다. 칼날 손상이 적고 칼자국이 잘 남지 않습니다.",
+      "tags": [
+        "도마",
+        "원목",
+        "주방"
+      ],
+      "image": "images/SKU-2050.jpg",
+      "source_url": "https://www.flickr.com/photos/94852245@N00/4364156221",
+      "author": "seier+seier",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/"
+    },
+    {
+      "sku": "SKU-2051",
+      "name": "안스리움 반려식물 화분",
+      "brand": "BRSM",
+      "category": "LV0303",
+      "price": 27000,
+      "list_price": null,
+      "stock_qty": 50,
+      "sale_yn": "Y",
+      "description": "붉은 꽃이 오래 피는 안스리움 화분입니다. 반그늘에서도 잘 자라 실내에서 키우기 좋습니다. 도자기 화분에 심어 배송됩니다.",
+      "tags": [
+        "반려식물",
+        "화분",
+        "공기정화"
+      ],
+      "image": "images/SKU-2051.jpg",
+      "source_url": "https://www.flickr.com/photos/127365614@N08/16420081256",
+      "author": "ProFlowers.com",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/"
+    },
+    {
+      "sku": "SKU-1002",
+      "name": "기계식 키보드",
+      "brand": "NOVA",
+      "category": "DG0102",
+      "price": 129000,
+      "list_price": 149000,
+      "stock_qty": 40,
+      "sale_yn": "Y",
+      "description": "핫스왑을 지원하는 텐키리스 기계식 키보드입니다. PBT 키캡과 흡음재로 타건감이 안정적입니다. 유선과 블루투스를 모두 지원합니다.",
+      "tags": [
+        "키보드",
+        "기계식",
+        "텐키리스"
+      ],
+      "image": "images/SKU-1002.jpg",
+      "source_url": "https://www.flickr.com/photos/47581723@N00/31006251357",
+      "author": "Nebulant",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/"
+    },
+    {
+      "sku": "SKU-1003",
+      "name": "4K 모니터",
+      "brand": "NOVA",
+      "category": "DG0101",
+      "price": 389000,
+      "list_price": 449000,
+      "stock_qty": 8,
+      "sale_yn": "Y",
+      "description": "27인치 IPS 패널의 4K UHD 모니터입니다. sRGB 99% 색재현율로 사진과 영상 작업에 적합합니다. 높이 조절 스탠드를 기본 제공합니다.",
+      "tags": [
+        "모니터",
+        "4K",
+        "IPS"
+      ],
+      "image": "images/SKU-1003.jpg",
+      "source_url": "https://www.flickr.com/photos/34353636@N00/472792571",
+      "author": "liewcf",
+      "license": "CC BY-SA 2.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/2.0/"
+    },
+    {
+      "sku": "SKU-2061",
+      "name": "무소음 무선 마우스",
+      "brand": "NOVA",
+      "category": "DG0102",
+      "price": 19900,
+      "list_price": null,
+      "stock_qty": 220,
+      "sale_yn": "Y",
+      "description": "클릭 소음을 줄인 2.4GHz 무선 마우스입니다. AA 건전지 하나로 최대 12개월 사용할 수 있습니다.",
+      "tags": [
+        "마우스",
+        "무선",
+        "무소음"
+      ],
+      "image": "images/SKU-2061.jpg",
+      "source_url": "https://www.flickr.com/photos/42183150@N00/6848810640",
+      "author": "Trostle",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/"
+    },
+    {
+      "sku": "SKU-2062",
+      "name": "11.6인치 경량 노트북",
+      "brand": "NOVA",
+      "category": "DG0103",
+      "price": 449000,
+      "list_price": null,
+      "stock_qty": 0,
+      "sale_yn": "N",
+      "description": "1kg 초반의 가벼운 11.6인치 노트북입니다. 문서 작업과 인터넷 강의용으로 적합합니다. 현재 판매가 일시 중지된 상품입니다.",
+      "tags": [
+        "노트북",
+        "경량",
+        "학생"
+      ],
+      "image": "images/SKU-2062.jpg",
+      "source_url": "https://www.flickr.com/photos/37996646802@N01/2193891309",
+      "author": "cogdogblog",
+      "license": "CC0 1.0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    {
+      "sku": "SKU-2063",
+      "name": "무선 블루투스 헤드폰",
+      "brand": "PULS",
+      "category": "DG0201",
+      "price": 99000,
+      "list_price": 129000,
+      "stock_qty": 65,
+      "sale_yn": "Y",
+      "description": "40mm 드라이버를 탑재한 오버이어 블루투스 헤드폰입니다. 한 번 충전으로 최대 40시간 재생되며 접이식 구조로 휴대가 편합니다.",
+      "tags": [
+        "헤드폰",
+        "블루투스",
+        "무선"
+      ],
+      "image": "images/SKU-2063.jpg",
+      "source_url": "https://www.flickr.com/photos/110255976@N07/11140908364",
+      "author": "blacklerphotos",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/"
+    },
+    {
+      "sku": "SKU-2065",
+      "name": "노이즈캔슬링 무선 이어폰",
+      "brand": "PULS",
+      "category": "DG0201",
+      "price": 79000,
+      "list_price": null,
+      "stock_qty": 140,
+      "sale_yn": "Y",
+      "description": "액티브 노이즈캔슬링을 지원하는 커널형 무선 이어폰입니다. IPX4 생활방수로 운동할 때도 쓸 수 있습니다.",
+      "tags": [
+        "이어폰",
+        "노이즈캔슬링",
+        "무선"
+      ],
+      "image": "images/SKU-2065.jpg",
+      "source_url": "https://www.flickr.com/photos/60295192@N08/52234000405",
+      "author": "Fairphone",
+      "license": "CC BY-SA 2.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/2.0/"
+    },
+    {
+      "sku": "SKU-2064",
+      "name": "포터블 블루투스 스피커",
+      "brand": "PULS",
+      "category": "DG0202",
+      "price": 59000,
+      "list_price": 69000,
+      "stock_qty": 48,
+      "sale_yn": "Y",
+      "description": "한 손에 들어오는 포터블 블루투스 스피커입니다. 360도 사운드와 최대 12시간 재생을 지원합니다.",
+      "tags": [
+        "스피커",
+        "블루투스",
+        "휴대용"
+      ],
+      "image": "images/SKU-2064.jpg",
+      "source_url": "https://www.flickr.com/photos/34353636@N00/8399470150",
+      "author": "liewcf",
+      "license": "CC BY-SA 2.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/2.0/"
+    },
+    {
+      "sku": "SKU-2066",
+      "name": "클래식 이안리플렉스 필름 카메라",
+      "brand": "NOVA",
+      "category": "DG0301",
+      "price": 289000,
+      "list_price": null,
+      "stock_qty": 3,
+      "sale_yn": "Y",
+      "description": "정방형 중형 필름을 쓰는 이안리플렉스 카메라입니다. 점검을 마친 상태로 출고되며 필름 1롤이 함께 제공됩니다.",
+      "tags": [
+        "카메라",
+        "필름",
+        "클래식"
+      ],
+      "image": "images/SKU-2066.jpg",
+      "source_url": "https://www.flickr.com/photos/41894170049@N01/1728649236",
+      "author": "andrewmalone",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/"
+    },
+    {
+      "sku": "SKU-2067",
+      "name": "알루미늄 경량 삼각대",
+      "brand": "NOVA",
+      "category": "DG0302",
+      "price": 39000,
+      "list_price": null,
+      "stock_qty": 37,
+      "sale_yn": "Y",
+      "description": "접으면 45cm인 알루미늄 경량 삼각대입니다. 스마트폰 거치대가 함께 들어 있어 카메라와 휴대폰 모두에 쓸 수 있습니다.",
+      "tags": [
+        "삼각대",
+        "촬영",
+        "경량"
+      ],
+      "image": "images/SKU-2067.jpg",
+      "source_url": "https://www.flickr.com/photos/38451115@N04/5574814355",
+      "author": "pasukaru76",
+      "license": "CC0 1.0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    {
+      "sku": "SKU-2068",
+      "name": "고속충전 보조배터리 10000mAh",
+      "brand": "PULS",
+      "category": "DG0303",
+      "price": 25900,
+      "list_price": null,
+      "stock_qty": 180,
+      "sale_yn": "Y",
+      "description": "PD 20W 고속충전을 지원하는 10000mAh 보조배터리입니다. 두 기기를 동시에 충전할 수 있습니다.",
+      "tags": [
+        "보조배터리",
+        "고속충전",
+        "PD"
+      ],
+      "image": "images/SKU-2068.jpg",
+      "source_url": "https://www.flickr.com/photos/78077658@N02/9720052690",
+      "author": "Tranpan23",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/"
+    },
+    {
+      "sku": "SKU-2069",
+      "name": "스퀘어 스마트워치",
+      "brand": "PULS",
+      "category": "DG0304",
+      "price": 159000,
+      "list_price": 199000,
+      "stock_qty": 26,
+      "sale_yn": "Y",
+      "description": "심박·수면·걸음 수를 기록하는 스퀘어 스마트워치입니다. 알림 확인과 운동 모드 20종을 지원합니다.",
+      "tags": [
+        "스마트워치",
+        "웨어러블",
+        "헬스케어"
+      ],
+      "image": "images/SKU-2069.jpg",
+      "source_url": "https://www.flickr.com/photos/65265630@N03/10289879613",
+      "author": "Janitors",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/"
+    },
+    {
+      "sku": "SKU-2070",
+      "name": "USB-C 고속 충전 케이블 1.5m",
+      "brand": "PULS",
+      "category": "DG0303",
+      "price": 9900,
+      "list_price": null,
+      "stock_qty": 400,
+      "sale_yn": "Y",
+      "description": "60W 고속 충전과 데이터 전송을 지원하는 USB 케이블입니다. 1.5m 길이로 침대나 소파에서도 여유롭게 쓸 수 있습니다.",
+      "tags": [
+        "케이블",
+        "USB-C",
+        "충전"
+      ],
+      "image": "images/SKU-2070.jpg",
+      "source_url": "https://www.flickr.com/photos/17425845@N00/2418503818",
+      "author": "oskay",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/"
+    },
+    {
+      "sku": "SKU-2081",
+      "name": "경북 부사 사과 3kg",
+      "brand": "FRMS",
+      "category": "FD0101",
+      "price": 29900,
+      "list_price": 34900,
+      "stock_qty": 60,
+      "sale_yn": "Y",
+      "description": "경북 산지에서 수확한 부사 사과 3kg입니다. 아삭한 식감과 높은 당도가 특징입니다. 산지에서 선별 후 바로 발송합니다.",
+      "tags": [
+        "사과",
+        "과일",
+        "산지직송"
+      ],
+      "image": "images/SKU-2081.jpg",
+      "source_url": "https://www.flickr.com/photos/87866532@N04/8074168006",
+      "author": "Carriagehouse2011",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/"
+    },
+    {
+      "sku": "SKU-2082",
+      "name": "제주 감귤 5kg",
+      "brand": "FRMS",
+      "category": "FD0101",
+      "price": 24900,
+      "list_price": null,
+      "stock_qty": 0,
+      "sale_yn": "Y",
+      "description": "제주 노지에서 재배한 감귤 5kg입니다. 새콤달콤한 맛이 진하고 껍질이 얇아 먹기 편합니다. 현재 수확 시기가 아니어서 품절 상태입니다.",
+      "tags": [
+        "감귤",
+        "제주",
+        "과일"
+      ],
+      "image": "images/SKU-2082.jpg",
+      "source_url": "https://www.flickr.com/photos/54359128@N00/3121053314",
+      "author": "Geoff Peters 604",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/"
+    },
+    {
+      "sku": "SKU-2083",
+      "name": "완숙 토마토 2kg",
+      "brand": "FRMS",
+      "category": "FD0102",
+      "price": 15900,
+      "list_price": null,
+      "stock_qty": 70,
+      "sale_yn": "Y",
+      "description": "줄기째 붉게 익힌 완숙 토마토 2kg입니다. 샐러드와 주스, 요리에 두루 활용할 수 있습니다.",
+      "tags": [
+        "토마토",
+        "채소",
+        "완숙"
+      ],
+      "image": "images/SKU-2083.jpg",
+      "source_url": "https://www.flickr.com/photos/27429206@N02/2694720316",
+      "author": "Vladimir Morozov",
+      "license": "CC BY-SA 2.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/2.0/"
+    },
+    {
+      "sku": "SKU-2084",
+      "name": "한우 1등급 등심 500g",
+      "brand": "FRMS",
+      "category": "FD0103",
+      "price": 59000,
+      "list_price": null,
+      "stock_qty": 25,
+      "sale_yn": "Y",
+      "description": "1등급 한우 등심 500g입니다. 마블링이 고르게 분포해 구이용으로 좋습니다. 냉장 상태로 아이스박스에 담아 배송합니다.",
+      "tags": [
+        "한우",
+        "등심",
+        "정육"
+      ],
+      "image": "images/SKU-2084.jpg",
+      "source_url": "https://www.rawpixel.com/image/5927080/photo-image-public-domain-food-free",
+      "author": "unknown",
+      "license": "CC0 1.0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    {
+      "sku": "SKU-2085",
+      "name": "노르웨이 생연어 필렛 400g",
+      "brand": "FRMS",
+      "category": "FD0103",
+      "price": 23900,
+      "list_price": null,
+      "stock_qty": 30,
+      "sale_yn": "Y",
+      "description": "노르웨이산 생연어를 손질한 필렛 400g입니다. 스테이크나 회로 즐길 수 있습니다. 냉장 배송되며 수령 후 2일 안에 드시기를 권합니다.",
+      "tags": [
+        "연어",
+        "수산",
+        "냉장"
+      ],
+      "image": "images/SKU-2085.jpg",
+      "source_url": "https://www.flickr.com/photos/29848680@N08/3411600439",
+      "author": "James Bowe",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/"
+    },
+    {
+      "sku": "SKU-2086",
+      "name": "싱글오리진 원두 1kg",
+      "brand": "GRTB",
+      "category": "FD0201",
+      "price": 32000,
+      "list_price": 38000,
+      "stock_qty": 90,
+      "sale_yn": "Y",
+      "description": "미디엄 로스팅한 싱글오리진 원두 1kg입니다. 주문 후 로스팅해 발송하므로 신선합니다. 분쇄 여부를 선택할 수 있습니다.",
+      "tags": [
+        "원두",
+        "커피",
+        "로스팅"
+      ],
+      "image": "images/SKU-2086.jpg",
+      "source_url": "https://www.flickr.com/photos/96332550@N00/307110116",
+      "author": "FreeWine",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/"
+    },
+    {
+      "sku": "SKU-2087",
+      "name": "하동 녹차 잎차 100g",
+      "brand": "GRTB",
+      "category": "FD0201",
+      "price": 18000,
+      "list_price": null,
+      "stock_qty": 45,
+      "sale_yn": "Y",
+      "description": "하동 야생 차밭에서 딴 잎으로 만든 녹차 잎차입니다. 은은한 단맛과 고소한 향이 특징입니다. 틴 케이스에 담아 보관이 편합니다.",
+      "tags": [
+        "녹차",
+        "잎차",
+        "하동"
+      ],
+      "image": "images/SKU-2087.jpg",
+      "source_url": "https://www.flickr.com/photos/188326905@N04/49890023542",
+      "author": "Goat Tree Designs",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/"
+    },
+    {
+      "sku": "SKU-2088",
+      "name": "국산 아카시아 벌꿀 1kg",
+      "brand": "SODAM",
+      "category": "FD0203",
+      "price": 35000,
+      "list_price": 42000,
+      "stock_qty": 55,
+      "sale_yn": "Y",
+      "description": "국내 양봉 농가에서 채밀한 아카시아 벌꿀 1kg입니다. 맑은 색과 부드러운 단맛이 특징입니다.",
+      "tags": [
+        "꿀",
+        "아카시아",
+        "국산"
+      ],
+      "image": "images/SKU-2088.jpg",
+      "source_url": "https://www.flickr.com/photos/184594136@N08/51330849013",
+      "author": "Alabama Extension",
+      "license": "CC0 1.0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    {
+      "sku": "SKU-2089",
+      "name": "이천 햅쌀 10kg",
+      "brand": "SODAM",
+      "category": "FD0202",
+      "price": 38900,
+      "list_price": null,
+      "stock_qty": 100,
+      "sale_yn": "Y",
+      "description": "이천에서 수확한 햅쌀 10kg입니다. 도정일로부터 7일 이내 발송해 밥맛이 좋습니다.",
+      "tags": [
+        "쌀",
+        "햅쌀",
+        "이천"
+      ],
+      "image": "images/SKU-2089.jpg",
+      "source_url": "https://www.flickr.com/photos/58876504@N02/6740181017",
+      "author": "Rowan Peter",
+      "license": "CC BY-SA 2.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/2.0/"
+    },
+    {
+      "sku": "SKU-2090",
+      "name": "하루 한 줌 믹스넛 30봉",
+      "brand": "SODAM",
+      "category": "FD0203",
+      "price": 27900,
+      "list_price": null,
+      "stock_qty": 150,
+      "sale_yn": "Y",
+      "description": "아몬드·캐슈넛·브라질너트 등을 섞은 하루 견과 30봉입니다. 소포장이라 간식으로 챙기기 좋습니다.",
+      "tags": [
+        "견과류",
+        "간식",
+        "소포장"
+      ],
+      "image": "images/SKU-2090.jpg",
+      "source_url": "https://www.flickr.com/photos/45032885@N04/4415406430",
+      "author": "s58y",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/"
+    },
+    {
+      "sku": "SKU-2091",
+      "name": "엑스트라버진 올리브오일 500ml",
+      "brand": "GRTB",
+      "category": "FD0204",
+      "price": 19900,
+      "list_price": null,
+      "stock_qty": 65,
+      "sale_yn": "Y",
+      "description": "냉압착 방식으로 짠 엑스트라버진 올리브오일입니다. 샐러드 드레싱이나 빵에 찍어 먹기 좋습니다.",
+      "tags": [
+        "올리브오일",
+        "엑스트라버진",
+        "오일"
+      ],
+      "image": "images/SKU-2091.jpg",
+      "source_url": "https://www.rawpixel.com/image/5927777/photo-image-background-public-domain-black",
+      "author": "unknown",
+      "license": "CC0 1.0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    {
+      "sku": "SKU-2092",
+      "name": "유기농 카카오닙스 500g",
+      "brand": "GRTB",
+      "category": "FD0203",
+      "price": 16900,
+      "list_price": null,
+      "stock_qty": 40,
+      "sale_yn": "Y",
+      "description": "유기농 카카오 원두를 볶아 잘게 부순 카카오닙스입니다. 요거트나 오트밀에 곁들이면 쌉싸름한 풍미를 더합니다.",
+      "tags": [
+        "카카오닙스",
+        "유기농",
+        "슈퍼푸드"
+      ],
+      "image": "images/SKU-2092.jpg",
+      "source_url": "https://www.flickr.com/photos/61532128@N00/5169855559",
+      "author": "EverJean",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/"
+    },
+    {
+      "sku": "SKU-2101",
+      "name": "TPE 요가매트 6mm",
+      "brand": "BRSM",
+      "category": "SP0101",
+      "price": 29900,
+      "list_price": 39900,
+      "stock_qty": 85,
+      "sale_yn": "Y",
+      "description": "미끄럼 방지 패턴의 TPE 요가매트입니다. 6mm 두께로 무릎 부담을 줄여 주며 스트랩이 함께 제공됩니다.",
+      "tags": [
+        "요가매트",
+        "TPE",
+        "홈트"
+      ],
+      "image": "images/SKU-2101.jpg",
+      "source_url": "https://www.flickr.com/photos/24886284@N00/393409257",
+      "author": "cowbite",
+      "license": "CC BY-SA 2.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/2.0/"
+    },
+    {
+      "sku": "SKU-2102",
+      "name": "크롬 덤벨 5kg 2개 세트",
+      "brand": "PULS",
+      "category": "SP0102",
+      "price": 49000,
+      "list_price": null,
+      "stock_qty": 40,
+      "sale_yn": "Y",
+      "description": "미끄럼 방지 널링 손잡이의 크롬 덤벨 세트입니다. 5kg 2개로 구성되어 홈트레이닝에 적합합니다.",
+      "tags": [
+        "덤벨",
+        "홈트",
+        "근력운동"
+      ],
+      "image": "images/SKU-2102.jpg",
+      "source_url": "https://www.flickr.com/photos/21051491@N02/3210745877",
+      "author": "qubodup",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/"
+    },
+    {
+      "sku": "SKU-2103",
+      "name": "주물 케틀벨 12kg",
+      "brand": "PULS",
+      "category": "SP0102",
+      "price": 45000,
+      "list_price": null,
+      "stock_qty": 0,
+      "sale_yn": "Y",
+      "description": "한 덩어리로 주조한 주물 케틀벨입니다. 넓은 손잡이로 스윙과 스쿼트 등 전신 운동에 쓸 수 있습니다.",
+      "tags": [
+        "케틀벨",
+        "근력운동",
+        "홈트"
+      ],
+      "image": "images/SKU-2103.jpg",
+      "source_url": "https://www.flickr.com/photos/27504933@N00/2848737069",
+      "author": "WilsonB",
+      "license": "CC BY-SA 2.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/2.0/"
+    },
+    {
+      "sku": "SKU-2104",
+      "name": "원목 손잡이 줄넘기",
+      "brand": "BRSM",
+      "category": "SP0101",
+      "price": 9900,
+      "list_price": null,
+      "stock_qty": 200,
+      "sale_yn": "Y",
+      "description": "원목 손잡이를 단 PVC 줄넘기입니다. 길이 조절이 쉬워 어린이부터 성인까지 사용할 수 있습니다.",
+      "tags": [
+        "줄넘기",
+        "유산소",
+        "홈트"
+      ],
+      "image": "images/SKU-2104.jpg",
+      "source_url": "https://www.flickr.com/photos/110671496@N06/17122891210",
+      "author": "Jonathan Rolande",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/"
+    },
+    {
+      "sku": "SKU-2105",
+      "name": "쿠셔닝 러닝화",
+      "brand": "URBF",
+      "category": "SP0303",
+      "price": 99000,
+      "list_price": 119000,
+      "stock_qty": 50,
+      "sale_yn": "Y",
+      "description": "가벼운 쿠셔닝 미드솔을 적용한 러닝화입니다. 통기성 좋은 메시 갑피로 장거리 러닝에도 쾌적합니다.",
+      "tags": [
+        "러닝화",
+        "쿠셔닝",
+        "운동화"
+      ],
+      "image": "images/SKU-2105.jpg",
+      "source_url": "https://www.flickr.com/photos/63051956@N00/3769610224",
+      "author": "minorissues",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/"
+    },
+    {
+      "sku": "SKU-2106",
+      "name": "등산 배낭 35L",
+      "brand": "BRSM",
+      "category": "SP0202",
+      "price": 89000,
+      "list_price": null,
+      "stock_qty": 22,
+      "sale_yn": "Y",
+      "description": "등판 통기 구조를 적용한 35L 등산 배낭입니다. 레인커버가 내장되어 갑작스러운 비에도 대비할 수 있습니다.",
+      "tags": [
+        "배낭",
+        "등산",
+        "35L"
+      ],
+      "image": "images/SKU-2106.jpg",
+      "source_url": "https://www.flickr.com/photos/14362628@N00/207756390",
+      "author": "andrew.petro",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/"
+    },
+    {
+      "sku": "SKU-2107",
+      "name": "4인용 돔 텐트",
+      "brand": "BRSM",
+      "category": "SP0201",
+      "price": 219000,
+      "list_price": 259000,
+      "stock_qty": 9,
+      "sale_yn": "Y",
+      "description": "설치가 쉬운 4인용 돔 텐트입니다. 내수압 3000mm 플라이로 비바람에 강합니다. 캠핑 입문자에게 알맞습니다.",
+      "tags": [
+        "텐트",
+        "캠핑",
+        "4인용"
+      ],
+      "image": "images/SKU-2107.jpg",
+      "source_url": "https://www.flickr.com/photos/37387065@N05/9031890963",
+      "author": "Dave Dugdale",
+      "license": "CC BY-SA 2.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/2.0/"
+    },
+    {
+      "sku": "SKU-2108",
+      "name": "접이식 캠핑 체어",
+      "brand": "BRSM",
+      "category": "SP0201",
+      "price": 34900,
+      "list_price": null,
+      "stock_qty": 75,
+      "sale_yn": "Y",
+      "description": "컵홀더가 달린 접이식 캠핑 체어입니다. 수납 가방이 포함되어 차량 보관이 쉽습니다. 최대 하중은 120kg입니다.",
+      "tags": [
+        "캠핑의자",
+        "접이식",
+        "캠핑"
+      ],
+      "image": "images/SKU-2108.jpg",
+      "source_url": "https://www.flickr.com/photos/19714819@N00/15226270022",
+      "author": "MarkDoliner",
+      "license": "CC BY-SA 2.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/2.0/"
+    },
+    {
+      "sku": "SKU-2109",
+      "name": "어린이 자전거 헬멧",
+      "brand": "PULS",
+      "category": "SP0302",
+      "price": 32000,
+      "list_price": null,
+      "stock_qty": 60,
+      "sale_yn": "Y",
+      "description": "통풍구를 넉넉히 낸 어린이용 자전거 헬멧입니다. 다이얼로 머리 둘레를 조절할 수 있고 KC 인증을 받았습니다.",
+      "tags": [
+        "헬멧",
+        "자전거",
+        "어린이"
+      ],
+      "image": "images/SKU-2109.jpg",
+      "source_url": "https://www.flickr.com/photos/25147647@N04/9258410966",
+      "author": "Tolbxela",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/"
+    },
+    {
+      "sku": "SKU-2110",
+      "name": "공인 규격 축구공 5호",
+      "brand": "PULS",
+      "category": "SP0301",
+      "price": 29000,
+      "list_price": null,
+      "stock_qty": 110,
+      "sale_yn": "Y",
+      "description": "열접착 방식으로 만든 5호 축구공입니다. 반발력이 일정하고 잔디와 인조잔디 모두에서 사용할 수 있습니다.",
+      "tags": [
+        "축구공",
+        "5호",
+        "구기"
+      ],
+      "image": "images/SKU-2110.jpg",
+      "source_url": "https://www.flickr.com/photos/93421824@N06/8633590343",
+      "author": "Filter Forge",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0/"
+    },
+    {
+      "sku": "SKU-2111",
+      "name": "입문용 테니스 라켓",
+      "brand": "PULS",
+      "category": "SP0301",
+      "price": 79000,
+      "list_price": 95000,
+      "stock_qty": 18,
+      "sale_yn": "Y",
+      "description": "가벼운 카본 프레임의 입문용 테니스 라켓입니다. 스트링이 매어진 상태로 출고되어 바로 사용할 수 있습니다.",
+      "tags": [
+        "테니스",
+        "라켓",
+        "입문용"
+      ],
+      "image": "images/SKU-2111.jpg",
+      "source_url": "https://www.flickr.com/photos/39292753@N06/9231978369",
+      "author": "davelowensohn",
+      "license": "CC BY-SA 2.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/2.0/"
+    },
+    {
+      "sku": "SKU-2112",
+      "name": "스테인리스 스포츠 물병 750ml",
+      "brand": "BRSM",
+      "category": "SP0303",
+      "price": 15900,
+      "list_price": null,
+      "stock_qty": 160,
+      "sale_yn": "Y",
+      "description": "식품용 스테인리스로 만든 750ml 스포츠 물병입니다. 한 손으로 여닫는 스포츠 캡으로 운동 중에도 편리합니다.",
+      "tags": [
+        "물병",
+        "스테인리스",
+        "텀블러"
+      ],
+      "image": "images/SKU-2112.jpg",
+      "source_url": "https://commons.wikimedia.org/w/index.php?curid=19133709",
+      "author": "Amraepowell",
+      "license": "CC0 1.0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/deed.en/"
+    }
+  ]
+}

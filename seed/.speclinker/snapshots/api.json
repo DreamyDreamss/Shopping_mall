@@ -1,0 +1,310 @@
+{
+ "base": "http://localhost:8087",
+ "captured_at": "2026-09-16T06:32:54",
+ "ignore_order": false,
+ "responses": {
+  "/api/members": {
+   "__json": [
+    {
+     "grade": "GOLD",
+     "memberId": "M-0001",
+     "memberName": "김실증",
+     "phone": "010-1111-2222",
+     "recentOrders": []
+    },
+    {
+     "grade": "SILVER",
+     "memberId": "M-0002",
+     "memberName": "이도그",
+     "phone": "010-3333-4444",
+     "recentOrders": []
+    },
+    {
+     "grade": "BRONZE",
+     "memberId": "M-0003",
+     "memberName": "박푸딩",
+     "phone": null,
+     "recentOrders": []
+    }
+   ],
+   "__status": 200
+  },
+  "/api/members/grades": {
+   "__json": [
+    {
+     "code": "BRONZE",
+     "discountRate": 0,
+     "name": "브론즈"
+    },
+    {
+     "code": "SILVER",
+     "discountRate": 3,
+     "name": "실버"
+    },
+    {
+     "code": "GOLD",
+     "discountRate": 5,
+     "name": "골드"
+    },
+    {
+     "code": "VIP",
+     "discountRate": 10,
+     "name": "VIP"
+    }
+   ],
+   "__status": 200
+  },
+  "/api/orders?startDate=2026-01-01&endDate=2026-12-31": {
+   "__json": {
+    "items": [
+     {
+      "deliveries": null,
+      "items": null,
+      "memberId": "M-0002",
+      "memberName": "이도그",
+      "orderNo": "20260817-0002",
+      "orderState": "CANCELED",
+      "orderedAt": "2026-08-17T09:40:00",
+      "totalAmount": 450000
+     },
+     {
+      "deliveries": null,
+      "items": null,
+      "memberId": "M-0003",
+      "memberName": "박푸딩",
+      "orderNo": "20260817-0001",
+      "orderState": "PLACED",
+      "orderedAt": "2026-08-17T09:00:00",
+      "totalAmount": 129000
+     },
+     {
+      "deliveries": null,
+      "items": null,
+      "memberId": "M-0001",
+      "memberName": "김실증",
+      "orderNo": "20260816-0002",
+      "orderState": "PARTIAL_SHIPPED",
+      "orderedAt": "2026-08-16T16:05:00",
+      "totalAmount": 579000
+     },
+     {
+      "deliveries": null,
+      "items": null,
+      "memberId": "M-0002",
+      "memberName": "이도그",
+      "orderNo": "20260816-0001",
+      "orderState": "PAID",
+      "orderedAt": "2026-08-16T14:30:00",
+      "totalAmount": 390000
+     },
+     {
+      "deliveries": null,
+      "items": null,
+      "memberId": "M-0001",
+      "memberName": "김실증",
+      "orderNo": "20260815-0001",
+      "orderState": "DONE",
+      "orderedAt": "2026-08-15T10:12:00",
+      "totalAmount": 519000
+     }
+    ],
+    "page": 1,
+    "totalCount": 5
+   },
+   "__status": 200
+  },
+  "/api/orders?startDate=2026-01-01&endDate=2026-12-31&orderState=PAID": {
+   "__json": {
+    "items": [
+     {
+      "deliveries": null,
+      "items": null,
+      "memberId": "M-0002",
+      "memberName": "이도그",
+      "orderNo": "20260816-0001",
+      "orderState": "PAID",
+      "orderedAt": "2026-08-16T14:30:00",
+      "totalAmount": 390000
+     }
+    ],
+    "page": 1,
+    "totalCount": 1
+   },
+   "__status": 200
+  },
+  "/api/orders?startDate=2026-01-01&endDate=2026-12-31&page=1&size=10": {
+   "__json": {
+    "items": [
+     {
+      "deliveries": null,
+      "items": null,
+      "memberId": "M-0002",
+      "memberName": "이도그",
+      "orderNo": "20260817-0002",
+      "orderState": "CANCELED",
+      "orderedAt": "2026-08-17T09:40:00",
+      "totalAmount": 450000
+     },
+     {
+      "deliveries": null,
+      "items": null,
+      "memberId": "M-0003",
+      "memberName": "박푸딩",
+      "orderNo": "20260817-0001",
+      "orderState": "PLACED",
+      "orderedAt": "2026-08-17T09:00:00",
+      "totalAmount": 129000
+     },
+     {
+      "deliveries": null,
+      "items": null,
+      "memberId": "M-0001",
+      "memberName": "김실증",
+      "orderNo": "20260816-0002",
+      "orderState": "PARTIAL_SHIPPED",
+      "orderedAt": "2026-08-16T16:05:00",
+      "totalAmount": 579000
+     },
+     {
+      "deliveries": null,
+      "items": null,
+      "memberId": "M-0002",
+      "memberName": "이도그",
+      "orderNo": "20260816-0001",
+      "orderState": "PAID",
+      "orderedAt": "2026-08-16T14:30:00",
+      "totalAmount": 390000
+     },
+     {
+      "deliveries": null,
+      "items": null,
+      "memberId": "M-0001",
+      "memberName": "김실증",
+      "orderNo": "20260815-0001",
+      "orderState": "DONE",
+      "orderedAt": "2026-08-15T10:12:00",
+      "totalAmount": 519000
+     }
+    ],
+    "page": 1,
+    "totalCount": 5
+   },
+   "__status": 200
+  },
+  "/api/orders?startDate=2026-01-01&endDate=2026-12-31&page=1&size=20": {
+   "__json": {
+    "items": [
+     {
+      "deliveries": null,
+      "items": null,
+      "memberId": "M-0002",
+      "memberName": "이도그",
+      "orderNo": "20260817-0002",
+      "orderState": "CANCELED",
+      "orderedAt": "2026-08-17T09:40:00",
+      "totalAmount": 450000
+     },
+     {
+      "deliveries": null,
+      "items": null,
+      "memberId": "M-0003",
+      "memberName": "박푸딩",
+      "orderNo": "20260817-0001",
+      "orderState": "PLACED",
+      "orderedAt": "2026-08-17T09:00:00",
+      "totalAmount": 129000
+     },
+     {
+      "deliveries": null,
+      "items": null,
+      "memberId": "M-0001",
+      "memberName": "김실증",
+      "orderNo": "20260816-0002",
+      "orderState": "PARTIAL_SHIPPED",
+      "orderedAt": "2026-08-16T16:05:00",
+      "totalAmount": 579000
+     },
+     {
+      "deliveries": null,
+      "items": null,
+      "memberId": "M-0002",
+      "memberName": "이도그",
+      "orderNo": "20260816-0001",
+      "orderState": "PAID",
+      "orderedAt": "2026-08-16T14:30:00",
+      "totalAmount": 390000
+     },
+     {
+      "deliveries": null,
+      "items": null,
+      "memberId": "M-0001",
+      "memberName": "김실증",
+      "orderNo": "20260815-0001",
+      "orderState": "DONE",
+      "orderedAt": "2026-08-15T10:12:00",
+      "totalAmount": 519000
+     }
+    ],
+    "page": 1,
+    "totalCount": 5
+   },
+   "__status": 200
+  },
+  "/api/products": {
+   "__json": [
+    {
+     "price": 390000,
+     "productName": "스탠딩 데스크",
+     "saleYn": "Y",
+     "sku": "SKU-1001",
+     "stockQty": 12
+    },
+    {
+     "price": 129000,
+     "productName": "기계식 키보드",
+     "saleYn": "Y",
+     "sku": "SKU-1002",
+     "stockQty": 40
+    },
+    {
+     "price": 450000,
+     "productName": "4K 모니터",
+     "saleYn": "Y",
+     "sku": "SKU-1003",
+     "stockQty": 7
+    }
+   ],
+   "__status": 200
+  },
+  "/api/products?inStock=true": {
+   "__json": [
+    {
+     "price": 390000,
+     "productName": "스탠딩 데스크",
+     "saleYn": "Y",
+     "sku": "SKU-1001",
+     "stockQty": 12
+    },
+    {
+     "price": 129000,
+     "productName": "기계식 키보드",
+     "saleYn": "Y",
+     "sku": "SKU-1002",
+     "stockQty": 40
+    },
+    {
+     "price": 450000,
+     "productName": "4K 모니터",
+     "saleYn": "Y",
+     "sku": "SKU-1003",
+     "stockQty": 7
+    }
+   ],
+   "__status": 200
+  },
+  "/api/products?keyword=%EC%83%81%ED%92%88": {
+   "__json": [],
+   "__status": 200
+  }
+ }
+}

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sm.lab.shop.dao.OrderDao">
+  <!-- linked_func: FUNC-order-001
+       spec: docs/00_FUNC/stories/STORY-FUNC-order-001.md -->
+
+  <!-- 주문 목록 — 회원명 조인, 논리삭제 상시필터(del_yn='N'), 주문상태 필터(orderState, LAB-101),
+       조회 기간 필터(startDate/endDate, SR-205). round2(QA r1 권고1): round1의 selectOrdersInPeriod를
+       되돌려 한 벌로 통합 — 상시필터·조인·정렬 중복을 없앤다. startDate/endDate는 선택적(null이면
+       무필터) — 목록 화면/API는 OrderService.list가 항상 유효 구간을 채워 넘기고(미제시 시 최근
+       30일 기본), export(FUNC-order-013)는 null,null을 넘겨 기간 무필터로 기존 동작 그대로 유지한다.
+       경계는 [startDate, endDate+1일) 반열림 구간 — DATE(ordered_at) BETWEEN(round1)은 컬럼에
+       함수를 씌워 non-sargable이라 향후 ordered_at 인덱스가 추가돼도 활용되지 못하므로, 비교연산자만
+       쓰는 이 형태로 교체했다(QA r1 권고2).
+       linked_func: FUNC-order-001 -->
+  <select id="selectOrders" resultType="com.sm.lab.shop.domain.Order">
+    SELECT o.order_no, o.member_id, m.member_name, o.order_state, o.total_amount, o.ordered_at
+      FROM ORDERS o
+      JOIN MEMBERS m ON o.member_id = m.member_id
+     WHERE o.del_yn = 'N'
+    <if test="startDate != null">
+       AND o.ordered_at &gt;= #{startDate}
+    </if>
+    <if test="endDate != null">
+       AND o.ordered_at &lt; #{endDate} + INTERVAL 1 DAY
+    </if>
+    <if test="memberId != null and memberId != ''">
+       AND o.member_id = #{memberId}
+    </if>
+    <if test="state != null and state != ''">
+       AND o.order_state = #{state}
+    </if>
+     ORDER BY o.ordered_at DESC
+     LIMIT #{size} OFFSET #{offset}
+  </select>
+
+  <select id="countOrders" resultType="int">
+    SELECT COUNT(*)
+      FROM ORDERS o
+     WHERE o.del_yn = 'N'
+    <if test="startDate != null">
+       AND o.ordered_at &gt;= #{startDate}
+    </if>
+    <if test="endDate != null">
+       AND o.ordered_at &lt; #{endDate} + INTERVAL 1 DAY
+    </if>
+    <if test="memberId != null and memberId != ''">
+       AND o.member_id = #{memberId}
+    </if>
+    <if test="state != null and state != ''">
+       AND o.order_state = #{state}
+    </if>
+  </select>
+
+  <select id="selectByOrderNo" resultType="com.sm.lab.shop.domain.Order">
+    SELECT o.order_no, o.member_id, m.member_name, o.order_state, o.total_amount, o.ordered_at
+      FROM ORDERS o
+      JOIN MEMBERS m ON o.member_id = m.member_id
+     WHERE o.del_yn = 'N'
+       AND o.order_no = #{orderNo}
+  </select>
+
+  <!-- 회원 최근 주문 요약 — 삭제 제외 상시필터, 최신순 상위 N건
+       linked_func: FUNC-order-004 (LAB-103) -->
+  <select id="selectRecentByMember" resultType="com.sm.lab.shop.domain.OrderSummary">
+    SELECT o.order_no, o.order_state, o.total_amount, o.ordered_at
+      FROM ORDERS o
+     WHERE o.del_yn = 'N'
+       AND o.member_id = #{memberId}
+     ORDER BY o.ordered_at DESC, o.order_no DESC
+     LIMIT #{limit}
+  </select>
+
+  <select id="selectItems" resultType="com.sm.lab.shop.domain.OrderItem">
+    SELECT i.order_no, i.line_no, i.sku, p.product_name, i.qty, i.unit_price
+      FROM ORDER_ITEMS i
+      JOIN PRODUCTS p ON i.sku = p.sku
+     WHERE i.order_no = #{orderNo}
+     ORDER BY i.line_no
+  </select>
+
+  <!-- linked_func: FUNC-order-006 — 배송 이력 최신순 정렬: shipped_at DESC(MariaDB DESC에서 NULL은
+       마지막 — 미발송 READY 건은 하단), tie는 delivery_no DESC (LAB-113) -->
+  <select id="selectDeliveries" resultType="com.sm.lab.shop.domain.OrderDelivery">
+    SELECT d.delivery_no, d.order_no, d.delivery_state, d.invoice_no, d.shipped_at
+      FROM ORDER_DELIVERY d
+     WHERE d.order_no = #{orderNo}
+     ORDER BY d.shipped_at DESC, d.delivery_no DESC
+  </select>
+
+  <!-- linked_func: FUNC-order-001 — SR-210: 주문 목록 화면(UIS-ORD-001) 배송상태 열 전용 배치 조회.
+       확정 문답(scope_freeze, api_compat): INF-ORD-003(GET /api/orders) 응답에는 쓰지 않는다 —
+       화면 조회 경로(OrderService.latestDeliveryStatesByOrderNo) 전용.
+       round4(재작업지시 2 — QA r13 CONCERNS 권고2): 최신 판정 기준을 FUNC-order-006(selectDeliveries,
+       주문 상세 화면)의 shipped_at DESC 기준과 더 이상 맞추지 않는다. 이 화면(주문 목록)에서 "최신"은
+       "배송 이력이 가장 최근에 생성된 건"을 의미하며, ORDER_DELIVERY에는 등록시각 컬럼이 없어
+       delivery_no(배송번호, PK, 발번 시 순차 채번 — DB 실측 varchar(20)/AUTO_INCREMENT 아님이나 같은
+       주문 내에서는 순번이 증가하는 코드 규약)를 생성 순서 대리 지표로 쓴다. shipped_at DESC를
+       1순위로 쓰면 MariaDB DESC에서 NULL이 마지막으로 정렬되어, shipped_at이 NULL인 미출고(READY)
+       건이 더 나중에 생성됐어도 항상 출고완료 이력 뒤로 밀리는 결함이 있었다(실데이터 20260816-0002 —
+       D-0816-1 SHIPPED(2026-08-17 08:20) + D-0816-2 READY(NULL)에서 SHIPPED가 "최신"으로 잘못
+       표시됨, D-0816-2가 더 나중에 채번된 실제 최신 이력). delivery_no DESC 단독 기준으로 정정 —
+       ROW_NUMBER() 윈도우 함수(MariaDB 11.4)로 주문번호별 1건(최신 생성)만 선별한다.
+       linked_func: FUNC-order-001 -->
+  <select id="selectLatestDeliveryStates" resultType="com.sm.lab.shop.domain.OrderDelivery">
+    SELECT t.order_no, t.delivery_state
+      FROM (
+        SELECT d.order_no, d.delivery_state,
+               ROW_NUMBER() OVER (PARTITION BY d.order_no ORDER BY d.delivery_no DESC) AS rn
+          FROM ORDER_DELIVERY d
+         WHERE d.order_no IN
+          <foreach item="orderNo" collection="orderNos" open="(" separator="," close=")">
+            #{orderNo}
+          </foreach>
+      ) t
+     WHERE t.rn = 1
+  </select>
+
+  <insert id="insertOrder" parameterType="com.sm.lab.shop.domain.Order">
+    INSERT INTO ORDERS (order_no, member_id, order_state, total_amount)
+    VALUES (#{orderNo}, #{memberId}, #{orderState}, #{totalAmount})
+  </insert>
+
+  <insert id="insertItem" parameterType="com.sm.lab.shop.domain.OrderItem">
+    INSERT INTO ORDER_ITEMS (order_no, line_no, sku, qty, unit_price)
+    VALUES (#{orderNo}, #{lineNo}, #{sku}, #{qty}, #{unitPrice})
+  </insert>
+
+  <!-- linked_func: FUNC-order-002 — 상태 가드: 동시 취소 레이스의 이중 원복 방지 (LAB-102 QA r1) -->
+  <update id="updateState">
+    UPDATE ORDERS
+       SET order_state = #{state}
+     WHERE order_no = #{orderNo}
+       AND del_yn = 'N'
+       AND order_state NOT IN ('CANCELED', 'DONE')
+  </update>
+
+</mapper>

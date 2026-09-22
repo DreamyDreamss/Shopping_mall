@@ -1,0 +1,320 @@
+{
+  "func": "SR-306.2",
+  "epic": "SR-306",
+  "story": "docs/변경관리/SR-306/STORY-2.md",
+  "gate": "CONCERNS",
+  "reviewer": "qa-agent",
+  "updated": "2026-09-17T08:28:46",
+  "layers": {
+    "spec": "pass",
+    "security": "pass",
+    "regression": "pass",
+    "baseline": "pass",
+    "scope": "fail",
+    "rules": "concerns",
+    "conformance": "pass"
+  },
+  "top_issues": [
+    {
+      "severity": "high",
+      "layer": "scope",
+      "finding": "스코프 밖 변경: modules/shop-web/tsconfig.tsbuildinfo (M)",
+      "suggested_action": "이 변경이 이 작업 항목에 필요한지 확인하고, 아니면 되돌리세요"
+    },
+    {
+      "severity": "medium",
+      "layer": "rules",
+      "finding": "규칙 위반 [lab/file-size-cap/java-file-cap] modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java:0 — 자바 파일 450줄 초과 — 책임을 나눈다(필터·핸들러·서비스가 한 파일에 자라면 QA가 스코프를 못 가른다)",
+      "suggested_action": "규칙을 지키도록 고치거나, 규칙이 틀렸으면 SpecLens /rules에서 규칙을 고치세요"
+    },
+    {
+      "severity": "low",
+      "layer": "conformance",
+      "finding": "STORY의 '수용 기준' 절 TO-BE 항목 3개(INF-ORD-008·INF-ORD-009·SCH-ORD-005)가 02_변경명세.md·STORY 모두 '[미상] — 사람이 적는다' 플레이스홀더로 남아 있다(이 랩의 zero-LLM 기계채택 관례상 정상 — 실질 TO-BE는 상단 '확정된 요건 문답 10건'에 있고 dev/QA/test-agent가 그것을 근거로 썼다). 코드 결함은 아니며 verify-agent가 대신 그 확정 문답을 AC 정본으로 사용해 매핑했음을 기록만 남긴다.",
+      "suggested_action": "STEP 5.5(스펙 재동기화)에서 INF-ORD-008/009·SCH-ORD-005에 listPrice/imageUrl·list_price/image_url 반영 시 이 절의 [미상]도 함께 채우면 다음 회차 추적이 쉬워짐(권고, 비차단)",
+      "confidence": "high"
+    },
+    {
+      "severity": "low",
+      "layer": "conformance",
+      "finding": "ApiKeyAuthFilter.java가 557줄로 file-size-cap(should, java 450) 초과 — 다만 QA round1이 이미 지적한 기존 초과분이며 이 항목의 변경분(+7줄, isOpenRoute 화이트리스트 1조건)이 원인이 아니다.",
+      "suggested_action": "후속 분리 TODO(QA 권고와 동일, 비차단)",
+      "confidence": "high"
+    }
+  ],
+  "rounds": [
+    {
+      "round": 1,
+      "gate": "CONCERNS",
+      "human": {
+        "decision": "rework",
+        "by": "사람",
+        "at": "2026-09-17T07:56:22",
+        "comment": "1을 고치기: null 응답 단언을 jsonPath(...).value(org.hamcrest.Matchers.nullValue())로 바꾸고, 필드 자체가 사라지면 실패하는지 직접 확인(필드를 빼 보고 테스트가 깨지는지)한 뒤 그 사실을 Dev 기록에 남긴다. 2를 고치기: ApiKeyAuthFilter의 /images/ 화이트리스트를 /images/products/ 로 좁힌다. 3·4·5는 이번 라운드에서 손대지 않는다(사람 결정: 3은 설정 제거가 오히려 위험, 4는 미사용 화면 후속 TODO, 5는 이미 추적 중인 기존 초과분). 완료 조건: 정가 NULL 상품 응답에서 listPrice가 있고 null임을 단언 · /images/products/*.svg 200 유지 · /images/ 밑 다른 경로(예: /images/secret.txt)는 401 또는 404로 막힘 · 기존 통과 유지. 전체 스위트로 재확인.",
+        "targets": []
+      },
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "ProductControllerTest가 listPrice/imageUrl의 null 응답을 jsonPath(...).doesNotExist()로 단언한다. Spring JsonPathExpectationsHelper.doesNotExist()는 마지막에 assertTrue(value == null)이라(spring-test 6.1.14 바이트코드 확인) '필드 없음'과 '필드 있고 값 null' 둘 다 통과한다 — 변경명세의 '값이 없으면 null로 내려간다'와 사람 완료조건 'list_price NULL 상품은 null 응답'을 고정하는 테스트가 실질적으로 없다(현재 실제 응답은 Jackson 기본 inclusion=ALWAYS라 null이 맞음). 사례집 SR-302 #1 '가드를 지워도 통과하는 거짓 보증' 재발 형태.",
+          "suggested_action": "jsonPath(\"$[0].listPrice\").value(org.hamcrest.Matchers.nullValue())로 교체(경로 부재면 실패, null이면 통과). $.imageUrl 단언도 동일하게 교체."
+        },
+        {
+          "severity": "low",
+          "layer": "security",
+          "finding": "ApiKeyAuthFilter.isOpenRoute의 path.startsWith(\"/images/\")는 필터 전체를 스킵하므로 훗날 /images/ 아래 매핑(업로드 API 등)이 생기면 자동 무인증이 된다(현재는 정적 자산뿐이라 무해).",
+          "suggested_action": "실제 서빙 위치인 /images/products/ 로 접두사를 좁힌다."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "ProductImageStaticResourceConfig는 Spring Boot 기본 정적 매핑(classpath:/static/ -> /**, add-mappings 기본 true)과 기능이 겹쳐 삭제해도 ProductImageStaticResourceServingTest가 그대로 통과한다 — 설정의 필요성을 테스트가 증명하지 못한다.",
+          "suggested_action": "기본 매핑 위임으로 클래스를 제거하거나, 중복임을 Javadoc에 명시해 다음 사람이 필수 설정으로 오인하지 않게 한다."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "selectProductsForList(Thymeleaf 정렬 화면)만 두 컬럼을 빼서 같은 화면이 sort=latest면 값이 차고 priceAsc/Desc면 null이 되는 비대칭이 생겼다(템플릿 미사용이라 현재 무증상).",
+          "suggested_action": "후속 TODO — 해당 화면이 정가·이미지를 쓰게 될 때 컬럼을 함께 채운다(주석은 이미 남아 있음)."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "ApiKeyAuthFilter.java 554줄로 file-size-cap(java 450, should) 초과 — 이번 변경분(+7줄)이 원인이 아닌 기존 초과분.",
+          "suggested_action": "후속 분리 TODO(이번 라운드 재작업 대상 아님)."
+        }
+      ],
+      "cause": "impl_bug"
+    },
+    {
+      "round": 2,
+      "gate": "CONCERNS",
+      "human": {
+        "decision": "rework",
+        "by": "사람",
+        "at": "2026-09-17T08:13:39",
+        "comment": "round 2 재작업: 1) imagesPathOutsideProductsPrefix_isNotWhitelisted의 단언을 assertThat(status).isIn(401,404) 대신 assertThat(status).isEqualTo(401)로 고정한다 — 화이트리스트를 /images/ 전체로 되돌리면 404가 되어 테스트가 깨지는지 직접 확인하고 Dev 기록에 남길 것. 2) 같은 파일의 주석(:80, '정적 리소스 매핑도 /images/products/**로 고정')을 실제 설정(ProductImageStaticResourceConfig가 여전히 /images/**를 등록)에 맞게 정정한다. 설정 클래스 자체는 건드리지 않는다(보류된 항목). 완료 조건: GET /images/secret.txt = 401 고정 · /images/products/sku-1001.svg 200 · 없는 이미지 404 · 경로 순회 차단 · /api/orders 401 유지. 전체 스위트로 재확인.",
+        "targets": []
+      },
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "round 2가 재작업 2(화이트리스트 좁히기)를 지키려고 새로 만든 경계 테스트 ProductImageStaticResourceServingTest.imagesPathOutsideProductsPrefix_isNotWhitelisted(:82-84)가 GET /images/secret.txt를 assertThat(status).isIn(401, 404)로 단언한다. 좁힌 지금은 필터 default-deny로 401이지만, 화이트리스트를 다시 /images/로 넓히면 필터가 스킵되고 /images/** 리소스 핸들러가 파일 없음으로 404를 내므로 같은 테스트가 그대로 통과한다 — 좁혀져 있음을 전혀 증명하지 못하는 거짓 보증 가드다. round 1 권고 1(=이번 재작업 1)과 동일한 클래스이며, 이번 재작업이 새로 만든 코드에 기인한다(사례집 SR-302 #1 재발).",
+          "suggested_action": "assertThat(status).isEqualTo(401)로 고정한다 — 화이트리스트를 넓히면 404가 되어 실패하므로 진짜 가드가 된다. 사람 완료조건의 '401 또는 404'는 허용 동작의 느슨한 서술이고, 이 테스트가 주석(:77-81)에 선언한 목적(형제 경로가 더 이상 필터를 자동 스킵하지 않음)은 401 고정으로만 달성된다."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "ProductImageStaticResourceServingTest 주석 :80의 '정적 리소스 매핑도 /images/products/**로 고정돼 있어'가 사실과 다르다 — ProductImageStaticResourceConfig는 여전히 /images/** -> classpath:/static/images/를 등록한다(:24-25). 이 오인이 위 medium의 느슨한 단언(404를 '매핑 없음'으로 해석)을 낳은 것으로 보인다.",
+          "suggested_action": "주석을 실제 매핑(/images/**)대로 정정한다. 설정 클래스 자체는 손대지 않는다 — 사람이 보류한 round 1 권고 3 영역."
+        }
+      ],
+      "cause": "impl_bug"
+    },
+    {
+      "round": 3,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass"
+      },
+      "top_issues": [],
+      "cause": "none"
+    },
+    {
+      "round": 4,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "pass"
+      },
+      "top_issues": [],
+      "layer": "baseline"
+    },
+    {
+      "round": 5,
+      "gate": "FAIL",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "pass",
+        "scope": "fail"
+      },
+      "top_issues": [
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: modules/shop-web/tsconfig.tsbuildinfo (M)",
+          "suggested_action": "이 변경이 이 작업 항목에 필요한지 확인하고, 아니면 되돌리세요"
+        }
+      ],
+      "layer": "scope"
+    },
+    {
+      "round": 6,
+      "gate": "FAIL",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "pass",
+        "scope": "fail",
+        "rules": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: modules/shop-web/tsconfig.tsbuildinfo (M)",
+          "suggested_action": "이 변경이 이 작업 항목에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "medium",
+          "layer": "rules",
+          "finding": "규칙 위반 [lab/file-size-cap/java-file-cap] modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java:0 — 자바 파일 450줄 초과 — 책임을 나눈다(필터·핸들러·서비스가 한 파일에 자라면 QA가 스코프를 못 가른다)",
+          "suggested_action": "규칙을 지키도록 고치거나, 규칙이 틀렸으면 SpecLens /rules에서 규칙을 고치세요"
+        }
+      ],
+      "layer": "rules"
+    },
+    {
+      "round": 7,
+      "gate": "FAIL",
+      "human": {
+        "decision": "waiver",
+        "by": "사람",
+        "at": "2026-09-17T08:30:04",
+        "comment": "tsconfig.tsbuildinfo는 TypeScript 증분 빌드 캐시 파일(.gitignore 대상)이고 이 항목은 shop-api만 변경 — 실질 스코프 위반 아님. 재발 방지는 사람이 별도로 shop-web 추적 제외 정리.",
+        "targets": []
+      },
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "pass",
+        "scope": "fail",
+        "rules": "concerns",
+        "conformance": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: modules/shop-web/tsconfig.tsbuildinfo (M)",
+          "suggested_action": "이 변경이 이 작업 항목에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "medium",
+          "layer": "rules",
+          "finding": "규칙 위반 [lab/file-size-cap/java-file-cap] modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java:0 — 자바 파일 450줄 초과 — 책임을 나눈다(필터·핸들러·서비스가 한 파일에 자라면 QA가 스코프를 못 가른다)",
+          "suggested_action": "규칙을 지키도록 고치거나, 규칙이 틀렸으면 SpecLens /rules에서 규칙을 고치세요"
+        },
+        {
+          "severity": "low",
+          "layer": "conformance",
+          "finding": "STORY의 '수용 기준' 절 TO-BE 항목 3개(INF-ORD-008·INF-ORD-009·SCH-ORD-005)가 02_변경명세.md·STORY 모두 '[미상] — 사람이 적는다' 플레이스홀더로 남아 있다(이 랩의 zero-LLM 기계채택 관례상 정상 — 실질 TO-BE는 상단 '확정된 요건 문답 10건'에 있고 dev/QA/test-agent가 그것을 근거로 썼다). 코드 결함은 아니며 verify-agent가 대신 그 확정 문답을 AC 정본으로 사용해 매핑했음을 기록만 남긴다.",
+          "suggested_action": "STEP 5.5(스펙 재동기화)에서 INF-ORD-008/009·SCH-ORD-005에 listPrice/imageUrl·list_price/image_url 반영 시 이 절의 [미상]도 함께 채우면 다음 회차 추적이 쉬워짐(권고, 비차단)",
+          "confidence": "high"
+        },
+        {
+          "severity": "low",
+          "layer": "conformance",
+          "finding": "ApiKeyAuthFilter.java가 557줄로 file-size-cap(should, java 450) 초과 — 다만 QA round1이 이미 지적한 기존 초과분이며 이 항목의 변경분(+7줄, isOpenRoute 화이트리스트 1조건)이 원인이 아니다.",
+          "suggested_action": "후속 분리 TODO(QA 권고와 동일, 비차단)",
+          "confidence": "high"
+        }
+      ],
+      "layer": "conformance"
+    }
+  ],
+  "waiver": {
+    "active": true,
+    "by": "사람",
+    "reason": "tsconfig.tsbuildinfo는 TypeScript 증분 빌드 캐시 파일(.gitignore 대상)이고 이 항목은 shop-api만 변경 — 실질 스코프 위반 아님. 재발 방지는 사람이 별도로 shop-web 추적 제외 정리.",
+    "at": "2026-09-17T08:30:04",
+    "layer": "scope"
+  },
+  "story_transitions": [
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "SR 승인(SR-306)",
+      "at": "2026-09-17T07:31:43"
+    },
+    {
+      "from": "Approved",
+      "to": "InProgress",
+      "by": "sl-aidd",
+      "at": "2026-09-17T07:39:28"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "qa-agent",
+      "at": "2026-09-17T07:47:29"
+    },
+    {
+      "from": "Review",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-17T07:56:22"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "qa-agent",
+      "at": "2026-09-17T08:07:09"
+    },
+    {
+      "from": "Review",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-17T08:13:39"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "qa-agent",
+      "at": "2026-09-17T08:16:27"
+    },
+    {
+      "from": "Review",
+      "to": "Done",
+      "by": "사람",
+      "at": "2026-09-17T08:32:36"
+    }
+  ],
+  "cause": "none",
+  "escalate": false,
+  "fail_rounds": 0,
+  "max_rounds": 3,
+  "waivers": [
+    {
+      "active": true,
+      "by": "사람",
+      "reason": "tsconfig.tsbuildinfo는 TypeScript 증분 빌드 캐시 파일(.gitignore 대상)이고 이 항목은 shop-api만 변경 — 실질 스코프 위반 아님. 재발 방지는 사람이 별도로 shop-web 추적 제외 정리.",
+      "at": "2026-09-17T08:30:04",
+      "layer": "scope"
+    }
+  ]
+}

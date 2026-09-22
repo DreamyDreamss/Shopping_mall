@@ -1,0 +1,2680 @@
+{
+  "ok": true,
+  "total": 201,
+  "changed": 55,
+  "gone": [],
+  "pillow_missing": false,
+  "rows": [
+    {
+      "id": "주문-배송상태-배지--출고대기",
+      "file": "92b8ac785ed2cdaa.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 18392,
+      "before_size": [
+        968,
+        19
+      ],
+      "after_size": [
+        968,
+        19
+      ]
+    },
+    {
+      "id": "주문-배송상태-배지--출고",
+      "file": "5815029f78e20c3e.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 18392,
+      "before_size": [
+        968,
+        19
+      ],
+      "after_size": [
+        968,
+        19
+      ]
+    },
+    {
+      "id": "주문-배송상태-배지--배송완료",
+      "file": "c17bcf05c8735ba6.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 18392,
+      "before_size": [
+        968,
+        19
+      ],
+      "after_size": [
+        968,
+        19
+      ]
+    },
+    {
+      "id": "주문-배송상태-배지--이력없음",
+      "file": "adaeb4a73462be3e.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 18392,
+      "before_size": [
+        968,
+        19
+      ],
+      "after_size": [
+        968,
+        19
+      ]
+    },
+    {
+      "id": "회원-로그인--기본",
+      "file": "13ad4af8b7ce908a.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 156816,
+      "before_size": [
+        968,
+        162
+      ],
+      "after_size": [
+        968,
+        162
+      ]
+    },
+    {
+      "id": "회원-로그인--입력됨",
+      "file": "d80ca436e71406c6.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 156816,
+      "before_size": [
+        968,
+        162
+      ],
+      "after_size": [
+        968,
+        162
+      ]
+    },
+    {
+      "id": "회원-로그인--제출중",
+      "file": "45c6f7a8666a48fa.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 156816,
+      "before_size": [
+        968,
+        162
+      ],
+      "after_size": [
+        968,
+        162
+      ]
+    },
+    {
+      "id": "회원-로그인--실패401",
+      "file": "08b23645ec5b320c.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 182952,
+      "before_size": [
+        968,
+        189
+      ],
+      "after_size": [
+        968,
+        189
+      ]
+    },
+    {
+      "id": "회원-로그인--잠금429",
+      "file": "c54fdd1bea123c81.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 182952,
+      "before_size": [
+        968,
+        189
+      ],
+      "after_size": [
+        968,
+        189
+      ]
+    },
+    {
+      "id": "회원-로그인--비밀번호토글",
+      "file": "59ccd5cbc400ea0f.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 156816,
+      "before_size": [
+        968,
+        162
+      ],
+      "after_size": [
+        968,
+        162
+      ]
+    },
+    {
+      "id": "주문-주문-상세--기본",
+      "file": "111d4e7e4ae60761.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 363000,
+      "before_size": [
+        968,
+        375
+      ],
+      "after_size": [
+        968,
+        375
+      ]
+    },
+    {
+      "id": "주문-주문-상세--미출고섞임",
+      "file": "8a7257479da3d071.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 387200,
+      "before_size": [
+        968,
+        400
+      ],
+      "after_size": [
+        968,
+        400
+      ]
+    },
+    {
+      "id": "주문-주문-상세--배송이력없음",
+      "file": "cb422ffb958a0077.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 327184,
+      "before_size": [
+        968,
+        338
+      ],
+      "after_size": [
+        968,
+        338
+      ]
+    },
+    {
+      "id": "주문-주문-상세--품목없음",
+      "file": "3d09fed27fb23c6c.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 287496,
+      "before_size": [
+        968,
+        297
+      ],
+      "after_size": [
+        968,
+        297
+      ]
+    },
+    {
+      "id": "주문-주문-상세--탈퇴회원",
+      "file": "8d6062b5f657969a.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 363000,
+      "before_size": [
+        968,
+        375
+      ],
+      "after_size": [
+        968,
+        375
+      ]
+    },
+    {
+      "id": "주문-주문-상세--로딩",
+      "file": "4e214757ce138c18.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 45496,
+      "before_size": [
+        968,
+        47
+      ],
+      "after_size": [
+        968,
+        47
+      ]
+    },
+    {
+      "id": "주문-주문-상세--조회실패",
+      "file": "4eb7737e88e937c7.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 43560,
+      "before_size": [
+        968,
+        45
+      ],
+      "after_size": [
+        968,
+        45
+      ]
+    },
+    {
+      "id": "주문-주문-상세--주문없음",
+      "file": "036be5739674b51b.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 45496,
+      "before_size": [
+        968,
+        47
+      ],
+      "after_size": [
+        968,
+        47
+      ]
+    },
+    {
+      "id": "주문-주문-상세--조회실패다시시도",
+      "file": "1694c4809b59f583.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 49368,
+      "before_size": [
+        968,
+        51
+      ],
+      "after_size": [
+        968,
+        51
+      ]
+    },
+    {
+      "id": "주문-검색-조건--빈조건",
+      "file": "532ac4111893f8e4.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 43560,
+      "before_size": [
+        968,
+        45
+      ],
+      "after_size": [
+        968,
+        45
+      ]
+    },
+    {
+      "id": "주문-검색-조건--조건입력",
+      "file": "27b7e27eab40d41e.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 43560,
+      "before_size": [
+        968,
+        45
+      ],
+      "after_size": [
+        968,
+        45
+      ]
+    },
+    {
+      "id": "주문-검색-조건--기간역전",
+      "file": "e3f6f4f53d61436c.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 43560,
+      "before_size": [
+        968,
+        45
+      ],
+      "after_size": [
+        968,
+        45
+      ]
+    },
+    {
+      "id": "주문-검색-조건--조회중",
+      "file": "a58758eb3ec671e1.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 43560,
+      "before_size": [
+        968,
+        45
+      ],
+      "after_size": [
+        968,
+        45
+      ]
+    },
+    {
+      "id": "주문-주문-요약-카드--집계있음",
+      "file": "6d41eed3a9bfe136.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 37752,
+      "before_size": [
+        968,
+        39
+      ],
+      "after_size": [
+        968,
+        39
+      ]
+    },
+    {
+      "id": "주문-주문-요약-카드--결과없음",
+      "file": "59647ec3966d50d4.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 35816,
+      "before_size": [
+        968,
+        37
+      ],
+      "after_size": [
+        968,
+        37
+      ]
+    },
+    {
+      "id": "주문-주문-요약-카드--조회실패숨김",
+      "file": "47104a4b5b632b84.png",
+      "status": "촬영 실패",
+      "changed": null
+    },
+    {
+      "id": "주문-주문-목록-그리드--목록있음",
+      "file": "ed10b7ec8382d8d1.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 161656,
+      "before_size": [
+        968,
+        167
+      ],
+      "after_size": [
+        968,
+        167
+      ]
+    },
+    {
+      "id": "주문-주문-목록-그리드--결과없음",
+      "file": "6ac16ab0729b3691.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 45496,
+      "before_size": [
+        968,
+        47
+      ],
+      "after_size": [
+        968,
+        47
+      ]
+    },
+    {
+      "id": "주문-주문-목록-그리드--조회중",
+      "file": "3b452ca86edd6732.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 45496,
+      "before_size": [
+        968,
+        47
+      ],
+      "after_size": [
+        968,
+        47
+      ]
+    },
+    {
+      "id": "주문-주문-목록-그리드--조회실패",
+      "file": "26c20970f6c520f4.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 43560,
+      "before_size": [
+        968,
+        45
+      ],
+      "after_size": [
+        968,
+        45
+      ]
+    },
+    {
+      "id": "주문-주문-목록-그리드--탈퇴회원포함",
+      "file": "745abe14eb890667.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 97768,
+      "before_size": [
+        968,
+        101
+      ],
+      "after_size": [
+        968,
+        101
+      ]
+    },
+    {
+      "id": "주문-주문-목록-그리드--미지의배송코드",
+      "file": "c20c05672a5b9806.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 97768,
+      "before_size": [
+        968,
+        101
+      ],
+      "after_size": [
+        968,
+        101
+      ]
+    },
+    {
+      "id": "주문-주문-목록-그리드--선택행강조",
+      "file": "a8ba281dd634f21b.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 161656,
+      "before_size": [
+        968,
+        167
+      ],
+      "after_size": [
+        968,
+        167
+      ]
+    },
+    {
+      "id": "공통-badge--tv상품",
+      "file": "e1eaf58989ba7c78.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "공통-badge--무료배송",
+      "file": "b3a6bb33501856f0.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "공통-badge--무이자",
+      "file": "905ad133490aa5fe.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "공통-badge--live",
+      "file": "098eec255d4bd207.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "공통-badge--할인율",
+      "file": "a9ae67d303214dea.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "공통-bottomsheet--열림",
+      "file": "d76c681760d0199d.png",
+      "status": "촬영 실패",
+      "changed": null
+    },
+    {
+      "id": "공통-bottomsheet--닫힘",
+      "file": "847e9495e1de9b66.png",
+      "status": "촬영 실패",
+      "changed": null
+    },
+    {
+      "id": "공통-button--주-기본",
+      "file": "f1ad0167c428b454.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "공통-button--주-호버",
+      "file": "e6d1506a4b706617.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "공통-button--주-포커스",
+      "file": "81aa70479c280384.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "공통-button--주-비활성",
+      "file": "afdd5e1673dddbd4.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "공통-button--주-로딩",
+      "file": "c1f4810cb821005f.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "공통-button--보조-기본",
+      "file": "05a48dc5c5693f79.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "공통-button--보조-호버",
+      "file": "20a6c51248680aa0.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "공통-button--보조-포커스",
+      "file": "34a59c25189d1e9b.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "공통-button--보조-비활성",
+      "file": "734695a484791c5c.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "공통-button--보조-로딩",
+      "file": "6ebbcddcdf44d65b.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "공통-button--구매-기본",
+      "file": "2a670a7cfe1e7ba4.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "공통-button--구매-호버",
+      "file": "5c814f21833a4893.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "공통-button--구매-포커스",
+      "file": "eaa617d7519c698c.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "공통-button--구매-비활성",
+      "file": "c02141e1b007cf5f.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "공통-button--구매-로딩",
+      "file": "c62c4546189787e6.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "공통-emptystate--기본",
+      "file": "283b49c806153e03.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "공통-emptystate--추천레일포함",
+      "file": "01d63e87c057eeb4.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "공통-errorstate--기본",
+      "file": "edafd256da3052a4.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "공통-popupcarousel--첫번째",
+      "file": "16eeb603bab25449.png",
+      "status": "촬영 실패",
+      "changed": null
+    },
+    {
+      "id": "공통-popupcarousel--마지막",
+      "file": "3c33ba563015e8f3.png",
+      "status": "촬영 실패",
+      "changed": null
+    },
+    {
+      "id": "공통-popupcarousel--오늘은그만보기",
+      "file": "5a6c58badf99a1b5.png",
+      "status": "촬영 실패",
+      "changed": null
+    },
+    {
+      "id": "공통-quantitystepper--중간값",
+      "file": "72e63ef61633cea3.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "공통-quantitystepper--최솟값",
+      "file": "79a71f7e3597b367.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "공통-quantitystepper--최댓값",
+      "file": "f7f86d716a9b946b.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "공통-quantitystepper--직접입력보정",
+      "file": "f72d6f761939f18f.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "공통-skeleton--카드",
+      "file": "810aa97c12223aea.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "공통-skeleton--리스트",
+      "file": "6b55772fe53972ec.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "공통-tabs--기본",
+      "file": "62779bca8409a856.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "공통-tabs--스티키고정",
+      "file": "4b54fe926aa4a223.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "공통-tabs--배지있는탭",
+      "file": "8a02310b90e28c9d.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "공통-textinput--기본",
+      "file": "4561dc6d39abac28.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "공통-textinput--포커스",
+      "file": "12e0f5d2aef03bf4.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "공통-textinput--오류",
+      "file": "e9876842d56e54de.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "공통-textinput--비활성",
+      "file": "19bad80f23f5617e.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "공통-toast--기본",
+      "file": "6cbb7c3c33e4a53f.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "공통-toast--성공",
+      "file": "8b6d88eb3fd8c64f.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "공통-toast--오류",
+      "file": "6869333dad819634.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "공통-toaststack--한개",
+      "file": "79aad818eb485af1.png",
+      "status": "촬영 실패",
+      "changed": null
+    },
+    {
+      "id": "공통-toaststack--세개",
+      "file": "0c4586758481e399.png",
+      "status": "촬영 실패",
+      "changed": null
+    },
+    {
+      "id": "공통-toaststack--초과시제거",
+      "file": "2123544671d33447.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "마이페이지-배송지-삭제-확인--일반삭제확인",
+      "file": "7d10366d8747fc20.png",
+      "status": "촬영 실패",
+      "changed": null
+    },
+    {
+      "id": "마이페이지-배송지-삭제-확인--기본배송지삭제확인",
+      "file": "739a31572d9dd4a7.png",
+      "status": "촬영 실패",
+      "changed": null
+    },
+    {
+      "id": "마이페이지-배송지-폼--신규",
+      "file": "e65e137014ebc8e4.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 461736,
+      "before_size": [
+        968,
+        477
+      ],
+      "after_size": [
+        968,
+        477
+      ]
+    },
+    {
+      "id": "마이페이지-배송지-폼--수정",
+      "file": "17c2d463b93633e5.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 431728,
+      "before_size": [
+        968,
+        446
+      ],
+      "after_size": [
+        968,
+        446
+      ]
+    },
+    {
+      "id": "마이페이지-배송지-폼--검증오류",
+      "file": "36ba62ea44835afb.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 531432,
+      "before_size": [
+        968,
+        549
+      ],
+      "after_size": [
+        968,
+        549
+      ]
+    },
+    {
+      "id": "마이페이지-배송지-목록--목록-0건",
+      "file": "fd046d879978ec23.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 141328,
+      "before_size": [
+        968,
+        146
+      ],
+      "after_size": [
+        968,
+        146
+      ]
+    },
+    {
+      "id": "마이페이지-배송지-목록--목록-1건",
+      "file": "bbc8c30f97de0808.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 129712,
+      "before_size": [
+        968,
+        134
+      ],
+      "after_size": [
+        968,
+        134
+      ]
+    },
+    {
+      "id": "마이페이지-배송지-목록--목록-10건상한",
+      "file": "a53746b72562e0ec.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 695024,
+      "before_size": [
+        968,
+        718
+      ],
+      "after_size": [
+        968,
+        718
+      ]
+    },
+    {
+      "id": "마이페이지-배송지-목록--기본배송지전환중",
+      "file": "6834043face7b7d7.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 189728,
+      "before_size": [
+        968,
+        196
+      ],
+      "after_size": [
+        968,
+        196
+      ]
+    },
+    {
+      "id": "회원-비밀번호-재설정-2단계-코드--기본",
+      "file": "69b11a7fdb4f2d24.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 259424,
+      "before_size": [
+        968,
+        268
+      ],
+      "after_size": [
+        968,
+        268
+      ]
+    },
+    {
+      "id": "회원-비밀번호-재설정-2단계-코드--재전송쿨다운끝",
+      "file": "fdb2f36f3b9b2eaf.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 259424,
+      "before_size": [
+        968,
+        268
+      ],
+      "after_size": [
+        968,
+        268
+      ]
+    },
+    {
+      "id": "회원-비밀번호-재설정-2단계-코드--코드오류",
+      "file": "a8e4c2915512596c.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 285560,
+      "before_size": [
+        968,
+        295
+      ],
+      "after_size": [
+        968,
+        295
+      ]
+    },
+    {
+      "id": "회원-비밀번호-재설정-2단계-코드--만료",
+      "file": "0f8dfe1eb06ce057.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 122936,
+      "before_size": [
+        968,
+        127
+      ],
+      "after_size": [
+        968,
+        127
+      ]
+    },
+    {
+      "id": "회원-비밀번호-재설정-2단계-코드--시도초과",
+      "file": "55de84ad48080958.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 122936,
+      "before_size": [
+        968,
+        127
+      ],
+      "after_size": [
+        968,
+        127
+      ]
+    },
+    {
+      "id": "회원-비밀번호-재설정-4단계-완료--기본",
+      "file": "5bf5ef55b501d184.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 84216,
+      "before_size": [
+        968,
+        87
+      ],
+      "after_size": [
+        968,
+        87
+      ]
+    },
+    {
+      "id": "회원-비밀번호-재설정-3단계-새-비밀번호--기본",
+      "file": "01719ff58c5d9f85.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 96800,
+      "before_size": [
+        968,
+        100
+      ],
+      "after_size": [
+        968,
+        100
+      ]
+    },
+    {
+      "id": "회원-비밀번호-재설정-3단계-새-비밀번호--제출중",
+      "file": "b64ced105cb11cca.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 96800,
+      "before_size": [
+        968,
+        100
+      ],
+      "after_size": [
+        968,
+        100
+      ]
+    },
+    {
+      "id": "회원-비밀번호-재설정-3단계-새-비밀번호--비밀번호규칙오류",
+      "file": "091c4c5101c918cf.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 122936,
+      "before_size": [
+        968,
+        127
+      ],
+      "after_size": [
+        968,
+        127
+      ]
+    },
+    {
+      "id": "회원-비밀번호-재설정-1단계-요청--기본",
+      "file": "0f22540f003a420a.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 96800,
+      "before_size": [
+        968,
+        100
+      ],
+      "after_size": [
+        968,
+        100
+      ]
+    },
+    {
+      "id": "회원-비밀번호-재설정-1단계-요청--입력됨",
+      "file": "e08d2871fe17df8f.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 96800,
+      "before_size": [
+        968,
+        100
+      ],
+      "after_size": [
+        968,
+        100
+      ]
+    },
+    {
+      "id": "회원-비밀번호-재설정-1단계-요청--제출중",
+      "file": "31e5edf1622410b8.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 96800,
+      "before_size": [
+        968,
+        100
+      ],
+      "after_size": [
+        968,
+        100
+      ]
+    },
+    {
+      "id": "회원-비밀번호-재설정-1단계-요청--형식오류",
+      "file": "05da521a22d1fec5.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 122936,
+      "before_size": [
+        968,
+        127
+      ],
+      "after_size": [
+        968,
+        127
+      ]
+    },
+    {
+      "id": "쇼핑셸-appshell--pc-1280",
+      "file": "c6148f85fe07cffe.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "쇼핑셸-appshell--태블릿-1024",
+      "file": "572dae2b0f78ec4a.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "쇼핑셸-appshell--모바일-390",
+      "file": "13d7405ac274b4aa.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "쇼핑셸-appshell--최근본상품-3개",
+      "file": "1b535f8ce42e2913.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "쇼핑셸-appshell--최근본상품-0개",
+      "file": "898189f258ec603f.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "쇼핑셸-appshell--로그인-헤더",
+      "file": "dfb14ee8ef48f193.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "쇼핑셸-appshell--비로그인-헤더",
+      "file": "f8d0f899e168c4c0.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "쇼핑셸-appshell--qr-팝업-열림",
+      "file": "1b818046df090134.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "쇼핑셸-bottomtabbar--비로그인",
+      "file": "f6874ff239e7c8ee.png",
+      "status": "촬영 실패",
+      "changed": null
+    },
+    {
+      "id": "쇼핑셸-bottomtabbar--로그인",
+      "file": "387f36db4f355ed1.png",
+      "status": "촬영 실패",
+      "changed": null
+    },
+    {
+      "id": "장바구니-빈-장바구니--빈장바구니",
+      "file": "49500ab6e385ad0f.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 167464,
+      "before_size": [
+        968,
+        173
+      ],
+      "after_size": [
+        968,
+        173
+      ]
+    },
+    {
+      "id": "장바구니-라인아이템--기본",
+      "file": "7d3b11f50884ad34.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 96800,
+      "before_size": [
+        968,
+        100
+      ],
+      "after_size": [
+        968,
+        100
+      ]
+    },
+    {
+      "id": "장바구니-라인아이템--선택해제",
+      "file": "026c8f5a76c73e99.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 96800,
+      "before_size": [
+        968,
+        100
+      ],
+      "after_size": [
+        968,
+        100
+      ]
+    },
+    {
+      "id": "장바구니-라인아이템--수량변경중",
+      "file": "cfde3e827b46f0ba.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 96800,
+      "before_size": [
+        968,
+        100
+      ],
+      "after_size": [
+        968,
+        100
+      ]
+    },
+    {
+      "id": "장바구니-라인아이템--재고초과안내",
+      "file": "bf6bf0d7bfbdb96e.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 116160,
+      "before_size": [
+        968,
+        120
+      ],
+      "after_size": [
+        968,
+        120
+      ]
+    },
+    {
+      "id": "장바구니-라인아이템--최소수량안내",
+      "file": "069d07e979f3bb97.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 116160,
+      "before_size": [
+        968,
+        120
+      ],
+      "after_size": [
+        968,
+        120
+      ]
+    },
+    {
+      "id": "장바구니-라인아이템--수량변경실패",
+      "file": "8206ffa2308c14ed.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 116160,
+      "before_size": [
+        968,
+        120
+      ],
+      "after_size": [
+        968,
+        120
+      ]
+    },
+    {
+      "id": "장바구니-합계--전체선택",
+      "file": "0db2b090e0d90094.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 171336,
+      "before_size": [
+        968,
+        177
+      ],
+      "after_size": [
+        968,
+        177
+      ]
+    },
+    {
+      "id": "장바구니-합계--부분선택",
+      "file": "e6cc4efe220c0df8.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 206184,
+      "before_size": [
+        968,
+        213
+      ],
+      "after_size": [
+        968,
+        213
+      ]
+    },
+    {
+      "id": "장바구니-합계--선택없음",
+      "file": "82e05b7e3147a8e3.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 206184,
+      "before_size": [
+        968,
+        213
+      ],
+      "after_size": [
+        968,
+        213
+      ]
+    },
+    {
+      "id": "쇼핑홈-카테고리-숏컷--기본",
+      "file": "f1c449f7a1cbac7c.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 75504,
+      "before_size": [
+        968,
+        78
+      ],
+      "after_size": [
+        968,
+        78
+      ]
+    },
+    {
+      "id": "주문서-배송지-입력--기본",
+      "file": "f77d898bde3437d1.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 262328,
+      "before_size": [
+        968,
+        271
+      ],
+      "after_size": [
+        968,
+        271
+      ]
+    },
+    {
+      "id": "주문서-배송지-입력--입력완료",
+      "file": "4da44291734494a1.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 262328,
+      "before_size": [
+        968,
+        271
+      ],
+      "after_size": [
+        968,
+        271
+      ]
+    },
+    {
+      "id": "주문서-배송지-입력--배송지오류",
+      "file": "cdad44bc24b085ee.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 332024,
+      "before_size": [
+        968,
+        343
+      ],
+      "after_size": [
+        968,
+        343
+      ]
+    },
+    {
+      "id": "쇼핑홈-gnb--비로그인",
+      "file": "45c99e589b570e32.png",
+      "status": "변경",
+      "changed": true,
+      "ratio": 0.02626,
+      "pixels": 1271,
+      "total": 48400,
+      "before_size": [
+        968,
+        50
+      ],
+      "after_size": [
+        968,
+        50
+      ]
+    },
+    {
+      "id": "쇼핑홈-gnb--로그인",
+      "file": "574598a64a1d495c.png",
+      "status": "변경",
+      "changed": true,
+      "ratio": 0.02626,
+      "pixels": 1271,
+      "total": 48400,
+      "before_size": [
+        968,
+        50
+      ],
+      "after_size": [
+        968,
+        50
+      ]
+    },
+    {
+      "id": "쇼핑홈-gnb--장바구니담김",
+      "file": "e60bd6918d943e12.png",
+      "status": "변경",
+      "changed": true,
+      "ratio": 0.02626,
+      "pixels": 1271,
+      "total": 48400,
+      "before_size": [
+        968,
+        50
+      ],
+      "after_size": [
+        968,
+        50
+      ]
+    },
+    {
+      "id": "쇼핑셸-gnbtabs--기본",
+      "file": "ef2b103f265d2a19.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "쇼핑홈-히어로-배너--여러장",
+      "file": "49c43a7138654601.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 212960,
+      "before_size": [
+        968,
+        220
+      ],
+      "after_size": [
+        968,
+        220
+      ]
+    },
+    {
+      "id": "쇼핑홈-히어로-배너--한장",
+      "file": "3466b39216a5a2b9.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 212960,
+      "before_size": [
+        968,
+        220
+      ],
+      "after_size": [
+        968,
+        220
+      ]
+    },
+    {
+      "id": "주문서-주문-완료--주문완료",
+      "file": "a3371e65696227fb.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 303952,
+      "before_size": [
+        968,
+        314
+      ],
+      "after_size": [
+        968,
+        314
+      ]
+    },
+    {
+      "id": "주문서-결제-실패-안내--빈장바구니400",
+      "file": "2c09a6e4f67bef51.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 43560,
+      "before_size": [
+        968,
+        45
+      ],
+      "after_size": [
+        968,
+        45
+      ]
+    },
+    {
+      "id": "주문서-결제-실패-안내--회원없음404",
+      "file": "fd94926c2e2c27ad.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 43560,
+      "before_size": [
+        968,
+        45
+      ],
+      "after_size": [
+        968,
+        45
+      ]
+    },
+    {
+      "id": "주문서-결제-실패-안내--재고부족409",
+      "file": "848620cea23abf15.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 43560,
+      "before_size": [
+        968,
+        45
+      ],
+      "after_size": [
+        968,
+        45
+      ]
+    },
+    {
+      "id": "주문서-결제-실패-안내--일시적오류",
+      "file": "36b21c13c7ab2175.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 43560,
+      "before_size": [
+        968,
+        45
+      ],
+      "after_size": [
+        968,
+        45
+      ]
+    },
+    {
+      "id": "주문서-상품-요약--주문서기본",
+      "file": "50c23e00d95e5178.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 101640,
+      "before_size": [
+        968,
+        105
+      ],
+      "after_size": [
+        968,
+        105
+      ]
+    },
+    {
+      "id": "주문서-결제-수단--기본선택",
+      "file": "30cf957908984db5.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 125840,
+      "before_size": [
+        968,
+        130
+      ],
+      "after_size": [
+        968,
+        130
+      ]
+    },
+    {
+      "id": "주문서-결제-수단--계좌이체선택",
+      "file": "d560af60145e0d63.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 125840,
+      "before_size": [
+        968,
+        130
+      ],
+      "after_size": [
+        968,
+        130
+      ]
+    },
+    {
+      "id": "쇼핑홈-상품-카드--기본",
+      "file": "55c4a645fded2013.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 1014464,
+      "before_size": [
+        968,
+        1048
+      ],
+      "after_size": [
+        968,
+        1048
+      ]
+    },
+    {
+      "id": "쇼핑홈-상품-카드--할인",
+      "file": "869a8abaf0976216.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 1029952,
+      "before_size": [
+        968,
+        1064
+      ],
+      "after_size": [
+        968,
+        1064
+      ]
+    },
+    {
+      "id": "쇼핑홈-상품-카드--품절",
+      "file": "eb8a3ee3aabf4e3f.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 1014464,
+      "before_size": [
+        968,
+        1048
+      ],
+      "after_size": [
+        968,
+        1048
+      ]
+    },
+    {
+      "id": "쇼핑홈-상품-카드--이미지없음",
+      "file": "e95ef3a5d1225405.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 1029952,
+      "before_size": [
+        968,
+        1064
+      ],
+      "after_size": [
+        968,
+        1064
+      ]
+    },
+    {
+      "id": "쇼핑홈-상품-카드--정가없음",
+      "file": "602b63fd39096a48.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 1014464,
+      "before_size": [
+        968,
+        1048
+      ],
+      "after_size": [
+        968,
+        1048
+      ]
+    },
+    {
+      "id": "쇼핑홈-상품-카드--이미지있음",
+      "file": "57192e70a743f98f.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 1014464,
+      "before_size": [
+        968,
+        1048
+      ],
+      "after_size": [
+        968,
+        1048
+      ]
+    },
+    {
+      "id": "쇼핑홈-상품-카드--할인0퍼센트",
+      "file": "13fe235fb2be3feb.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 1014464,
+      "before_size": [
+        968,
+        1048
+      ],
+      "after_size": [
+        968,
+        1048
+      ]
+    },
+    {
+      "id": "쇼핑홈-상품-카드--이미지로드실패",
+      "file": "3d18e8e46c595670.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 1014464,
+      "before_size": [
+        968,
+        1048
+      ],
+      "after_size": [
+        968,
+        1048
+      ]
+    },
+    {
+      "id": "쇼핑상세-로딩-스켈레톤--로딩",
+      "file": "6747b35b018b6c80.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 348480,
+      "before_size": [
+        968,
+        360
+      ],
+      "after_size": [
+        968,
+        360
+      ]
+    },
+    {
+      "id": "쇼핑상세-상세-탭--기본",
+      "file": "bc3295915f86f707.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 134552,
+      "before_size": [
+        968,
+        139
+      ],
+      "after_size": [
+        968,
+        139
+      ]
+    },
+    {
+      "id": "쇼핑상세-상세-탭--상품평",
+      "file": "bb67ed58cc1fc1ce.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 134552,
+      "before_size": [
+        968,
+        139
+      ],
+      "after_size": [
+        968,
+        139
+      ]
+    },
+    {
+      "id": "쇼핑상세-상세-탭--상품문의",
+      "file": "8ab30e94d10fe3e5.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 134552,
+      "before_size": [
+        968,
+        139
+      ],
+      "after_size": [
+        968,
+        139
+      ]
+    },
+    {
+      "id": "쇼핑상세-상세-탭--탭전환",
+      "file": "f8e2fa4484a3fa8f.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 134552,
+      "before_size": [
+        968,
+        139
+      ],
+      "after_size": [
+        968,
+        139
+      ]
+    },
+    {
+      "id": "쇼핑홈-상품-목록-필터바--기본",
+      "file": "6388c3ed79a9860c.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 65824,
+      "before_size": [
+        968,
+        68
+      ],
+      "after_size": [
+        968,
+        68
+      ]
+    },
+    {
+      "id": "쇼핑홈-상품-목록-필터바--정렬변경",
+      "file": "77fbe9c2da8af12c.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 65824,
+      "before_size": [
+        968,
+        68
+      ],
+      "after_size": [
+        968,
+        68
+      ]
+    },
+    {
+      "id": "쇼핑홈-상품-목록-필터바--재고필터켬",
+      "file": "887f5456458e2583.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 65824,
+      "before_size": [
+        968,
+        68
+      ],
+      "after_size": [
+        968,
+        68
+      ]
+    },
+    {
+      "id": "쇼핑홈-추천-상품-그리드--목록있음",
+      "file": "b735f63a789af9f0.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 537240,
+      "before_size": [
+        968,
+        555
+      ],
+      "after_size": [
+        968,
+        555
+      ]
+    },
+    {
+      "id": "쇼핑홈-추천-상품-그리드--빈목록",
+      "file": "fe1d4a33ba004d12.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 75504,
+      "before_size": [
+        968,
+        78
+      ],
+      "after_size": [
+        968,
+        78
+      ]
+    },
+    {
+      "id": "쇼핑홈-추천-상품-그리드--로딩",
+      "file": "a6d84da584ad4b0b.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 45496,
+      "before_size": [
+        968,
+        47
+      ],
+      "after_size": [
+        968,
+        47
+      ]
+    },
+    {
+      "id": "쇼핑홈-추천-상품-그리드--조회실패",
+      "file": "fb8b52cfc6138f88.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 85184,
+      "before_size": [
+        968,
+        88
+      ],
+      "after_size": [
+        968,
+        88
+      ]
+    },
+    {
+      "id": "쇼핑상세-이미지-갤러리--기본",
+      "file": "faf7f5194f956795.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 1006720,
+      "before_size": [
+        968,
+        1040
+      ],
+      "after_size": [
+        968,
+        1040
+      ]
+    },
+    {
+      "id": "쇼핑상세-이미지-갤러리--이미지없음",
+      "file": "75021e962df2f2be.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 937024,
+      "before_size": [
+        968,
+        968
+      ],
+      "after_size": [
+        968,
+        968
+      ]
+    },
+    {
+      "id": "쇼핑상세-이미지-갤러리--로드실패",
+      "file": "3a5d070668dbeca1.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 937024,
+      "before_size": [
+        968,
+        968
+      ],
+      "after_size": [
+        968,
+        968
+      ]
+    },
+    {
+      "id": "쇼핑상세-상품-정보-패널--기본",
+      "file": "acfa4289035aa666.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 179080,
+      "before_size": [
+        968,
+        185
+      ],
+      "after_size": [
+        968,
+        185
+      ]
+    },
+    {
+      "id": "쇼핑상세-상품-정보-패널--할인있음",
+      "file": "3dea75a5562da3fc.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 195536,
+      "before_size": [
+        968,
+        202
+      ],
+      "after_size": [
+        968,
+        202
+      ]
+    },
+    {
+      "id": "쇼핑상세-상품-정보-패널--품절",
+      "file": "6983e88ee17b7008.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 162624,
+      "before_size": [
+        968,
+        168
+      ],
+      "after_size": [
+        968,
+        168
+      ]
+    },
+    {
+      "id": "쇼핑상세-상품-정보-패널--담기실패",
+      "file": "dbff38099fb61900.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 205216,
+      "before_size": [
+        968,
+        212
+      ],
+      "after_size": [
+        968,
+        212
+      ]
+    },
+    {
+      "id": "쇼핑상세-상품-정보-패널--담기중",
+      "file": "5fbe40b622a27f33.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 179080,
+      "before_size": [
+        968,
+        185
+      ],
+      "after_size": [
+        968,
+        185
+      ]
+    },
+    {
+      "id": "쇼핑상세-상품-정보-패널--담기성공",
+      "file": "4e720bcce2884b75.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 205216,
+      "before_size": [
+        968,
+        212
+      ],
+      "after_size": [
+        968,
+        212
+      ]
+    },
+    {
+      "id": "쇼핑상세-상품-정보-패널--바로구매성공",
+      "file": "ea108a38da517c9b.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 216832,
+      "before_size": [
+        968,
+        224
+      ],
+      "after_size": [
+        968,
+        224
+      ]
+    },
+    {
+      "id": "쇼핑상세-상품-정보-패널--로그인필요",
+      "file": "c15ad6c185f0b714.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 203280,
+      "before_size": [
+        968,
+        210
+      ],
+      "after_size": [
+        968,
+        210
+      ]
+    },
+    {
+      "id": "쇼핑홈-상품-목록-그리드--결과있음",
+      "file": "75be320c40326c70.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 270072,
+      "before_size": [
+        968,
+        279
+      ],
+      "after_size": [
+        968,
+        279
+      ]
+    },
+    {
+      "id": "쇼핑홈-상품-목록-그리드--결과없음-검색어",
+      "file": "7c686a28ad9a384a.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 94864,
+      "before_size": [
+        968,
+        98
+      ],
+      "after_size": [
+        968,
+        98
+      ]
+    },
+    {
+      "id": "쇼핑홈-상품-목록-그리드--결과없음-필터",
+      "file": "0f90a4bfa8ef5824.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 94864,
+      "before_size": [
+        968,
+        98
+      ],
+      "after_size": [
+        968,
+        98
+      ]
+    },
+    {
+      "id": "쇼핑홈-상품-목록-그리드--로딩",
+      "file": "b2b82b6e5dc99637.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 733744,
+      "before_size": [
+        968,
+        758
+      ],
+      "after_size": [
+        968,
+        758
+      ]
+    },
+    {
+      "id": "쇼핑홈-상품-목록-그리드--조회실패",
+      "file": "eac100d07cbc92a4.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 85184,
+      "before_size": [
+        968,
+        88
+      ],
+      "after_size": [
+        968,
+        88
+      ]
+    },
+    {
+      "id": "쇼핑상세-조회-실패-안내--상품없음",
+      "file": "895ae018310548ad.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 98736,
+      "before_size": [
+        968,
+        102
+      ],
+      "after_size": [
+        968,
+        102
+      ]
+    },
+    {
+      "id": "쇼핑상세-조회-실패-안내--조회실패",
+      "file": "7d0d4e63f7ed2de0.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 98736,
+      "before_size": [
+        968,
+        102
+      ],
+      "after_size": [
+        968,
+        102
+      ]
+    },
+    {
+      "id": "쇼핑상세-상품정보제공고시--기본",
+      "file": "3ce25a06153166f6.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 213928,
+      "before_size": [
+        968,
+        221
+      ],
+      "after_size": [
+        968,
+        221
+      ]
+    },
+    {
+      "id": "쇼핑홈-상품-목록-페이지네이션--기본",
+      "file": "8134209fea3b2e1c.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 31944,
+      "before_size": [
+        968,
+        33
+      ],
+      "after_size": [
+        968,
+        33
+      ]
+    },
+    {
+      "id": "쇼핑홈-상품-목록-페이지네이션--마지막페이지",
+      "file": "3efecc8168552b90.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 31944,
+      "before_size": [
+        968,
+        33
+      ],
+      "after_size": [
+        968,
+        33
+      ]
+    },
+    {
+      "id": "쇼핑홈-상품-목록-페이지네이션--첫페이지",
+      "file": "d06eb8b83e12d934.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 31944,
+      "before_size": [
+        968,
+        33
+      ],
+      "after_size": [
+        968,
+        33
+      ]
+    },
+    {
+      "id": "쇼핑셸-qrpopup--열림",
+      "file": "fab004b7ce0b4fe9.png",
+      "status": "촬영 실패",
+      "changed": null
+    },
+    {
+      "id": "쇼핑셸-qrpopup--닫힘",
+      "file": "208f501de3c53916.png",
+      "status": "촬영 실패",
+      "changed": null
+    },
+    {
+      "id": "쇼핑셸-quickbar--비로그인",
+      "file": "b968890078375359.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "쇼핑셸-quickbar--로그인",
+      "file": "496a5804b02ece5a.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "쇼핑홈-랭킹--인기탭",
+      "file": "f57f9e2ad55b4148.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 319440,
+      "before_size": [
+        968,
+        330
+      ],
+      "after_size": [
+        968,
+        330
+      ]
+    },
+    {
+      "id": "쇼핑홈-랭킹--가격탭전환",
+      "file": "be24254631086d68.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 357192,
+      "before_size": [
+        968,
+        369
+      ],
+      "after_size": [
+        968,
+        369
+      ]
+    },
+    {
+      "id": "쇼핑홈-최근-본-상품--있음",
+      "file": "71c8d52852d738e4.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 251680,
+      "before_size": [
+        968,
+        260
+      ],
+      "after_size": [
+        968,
+        260
+      ]
+    },
+    {
+      "id": "쇼핑홈-최근-본-상품--없음",
+      "file": "40d11905ddc76ec4.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 74536,
+      "before_size": [
+        968,
+        77
+      ],
+      "after_size": [
+        968,
+        77
+      ]
+    },
+    {
+      "id": "쇼핑상세-함께-보면-좋은-상품--기본",
+      "file": "8ce8feaacb526fc0.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 267168,
+      "before_size": [
+        968,
+        276
+      ],
+      "after_size": [
+        968,
+        276
+      ]
+    },
+    {
+      "id": "쇼핑상세-함께-보면-좋은-상품--비어있음",
+      "file": "7c65308aa1c7ee07.png",
+      "status": "촬영 실패",
+      "changed": null
+    },
+    {
+      "id": "쇼핑셸-rightrail--최근본상품-3개",
+      "file": "276e74d14585a035.png",
+      "status": "새 상태",
+      "changed": true,
+      "added": true
+    },
+    {
+      "id": "쇼핑셸-rightrail--비어있음",
+      "file": "1f7642baa74f38f1.png",
+      "status": "촬영 실패",
+      "changed": null
+    },
+    {
+      "id": "쇼핑홈-푸터--기본",
+      "file": "fd4629d0f534214e.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 115192,
+      "before_size": [
+        968,
+        119
+      ],
+      "after_size": [
+        968,
+        119
+      ]
+    },
+    {
+      "id": "주문서-우편번호-검색--검색전",
+      "file": "8242c40d97681b7c.png",
+      "status": "촬영 실패",
+      "changed": null
+    },
+    {
+      "id": "주문서-우편번호-검색--결과있음",
+      "file": "cec0cbe668cdc42a.png",
+      "status": "촬영 실패",
+      "changed": null
+    },
+    {
+      "id": "주문서-우편번호-검색--결과없음",
+      "file": "daa6e37a0e577d3f.png",
+      "status": "촬영 실패",
+      "changed": null
+    },
+    {
+      "id": "주문서-우편번호-검색--검색중",
+      "file": "bf8105d6828dc8ef.png",
+      "status": "촬영 실패",
+      "changed": null
+    },
+    {
+      "id": "주문서-우편번호-검색--조회실패",
+      "file": "d2152ba9cf089abd.png",
+      "status": "촬영 실패",
+      "changed": null
+    },
+    {
+      "id": "design-tokens--tokens",
+      "file": "1841f7e016c2c403.png",
+      "status": "같음",
+      "changed": false,
+      "ratio": 0.0,
+      "pixels": 0,
+      "total": 4314376,
+      "before_size": [
+        968,
+        4457
+      ],
+      "after_size": [
+        968,
+        4457
+      ]
+    }
+  ],
+  "dirs": {
+    "baseline": "{{WS}}\\.speclinker\\story_shots\\baseline",
+    "current": "{{WS}}\\.speclinker\\story_shots\\current",
+    "diff": "{{WS}}\\.speclinker\\story_shots\\diff"
+  }
+}

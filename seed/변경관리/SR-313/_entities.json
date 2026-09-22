@@ -1,0 +1,30 @@
+{
+  "tables": [
+    "ORDER_ITEMS",
+    "PRODUCTS"
+  ],
+  "tables_unknown": [
+    "ECOMMERCE_PLAN",
+    "PRODUCT_IMAGES",
+    "PRODUCT_NOTICES",
+    "PRODUCT_TAGS"
+  ],
+  "infs": [],
+  "infs_unmatched": [],
+  "paths": [],
+  "paths_candidate": [
+    "/EXTRA/DETAIL/VIDEO",
+    "/api/categories",
+    "/plan/ECOMMERCE_PLAN",
+    "/plan/bench",
+    "/plan/benchmark_ktalpha",
+    "/plan/new_srs"
+  ],
+  "screens": [
+    "상품 목록",
+    "장바구니"
+  ],
+  "uis_ids": [],
+  "terms": [],
+  "entities_arg": "ORDER_ITEMS,PRODUCTS,상품 목록,장바구니"
+}

@@ -1,0 +1,23 @@
+{
+  "tables": [],
+  "tables_unknown": [],
+  "infs": [],
+  "infs_unmatched": [],
+  "paths": [
+    "/api/cart/",
+    "/api/cart/checkout",
+    "/api/cart/items"
+  ],
+  "paths_candidate": [
+    "/api/cart",
+    "/shop/cart",
+    "/shop/order"
+  ],
+  "screens": [
+    "상품 목록",
+    "장바구니"
+  ],
+  "uis_ids": [],
+  "terms": [],
+  "entities_arg": "/api/cart/,/api/cart/checkout,/api/cart/items,상품 목록,장바구니"
+}

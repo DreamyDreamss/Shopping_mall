@@ -1,0 +1,25 @@
+{
+  "tables": [
+    "PRODUCTS"
+  ],
+  "tables_unknown": [
+    "ECOMMERCE_PLAN"
+  ],
+  "infs": [],
+  "infs_unmatched": [],
+  "paths": [],
+  "paths_candidate": [
+    "/_lab/catalog/images",
+    "/images/products",
+    "/plan/ECOMMERCE_PLAN",
+    "/plan/bench",
+    "/plan/benchmark_ktalpha",
+    "/plan/new_srs"
+  ],
+  "screens": [
+    "장바구니"
+  ],
+  "uis_ids": [],
+  "terms": [],
+  "entities_arg": "PRODUCTS,장바구니"
+}

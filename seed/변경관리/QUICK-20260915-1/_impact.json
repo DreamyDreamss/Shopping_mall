@@ -1,0 +1,38 @@
+{
+  "schema": 2,
+  "sr": "QUICK-20260915-1",
+  "title": "QUICK-20260915-1",
+  "clarification": "none",
+  "affected": {
+    "inf": [
+      "INF-MBR-003"
+    ],
+    "sch": [],
+    "uis": [],
+    "bat": []
+  },
+  "new_specs": [],
+  "items": [
+    {
+      "n": 1,
+      "title": "로그인 실패 5회 잠금 안내 문구를 '잠시 후 다시 시도'로 바꾼다",
+      "specs": {
+        "uis": [],
+        "inf": [
+          "INF-MBR-003"
+        ],
+        "sch": [],
+        "bat": []
+      },
+      "new_specs": [],
+      "module": null,
+      "origin": "quick"
+    }
+  ],
+  "item_seq": 1,
+  "stories": [
+    "QUICK-20260915-1.1"
+  ],
+  "story_files": [],
+  "generated_at": "2026-09-15T03:33:47"
+}

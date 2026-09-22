@@ -1,0 +1,21 @@
+{
+  "tables": [],
+  "tables_unknown": [
+    "ECOMMERCE_PLAN"
+  ],
+  "infs": [],
+  "infs_unmatched": [],
+  "paths": [],
+  "paths_candidate": [
+    "/plan/ECOMMERCE_PLAN",
+    "/plan/bench",
+    "/plan/benchmark_ktalpha",
+    "/plan/new_srs"
+  ],
+  "screens": [
+    "상품 목록"
+  ],
+  "uis_ids": [],
+  "terms": [],
+  "entities_arg": "상품 목록"
+}

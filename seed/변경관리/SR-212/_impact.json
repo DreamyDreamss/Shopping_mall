@@ -1,0 +1,30 @@
+{
+  "title": "SR-212",
+  "stories": [
+    "FUNC-order-010",
+    "FUNC-order-015",
+    "FUNC-order-016"
+  ],
+  "clarification": "none",
+  "new_funcs": [
+    {
+      "func_id": "FUNC-order-015",
+      "kind": "inf",
+      "spec_id": "INF-ORD-016"
+    },
+    {
+      "func_id": "FUNC-order-016",
+      "kind": "inf",
+      "spec_id": "INF-ORD-017"
+    }
+  ],
+  "affected": {
+    "inf": [],
+    "sch": [],
+    "uis": [
+      "UIS-ORD-004"
+    ],
+    "bat": []
+  },
+  "generated_at": "2026-09-08T23:58:33"
+}

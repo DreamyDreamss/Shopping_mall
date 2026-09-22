@@ -1,0 +1,14 @@
+{
+  "tables": [],
+  "tables_unknown": [],
+  "infs": [],
+  "infs_unmatched": [],
+  "paths": [],
+  "paths_candidate": [],
+  "screens": [
+    "장바구니"
+  ],
+  "uis_ids": [],
+  "terms": [],
+  "entities_arg": "장바구니"
+}

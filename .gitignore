@@ -1,0 +1,17 @@
+# 빌드 산출물
+apps/*/target/
+apps/*/dist/
+apps/*/storybook-static/
+apps/*/node_modules/
+apps/*/test-results/
+apps/*/tsconfig.tsbuildinfo
+# setup이 생성하는 것 — 절대 경로를 담으므로 저장소에 두지 않는다
+apps/shop-api/mvnw.cmd
+.runtime/
+# 로그·임시
+*.log
+_tmp/
+# 비밀
+.mcp.json
+__pycache__/
+*.pyc

@@ -1,0 +1,43 @@
+{
+  "title": "SR-234",
+  "stories": [
+    "FUNC-member-007",
+    "FUNC-member-008",
+    "FUNC-member-009"
+  ],
+  "clarification": "none",
+  "new_funcs": [
+    {
+      "func_id": "FUNC-member-007",
+      "kind": "uis",
+      "spec_id": "UIS-MBR-003",
+      "name": "비밀번호 재설정 화면",
+      "module": "shop-web",
+      "module_path": "{{SRC_SHOP_WEB}}"
+    },
+    {
+      "func_id": "FUNC-member-008",
+      "kind": "inf",
+      "spec_id": "INF-MBR-006",
+      "name": "비밀번호 재설정 코드 요청 API",
+      "module": "shop-api",
+      "module_path": "{{SRC_SHOP_API}}"
+    },
+    {
+      "func_id": "FUNC-member-009",
+      "kind": "inf",
+      "spec_id": "INF-MBR-007",
+      "name": "비밀번호 재설정 확정 API",
+      "module": "shop-api",
+      "module_path": "{{SRC_SHOP_API}}"
+    }
+  ],
+  "affected": {
+    "inf": [],
+    "sch": [],
+    "uis": [],
+    "bat": []
+  },
+  "story_files": [],
+  "generated_at": "2026-09-13T08:39:50"
+}

@@ -1,0 +1,67 @@
+{
+  "schema": 2,
+  "sr": "SR-297",
+  "title": "SR-297",
+  "clarification": "none",
+  "affected": {
+    "inf": [
+      "INF-MBR-006"
+    ],
+    "sch": [
+      "SCH-MBR-005"
+    ],
+    "uis": [],
+    "bat": []
+  },
+  "new_specs": [
+    {
+      "kind": "BAT",
+      "id": "BAT-MBR-001",
+      "domain": "member",
+      "name": "비밀번호 재설정 만료 행 정리 배치",
+      "module": "shop-api",
+      "module_path": "{{SRC_SHOP_API}}"
+    }
+  ],
+  "items": [
+    {
+      "n": 1,
+      "title": "비밀번호 재설정 만료 행 정리 배치",
+      "specs": {
+        "uis": [],
+        "inf": [],
+        "sch": [],
+        "bat": []
+      },
+      "new_specs": [
+        "BAT-MBR-001"
+      ],
+      "module": "shop-api",
+      "origin": "auto:new"
+    },
+    {
+      "n": 2,
+      "title": "비밀번호 재설정 코드 요청",
+      "specs": {
+        "uis": [],
+        "inf": [
+          "INF-MBR-006"
+        ],
+        "sch": [
+          "SCH-MBR-005"
+        ],
+        "bat": []
+      },
+      "new_specs": [],
+      "module": null,
+      "origin": "auto:inf"
+    }
+  ],
+  "item_seq": 2,
+  "stories": [
+    "SR-297.1",
+    "SR-297.2"
+  ],
+  "story_files": [],
+  "generated_at": "2026-09-16T03:19:22"
+}

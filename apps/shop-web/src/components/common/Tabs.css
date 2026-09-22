@@ -1,0 +1,43 @@
+/* SR-310 — Tabs 스티키 고정은 실제 `position: sticky`가 필요해(스크롤 이벤트로 흉내내지 않는다)
+   인라인스타일이 아닌 별도 파일로 둔다. */
+.cmn-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--color-surface-1);
+  background: #fff;
+}
+
+.cmn-tabs--sticky {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+}
+
+.cmn-tabs__tab {
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: none;
+  padding: var(--space-3) var(--space-4);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.cmn-tabs__tab--active {
+  border-bottom-color: var(--color-text);
+  color: var(--color-text);
+  font-weight: var(--font-weight-bold);
+}
+
+/* SR-311 round2 — 탭 라벨 위 작은 점(빨간 라벨). 탭 버튼 안쪽에서 그려지므로 활성/비활성 굵기·노출
+   탭 수와 무관하게 항상 라벨과 정렬된다. */
+.cmn-tabs__badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-brand);
+}

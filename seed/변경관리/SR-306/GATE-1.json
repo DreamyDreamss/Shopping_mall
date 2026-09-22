@@ -1,0 +1,492 @@
+{
+  "func": "SR-306.1",
+  "epic": "SR-306",
+  "story": "docs/변경관리/SR-306/STORY-1.md",
+  "gate": "PASS",
+  "reviewer": "qa-agent",
+  "updated": "2026-09-17T09:47:43",
+  "layers": {
+    "spec": "pass",
+    "security": "pass",
+    "regression": "pass",
+    "scope": "pass",
+    "rules": "pass",
+    "stories": "pass",
+    "conformance": "pass"
+  },
+  "top_issues": [
+    {
+      "severity": "low",
+      "layer": "conformance",
+      "finding": "ProductCard.stories.tsx의 '이미지있음' 상태가 '정가없음'과 완전히 동일한 args(SKU-1002)를 그대로 유지한다(재작업 지시 7 미해결) — round2에서 이미 명시적 유지 결정이 났고 round3·round4 diff에도 변경 없음(사실 확인). 사람 승인·QA 비차단(low) 판정과 일치해 게이트를 막지 않는다.",
+      "suggested_action": "후속 라운드에서 이미지있음 상태를 다른 실 SKU로 차별화하거나 제거 여부를 정리(story 재작업 지시 7 그대로 유지).",
+      "confidence": "high",
+      "file": "modules/shop-web/src/features/shop/ProductCard.stories.tsx",
+      "line": 61
+    },
+    {
+      "severity": "low",
+      "layer": "conformance",
+      "finding": ".storybook/main.ts의 staticDirs가 별도 git 저장소인 shop-api 디렉터리를 형제 경로 존재 전제로 참조한다(재작업 지시 3) — round4 diff에서 그 전제를 주석 2건으로 문서화했음을 확인(코드 동작 변경 없음, 사람 지시 이행). 워크스페이스 CLAUDE.md 모듈 표에는 아직 이 크로스 모듈 의존이 각주로 남지 않아(round3 QA 권고 2·재동기화 입력과 별개) 후속 문서화 여지가 있다 — 차단 아님(low, story 자체가 '코드 변경 없이 끝나는 항목'으로 명시).",
+      "suggested_action": "STEP 5.5 또는 후속 정리에서 CLAUDE.md 모듈 표 각주에 shop-api 형제 경로 전제를 1줄 추가 권고(story 권고와 동일, 재게이트 불필요).",
+      "confidence": "high",
+      "file": "modules/shop-web/.storybook/main.ts",
+      "line": 15
+    }
+  ],
+  "rounds": [
+    {
+      "round": 1,
+      "gate": "FAIL",
+      "human": {
+        "decision": "rework",
+        "by": "사람",
+        "at": "2026-09-17T09:00:00",
+        "comment": "부동소수점으로 나눈 뒤 내림하면 10%가 9%로 보인다. 정수 연산으로 바꾼다. 할인율 = (listPrice - price) * 100 / listPrice 를 정수 연산으로(먼저 곱하고 나중에 나눈다). listPrice가 없거나 price 이상이면 계산 자체를 하지 않는다. 계산 함수는 한 곳에 두고 스토리·테스트가 같은 함수를 쓰게 할 것. QA가 지목한 17개 비율을 포함한 표 기반 테스트(정가·판매가 -> 기대 %)를 추가하고, 고치기 전에 그 테스트가 9%로 실패하는 것을 먼저 확인해 Dev 기록에 남길 것. 0%는 배지 숨김, 99%·1% 경계도 포함.",
+        "targets": []
+      },
+      "layers": {
+        "spec": "fail",
+        "security": "pass",
+        "regression": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "high",
+          "layer": "spec",
+          "finding": "ProductCard.tsx:20 할인율이 Math.floor((1 - price/listPrice) * 100)로 구현돼(계획서 공식 이탈) 배정밀도 오차로 1%p 낮게 표시된다 — 정가 100,000 기준 1~90% 중 17개 비율이 틀리고, 실제 10.0%(90,000/100,000)가 9%, 20.0%(80,000/100,000)가 19%로 나온다. 확정답변 8 '할인율은 내림해 정수 %로 표시' 위반. 계획서 공식도 29%/57%/58%에서 틀리므로 되돌리기가 아닌 정수 연산이 필요하다.",
+          "suggested_action": "discountRate = Math.floor((product.listPrice! - product.price) * 100 / product.listPrice!)로 교체(정수 연산 — 1~99% 전 구간 정확함을 실측 확인). 계획서 공식으로 되돌리지 말 것."
+        },
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "ShopHomePage.test.tsx 신규 할인율 테스트가 390,000/450,000(=13.33%, 내림이 필요한 비율)만 단언해 위 부동소수 결함을 원리적으로 검출하지 못한다(실패 사례집 39행 '가드를 걷어내 실제로 깨지는지 확인' 재발 형태).",
+          "suggested_action": "실제 비율이 정수인 케이스(price 90,000 / listPrice 100,000 → '10%')를 추가하고 수정 전에 그 테스트가 9%로 실패함을 확인한 뒤 고친다. 내림 케이스(35,000/42,000 → '16%')도 함께 고정."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "Dev 기록이 '계획대로 진행, 이탈 없음'으로 적었으나 할인율 공식은 계획과 다르다(같은 기록에 다른 식이 적혀 있다).",
+          "suggested_action": "계획과 다른 식·구조를 쓸 때는 Dev 기록에 이탈로 명시하고 사유를 남긴다."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "ProductCard.stories.tsx의 '이미지있음' 상태가 '정가없음'과 args가 완전히 동일(SKU-1002)해 새 시각 상태를 추가하지 않는다(계획·사람 승인분).",
+          "suggested_action": "후속에서 상태를 차별화하거나('정가 있음+이미지 있음'은 이미 '할인'이 덮는다) 제거 여부를 정리."
+        },
+        {
+          "severity": "low",
+          "layer": "security",
+          "finding": "imageUrl 값 형태를 프론트가 검증하지 않아 DB에 절대 URL이 들어오면 그대로 외부 요청이 나간다(확정답변 1이 외부 이미지 URL을 제외해 현 데이터로는 미발생).",
+          "suggested_action": "외부 URL을 허용하는 후속 SR에서 경로 접두(/images/products/) 검증을 도입."
+        }
+      ],
+      "cause": "impl_bug"
+    },
+    {
+      "round": 2,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass"
+      },
+      "top_issues": [],
+      "cause": "none"
+    },
+    {
+      "round": 3,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "pass"
+      },
+      "top_issues": [],
+      "layer": "baseline"
+    },
+    {
+      "round": 4,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "pass",
+        "scope": "pass"
+      },
+      "top_issues": [],
+      "layer": "scope"
+    },
+    {
+      "round": 5,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "pass",
+        "scope": "pass",
+        "rules": "pass"
+      },
+      "top_issues": [],
+      "layer": "rules"
+    },
+    {
+      "round": 6,
+      "gate": "FAIL",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "pass",
+        "scope": "pass",
+        "rules": "pass",
+        "stories": "fail"
+      },
+      "top_issues": [
+        {
+          "severity": "high",
+          "layer": "stories",
+          "finding": "스토리가 깨졌습니다: 쇼핑홈-상품-카드--할인 — Failed to load resource: the server responded with a status of 404 (File not found)",
+          "suggested_action": "그 상태를 다시 그리도록 고치거나, 상태가 없어졌다면 스토리를 지우세요"
+        },
+        {
+          "severity": "high",
+          "layer": "stories",
+          "finding": "스토리가 깨졌습니다: 쇼핑홈-상품-카드--정가없음 — Failed to load resource: the server responded with a status of 404 (File not found)",
+          "suggested_action": "그 상태를 다시 그리도록 고치거나, 상태가 없어졌다면 스토리를 지우세요"
+        },
+        {
+          "severity": "high",
+          "layer": "stories",
+          "finding": "스토리가 깨졌습니다: 쇼핑홈-상품-카드--이미지있음 — Failed to load resource: the server responded with a status of 404 (File not found)",
+          "suggested_action": "그 상태를 다시 그리도록 고치거나, 상태가 없어졌다면 스토리를 지우세요"
+        },
+        {
+          "severity": "high",
+          "layer": "stories",
+          "finding": "스토리가 깨졌습니다: 쇼핑홈-상품-카드--할인0퍼센트 — Failed to load resource: the server responded with a status of 404 (File not found)",
+          "suggested_action": "그 상태를 다시 그리도록 고치거나, 상태가 없어졌다면 스토리를 지우세요"
+        },
+        {
+          "severity": "high",
+          "layer": "stories",
+          "finding": "스토리가 깨졌습니다: 쇼핑홈-추천-상품-그리드--목록있음 — Failed to load resource: the server responded with a status of 404 (File not found)",
+          "suggested_action": "그 상태를 다시 그리도록 고치거나, 상태가 없어졌다면 스토리를 지우세요"
+        },
+        {
+          "severity": "high",
+          "layer": "stories",
+          "finding": "스토리가 깨졌습니다: 쇼핑홈-추천-상품-그리드--빈목록 — Failed to load resource: the server responded with a status of 404 (File not found); Failed to load resource: the server responded with a status of 404 (File not found); Failed to load resource: the s",
+          "suggested_action": "그 상태를 다시 그리도록 고치거나, 상태가 없어졌다면 스토리를 지우세요"
+        }
+      ],
+      "layer": "stories"
+    },
+    {
+      "round": 7,
+      "gate": "FAIL",
+      "human": {
+        "decision": "rework",
+        "by": "사람",
+        "at": "2026-09-17T09:21:32",
+        "comment": "사본을 만들면 원본과 어긋날 수 있으니 복사 대신 스토리북 설정에서 원본을 가리키게 한다 — .storybook의 staticDirs에 shop-api의 static 디렉터리를 추가해 /images/products/* 가 그대로 뜨게 할 것. 그게 환경 제약으로 막히면 그때만 사본을 두되 '원본은 shop-api'임을 주석으로 남긴다. staticDirs 항목은 상대 경로로(모듈 밖 경로가 필요하면 ../shop-api/src/main/resources/static) 추가하고, 빌드(build-storybook)와 개발 서버 양쪽에서 동작하는지 확인한다. 이미지 로드 실패 스토리는 의도적으로 잘못된 경로를 그대로 둔다. test-storybook 전체 실행으로 6건 통과 확인, 이미지 로드 실패 스토리는 대체 영역 유지, npm test 전체 통과.",
+        "targets": []
+      },
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "pass",
+        "scope": "pass",
+        "rules": "pass",
+        "stories": "fail",
+        "conformance": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "high",
+          "layer": "stories",
+          "finding": "스토리가 깨졌습니다: 쇼핑홈-상품-카드--할인 — Failed to load resource: the server responded with a status of 404 (File not found)",
+          "suggested_action": "그 상태를 다시 그리도록 고치거나, 상태가 없어졌다면 스토리를 지우세요"
+        },
+        {
+          "severity": "high",
+          "layer": "stories",
+          "finding": "스토리가 깨졌습니다: 쇼핑홈-상품-카드--정가없음 — Failed to load resource: the server responded with a status of 404 (File not found)",
+          "suggested_action": "그 상태를 다시 그리도록 고치거나, 상태가 없어졌다면 스토리를 지우세요"
+        },
+        {
+          "severity": "high",
+          "layer": "stories",
+          "finding": "스토리가 깨졌습니다: 쇼핑홈-상품-카드--이미지있음 — Failed to load resource: the server responded with a status of 404 (File not found)",
+          "suggested_action": "그 상태를 다시 그리도록 고치거나, 상태가 없어졌다면 스토리를 지우세요"
+        },
+        {
+          "severity": "high",
+          "layer": "stories",
+          "finding": "스토리가 깨졌습니다: 쇼핑홈-상품-카드--할인0퍼센트 — Failed to load resource: the server responded with a status of 404 (File not found)",
+          "suggested_action": "그 상태를 다시 그리도록 고치거나, 상태가 없어졌다면 스토리를 지우세요"
+        },
+        {
+          "severity": "high",
+          "layer": "stories",
+          "finding": "스토리가 깨졌습니다: 쇼핑홈-추천-상품-그리드--목록있음 — Failed to load resource: the server responded with a status of 404 (File not found)",
+          "suggested_action": "그 상태를 다시 그리도록 고치거나, 상태가 없어졌다면 스토리를 지우세요"
+        },
+        {
+          "severity": "high",
+          "layer": "stories",
+          "finding": "스토리가 깨졌습니다: 쇼핑홈-추천-상품-그리드--빈목록 — Failed to load resource: the server responded with a status of 404 (File not found); Failed to load resource: the server responded with a status of 404 (File not found); Failed to load resource: the s",
+          "suggested_action": "그 상태를 다시 그리도록 고치거나, 상태가 없어졌다면 스토리를 지우세요"
+        },
+        {
+          "severity": "low",
+          "layer": "conformance",
+          "finding": "ProductCard.stories.tsx의 '이미지있음' 상태가 '정가없음'과 완전히 동일한 args(SKU-1002)를 그대로 유지한다(재작업 지시 4 미해결) — 사람 승인·QA 비차단 판정(round1 권고, round2 명시적 유지 결정)이 diff·Dev 기록과 일치해 확인됨. 새 시각 상태를 추가하지 않는다는 관찰은 여전히 사실이나, story·round2 Dev 기록이 이를 '이번 라운드 변경 없음'으로 이미 명시했으므로 게이트를 막지 않는다.",
+          "suggested_action": "후속 라운드에서 이미지있음 상태를 다른 실 SKU로 차별화하거나 제거 여부를 정리(story 재작업 지시 4·QA round1 권고 2 그대로 유지).",
+          "confidence": "high",
+          "file": "modules/shop-web/src/features/shop/ProductCard.stories.tsx",
+          "line": 61
+        },
+        {
+          "severity": "low",
+          "layer": "conformance",
+          "finding": "재작업 지시 5(imageUrl 절대 URL 미검증)는 story·QA 양쪽이 '외부 이미지 URL을 허용하는 후속 SR 범위'로 명시적으로 범위 밖 처리했고 diff도 이에 부합(경로 검증 코드 추가 없음) — 위반이 아니라 사실 기록.",
+          "suggested_action": "없음(후속 SR TODO로 이미 기록됨).",
+          "confidence": "high",
+          "file": "modules/shop-web/src/features/shop/ProductCard.tsx",
+          "line": 41
+        }
+      ],
+      "layer": "conformance"
+    },
+    {
+      "round": 8,
+      "gate": "FAIL",
+      "human": {
+        "decision": "rework",
+        "by": "사람",
+        "at": "2026-09-17T09:35:10",
+        "comment": "QA 제안대로 반영. 이미지 로드 실패 상태는 없애지 않는다(확정 문답 9). 대신 네트워크 404 대신 깨진 data URI(data:image/png;base64,AAAAAAAA)를 써서 onError 폴백은 그대로 검증하고 콘솔 오류는 남기지 않는다. 1) 이미지로드실패 스토리의 imageUrl을 깨진 data URI로 교체하고 왜 404 경로를 쓰지 않는지 한 줄 주석(축E가 콘솔 오류를 실패로 본다)을 남긴다. 2) .storybook/main.ts staticDirs에 shop-api 저장소가 형제 경로에 있어야 한다는 전제를 주석으로 적는다. 3) project.env STORYBOOK_TEST_CMD는 건드리지 말 것(사람이 별도 판단). 완료 조건: 축E(story_gate.py)로 전 스토리 통과 확인 — test-storybook 통과만으로 판단하지 말 것. 이미지 로드 실패 스토리가 여전히 이니셜 대체 영역을 보여주는지 단언.",
+        "targets": []
+      },
+      "layers": {
+        "spec": "fail",
+        "security": "pass",
+        "regression": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "high",
+          "layer": "stories",
+          "finding": "round2 축E FAIL이 해소되지 않았다. staticDirs 수정으로 sku-1001~1003.svg 404 6건은 실제로 사라졌으나(QA 독립 실측: build 산출물에 이미지 복사됨, 200 확인), QA가 직접 실행한 story_gate.py는 여전히 verdict=fail이다 — 남은 1건 '쇼핑홈-상품-카드--이미지로드실패 — Failed to load resource: 404'. 축E 렌더러(storybook_render.js:71-72)는 favicon 외 콘솔 error 1건이면 그 스토리를 깨진 것으로 세고 '의도적 404'를 예외로 둘 수단이 없어(renders-nothing 태그는 빈 렌더 전용), 사람 코멘트가 지시한 '잘못된 경로를 그대로 둔다'를 지키면 이 스토리는 구조적으로 통과할 수 없다. round2에 이 스토리가 통과로 보인 것은 404 콘솔 error가 비동기로 다음 스토리(빈목록)에 귀속됐기 때문으로, round3가 만든 새 결함이 아니라 미해소 high다. 확정답변 9가 이 상태를 명시해 스토리 삭제는 스펙 위반이다.",
+          "suggested_action": "ProductCard.stories.tsx의 이미지로드실패 imageUrl을 네트워크 404 없이 onerror를 일으키는 값으로 교체한다 — QA 실측(_tmp/qa_img_probe.js, 축E와 동일 판정 기준)으로 data:image/png;base64,AAAAAAAA 는 onerror 발생 + 콘솔 error 0건 확인. 상태 이름·의미는 유지하고 사유를 JSDoc에 남긴 뒤, 검증은 python {{PLUGIN_PATH}}/scripts/story_gate.py {{WS}} --func SR-306.1 이 verdict=pass 가 되는 것으로 한다."
+        },
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "Dev 기록이 3라운드 연속 `npx test-storybook`(18 스위트/69건 통과)으로 화면 축 통과를 대리 증명했으나 이 대상 project.env에는 STORYBOOK_TEST_CMD가 없다(STORYBOOK_SOURCE·RUN_CMD·STATIC·BUILD_CMD만 존재). 따라서 축E는 storybook_render.js(콘솔 error 1건 = 실패)를 쓰며 test-runner와 실패 기준이 다르다 — round2·round3의 '69건 통과'가 축E FAIL과 공존한 것이 그 증거다. 잘못된 도구로 검증해 온 것이 라운드가 반복된 직접 원인이다.",
+          "suggested_action": "다음 라운드부터 화면 축은 python {{PLUGIN_PATH}}/scripts/story_gate.py {{WS}} --func SR-306.1 로 직접 확인하고 그 verdict를 Dev 기록에 적는다."
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "staticDirs: ['../../shop-api/src/main/resources/static'] 가 별도 git 저장소인 shop-web에 shop-api 디렉터리 존재를 빌드 전제로 심는다. Storybook 10.6.0은 경로가 없으면 'Failed to load static files, no such directory'로 하드 실패하므로(설치본 dist에서 메시지 확인), shop-web 단독 체크아웃/CI에서는 storybook dev·build 양쪽이 죽고 축E가 스토리 1건이 아니라 축 전체 unknown(판정 불능)으로 꺼진다.",
+          "suggested_action": "사본을 만들지 않는 결정은 유지하되 크로스 모듈 의존을 한 줄로 문서화한다(워크스페이스 CLAUDE.md 모듈 표 각주 또는 shop-web package.json/README 주석). 코드 변경이 없어 필수수정 1과 같은 라운드에 처리한다."
+        },
+        {
+          "severity": "low",
+          "layer": "stories",
+          "finding": "축E 렌더러에 '이 스토리는 콘솔 error가 정상'을 선언할 수단이 없다(renders-nothing은 빈 렌더 전용). 필수수정 1은 워크스페이스 쪽 우회이고 근본은 플러그인 개선 여지다.",
+          "suggested_action": "expects-console-error 류 태그 도입, 또는 STORYBOOK_TEST_CMD 채택(축E 설계가 권하는 더 강한 판정)을 사람이 판단. 단 후자는 test-runner가 기동된 스토리북을 요구해 AIDD 잡 중 shop-web dev 서버 기동 금지(CLAUDE.md OOM 실측)와 충돌한다. 이번 SR에서는 고치지 않는다."
+        },
+        {
+          "severity": "low",
+          "layer": "security",
+          "finding": "staticDirs가 shop-api static/ 디렉터리 전체를 스토리북 dev 서버와 storybook-static/ 산출물로 공개한다. 현재 실물은 제품 SVG 3개뿐이라(실측) 노출 위험 없음.",
+          "suggested_action": "그 디렉터리에 비공개 자산을 두게 되면 staticDirs를 .../static/images 처럼 필요한 하위 경로로 좁힌다(후속 TODO)."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "story_shots 기준선(.speclinker/story_shots/baseline/)은 이미지가 404였던 시점의 픽셀을 담고 있다. round3로 할인·정가없음/이미지있음·할인0퍼센트와 그리드 목록있음의 렌더 결과가 실제로 달라졌다(깨진 이미지 → 실 SVG).",
+          "suggested_action": "필수수정 1까지 끝난 뒤 기준선을 한 번에 재기록하고 사유('SR-306.1 — 상품 이미지가 스토리북에서 실제로 서빙됨')를 남긴다."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "round1 권고 2 / 재작업 지시 7(ProductCard.stories.tsx의 이미지있음이 정가없음과 동일 args, SKU-1002)은 round2에서 명시적 유지 결정이 났고 round3도 무변경 — 사실 기록이며 차단 아님.",
+          "suggested_action": "없음(후속 정리 항목으로 유지, 재게이트하지 않는다)."
+        }
+      ],
+      "cause": "human_instruction"
+    },
+    {
+      "round": 9,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass"
+      },
+      "top_issues": [],
+      "cause": "none"
+    },
+    {
+      "round": 10,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "scope": "pass"
+      },
+      "top_issues": [],
+      "layer": "scope"
+    },
+    {
+      "round": 11,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "scope": "pass",
+        "rules": "pass"
+      },
+      "top_issues": [],
+      "layer": "rules"
+    },
+    {
+      "round": 12,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "scope": "pass",
+        "rules": "pass",
+        "stories": "pass"
+      },
+      "top_issues": [],
+      "layer": "stories"
+    },
+    {
+      "round": 13,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "scope": "pass",
+        "rules": "pass",
+        "stories": "pass",
+        "conformance": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "conformance",
+          "finding": "ProductCard.stories.tsx의 '이미지있음' 상태가 '정가없음'과 완전히 동일한 args(SKU-1002)를 그대로 유지한다(재작업 지시 7 미해결) — round2에서 이미 명시적 유지 결정이 났고 round3·round4 diff에도 변경 없음(사실 확인). 사람 승인·QA 비차단(low) 판정과 일치해 게이트를 막지 않는다.",
+          "suggested_action": "후속 라운드에서 이미지있음 상태를 다른 실 SKU로 차별화하거나 제거 여부를 정리(story 재작업 지시 7 그대로 유지).",
+          "confidence": "high",
+          "file": "modules/shop-web/src/features/shop/ProductCard.stories.tsx",
+          "line": 61
+        },
+        {
+          "severity": "low",
+          "layer": "conformance",
+          "finding": ".storybook/main.ts의 staticDirs가 별도 git 저장소인 shop-api 디렉터리를 형제 경로 존재 전제로 참조한다(재작업 지시 3) — round4 diff에서 그 전제를 주석 2건으로 문서화했음을 확인(코드 동작 변경 없음, 사람 지시 이행). 워크스페이스 CLAUDE.md 모듈 표에는 아직 이 크로스 모듈 의존이 각주로 남지 않아(round3 QA 권고 2·재동기화 입력과 별개) 후속 문서화 여지가 있다 — 차단 아님(low, story 자체가 '코드 변경 없이 끝나는 항목'으로 명시).",
+          "suggested_action": "STEP 5.5 또는 후속 정리에서 CLAUDE.md 모듈 표 각주에 shop-api 형제 경로 전제를 1줄 추가 권고(story 권고와 동일, 재게이트 불필요).",
+          "confidence": "high",
+          "file": "modules/shop-web/.storybook/main.ts",
+          "line": 15
+        }
+      ],
+      "layer": "conformance"
+    }
+  ],
+  "waiver": {
+    "active": false
+  },
+  "story_transitions": [
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "사람",
+      "at": "2026-09-17T08:41:18"
+    },
+    {
+      "from": "Approved",
+      "to": "InProgress",
+      "by": "sl-aidd",
+      "at": "2026-09-17T08:48:09"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "qa-agent",
+      "at": "2026-09-17T08:54:10"
+    },
+    {
+      "from": "Review",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-17T09:00:00"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "qa-agent",
+      "at": "2026-09-17T09:05:50"
+    },
+    {
+      "from": "Review",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-17T09:21:32"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "qa-agent",
+      "at": "2026-09-17T09:25:09"
+    },
+    {
+      "from": "Review",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-17T09:35:10"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "qa-agent",
+      "at": "2026-09-17T09:37:17"
+    },
+    {
+      "from": "Review",
+      "to": "Done",
+      "by": "사람",
+      "at": "2026-09-17T09:49:45"
+    }
+  ],
+  "cause": "none",
+  "escalate": false,
+  "fail_rounds": 2,
+  "max_rounds": 3
+}

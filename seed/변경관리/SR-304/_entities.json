@@ -1,0 +1,24 @@
+{
+  "tables": [
+    "PRODUCTS"
+  ],
+  "tables_unknown": [],
+  "infs": [],
+  "infs_unmatched": [],
+  "paths": [
+    "/api/cart/",
+    "/api/cart/items",
+    "/api/products",
+    "/api/products/{sku}"
+  ],
+  "paths_candidate": [
+    "/shop/products"
+  ],
+  "screens": [
+    "상품 상세",
+    "장바구니"
+  ],
+  "uis_ids": [],
+  "terms": [],
+  "entities_arg": "PRODUCTS,/api/cart/,/api/cart/items,/api/products,/api/products/{sku},상품 상세,장바구니"
+}

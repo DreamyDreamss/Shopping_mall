@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- linked_func: FUNC-member-005, FUNC-member-006 -->
+<!-- spec: docs/00_FUNC/stories/STORY-FUNC-member-005.md, docs/00_FUNC/stories/STORY-FUNC-member-006.md -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sm.lab.shop.dao.MemberRefreshTokenDao">
+
+  <!-- 원문은 저장하지 않는다 — SHA-256 해시(소문자 hex)만 저장(계약, 006과의 인터페이스 가정).
+       revoked_at은 항상 NULL — 폐기는 FUNC-006 소관. -->
+  <insert id="insert">
+    INSERT INTO MEMBER_REFRESH_TOKENS (token_hash, member_id, issued_at, expires_at, revoked_at)
+    VALUES (#{tokenHash}, #{memberId}, #{issuedAt}, #{expiresAt}, NULL)
+  </insert>
+
+  <!-- round 9(재작업 지시 4) — 이 회원의 만료·폐기 행 정리. 방금 삽입한 행은 만료도 폐기도
+       아니므로 지워지지 않는다. -->
+  <delete id="purgeExpiredOrRevoked">
+    DELETE FROM MEMBER_REFRESH_TOKENS
+     WHERE member_id = #{memberId}
+       AND (expires_at &lt;= #{now} OR revoked_at IS NOT NULL)
+  </delete>
+
+  <!-- round 9(재작업 지시 4) — 상한 초과분(issued_at 오래된 순) 삭제. 삭제 대상 테이블을 그대로
+       서브쿼리 FROM에 못 쓰는 MySQL/MariaDB 제약(Error 1093) 때문에 "유지할 목록"을 파생 테이블로
+       한 번 더 감싼다(member_signup_rate_limits류와 달리 이 제약 회피가 필요한 첫 사례). -->
+  <delete id="enforceActiveCap">
+    DELETE FROM MEMBER_REFRESH_TOKENS
+     WHERE member_id = #{memberId}
+       AND token_hash NOT IN (
+         SELECT token_hash FROM (
+           SELECT token_hash
+             FROM MEMBER_REFRESH_TOKENS
+            WHERE member_id = #{memberId}
+            ORDER BY issued_at DESC
+            LIMIT #{limit}
+         ) AS keep
+       )
+  </delete>
+
+  <!-- linked_func: FUNC-member-006 — refresh 자격 판정의 유일한 검문소(계획 "폴백·우회 경로의
+       자격 판정" 절). revoked_at IS NULL AND expires_at > now 둘 다 반드시 이 WHERE 절에 있어야
+       한다 — 없으면 폐기·만료된 토큰이 refresh를 영구히 통과시키는 우회 경로가 된다. -->
+  <select id="selectActiveByTokenHash" resultType="java.lang.String">
+    SELECT member_id
+      FROM MEMBER_REFRESH_TOKENS
+     WHERE token_hash = #{tokenHash}
+       AND revoked_at IS NULL
+       AND expires_at &gt; #{now}
+  </select>
+
+  <!-- linked_func: FUNC-member-006 — 로그아웃 = 이 회원의 활성 토큰 전체 폐기(개별 아님). 이미
+       폐기된 행은 대상이 아니라(WHERE revoked_at IS NULL) 재실행해도 안전하다. -->
+  <update id="revokeAllForMember">
+    UPDATE MEMBER_REFRESH_TOKENS
+       SET revoked_at = #{now}
+     WHERE member_id = #{memberId}
+       AND revoked_at IS NULL
+  </update>
+
+  <!-- linked_func: FUNC-member-006 — refresh 성공 시 회전(rotation)으로 방금 쓴 구 토큰만 개별
+       폐기(재사용 방지). 이미 폐기됐으면 이 UPDATE는 0행 영향으로 안전하다. -->
+  <update id="revokeByTokenHash">
+    UPDATE MEMBER_REFRESH_TOKENS
+       SET revoked_at = #{now}
+     WHERE token_hash = #{tokenHash}
+       AND revoked_at IS NULL
+  </update>
+
+</mapper>

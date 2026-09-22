@@ -1,0 +1,16 @@
+{
+  "tables": [],
+  "tables_unknown": [],
+  "infs": [],
+  "infs_unmatched": [],
+  "paths": [],
+  "paths_candidate": [],
+  "screens": [
+    "상품 목록"
+  ],
+  "uis_ids": [
+    "UIS-ORD-003"
+  ],
+  "terms": [],
+  "entities_arg": "상품 목록,UIS-ORD-003"
+}

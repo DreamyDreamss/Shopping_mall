@@ -1,0 +1,763 @@
+{
+  "func": "SR-297.1",
+  "epic": "SR-297",
+  "story": "docs/변경관리/SR-297/STORY-1.md",
+  "gate": "PASS",
+  "reviewer": "qa-agent",
+  "updated": "2026-09-16T04:24:57",
+  "layers": {
+    "spec": "pass",
+    "security": "pass",
+    "regression": "pass",
+    "baseline": "fail",
+    "scope": "pass",
+    "rules": "pass",
+    "conformance": "pass"
+  },
+  "top_issues": [
+    {
+      "severity": "low",
+      "layer": "spec",
+      "finding": "STORY 수용 기준 1번(라인 37)이 여전히 'expires_at < now'로 남아 구현(now - P7D)·승인된 재작업 결정과 어긋난다. 사람 코멘트가 더 나중 승인이라 구현이 옳지만 AC 체크리스트가 오독을 부른다",
+      "suggested_action": "STEP 5.5에서 AC1 문구를 'expires_at < now - 보존기간(member.password-reset.purge-retention, 기본 P7D)'으로 갱신"
+    },
+    {
+      "severity": "low",
+      "layer": "regression",
+      "finding": "MemberPasswordResetDaoTest:322가 임계값으로 LocalDateTime.now()를 넘긴다 — 실제 스케줄러는 항상 now-retention을 넘긴다. 단언은 자기 TARGET으로 좁혀져 플레이키하지 않으나 공유 랩 DB의 타인 in-flight 만료 행까지 전역 삭제한다(round1부터 있던 코드, 이번 재작업 산물 아님)",
+      "suggested_action": "후속 TODO — 임계값을 now.minusDays(7)로 통일해 시드 행만 지우게 한다"
+    },
+    {
+      "severity": "low",
+      "layer": "spec",
+      "finding": "같은 배치의 설정이 두 루트로 갈렸다 — cron은 lab.batch.password-reset-cleanup.cron, 보존기간만 신규 루트 member.password-reset.purge-retention. 동작·충돌 문제는 없다",
+      "suggested_action": "후속 정리 시 lab.batch.password-reset-cleanup.purge-retention으로 통합"
+    },
+    {
+      "severity": "low",
+      "layer": "spec",
+      "finding": "P7D 기본값의 String→Duration 바인딩은 @SpringBootTest 컨텍스트 로딩으로 증명되나 '기본이 7일'임을 단언하는 테스트는 없다(단위 테스트는 Duration.ofDays(7)을 직접 주입)",
+      "suggested_action": "추가 조치 불필요 — 기록만"
+    },
+    {
+      "severity": "low",
+      "layer": "regression",
+      "finding": "이 항목 무관/하네스 소관 — 전체 스위트 실패 2건(OrderListEndToEndIntegrationTest, ApiKeyAuthIntegrationTest)은 고정 시드의 날짜 만료 time bomb이다. OrderService.list:63이 startDate 미제시 시 LocalDate.now().minusDays(30)(오늘 기준 2026-08-17)을 쓰는데 M-0001 주문은 20260815/20260816이라 기간 필터 밖으로 빠진다. 두 테스트만 단독 실행해도 동일 재현 — 이 항목 diff에 주문 도메인이 0건이라 원인일 수 없음이 확정. dev가 보고한 '공유 DB 동시성' 추정은 오진",
+      "suggested_action": "시드 ordered_at을 상대 날짜로 바꾸거나 두 테스트가 명시 startDate를 넘기도록 수정(AIDD 하네스/기준선 소관). 기준선 대조 게이트가 있다면 510/1 → 527/2 증가분도 여기서 푼다"
+    },
+    {
+      "severity": "high",
+      "layer": "baseline",
+      "finding": "테스트 기준선 악화: shop-api: 실패+오류 1→2 증가",
+      "suggested_action": "사라진 테스트(수집 실패·import 깨짐)나 새 실패를 고치세요. 의도한 삭제면 `/sl-test --baseline --force`로 기준선을 다시 뜨고 사유를 남기세요"
+    },
+    {
+      "severity": "low",
+      "layer": "scope",
+      "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberPasswordResetDao.java — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+      "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+    },
+    {
+      "severity": "low",
+      "layer": "scope",
+      "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberSignupCompletionDao.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+      "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+    },
+    {
+      "severity": "low",
+      "layer": "scope",
+      "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberPasswordResetConfirmationService.java — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+      "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+    },
+    {
+      "severity": "low",
+      "layer": "scope",
+      "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberRegistrationService.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+      "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+    },
+    {
+      "severity": "low",
+      "layer": "scope",
+      "finding": "소속 불명(막지 않음): modules/shop-api/src/main/resources/mapper/memberPasswordReset.xml — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+      "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+    },
+    {
+      "severity": "low",
+      "layer": "scope",
+      "finding": "소속 불명(막지 않음): modules/shop-api/src/main/resources/mapper/memberSignupCompletion.xml — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+      "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+    },
+    {
+      "severity": "low",
+      "layer": "scope",
+      "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/MemberPasswordResetConfirmationFlowTest.java — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+      "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+    },
+    {
+      "severity": "low",
+      "layer": "scope",
+      "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/MemberRegistrationConcurrencyTest.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+      "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+    },
+    {
+      "severity": "low",
+      "layer": "scope",
+      "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/dao/MemberPasswordResetDaoTest.java — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+      "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+    },
+    {
+      "severity": "low",
+      "layer": "scope",
+      "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/dao/MemberSignupCompletionDaoTest.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+      "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+    },
+    {
+      "severity": "low",
+      "layer": "scope",
+      "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/service/MemberPasswordResetConfirmationServiceTest.java — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+      "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+    },
+    {
+      "severity": "low",
+      "layer": "scope",
+      "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/service/MemberRegistrationServiceTest.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+      "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+    },
+    {
+      "severity": "low",
+      "layer": "scope",
+      "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/MemberPasswordResetConfirmationConcurrencyTest.java — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+      "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+    },
+    {
+      "severity": "low",
+      "layer": "conformance",
+      "finding": "AC-4(독립 autocommit)를 직접 단언하는 테스트가 없다 — @Transactional 부재·요청 경로 무변경이라는 구조적 사실로만 보증된다. STORY 자체가 round1 QA 권고4로 이미 기록한 기지 갭이며 이번 검증에서도 diff상 동일하게 확인됨(추가 조치 요구 아님, 기록용).",
+      "suggested_action": "필요 시 별도 통합 테스트로 배치 실행 중 요청 경로 트랜잭션과 격리됨을 직접 증명(선택 사항, 이 항목 완료 조건은 아님).",
+      "confidence": "high",
+      "file": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberPasswordResetMaintenanceScheduler.java",
+      "line": 74
+    },
+    {
+      "severity": "low",
+      "layer": "conformance",
+      "finding": "이 항목(#1, BAT-MBR-001)의 신규 스펙 문서 본문이 아직 역생성되지 않아(_impact.json new_specs만 있고 affected inf/sch는 비어 있음) diff와 대조할 기존 TO-BE 계약 자체가 없다 — 계약 위반 판정 대상 없음(정상 상태, STORY 자체도 이를 STEP 5.5 소관으로 명시).",
+      "suggested_action": "STEP 5.5에서 BAT-MBR-001·SCH(신규 MEMBER_PASSWORD_RESET_RATE_LIMITS)·SCH-MBR-005·INF-MBR-007 재동기화 진행(STORY '재동기화 입력' 절에 이미 상세 명시됨).",
+      "confidence": "high"
+    }
+  ],
+  "rounds": [
+    {
+      "round": 1,
+      "gate": "CONCERNS",
+      "human": {
+        "decision": "rework",
+        "by": "사람",
+        "at": "2026-09-16T03:53:39",
+        "comment": "[결정 요약] 재작업. 1) 만료 행 즉시 삭제는 확정 API 오류 계약(만료=410 MBR-4101)을 깬다 — 만료 후 7일(설정값, 기본 7d) 지난 행만 삭제한다. 7일 이내 '어제 코드' 확정 시도는 기존대로 410. 7일 초과 뒤 409가 되는 것은 알려진 동작으로 INF-MBR-007·BAT-MBR-001에 명시. 2) expires_at 인덱스 추가(가입 idx_msv_expires_at와 같은 방식). 3) DAO 테스트는 영향행수 절대값 대신 시딩한 UUID 행의 존재/부재 재조회로 단언.\n[구현 방식] 배치 조건 expires_at < now - retention(설정 member.password-reset.purge-retention, 기본 P7D). 인덱스는 V9 DDL에 CREATE INDEX IF NOT EXISTS(기존 V5 파일은 수정하지 않음). 카운터 행 정리(day_key < 오늘)는 그대로. 각 DELETE 독립 autocommit 유지.\n[테스트·완료 조건] 추가 AC: 만료 1일 전 행 보존·만료 8일 지난 행 삭제 단언, 확정 API에 만료 1일 지난 코드 입력 시 여전히 410 MBR-4101(HTTP 단언). 기존 확정·요청 API 테스트 전부 통과.",
+        "targets": []
+      },
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "만료 행 삭제가 확정 API(INF-MBR-007)의 오류 코드를 바꾼다 — MemberPasswordResetConfirmationService.handleConfirmFailure는 행이 남아 있으면 410/MBR-4101(만료), 행이 없으면 409/MBR-4102(오답)로 갈린다. 배치가 만료 행을 지우면 '어제 코드로 오늘 확정'이 410→409가 되고 화면(FUNC-member-007)은 MBR-4101에서만 재요청 전이를 하므로 사용자가 2단계에서 재시도를 반복한다. 변경명세 회귀범위 '확정 흐름 불변'·'오류 응답 계약 변경 없음'과 BAT TO-BE의 '만료 행 DELETE'가 서로 답을 안 준 지점.",
+          "suggested_action": "사람 결정 — (a) 그대로 두고 변경명세 회귀범위에 '배치 실행 후 410→409 수렴' 명시 (b) 보존 유예(expires_at < now - INTERVAL n DAY)로 410 창 유지 (c) 확정 API의 행없음 분기 조정(별도 SR, 존재 오라클 재검토 필요)"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "MEMBER_PASSWORD_RESETS.expires_at에 인덱스가 없어(실측: PRIMARY(target) 하나뿐) 배치 DELETE가 풀스캔이다. InnoDB REPEATABLE READ에서 스캔한 전 행·갭에 next-key lock이 걸려 계획의 '매칭된 행만 잠근다' 전제가 성립하지 않는다. 형제 배치는 같은 이유로 idx_msv_expires_at을 이미 추가했다(member_signup_verifications.sql:78-82, 사례집 SR-231 r3).",
+          "suggested_action": "V9에 ALTER TABLE MEMBER_PASSWORD_RESETS ADD INDEX IF NOT EXISTS idx_mpr_expires_at (expires_at); 추가 — 단 변경명세 SCH-MBR-005 TO-BE('스키마 변경 없음')와 함께 결정"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "신규/추가 테스트가 테이블 전역 영향행수를 단언한다(MemberPasswordResetRateLimitDaoTest:58,78 · MemberPasswordResetDaoTest:318,341의 assertThat(affected).isEqualTo(1)). purgeOldRows/purgeExpiredCodes는 UUID target과 무관하게 테이블 전역에서 지우므로 UUID 격리가 시딩만 격리하고 단언은 격리하지 못한다. e2e/TC가 남긴 만료 행 하나만 있어도 affected=2로 깨지고 다음 실행에 스스로 낫는 1회성 플레이크가 된다. 미러링 대상인 MemberSignupRateLimitDaoTest:151-162는 영향행수를 단언하지 않고 재조회로만 단언한다.",
+          "suggested_action": "영향행수 단언을 제거하고 내 target 기준 COUNT 재조회 단언으로 바꾼다(멱등은 '2번째 호출 뒤에도 내 행 상태 동일')"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "AC4(정리 실패가 요청 경로 트랜잭션과 섞이지 않음 — 독립 autocommit)를 직접 단언하는 테스트가 없다. 구조적 사실(@Transactional 부재·요청 경로 무변경·@Scheduled 스레드)로만 보증된다.",
+          "suggested_action": "추가 조치 불필요 — AC를 '테스트로 증명'으로 읽을 경우의 미충족만 기록"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "새 배치의 스케줄링 활성화가 MemberSignupSchedulingConfig(javadoc상 '회원가입 스케줄러 전용', linked_func: FUNC-member-002)에 전적으로 의존하는데 그 클래스에 역참조가 없다. 가입 도메인 정리 중 삭제·개명하면 비밀번호 재설정 배치가 조용히 멈추고 테스트는 스케줄링을 끄므로 잡지 못한다.",
+          "suggested_action": "MemberSignupSchedulingConfig javadoc에 MemberPasswordResetMaintenanceScheduler(SR-297 #1)도 이 스위치에 의존한다는 한 줄 역참조 추가(동작 변경 없음)"
+        }
+      ],
+      "cause": "spec_gap"
+    },
+    {
+      "round": 2,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "STORY 수용 기준 1번(라인 37)이 여전히 'expires_at < now'로 남아 구현(now - P7D)·승인된 재작업 결정과 어긋난다. 사람 코멘트가 더 나중 승인이라 구현이 옳지만 AC 체크리스트가 오독을 부른다",
+          "suggested_action": "STEP 5.5에서 AC1 문구를 'expires_at < now - 보존기간(member.password-reset.purge-retention, 기본 P7D)'으로 갱신"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "MemberPasswordResetDaoTest:322가 임계값으로 LocalDateTime.now()를 넘긴다 — 실제 스케줄러는 항상 now-retention을 넘긴다. 단언은 자기 TARGET으로 좁혀져 플레이키하지 않으나 공유 랩 DB의 타인 in-flight 만료 행까지 전역 삭제한다(round1부터 있던 코드, 이번 재작업 산물 아님)",
+          "suggested_action": "후속 TODO — 임계값을 now.minusDays(7)로 통일해 시드 행만 지우게 한다"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "같은 배치의 설정이 두 루트로 갈렸다 — cron은 lab.batch.password-reset-cleanup.cron, 보존기간만 신규 루트 member.password-reset.purge-retention. 동작·충돌 문제는 없다",
+          "suggested_action": "후속 정리 시 lab.batch.password-reset-cleanup.purge-retention으로 통합"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "P7D 기본값의 String→Duration 바인딩은 @SpringBootTest 컨텍스트 로딩으로 증명되나 '기본이 7일'임을 단언하는 테스트는 없다(단위 테스트는 Duration.ofDays(7)을 직접 주입)",
+          "suggested_action": "추가 조치 불필요 — 기록만"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "이 항목 무관/하네스 소관 — 전체 스위트 실패 2건(OrderListEndToEndIntegrationTest, ApiKeyAuthIntegrationTest)은 고정 시드의 날짜 만료 time bomb이다. OrderService.list:63이 startDate 미제시 시 LocalDate.now().minusDays(30)(오늘 기준 2026-08-17)을 쓰는데 M-0001 주문은 20260815/20260816이라 기간 필터 밖으로 빠진다. 두 테스트만 단독 실행해도 동일 재현 — 이 항목 diff에 주문 도메인이 0건이라 원인일 수 없음이 확정. dev가 보고한 '공유 DB 동시성' 추정은 오진",
+          "suggested_action": "시드 ordered_at을 상대 날짜로 바꾸거나 두 테스트가 명시 startDate를 넘기도록 수정(AIDD 하네스/기준선 소관). 기준선 대조 게이트가 있다면 510/1 → 527/2 증가분도 여기서 푼다"
+        }
+      ],
+      "cause": "none"
+    },
+    {
+      "round": 3,
+      "gate": "FAIL",
+      "human": {
+        "decision": "waiver",
+        "by": "사람",
+        "at": "2026-09-16T04:22:56",
+        "comment": "기준선 악화(510/1→527/2)는 SR-297.1 diff와 무관 — OrderListEndToEndIntegrationTest·ApiKeyAuthIntegrationTest 2건은 주문 도메인 time-bomb(OrderService.java:63 LocalDate.now().minusDays(30) vs 고정 시드 20260815/16)이 원인. 단독 실행으로도 동일 재현되어 이 항목 코드 변경이 원인이 아님을 확인. 이미 SR-300(주문 조회창 30일 드리프트)으로 접수됨 — 새 후속 SR 생성하지 않는다. 기준선 재측정은 SR-298·SR-297 종료 후 사람이 별도 수행.",
+        "targets": []
+      },
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "fail"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "STORY 수용 기준 1번(라인 37)이 여전히 'expires_at < now'로 남아 구현(now - P7D)·승인된 재작업 결정과 어긋난다. 사람 코멘트가 더 나중 승인이라 구현이 옳지만 AC 체크리스트가 오독을 부른다",
+          "suggested_action": "STEP 5.5에서 AC1 문구를 'expires_at < now - 보존기간(member.password-reset.purge-retention, 기본 P7D)'으로 갱신"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "MemberPasswordResetDaoTest:322가 임계값으로 LocalDateTime.now()를 넘긴다 — 실제 스케줄러는 항상 now-retention을 넘긴다. 단언은 자기 TARGET으로 좁혀져 플레이키하지 않으나 공유 랩 DB의 타인 in-flight 만료 행까지 전역 삭제한다(round1부터 있던 코드, 이번 재작업 산물 아님)",
+          "suggested_action": "후속 TODO — 임계값을 now.minusDays(7)로 통일해 시드 행만 지우게 한다"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "같은 배치의 설정이 두 루트로 갈렸다 — cron은 lab.batch.password-reset-cleanup.cron, 보존기간만 신규 루트 member.password-reset.purge-retention. 동작·충돌 문제는 없다",
+          "suggested_action": "후속 정리 시 lab.batch.password-reset-cleanup.purge-retention으로 통합"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "P7D 기본값의 String→Duration 바인딩은 @SpringBootTest 컨텍스트 로딩으로 증명되나 '기본이 7일'임을 단언하는 테스트는 없다(단위 테스트는 Duration.ofDays(7)을 직접 주입)",
+          "suggested_action": "추가 조치 불필요 — 기록만"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "이 항목 무관/하네스 소관 — 전체 스위트 실패 2건(OrderListEndToEndIntegrationTest, ApiKeyAuthIntegrationTest)은 고정 시드의 날짜 만료 time bomb이다. OrderService.list:63이 startDate 미제시 시 LocalDate.now().minusDays(30)(오늘 기준 2026-08-17)을 쓰는데 M-0001 주문은 20260815/20260816이라 기간 필터 밖으로 빠진다. 두 테스트만 단독 실행해도 동일 재현 — 이 항목 diff에 주문 도메인이 0건이라 원인일 수 없음이 확정. dev가 보고한 '공유 DB 동시성' 추정은 오진",
+          "suggested_action": "시드 ordered_at을 상대 날짜로 바꾸거나 두 테스트가 명시 startDate를 넘기도록 수정(AIDD 하네스/기준선 소관). 기준선 대조 게이트가 있다면 510/1 → 527/2 증가분도 여기서 푼다"
+        },
+        {
+          "severity": "high",
+          "layer": "baseline",
+          "finding": "테스트 기준선 악화: shop-api: 실패+오류 1→2 증가",
+          "suggested_action": "사라진 테스트(수집 실패·import 깨짐)나 새 실패를 고치세요. 의도한 삭제면 `/sl-test --baseline --force`로 기준선을 다시 뜨고 사유를 남기세요"
+        }
+      ],
+      "layer": "baseline"
+    },
+    {
+      "round": 4,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "fail",
+        "scope": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "STORY 수용 기준 1번(라인 37)이 여전히 'expires_at < now'로 남아 구현(now - P7D)·승인된 재작업 결정과 어긋난다. 사람 코멘트가 더 나중 승인이라 구현이 옳지만 AC 체크리스트가 오독을 부른다",
+          "suggested_action": "STEP 5.5에서 AC1 문구를 'expires_at < now - 보존기간(member.password-reset.purge-retention, 기본 P7D)'으로 갱신"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "MemberPasswordResetDaoTest:322가 임계값으로 LocalDateTime.now()를 넘긴다 — 실제 스케줄러는 항상 now-retention을 넘긴다. 단언은 자기 TARGET으로 좁혀져 플레이키하지 않으나 공유 랩 DB의 타인 in-flight 만료 행까지 전역 삭제한다(round1부터 있던 코드, 이번 재작업 산물 아님)",
+          "suggested_action": "후속 TODO — 임계값을 now.minusDays(7)로 통일해 시드 행만 지우게 한다"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "같은 배치의 설정이 두 루트로 갈렸다 — cron은 lab.batch.password-reset-cleanup.cron, 보존기간만 신규 루트 member.password-reset.purge-retention. 동작·충돌 문제는 없다",
+          "suggested_action": "후속 정리 시 lab.batch.password-reset-cleanup.purge-retention으로 통합"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "P7D 기본값의 String→Duration 바인딩은 @SpringBootTest 컨텍스트 로딩으로 증명되나 '기본이 7일'임을 단언하는 테스트는 없다(단위 테스트는 Duration.ofDays(7)을 직접 주입)",
+          "suggested_action": "추가 조치 불필요 — 기록만"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "이 항목 무관/하네스 소관 — 전체 스위트 실패 2건(OrderListEndToEndIntegrationTest, ApiKeyAuthIntegrationTest)은 고정 시드의 날짜 만료 time bomb이다. OrderService.list:63이 startDate 미제시 시 LocalDate.now().minusDays(30)(오늘 기준 2026-08-17)을 쓰는데 M-0001 주문은 20260815/20260816이라 기간 필터 밖으로 빠진다. 두 테스트만 단독 실행해도 동일 재현 — 이 항목 diff에 주문 도메인이 0건이라 원인일 수 없음이 확정. dev가 보고한 '공유 DB 동시성' 추정은 오진",
+          "suggested_action": "시드 ordered_at을 상대 날짜로 바꾸거나 두 테스트가 명시 startDate를 넘기도록 수정(AIDD 하네스/기준선 소관). 기준선 대조 게이트가 있다면 510/1 → 527/2 증가분도 여기서 푼다"
+        },
+        {
+          "severity": "high",
+          "layer": "baseline",
+          "finding": "테스트 기준선 악화: shop-api: 실패+오류 1→2 증가",
+          "suggested_action": "사라진 테스트(수집 실패·import 깨짐)나 새 실패를 고치세요. 의도한 삭제면 `/sl-test --baseline --force`로 기준선을 다시 뜨고 사유를 남기세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberPasswordResetDao.java — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberSignupCompletionDao.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberPasswordResetConfirmationService.java — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberRegistrationService.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/resources/mapper/memberPasswordReset.xml — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/resources/mapper/memberSignupCompletion.xml — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/MemberPasswordResetConfirmationFlowTest.java — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/MemberRegistrationConcurrencyTest.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/dao/MemberPasswordResetDaoTest.java — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/dao/MemberSignupCompletionDaoTest.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/service/MemberPasswordResetConfirmationServiceTest.java — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/service/MemberRegistrationServiceTest.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/MemberPasswordResetConfirmationConcurrencyTest.java — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        }
+      ],
+      "layer": "scope"
+    },
+    {
+      "round": 5,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "fail",
+        "scope": "pass",
+        "rules": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "STORY 수용 기준 1번(라인 37)이 여전히 'expires_at < now'로 남아 구현(now - P7D)·승인된 재작업 결정과 어긋난다. 사람 코멘트가 더 나중 승인이라 구현이 옳지만 AC 체크리스트가 오독을 부른다",
+          "suggested_action": "STEP 5.5에서 AC1 문구를 'expires_at < now - 보존기간(member.password-reset.purge-retention, 기본 P7D)'으로 갱신"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "MemberPasswordResetDaoTest:322가 임계값으로 LocalDateTime.now()를 넘긴다 — 실제 스케줄러는 항상 now-retention을 넘긴다. 단언은 자기 TARGET으로 좁혀져 플레이키하지 않으나 공유 랩 DB의 타인 in-flight 만료 행까지 전역 삭제한다(round1부터 있던 코드, 이번 재작업 산물 아님)",
+          "suggested_action": "후속 TODO — 임계값을 now.minusDays(7)로 통일해 시드 행만 지우게 한다"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "같은 배치의 설정이 두 루트로 갈렸다 — cron은 lab.batch.password-reset-cleanup.cron, 보존기간만 신규 루트 member.password-reset.purge-retention. 동작·충돌 문제는 없다",
+          "suggested_action": "후속 정리 시 lab.batch.password-reset-cleanup.purge-retention으로 통합"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "P7D 기본값의 String→Duration 바인딩은 @SpringBootTest 컨텍스트 로딩으로 증명되나 '기본이 7일'임을 단언하는 테스트는 없다(단위 테스트는 Duration.ofDays(7)을 직접 주입)",
+          "suggested_action": "추가 조치 불필요 — 기록만"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "이 항목 무관/하네스 소관 — 전체 스위트 실패 2건(OrderListEndToEndIntegrationTest, ApiKeyAuthIntegrationTest)은 고정 시드의 날짜 만료 time bomb이다. OrderService.list:63이 startDate 미제시 시 LocalDate.now().minusDays(30)(오늘 기준 2026-08-17)을 쓰는데 M-0001 주문은 20260815/20260816이라 기간 필터 밖으로 빠진다. 두 테스트만 단독 실행해도 동일 재현 — 이 항목 diff에 주문 도메인이 0건이라 원인일 수 없음이 확정. dev가 보고한 '공유 DB 동시성' 추정은 오진",
+          "suggested_action": "시드 ordered_at을 상대 날짜로 바꾸거나 두 테스트가 명시 startDate를 넘기도록 수정(AIDD 하네스/기준선 소관). 기준선 대조 게이트가 있다면 510/1 → 527/2 증가분도 여기서 푼다"
+        },
+        {
+          "severity": "high",
+          "layer": "baseline",
+          "finding": "테스트 기준선 악화: shop-api: 실패+오류 1→2 증가",
+          "suggested_action": "사라진 테스트(수집 실패·import 깨짐)나 새 실패를 고치세요. 의도한 삭제면 `/sl-test --baseline --force`로 기준선을 다시 뜨고 사유를 남기세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberPasswordResetDao.java — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberSignupCompletionDao.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberPasswordResetConfirmationService.java — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberRegistrationService.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/resources/mapper/memberPasswordReset.xml — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/resources/mapper/memberSignupCompletion.xml — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/MemberPasswordResetConfirmationFlowTest.java — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/MemberRegistrationConcurrencyTest.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/dao/MemberPasswordResetDaoTest.java — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/dao/MemberSignupCompletionDaoTest.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/service/MemberPasswordResetConfirmationServiceTest.java — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/service/MemberRegistrationServiceTest.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/MemberPasswordResetConfirmationConcurrencyTest.java — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        }
+      ],
+      "layer": "rules"
+    },
+    {
+      "round": 6,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "fail",
+        "scope": "pass",
+        "rules": "pass",
+        "conformance": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "STORY 수용 기준 1번(라인 37)이 여전히 'expires_at < now'로 남아 구현(now - P7D)·승인된 재작업 결정과 어긋난다. 사람 코멘트가 더 나중 승인이라 구현이 옳지만 AC 체크리스트가 오독을 부른다",
+          "suggested_action": "STEP 5.5에서 AC1 문구를 'expires_at < now - 보존기간(member.password-reset.purge-retention, 기본 P7D)'으로 갱신"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "MemberPasswordResetDaoTest:322가 임계값으로 LocalDateTime.now()를 넘긴다 — 실제 스케줄러는 항상 now-retention을 넘긴다. 단언은 자기 TARGET으로 좁혀져 플레이키하지 않으나 공유 랩 DB의 타인 in-flight 만료 행까지 전역 삭제한다(round1부터 있던 코드, 이번 재작업 산물 아님)",
+          "suggested_action": "후속 TODO — 임계값을 now.minusDays(7)로 통일해 시드 행만 지우게 한다"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "같은 배치의 설정이 두 루트로 갈렸다 — cron은 lab.batch.password-reset-cleanup.cron, 보존기간만 신규 루트 member.password-reset.purge-retention. 동작·충돌 문제는 없다",
+          "suggested_action": "후속 정리 시 lab.batch.password-reset-cleanup.purge-retention으로 통합"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "P7D 기본값의 String→Duration 바인딩은 @SpringBootTest 컨텍스트 로딩으로 증명되나 '기본이 7일'임을 단언하는 테스트는 없다(단위 테스트는 Duration.ofDays(7)을 직접 주입)",
+          "suggested_action": "추가 조치 불필요 — 기록만"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "이 항목 무관/하네스 소관 — 전체 스위트 실패 2건(OrderListEndToEndIntegrationTest, ApiKeyAuthIntegrationTest)은 고정 시드의 날짜 만료 time bomb이다. OrderService.list:63이 startDate 미제시 시 LocalDate.now().minusDays(30)(오늘 기준 2026-08-17)을 쓰는데 M-0001 주문은 20260815/20260816이라 기간 필터 밖으로 빠진다. 두 테스트만 단독 실행해도 동일 재현 — 이 항목 diff에 주문 도메인이 0건이라 원인일 수 없음이 확정. dev가 보고한 '공유 DB 동시성' 추정은 오진",
+          "suggested_action": "시드 ordered_at을 상대 날짜로 바꾸거나 두 테스트가 명시 startDate를 넘기도록 수정(AIDD 하네스/기준선 소관). 기준선 대조 게이트가 있다면 510/1 → 527/2 증가분도 여기서 푼다"
+        },
+        {
+          "severity": "high",
+          "layer": "baseline",
+          "finding": "테스트 기준선 악화: shop-api: 실패+오류 1→2 증가",
+          "suggested_action": "사라진 테스트(수집 실패·import 깨짐)나 새 실패를 고치세요. 의도한 삭제면 `/sl-test --baseline --force`로 기준선을 다시 뜨고 사유를 남기세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberPasswordResetDao.java — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberSignupCompletionDao.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberPasswordResetConfirmationService.java — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberRegistrationService.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/resources/mapper/memberPasswordReset.xml — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/resources/mapper/memberSignupCompletion.xml — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/MemberPasswordResetConfirmationFlowTest.java — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/MemberRegistrationConcurrencyTest.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/dao/MemberPasswordResetDaoTest.java — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/dao/MemberSignupCompletionDaoTest.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/service/MemberPasswordResetConfirmationServiceTest.java — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/service/MemberRegistrationServiceTest.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/MemberPasswordResetConfirmationConcurrencyTest.java — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "conformance",
+          "finding": "AC-4(독립 autocommit)를 직접 단언하는 테스트가 없다 — @Transactional 부재·요청 경로 무변경이라는 구조적 사실로만 보증된다. STORY 자체가 round1 QA 권고4로 이미 기록한 기지 갭이며 이번 검증에서도 diff상 동일하게 확인됨(추가 조치 요구 아님, 기록용).",
+          "suggested_action": "필요 시 별도 통합 테스트로 배치 실행 중 요청 경로 트랜잭션과 격리됨을 직접 증명(선택 사항, 이 항목 완료 조건은 아님).",
+          "confidence": "high",
+          "file": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberPasswordResetMaintenanceScheduler.java",
+          "line": 74
+        },
+        {
+          "severity": "low",
+          "layer": "conformance",
+          "finding": "이 항목(#1, BAT-MBR-001)의 신규 스펙 문서 본문이 아직 역생성되지 않아(_impact.json new_specs만 있고 affected inf/sch는 비어 있음) diff와 대조할 기존 TO-BE 계약 자체가 없다 — 계약 위반 판정 대상 없음(정상 상태, STORY 자체도 이를 STEP 5.5 소관으로 명시).",
+          "suggested_action": "STEP 5.5에서 BAT-MBR-001·SCH(신규 MEMBER_PASSWORD_RESET_RATE_LIMITS)·SCH-MBR-005·INF-MBR-007 재동기화 진행(STORY '재동기화 입력' 절에 이미 상세 명시됨).",
+          "confidence": "high"
+        }
+      ],
+      "layer": "conformance"
+    }
+  ],
+  "waiver": {
+    "active": true,
+    "by": "사람",
+    "reason": "기준선 악화(510/1→527/2)는 SR-297.1 diff와 무관 — OrderListEndToEndIntegrationTest·ApiKeyAuthIntegrationTest 2건은 주문 도메인 time-bomb(OrderService.java:63 LocalDate.now().minusDays(30) vs 고정 시드 20260815/16)이 원인. 단독 실행으로도 동일 재현되어 이 항목 코드 변경이 원인이 아님을 확인. 이미 SR-300(주문 조회창 30일 드리프트)으로 접수됨 — 새 후속 SR 생성하지 않는다. 기준선 재측정은 SR-298·SR-297 종료 후 사람이 별도 수행.",
+    "at": "2026-09-16T04:22:56",
+    "layer": "baseline"
+  },
+  "story_transitions": [
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "SR 승인(SR-297)",
+      "at": "2026-09-16T03:25:50"
+    },
+    {
+      "from": "Approved",
+      "to": "InProgress",
+      "by": "sl-aidd",
+      "at": "2026-09-16T03:41:48"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "qa-agent",
+      "at": "2026-09-16T03:45:59"
+    },
+    {
+      "from": "Review",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-16T03:53:39"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "qa-agent",
+      "at": "2026-09-16T04:05:54"
+    },
+    {
+      "from": "Review",
+      "to": "Done",
+      "by": "사람",
+      "at": "2026-09-16T04:29:41"
+    }
+  ],
+  "cause": "none",
+  "escalate": false,
+  "fail_rounds": 0,
+  "max_rounds": 3,
+  "waivers": [
+    {
+      "active": true,
+      "by": "사람",
+      "reason": "기준선 악화(510/1→527/2)는 SR-297.1 diff와 무관 — OrderListEndToEndIntegrationTest·ApiKeyAuthIntegrationTest 2건은 주문 도메인 time-bomb(OrderService.java:63 LocalDate.now().minusDays(30) vs 고정 시드 20260815/16)이 원인. 단독 실행으로도 동일 재현되어 이 항목 코드 변경이 원인이 아님을 확인. 이미 SR-300(주문 조회창 30일 드리프트)으로 접수됨 — 새 후속 SR 생성하지 않는다. 기준선 재측정은 SR-298·SR-297 종료 후 사람이 별도 수행.",
+      "at": "2026-09-16T04:22:56",
+      "layer": "baseline"
+    }
+  ]
+}

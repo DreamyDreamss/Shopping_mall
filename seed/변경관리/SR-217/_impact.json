@@ -1,0 +1,21 @@
+{
+  "title": "SR-217",
+  "stories": [
+    "FUNC-order-017"
+  ],
+  "clarification": "none",
+  "new_funcs": [
+    {
+      "func_id": "FUNC-order-017",
+      "kind": "inf",
+      "spec_id": "INF-ORD-018"
+    }
+  ],
+  "affected": {
+    "inf": [],
+    "sch": [],
+    "uis": [],
+    "bat": []
+  },
+  "generated_at": "2026-09-09T07:36:09"
+}

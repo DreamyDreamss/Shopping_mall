@@ -1,0 +1,860 @@
+{
+  "func": "SR-303.1",
+  "epic": "SR-303",
+  "story": "docs/변경관리/SR-303/STORY-1.md",
+  "gate": "CONCERNS",
+  "reviewer": "qa-agent",
+  "updated": "2026-09-17T11:01:34",
+  "layers": {
+    "spec": "pass",
+    "security": "pass",
+    "regression": "pass",
+    "baseline": "pass",
+    "scope": "pass",
+    "rules": "concerns",
+    "stories": "pass",
+    "conformance": "pass"
+  },
+  "top_issues": [
+    {
+      "severity": "low",
+      "layer": "spec",
+      "finding": "round2 재작업 지시 2(Gnb.tsx:19-20 JSDoc의 '제출은 이 SR에서 no-op' 갱신)가 미반영 — 사람의 구현 지시 1~4에 없어 dev가 손대지 않았고 코드 동작 영향은 없으나, 호출부 2곳(ShopHomePage·ProductListPage)이 실제 navigate를 하므로 서술이 틀렸다. 코드 주석이라 STEP 5.5 재동기화가 고치지 않는다.",
+      "suggested_action": "다음에 Gnb.tsx를 여는 SR에서 JSDoc 1줄 갱신(코드 변경 없음)"
+    },
+    {
+      "severity": "low",
+      "layer": "regression",
+      "finding": "ProductListPage.tsx:72 inFlightKeyRef 해제가 키 값만 비교한다(round1 권고2·round2 권고3 이월, 사람 지시로 보류 확정 — 실측 미변경). 화면 상태는 세대 카운터가 보호하므로 영향은 낭비 요청 1회.",
+      "suggested_action": "후속 TODO: 해제 조건에 세대 id(requestIdRef) 비교를 함께 넣는다"
+    },
+    {
+      "severity": "low",
+      "layer": "spec",
+      "finding": "같은 검색어 재제출 시 setAppliedKeyword가 동일 값이라 effect가 돌지 않아 재조회가 일어나지 않는다(ProductListPage.tsx:98-101, round1 권고3·round2 권고4 이월, 사람 지시로 보류 확정 — 실측 미변경).",
+      "suggested_action": "후속 TODO: 제출 nonce state를 effect 의존성에 넣거나 현재 동작을 UIS-ORD-009 계약으로 명시"
+    },
+    {
+      "severity": "low",
+      "layer": "spec",
+      "finding": "목록 화면 안에서의 재검색이 URL을 갱신하지 않아(ProductListPage.tsx:25 읽기 전용 useSearchParams) ?keyword=A로 들어와 B로 재검색한 뒤 새로고침·북마크·공유하면 A 결과가 열린다(round2 권고5 이월).",
+      "suggested_action": "UIS-ORD-009에 계약으로 명시하거나 후속 SR에서 setSearchParams로 동기화"
+    },
+    {
+      "severity": "low",
+      "layer": "spec",
+      "finding": "카테고리 숏컷 6개가 전부 같은 목적지(/shop/products 전체 목록)로 가고 어떤 카테고리를 눌렀는지 화면 표시가 없다 — 사람이 결정 (a)로 명시 선택한 동작이라 되돌리자는 권고가 아니다.",
+      "suggested_action": "카테고리 필터 후속 SR의 입력으로만 남긴다(UIS-ORD-009에 '전체 목록으로만 이동' 명시)"
+    },
+    {
+      "severity": "low",
+      "layer": "regression",
+      "finding": "환경 관측(이 SR과 무관, shop-api diff 0건) — 8087의 shop-api 인스턴스가 낡았다: 무키 GET /shop·/api/products·/api/products/SKU-1001이 전부 401인데 소스는 SR-301/SR-307을 이미 담고 있다(무키 /api/members/grades만 200, target/*.jar는 09-15 빌드). 재기동 없이 화면을 열면 SR-303과 무관한 401을 이 SR의 결함으로 오인한다.",
+      "suggested_action": "E2E·TC 실행이나 사람의 눈 확인 전에 shop-api를 재기동한다(lab/run-app.ps1)"
+    },
+    {
+      "severity": "low",
+      "layer": "scope",
+      "finding": "소속 불명(막지 않음): modules/shop-web/src/features/shop/CategoryShortcuts.tsx — 완료 항목 SR-302.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+      "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+    },
+    {
+      "severity": "low",
+      "layer": "scope",
+      "finding": "소속 불명(막지 않음): modules/shop-web/src/pages/ShopHomePage.test.tsx — 완료 항목 SR-302.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+      "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+    },
+    {
+      "severity": "low",
+      "layer": "scope",
+      "finding": "소속 불명(막지 않음): modules/shop-web/src/pages/ShopHomePage.tsx — 완료 항목 SR-302.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+      "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+    },
+    {
+      "severity": "medium",
+      "layer": "rules",
+      "finding": "규칙 위반 [lab/file-size-cap/tsx-file-cap] modules/shop-web/src/pages/ProductListPage.test.tsx:0 — 화면 부품 300줄 초과 — 상태별 부품으로 나누고 각각 스토리를 둔다",
+      "suggested_action": "규칙을 지키도록 고치거나, 규칙이 틀렸으면 SpecLens /rules에서 규칙을 고치세요"
+    },
+    {
+      "severity": "medium",
+      "layer": "rules",
+      "finding": "규칙 위반 [lab/file-size-cap/tsx-file-cap] modules/shop-web/src/pages/ShopHomePage.test.tsx:0 — 화면 부품 300줄 초과 — 상태별 부품으로 나누고 각각 스토리를 둔다",
+      "suggested_action": "규칙을 지키도록 고치거나, 규칙이 틀렸으면 SpecLens /rules에서 규칙을 고치세요"
+    },
+    {
+      "severity": "low",
+      "layer": "stories",
+      "finding": "고친 화면 부품에 스토리가 없습니다: src/App.tsx",
+      "suggested_action": "그 부품의 상태를 스토리로 남기세요 — 없으면 다음 사람이 그 상태를 볼 방법이 없습니다. 차단하려면 하네스 규칙 `story-per-component`(pair 검사)를 채택하세요(/rules 제안 탭) — 축 C가 must로 막습니다"
+    },
+    {
+      "severity": "low",
+      "layer": "conformance",
+      "finding": "Gnb.tsx:19-20 JSDoc이 '검색 제출은 이 SR에서 no-op'으로 남아 있으나 실제로는 ShopHomePage·ProductListPage 양쪽 모두 실제 navigate를 수행 — 코드 동작과 무관한 주석 노후화(story 후속 TODO 1과 일치)",
+      "suggested_action": "다음에 Gnb.tsx를 여는 SR에서 주석 1줄 갱신(차단 아님)",
+      "confidence": "high",
+      "file": "modules/shop-web/src/features/shop/Gnb.tsx",
+      "line": 19
+    }
+  ],
+  "rounds": [
+    {
+      "round": 1,
+      "gate": "CONCERNS",
+      "human": {
+        "decision": "rework",
+        "by": "사람",
+        "at": "2026-09-17T10:22:14",
+        "comment": "QA CONCERNS(medium 1건: 진입경로 부재) — 이번에 함께 고친다. 만들었는데 아무도 갈 수 없는 화면은 완성이 아니다(SR-302 재발 패턴).\n구현 지시:\n1) Gnb의 onSearchSubmit이 검색어를 들고 /shop/products로 이동한다(현재 no-op) — 목록 화면은 그 검색어를 초기 appliedKeyword로 받아 입력창에 반영한다.\n2) CategoryShortcuts 항목 클릭도 같은 목록 화면으로 이동한다 — 카테고리 데이터가 없으므로 그 정적 라벨을 검색어(keyword)로 넘긴다.\n3) Gnb는 SR-302 산출물이니 핸들러 1개만 최소 변경하고 레이아웃·스타일은 건드리지 않는다.\n4) low 이슈 중 (3) SKELETON_CARD_COUNT를 PAGE_SIZE와 같은 상수에서 파생시키는 것만 함께 고친다. 나머지 low 3건(inFlightKeyRef 키 비교, 동일 검색어 재제출 bail-out, AC 체크박스)은 이번에 손대지 않고 남긴다.\n완료 조건: 홈에서 검색어 제출 시 목록 화면이 그 검색어로 열림 / 카테고리 숏컷 클릭 시 목록 화면 이동 / 기존 홈 테스트 전부 통과 / 목록 화면 초기 검색어가 입력창에 반영. 회귀는 npm test + test-storybook 전체 스위트로 확인.",
+        "targets": []
+      },
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "신규 화면 /shop/products로 가는 진입 경로가 앱 전체에 0건 — grep 실측상 참조가 App.tsx의 <Route> 정의와 자기 자신·테스트뿐이고, ShopHomePage의 Gnb 검색은 여전히 onSearchSubmit={() => {}} no-op, CategoryShortcuts는 링크 없는 정적 표시다. 사용자는 주소창에 #/shop/products를 직접 쳐야만 도달한다. 사례집 SR-302 #1('#/shop으로 가는 링크가 앱 어디에도 없어 아무도 쇼핑 홈에 도달하지 못했다')과 같은 클래스의 재발. 다만 STORY '범위 밖'이 Gnb 검색창 연결을 명시 제외했고 사람이 계획을 확인했으므로 구현 결함이 아니라 확정 문답의 공백이다.",
+          "suggested_action": "사람이 둘 중 하나를 선택: (a) 이번 SR에서 진입점 한 곳만 추가(ShopHomePage의 onSearchSubmit을 /shop/products 이동으로 연결하거나 '추천 상품' 옆 [전체 보기] 링크) (b) 후속 SR로 명시 이관하고 그때까지 비도달 상태를 수용. 코드는 어느 쪽이든 현 상태로 두어도 무방."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "ProductListPage.load의 finally가 inFlightKeyRef를 키 값만으로 해제해, 서로 다른 파라미터 요청 3개가 겹치고 1번째와 3번째 키가 같으면(기본 → 재고 on → 재고 off) 1번째의 늦은 응답이 3번째의 in-flight 마커를 대신 지운다. 화면 상태는 세대 카운터가 보호해 틀리지 않고 중복 억제만 약해지며, 조회가 멱등이라 영향은 낭비 요청 1회.",
+          "suggested_action": "해제 조건에 세대 id 비교를 함께 넣는다(if (inFlightKeyRef.current === key && id === requestIdRef.current))."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "같은 검색어를 다시 제출하면 setAppliedKeyword(searchValue)가 동일 값이라 React가 리렌더를 생략해 effect가 돌지 않고 재조회가 일어나지 않는다 — 사용자가 새로고침 의도로 재제출하면 무반응. 확정 문답에 규정이 없어 차단 사유는 아니다.",
+          "suggested_action": "재조회가 필요하면 제출 시 증가하는 별도 nonce state를 effect 의존성에 넣거나, 현재 동작을 UIS-ORD-009에 의도된 계약으로 명시한다."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "ProductListGrid의 SKELETON_CARD_COUNT=8이 ProductListPage의 PAGE_SIZE=12와 달라 로딩 골격 개수와 실제 페이지 카드 수가 어긋난다. 둘 다 확정 문답에 없는 가정값이다.",
+          "suggested_action": "스켈레톤 개수를 PAGE_SIZE에 맞추거나, 다른 이유가 있으면 주석으로 근거를 남긴다."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "구현이 끝났는데 STORY 수용 기준 '- [ ] UIS-ORD-009'와 '구현 Task' 체크박스가 전부 미체크로 남아 있다(UIS-ORD-009 본문 부재는 STEP 5.5 역생성 예정이라 정상).",
+          "suggested_action": "AC 체크박스를 채워 집계와 맞춘다."
+        }
+      ],
+      "cause": "spec_gap"
+    },
+    {
+      "round": 2,
+      "gate": "CONCERNS",
+      "human": {
+        "decision": "rework",
+        "by": "사람",
+        "at": "2026-09-17T10:39:37",
+        "comment": "QA CONCERNS round2(medium: 카테고리 숏컷 진입이 항상 빈 결과) — round1 지시 자체가 틀렸음을 인정하고 고친다.\n결정: (a) 카테고리 클릭은 keyword 없이 /shop/products로만 이동(전체 목록). 라벨을 keyword로 넘기던 코드와 그 테스트를 제거한다.\n구현 지시:\n1) CategoryShortcuts 클릭 핸들러가 keyword 파라미터 없이 /shop/products로만 navigate하게 되돌린다(ShopHomePage.tsx의 카테고리 onSelect 경로).\n2) round1에서 추가한 \"카테고리 클릭 시 keyword로 이동\" 테스트(있다면)를 \"keyword 없이 전체 목록으로 이동\"으로 고친다.\n3) 검색창(Gnb onSearchSubmit) 경로는 그대로 유지 — 정상 동작 확인됨, 손대지 않는다.\n4) 실제 카테고리 필터링은 서버에 카테고리 데이터가 생긴 뒤 후속 SR로 미룬다 — 이 사실을 STEP 5.5에서 UIS-ORD-009에 \"카테고리 숏컷은 현재 전체 목록으로만 이동한다(카테고리 데이터 없음)\"로 한 줄 남긴다(dev-agent가 지금 코드에 주석/문서를 넣을 필요는 없음 — 스펙 역생성 단계에서 반영).\n완료 조건: 카테고리 숏컷 클릭 시 목록 화면이 전체 상품을 보여줌(빈 결과 아님) / 검색창 진입은 회귀 없음 / 기존 테스트 전부 통과. 회귀는 npm test + test-storybook 전체 스위트.",
+        "targets": []
+      },
+      "layers": {
+        "spec": "concerns",
+        "security": "pass",
+        "regression": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "재작업 지시 2대로 카테고리 라벨을 keyword로 넘기지만 서버 keyword는 product_name LIKE 부분일치라(mapper/product.xml:16-17) 현재 PRODUCTS 4행(스탠딩 데스크·기계식 키보드·4K 모니터·단종 마우스)과 겹치는 라벨이 없다 — API 실측 GET /api/products?keyword=패션 → [], keyword=키보드 → 1건. 새로 연결한 카테고리 진입 6개가 전부 '검색 결과가 없습니다'로 끝난다(검색 진입은 정상 동작). 사람 지시 원문을 그대로 따른 결과이므로 구현 결함이 아니라 지시 자체의 결함(사례집 SR-231 r5 '사람 지시도 QA 대상이다').",
+          "suggested_action": "셋 중 하나를 사람이 선택: (a) 카테고리 클릭은 keyword 없이 /shop/products로만 이동(전체 목록) — 카테고리 필터 후속 SR까지 빈 화면을 만들지 않음, (b) 현 동작 유지하고 UIS-ORD-009/008에 '카테고리는 상품명 검색어로 대체(데이터 없음)'를 의도된 계약으로 명시, (c) 카테고리 숏컷을 SR-302의 정적 표시로 되돌리고 진입점은 검색 하나만 유지."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "Gnb.tsx:19-20 JSDoc이 아직 '제출은 이 SR에서 no-op'이라고 적혀 있다 — 코드는 지시대로 무변경이 맞지만 호출부(ShopHomePage)가 바뀌어 서술이 낡았다.",
+          "suggested_action": "주석 1줄 갱신(코드 변경 없음)."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "목록 화면 안에서의 재검색이 URL을 갱신하지 않아(useSearchParams 읽기 전용, ProductListPage.tsx:25) ?keyword=A로 들어와 B로 재검색한 뒤 새로고침·북마크·공유하면 A 결과가 열린다. STORY가 의도한 동작으로 적어 둔 상태.",
+          "suggested_action": "UIS-ORD-009에 계약으로 명시하거나 setSearchParams로 동기화."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "round1 권고 2 이월 — ProductListPage.tsx:72의 inFlightKeyRef 해제가 키 값만 비교한다(사람 지시로 이번 라운드 보류, 지시대로 미수정 확인).",
+          "suggested_action": "후속 TODO: 해제 조건에 세대 id(requestIdRef) 비교를 함께 넣는다."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "round1 권고 3 이월 — 같은 검색어 재제출 시 setAppliedKeyword 동일 값이라 재조회가 일어나지 않는다(ProductListPage.tsx:98-101, 사람 지시로 이번 라운드 보류, 지시대로 미수정 확인).",
+          "suggested_action": "후속 TODO: 제출 nonce state를 effect 의존성에 넣거나 현재 동작을 UIS-ORD-009 계약으로 명시."
+        }
+      ],
+      "cause": "human_instruction"
+    },
+    {
+      "round": 3,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "round2 재작업 지시 2(Gnb.tsx:19-20 JSDoc의 '제출은 이 SR에서 no-op' 갱신)가 미반영 — 사람의 구현 지시 1~4에 없어 dev가 손대지 않았고 코드 동작 영향은 없으나, 호출부 2곳(ShopHomePage·ProductListPage)이 실제 navigate를 하므로 서술이 틀렸다. 코드 주석이라 STEP 5.5 재동기화가 고치지 않는다.",
+          "suggested_action": "다음에 Gnb.tsx를 여는 SR에서 JSDoc 1줄 갱신(코드 변경 없음)"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "ProductListPage.tsx:72 inFlightKeyRef 해제가 키 값만 비교한다(round1 권고2·round2 권고3 이월, 사람 지시로 보류 확정 — 실측 미변경). 화면 상태는 세대 카운터가 보호하므로 영향은 낭비 요청 1회.",
+          "suggested_action": "후속 TODO: 해제 조건에 세대 id(requestIdRef) 비교를 함께 넣는다"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "같은 검색어 재제출 시 setAppliedKeyword가 동일 값이라 effect가 돌지 않아 재조회가 일어나지 않는다(ProductListPage.tsx:98-101, round1 권고3·round2 권고4 이월, 사람 지시로 보류 확정 — 실측 미변경).",
+          "suggested_action": "후속 TODO: 제출 nonce state를 effect 의존성에 넣거나 현재 동작을 UIS-ORD-009 계약으로 명시"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "목록 화면 안에서의 재검색이 URL을 갱신하지 않아(ProductListPage.tsx:25 읽기 전용 useSearchParams) ?keyword=A로 들어와 B로 재검색한 뒤 새로고침·북마크·공유하면 A 결과가 열린다(round2 권고5 이월).",
+          "suggested_action": "UIS-ORD-009에 계약으로 명시하거나 후속 SR에서 setSearchParams로 동기화"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "카테고리 숏컷 6개가 전부 같은 목적지(/shop/products 전체 목록)로 가고 어떤 카테고리를 눌렀는지 화면 표시가 없다 — 사람이 결정 (a)로 명시 선택한 동작이라 되돌리자는 권고가 아니다.",
+          "suggested_action": "카테고리 필터 후속 SR의 입력으로만 남긴다(UIS-ORD-009에 '전체 목록으로만 이동' 명시)"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "환경 관측(이 SR과 무관, shop-api diff 0건) — 8087의 shop-api 인스턴스가 낡았다: 무키 GET /shop·/api/products·/api/products/SKU-1001이 전부 401인데 소스는 SR-301/SR-307을 이미 담고 있다(무키 /api/members/grades만 200, target/*.jar는 09-15 빌드). 재기동 없이 화면을 열면 SR-303과 무관한 401을 이 SR의 결함으로 오인한다.",
+          "suggested_action": "E2E·TC 실행이나 사람의 눈 확인 전에 shop-api를 재기동한다(lab/run-app.ps1)"
+        }
+      ],
+      "cause": "none"
+    },
+    {
+      "round": 4,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "round2 재작업 지시 2(Gnb.tsx:19-20 JSDoc의 '제출은 이 SR에서 no-op' 갱신)가 미반영 — 사람의 구현 지시 1~4에 없어 dev가 손대지 않았고 코드 동작 영향은 없으나, 호출부 2곳(ShopHomePage·ProductListPage)이 실제 navigate를 하므로 서술이 틀렸다. 코드 주석이라 STEP 5.5 재동기화가 고치지 않는다.",
+          "suggested_action": "다음에 Gnb.tsx를 여는 SR에서 JSDoc 1줄 갱신(코드 변경 없음)"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "ProductListPage.tsx:72 inFlightKeyRef 해제가 키 값만 비교한다(round1 권고2·round2 권고3 이월, 사람 지시로 보류 확정 — 실측 미변경). 화면 상태는 세대 카운터가 보호하므로 영향은 낭비 요청 1회.",
+          "suggested_action": "후속 TODO: 해제 조건에 세대 id(requestIdRef) 비교를 함께 넣는다"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "같은 검색어 재제출 시 setAppliedKeyword가 동일 값이라 effect가 돌지 않아 재조회가 일어나지 않는다(ProductListPage.tsx:98-101, round1 권고3·round2 권고4 이월, 사람 지시로 보류 확정 — 실측 미변경).",
+          "suggested_action": "후속 TODO: 제출 nonce state를 effect 의존성에 넣거나 현재 동작을 UIS-ORD-009 계약으로 명시"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "목록 화면 안에서의 재검색이 URL을 갱신하지 않아(ProductListPage.tsx:25 읽기 전용 useSearchParams) ?keyword=A로 들어와 B로 재검색한 뒤 새로고침·북마크·공유하면 A 결과가 열린다(round2 권고5 이월).",
+          "suggested_action": "UIS-ORD-009에 계약으로 명시하거나 후속 SR에서 setSearchParams로 동기화"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "카테고리 숏컷 6개가 전부 같은 목적지(/shop/products 전체 목록)로 가고 어떤 카테고리를 눌렀는지 화면 표시가 없다 — 사람이 결정 (a)로 명시 선택한 동작이라 되돌리자는 권고가 아니다.",
+          "suggested_action": "카테고리 필터 후속 SR의 입력으로만 남긴다(UIS-ORD-009에 '전체 목록으로만 이동' 명시)"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "환경 관측(이 SR과 무관, shop-api diff 0건) — 8087의 shop-api 인스턴스가 낡았다: 무키 GET /shop·/api/products·/api/products/SKU-1001이 전부 401인데 소스는 SR-301/SR-307을 이미 담고 있다(무키 /api/members/grades만 200, target/*.jar는 09-15 빌드). 재기동 없이 화면을 열면 SR-303과 무관한 401을 이 SR의 결함으로 오인한다.",
+          "suggested_action": "E2E·TC 실행이나 사람의 눈 확인 전에 shop-api를 재기동한다(lab/run-app.ps1)"
+        }
+      ],
+      "layer": "baseline"
+    },
+    {
+      "round": 5,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "pass",
+        "scope": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "round2 재작업 지시 2(Gnb.tsx:19-20 JSDoc의 '제출은 이 SR에서 no-op' 갱신)가 미반영 — 사람의 구현 지시 1~4에 없어 dev가 손대지 않았고 코드 동작 영향은 없으나, 호출부 2곳(ShopHomePage·ProductListPage)이 실제 navigate를 하므로 서술이 틀렸다. 코드 주석이라 STEP 5.5 재동기화가 고치지 않는다.",
+          "suggested_action": "다음에 Gnb.tsx를 여는 SR에서 JSDoc 1줄 갱신(코드 변경 없음)"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "ProductListPage.tsx:72 inFlightKeyRef 해제가 키 값만 비교한다(round1 권고2·round2 권고3 이월, 사람 지시로 보류 확정 — 실측 미변경). 화면 상태는 세대 카운터가 보호하므로 영향은 낭비 요청 1회.",
+          "suggested_action": "후속 TODO: 해제 조건에 세대 id(requestIdRef) 비교를 함께 넣는다"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "같은 검색어 재제출 시 setAppliedKeyword가 동일 값이라 effect가 돌지 않아 재조회가 일어나지 않는다(ProductListPage.tsx:98-101, round1 권고3·round2 권고4 이월, 사람 지시로 보류 확정 — 실측 미변경).",
+          "suggested_action": "후속 TODO: 제출 nonce state를 effect 의존성에 넣거나 현재 동작을 UIS-ORD-009 계약으로 명시"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "목록 화면 안에서의 재검색이 URL을 갱신하지 않아(ProductListPage.tsx:25 읽기 전용 useSearchParams) ?keyword=A로 들어와 B로 재검색한 뒤 새로고침·북마크·공유하면 A 결과가 열린다(round2 권고5 이월).",
+          "suggested_action": "UIS-ORD-009에 계약으로 명시하거나 후속 SR에서 setSearchParams로 동기화"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "카테고리 숏컷 6개가 전부 같은 목적지(/shop/products 전체 목록)로 가고 어떤 카테고리를 눌렀는지 화면 표시가 없다 — 사람이 결정 (a)로 명시 선택한 동작이라 되돌리자는 권고가 아니다.",
+          "suggested_action": "카테고리 필터 후속 SR의 입력으로만 남긴다(UIS-ORD-009에 '전체 목록으로만 이동' 명시)"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "환경 관측(이 SR과 무관, shop-api diff 0건) — 8087의 shop-api 인스턴스가 낡았다: 무키 GET /shop·/api/products·/api/products/SKU-1001이 전부 401인데 소스는 SR-301/SR-307을 이미 담고 있다(무키 /api/members/grades만 200, target/*.jar는 09-15 빌드). 재기동 없이 화면을 열면 SR-303과 무관한 401을 이 SR의 결함으로 오인한다.",
+          "suggested_action": "E2E·TC 실행이나 사람의 눈 확인 전에 shop-api를 재기동한다(lab/run-app.ps1)"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-web/src/features/shop/CategoryShortcuts.tsx — 완료 항목 SR-302.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-web/src/pages/ShopHomePage.test.tsx — 완료 항목 SR-302.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-web/src/pages/ShopHomePage.tsx — 완료 항목 SR-302.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        }
+      ],
+      "layer": "scope"
+    },
+    {
+      "round": 6,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "pass",
+        "scope": "pass",
+        "rules": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "round2 재작업 지시 2(Gnb.tsx:19-20 JSDoc의 '제출은 이 SR에서 no-op' 갱신)가 미반영 — 사람의 구현 지시 1~4에 없어 dev가 손대지 않았고 코드 동작 영향은 없으나, 호출부 2곳(ShopHomePage·ProductListPage)이 실제 navigate를 하므로 서술이 틀렸다. 코드 주석이라 STEP 5.5 재동기화가 고치지 않는다.",
+          "suggested_action": "다음에 Gnb.tsx를 여는 SR에서 JSDoc 1줄 갱신(코드 변경 없음)"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "ProductListPage.tsx:72 inFlightKeyRef 해제가 키 값만 비교한다(round1 권고2·round2 권고3 이월, 사람 지시로 보류 확정 — 실측 미변경). 화면 상태는 세대 카운터가 보호하므로 영향은 낭비 요청 1회.",
+          "suggested_action": "후속 TODO: 해제 조건에 세대 id(requestIdRef) 비교를 함께 넣는다"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "같은 검색어 재제출 시 setAppliedKeyword가 동일 값이라 effect가 돌지 않아 재조회가 일어나지 않는다(ProductListPage.tsx:98-101, round1 권고3·round2 권고4 이월, 사람 지시로 보류 확정 — 실측 미변경).",
+          "suggested_action": "후속 TODO: 제출 nonce state를 effect 의존성에 넣거나 현재 동작을 UIS-ORD-009 계약으로 명시"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "목록 화면 안에서의 재검색이 URL을 갱신하지 않아(ProductListPage.tsx:25 읽기 전용 useSearchParams) ?keyword=A로 들어와 B로 재검색한 뒤 새로고침·북마크·공유하면 A 결과가 열린다(round2 권고5 이월).",
+          "suggested_action": "UIS-ORD-009에 계약으로 명시하거나 후속 SR에서 setSearchParams로 동기화"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "카테고리 숏컷 6개가 전부 같은 목적지(/shop/products 전체 목록)로 가고 어떤 카테고리를 눌렀는지 화면 표시가 없다 — 사람이 결정 (a)로 명시 선택한 동작이라 되돌리자는 권고가 아니다.",
+          "suggested_action": "카테고리 필터 후속 SR의 입력으로만 남긴다(UIS-ORD-009에 '전체 목록으로만 이동' 명시)"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "환경 관측(이 SR과 무관, shop-api diff 0건) — 8087의 shop-api 인스턴스가 낡았다: 무키 GET /shop·/api/products·/api/products/SKU-1001이 전부 401인데 소스는 SR-301/SR-307을 이미 담고 있다(무키 /api/members/grades만 200, target/*.jar는 09-15 빌드). 재기동 없이 화면을 열면 SR-303과 무관한 401을 이 SR의 결함으로 오인한다.",
+          "suggested_action": "E2E·TC 실행이나 사람의 눈 확인 전에 shop-api를 재기동한다(lab/run-app.ps1)"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-web/src/features/shop/CategoryShortcuts.tsx — 완료 항목 SR-302.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-web/src/pages/ShopHomePage.test.tsx — 완료 항목 SR-302.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-web/src/pages/ShopHomePage.tsx — 완료 항목 SR-302.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "medium",
+          "layer": "rules",
+          "finding": "규칙 위반 [lab/file-size-cap/tsx-file-cap] modules/shop-web/src/pages/ProductListPage.test.tsx:0 — 화면 부품 300줄 초과 — 상태별 부품으로 나누고 각각 스토리를 둔다",
+          "suggested_action": "규칙을 지키도록 고치거나, 규칙이 틀렸으면 SpecLens /rules에서 규칙을 고치세요"
+        },
+        {
+          "severity": "medium",
+          "layer": "rules",
+          "finding": "규칙 위반 [lab/file-size-cap/tsx-file-cap] modules/shop-web/src/pages/ShopHomePage.test.tsx:0 — 화면 부품 300줄 초과 — 상태별 부품으로 나누고 각각 스토리를 둔다",
+          "suggested_action": "규칙을 지키도록 고치거나, 규칙이 틀렸으면 SpecLens /rules에서 규칙을 고치세요"
+        }
+      ],
+      "layer": "rules"
+    },
+    {
+      "round": 7,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "pass",
+        "scope": "pass",
+        "rules": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "round2 재작업 지시 2(Gnb.tsx:19-20 JSDoc의 '제출은 이 SR에서 no-op' 갱신)가 미반영 — 사람의 구현 지시 1~4에 없어 dev가 손대지 않았고 코드 동작 영향은 없으나, 호출부 2곳(ShopHomePage·ProductListPage)이 실제 navigate를 하므로 서술이 틀렸다. 코드 주석이라 STEP 5.5 재동기화가 고치지 않는다.",
+          "suggested_action": "다음에 Gnb.tsx를 여는 SR에서 JSDoc 1줄 갱신(코드 변경 없음)"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "ProductListPage.tsx:72 inFlightKeyRef 해제가 키 값만 비교한다(round1 권고2·round2 권고3 이월, 사람 지시로 보류 확정 — 실측 미변경). 화면 상태는 세대 카운터가 보호하므로 영향은 낭비 요청 1회.",
+          "suggested_action": "후속 TODO: 해제 조건에 세대 id(requestIdRef) 비교를 함께 넣는다"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "같은 검색어 재제출 시 setAppliedKeyword가 동일 값이라 effect가 돌지 않아 재조회가 일어나지 않는다(ProductListPage.tsx:98-101, round1 권고3·round2 권고4 이월, 사람 지시로 보류 확정 — 실측 미변경).",
+          "suggested_action": "후속 TODO: 제출 nonce state를 effect 의존성에 넣거나 현재 동작을 UIS-ORD-009 계약으로 명시"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "목록 화면 안에서의 재검색이 URL을 갱신하지 않아(ProductListPage.tsx:25 읽기 전용 useSearchParams) ?keyword=A로 들어와 B로 재검색한 뒤 새로고침·북마크·공유하면 A 결과가 열린다(round2 권고5 이월).",
+          "suggested_action": "UIS-ORD-009에 계약으로 명시하거나 후속 SR에서 setSearchParams로 동기화"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "카테고리 숏컷 6개가 전부 같은 목적지(/shop/products 전체 목록)로 가고 어떤 카테고리를 눌렀는지 화면 표시가 없다 — 사람이 결정 (a)로 명시 선택한 동작이라 되돌리자는 권고가 아니다.",
+          "suggested_action": "카테고리 필터 후속 SR의 입력으로만 남긴다(UIS-ORD-009에 '전체 목록으로만 이동' 명시)"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "환경 관측(이 SR과 무관, shop-api diff 0건) — 8087의 shop-api 인스턴스가 낡았다: 무키 GET /shop·/api/products·/api/products/SKU-1001이 전부 401인데 소스는 SR-301/SR-307을 이미 담고 있다(무키 /api/members/grades만 200, target/*.jar는 09-15 빌드). 재기동 없이 화면을 열면 SR-303과 무관한 401을 이 SR의 결함으로 오인한다.",
+          "suggested_action": "E2E·TC 실행이나 사람의 눈 확인 전에 shop-api를 재기동한다(lab/run-app.ps1)"
+        },
+        {
+          "severity": "medium",
+          "layer": "rules",
+          "finding": "규칙 위반 [lab/file-size-cap/tsx-file-cap] modules/shop-web/src/pages/ProductListPage.test.tsx:0 — 화면 부품 300줄 초과 — 상태별 부품으로 나누고 각각 스토리를 둔다",
+          "suggested_action": "규칙을 지키도록 고치거나, 규칙이 틀렸으면 SpecLens /rules에서 규칙을 고치세요"
+        },
+        {
+          "severity": "medium",
+          "layer": "rules",
+          "finding": "규칙 위반 [lab/file-size-cap/tsx-file-cap] modules/shop-web/src/pages/ShopHomePage.test.tsx:0 — 화면 부품 300줄 초과 — 상태별 부품으로 나누고 각각 스토리를 둔다",
+          "suggested_action": "규칙을 지키도록 고치거나, 규칙이 틀렸으면 SpecLens /rules에서 규칙을 고치세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-web/src/features/shop/CategoryShortcuts.tsx — 완료 항목 SR-302.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-web/src/pages/ShopHomePage.test.tsx — 완료 항목 SR-302.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-web/src/pages/ShopHomePage.tsx — 완료 항목 SR-302.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        }
+      ],
+      "layer": "scope"
+    },
+    {
+      "round": 8,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "pass",
+        "scope": "pass",
+        "rules": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "round2 재작업 지시 2(Gnb.tsx:19-20 JSDoc의 '제출은 이 SR에서 no-op' 갱신)가 미반영 — 사람의 구현 지시 1~4에 없어 dev가 손대지 않았고 코드 동작 영향은 없으나, 호출부 2곳(ShopHomePage·ProductListPage)이 실제 navigate를 하므로 서술이 틀렸다. 코드 주석이라 STEP 5.5 재동기화가 고치지 않는다.",
+          "suggested_action": "다음에 Gnb.tsx를 여는 SR에서 JSDoc 1줄 갱신(코드 변경 없음)"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "ProductListPage.tsx:72 inFlightKeyRef 해제가 키 값만 비교한다(round1 권고2·round2 권고3 이월, 사람 지시로 보류 확정 — 실측 미변경). 화면 상태는 세대 카운터가 보호하므로 영향은 낭비 요청 1회.",
+          "suggested_action": "후속 TODO: 해제 조건에 세대 id(requestIdRef) 비교를 함께 넣는다"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "같은 검색어 재제출 시 setAppliedKeyword가 동일 값이라 effect가 돌지 않아 재조회가 일어나지 않는다(ProductListPage.tsx:98-101, round1 권고3·round2 권고4 이월, 사람 지시로 보류 확정 — 실측 미변경).",
+          "suggested_action": "후속 TODO: 제출 nonce state를 effect 의존성에 넣거나 현재 동작을 UIS-ORD-009 계약으로 명시"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "목록 화면 안에서의 재검색이 URL을 갱신하지 않아(ProductListPage.tsx:25 읽기 전용 useSearchParams) ?keyword=A로 들어와 B로 재검색한 뒤 새로고침·북마크·공유하면 A 결과가 열린다(round2 권고5 이월).",
+          "suggested_action": "UIS-ORD-009에 계약으로 명시하거나 후속 SR에서 setSearchParams로 동기화"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "카테고리 숏컷 6개가 전부 같은 목적지(/shop/products 전체 목록)로 가고 어떤 카테고리를 눌렀는지 화면 표시가 없다 — 사람이 결정 (a)로 명시 선택한 동작이라 되돌리자는 권고가 아니다.",
+          "suggested_action": "카테고리 필터 후속 SR의 입력으로만 남긴다(UIS-ORD-009에 '전체 목록으로만 이동' 명시)"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "환경 관측(이 SR과 무관, shop-api diff 0건) — 8087의 shop-api 인스턴스가 낡았다: 무키 GET /shop·/api/products·/api/products/SKU-1001이 전부 401인데 소스는 SR-301/SR-307을 이미 담고 있다(무키 /api/members/grades만 200, target/*.jar는 09-15 빌드). 재기동 없이 화면을 열면 SR-303과 무관한 401을 이 SR의 결함으로 오인한다.",
+          "suggested_action": "E2E·TC 실행이나 사람의 눈 확인 전에 shop-api를 재기동한다(lab/run-app.ps1)"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-web/src/features/shop/CategoryShortcuts.tsx — 완료 항목 SR-302.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-web/src/pages/ShopHomePage.test.tsx — 완료 항목 SR-302.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-web/src/pages/ShopHomePage.tsx — 완료 항목 SR-302.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "medium",
+          "layer": "rules",
+          "finding": "규칙 위반 [lab/file-size-cap/tsx-file-cap] modules/shop-web/src/pages/ProductListPage.test.tsx:0 — 화면 부품 300줄 초과 — 상태별 부품으로 나누고 각각 스토리를 둔다",
+          "suggested_action": "규칙을 지키도록 고치거나, 규칙이 틀렸으면 SpecLens /rules에서 규칙을 고치세요"
+        },
+        {
+          "severity": "medium",
+          "layer": "rules",
+          "finding": "규칙 위반 [lab/file-size-cap/tsx-file-cap] modules/shop-web/src/pages/ShopHomePage.test.tsx:0 — 화면 부품 300줄 초과 — 상태별 부품으로 나누고 각각 스토리를 둔다",
+          "suggested_action": "규칙을 지키도록 고치거나, 규칙이 틀렸으면 SpecLens /rules에서 규칙을 고치세요"
+        }
+      ],
+      "layer": "rules"
+    },
+    {
+      "round": 9,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "pass",
+        "scope": "pass",
+        "rules": "concerns",
+        "stories": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "round2 재작업 지시 2(Gnb.tsx:19-20 JSDoc의 '제출은 이 SR에서 no-op' 갱신)가 미반영 — 사람의 구현 지시 1~4에 없어 dev가 손대지 않았고 코드 동작 영향은 없으나, 호출부 2곳(ShopHomePage·ProductListPage)이 실제 navigate를 하므로 서술이 틀렸다. 코드 주석이라 STEP 5.5 재동기화가 고치지 않는다.",
+          "suggested_action": "다음에 Gnb.tsx를 여는 SR에서 JSDoc 1줄 갱신(코드 변경 없음)"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "ProductListPage.tsx:72 inFlightKeyRef 해제가 키 값만 비교한다(round1 권고2·round2 권고3 이월, 사람 지시로 보류 확정 — 실측 미변경). 화면 상태는 세대 카운터가 보호하므로 영향은 낭비 요청 1회.",
+          "suggested_action": "후속 TODO: 해제 조건에 세대 id(requestIdRef) 비교를 함께 넣는다"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "같은 검색어 재제출 시 setAppliedKeyword가 동일 값이라 effect가 돌지 않아 재조회가 일어나지 않는다(ProductListPage.tsx:98-101, round1 권고3·round2 권고4 이월, 사람 지시로 보류 확정 — 실측 미변경).",
+          "suggested_action": "후속 TODO: 제출 nonce state를 effect 의존성에 넣거나 현재 동작을 UIS-ORD-009 계약으로 명시"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "목록 화면 안에서의 재검색이 URL을 갱신하지 않아(ProductListPage.tsx:25 읽기 전용 useSearchParams) ?keyword=A로 들어와 B로 재검색한 뒤 새로고침·북마크·공유하면 A 결과가 열린다(round2 권고5 이월).",
+          "suggested_action": "UIS-ORD-009에 계약으로 명시하거나 후속 SR에서 setSearchParams로 동기화"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "카테고리 숏컷 6개가 전부 같은 목적지(/shop/products 전체 목록)로 가고 어떤 카테고리를 눌렀는지 화면 표시가 없다 — 사람이 결정 (a)로 명시 선택한 동작이라 되돌리자는 권고가 아니다.",
+          "suggested_action": "카테고리 필터 후속 SR의 입력으로만 남긴다(UIS-ORD-009에 '전체 목록으로만 이동' 명시)"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "환경 관측(이 SR과 무관, shop-api diff 0건) — 8087의 shop-api 인스턴스가 낡았다: 무키 GET /shop·/api/products·/api/products/SKU-1001이 전부 401인데 소스는 SR-301/SR-307을 이미 담고 있다(무키 /api/members/grades만 200, target/*.jar는 09-15 빌드). 재기동 없이 화면을 열면 SR-303과 무관한 401을 이 SR의 결함으로 오인한다.",
+          "suggested_action": "E2E·TC 실행이나 사람의 눈 확인 전에 shop-api를 재기동한다(lab/run-app.ps1)"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-web/src/features/shop/CategoryShortcuts.tsx — 완료 항목 SR-302.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-web/src/pages/ShopHomePage.test.tsx — 완료 항목 SR-302.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-web/src/pages/ShopHomePage.tsx — 완료 항목 SR-302.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "medium",
+          "layer": "rules",
+          "finding": "규칙 위반 [lab/file-size-cap/tsx-file-cap] modules/shop-web/src/pages/ProductListPage.test.tsx:0 — 화면 부품 300줄 초과 — 상태별 부품으로 나누고 각각 스토리를 둔다",
+          "suggested_action": "규칙을 지키도록 고치거나, 규칙이 틀렸으면 SpecLens /rules에서 규칙을 고치세요"
+        },
+        {
+          "severity": "medium",
+          "layer": "rules",
+          "finding": "규칙 위반 [lab/file-size-cap/tsx-file-cap] modules/shop-web/src/pages/ShopHomePage.test.tsx:0 — 화면 부품 300줄 초과 — 상태별 부품으로 나누고 각각 스토리를 둔다",
+          "suggested_action": "규칙을 지키도록 고치거나, 규칙이 틀렸으면 SpecLens /rules에서 규칙을 고치세요"
+        },
+        {
+          "severity": "low",
+          "layer": "stories",
+          "finding": "고친 화면 부품에 스토리가 없습니다: src/App.tsx",
+          "suggested_action": "그 부품의 상태를 스토리로 남기세요 — 없으면 다음 사람이 그 상태를 볼 방법이 없습니다. 차단하려면 하네스 규칙 `story-per-component`(pair 검사)를 채택하세요(/rules 제안 탭) — 축 C가 must로 막습니다"
+        }
+      ],
+      "layer": "stories"
+    },
+    {
+      "round": 10,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "pass",
+        "scope": "pass",
+        "rules": "concerns",
+        "stories": "pass",
+        "conformance": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "round2 재작업 지시 2(Gnb.tsx:19-20 JSDoc의 '제출은 이 SR에서 no-op' 갱신)가 미반영 — 사람의 구현 지시 1~4에 없어 dev가 손대지 않았고 코드 동작 영향은 없으나, 호출부 2곳(ShopHomePage·ProductListPage)이 실제 navigate를 하므로 서술이 틀렸다. 코드 주석이라 STEP 5.5 재동기화가 고치지 않는다.",
+          "suggested_action": "다음에 Gnb.tsx를 여는 SR에서 JSDoc 1줄 갱신(코드 변경 없음)"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "ProductListPage.tsx:72 inFlightKeyRef 해제가 키 값만 비교한다(round1 권고2·round2 권고3 이월, 사람 지시로 보류 확정 — 실측 미변경). 화면 상태는 세대 카운터가 보호하므로 영향은 낭비 요청 1회.",
+          "suggested_action": "후속 TODO: 해제 조건에 세대 id(requestIdRef) 비교를 함께 넣는다"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "같은 검색어 재제출 시 setAppliedKeyword가 동일 값이라 effect가 돌지 않아 재조회가 일어나지 않는다(ProductListPage.tsx:98-101, round1 권고3·round2 권고4 이월, 사람 지시로 보류 확정 — 실측 미변경).",
+          "suggested_action": "후속 TODO: 제출 nonce state를 effect 의존성에 넣거나 현재 동작을 UIS-ORD-009 계약으로 명시"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "목록 화면 안에서의 재검색이 URL을 갱신하지 않아(ProductListPage.tsx:25 읽기 전용 useSearchParams) ?keyword=A로 들어와 B로 재검색한 뒤 새로고침·북마크·공유하면 A 결과가 열린다(round2 권고5 이월).",
+          "suggested_action": "UIS-ORD-009에 계약으로 명시하거나 후속 SR에서 setSearchParams로 동기화"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "카테고리 숏컷 6개가 전부 같은 목적지(/shop/products 전체 목록)로 가고 어떤 카테고리를 눌렀는지 화면 표시가 없다 — 사람이 결정 (a)로 명시 선택한 동작이라 되돌리자는 권고가 아니다.",
+          "suggested_action": "카테고리 필터 후속 SR의 입력으로만 남긴다(UIS-ORD-009에 '전체 목록으로만 이동' 명시)"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "환경 관측(이 SR과 무관, shop-api diff 0건) — 8087의 shop-api 인스턴스가 낡았다: 무키 GET /shop·/api/products·/api/products/SKU-1001이 전부 401인데 소스는 SR-301/SR-307을 이미 담고 있다(무키 /api/members/grades만 200, target/*.jar는 09-15 빌드). 재기동 없이 화면을 열면 SR-303과 무관한 401을 이 SR의 결함으로 오인한다.",
+          "suggested_action": "E2E·TC 실행이나 사람의 눈 확인 전에 shop-api를 재기동한다(lab/run-app.ps1)"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-web/src/features/shop/CategoryShortcuts.tsx — 완료 항목 SR-302.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-web/src/pages/ShopHomePage.test.tsx — 완료 항목 SR-302.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-web/src/pages/ShopHomePage.tsx — 완료 항목 SR-302.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "medium",
+          "layer": "rules",
+          "finding": "규칙 위반 [lab/file-size-cap/tsx-file-cap] modules/shop-web/src/pages/ProductListPage.test.tsx:0 — 화면 부품 300줄 초과 — 상태별 부품으로 나누고 각각 스토리를 둔다",
+          "suggested_action": "규칙을 지키도록 고치거나, 규칙이 틀렸으면 SpecLens /rules에서 규칙을 고치세요"
+        },
+        {
+          "severity": "medium",
+          "layer": "rules",
+          "finding": "규칙 위반 [lab/file-size-cap/tsx-file-cap] modules/shop-web/src/pages/ShopHomePage.test.tsx:0 — 화면 부품 300줄 초과 — 상태별 부품으로 나누고 각각 스토리를 둔다",
+          "suggested_action": "규칙을 지키도록 고치거나, 규칙이 틀렸으면 SpecLens /rules에서 규칙을 고치세요"
+        },
+        {
+          "severity": "low",
+          "layer": "stories",
+          "finding": "고친 화면 부품에 스토리가 없습니다: src/App.tsx",
+          "suggested_action": "그 부품의 상태를 스토리로 남기세요 — 없으면 다음 사람이 그 상태를 볼 방법이 없습니다. 차단하려면 하네스 규칙 `story-per-component`(pair 검사)를 채택하세요(/rules 제안 탭) — 축 C가 must로 막습니다"
+        },
+        {
+          "severity": "low",
+          "layer": "conformance",
+          "finding": "Gnb.tsx:19-20 JSDoc이 '검색 제출은 이 SR에서 no-op'으로 남아 있으나 실제로는 ShopHomePage·ProductListPage 양쪽 모두 실제 navigate를 수행 — 코드 동작과 무관한 주석 노후화(story 후속 TODO 1과 일치)",
+          "suggested_action": "다음에 Gnb.tsx를 여는 SR에서 주석 1줄 갱신(차단 아님)",
+          "confidence": "high",
+          "file": "modules/shop-web/src/features/shop/Gnb.tsx",
+          "line": 19
+        }
+      ],
+      "layer": "conformance"
+    }
+  ],
+  "waiver": {
+    "active": false
+  },
+  "story_transitions": [
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "SR 승인(SR-303)",
+      "at": "2026-09-17T00:24:18"
+    },
+    {
+      "from": "Approved",
+      "to": "InProgress",
+      "by": "sl-aidd",
+      "at": "2026-09-17T10:01:02"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "qa-agent",
+      "at": "2026-09-17T10:13:57"
+    },
+    {
+      "from": "Review",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-17T10:22:14"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "qa-agent",
+      "at": "2026-09-17T10:30:58"
+    },
+    {
+      "from": "Review",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-17T10:39:37"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "qa-agent",
+      "at": "2026-09-17T10:44:17"
+    },
+    {
+      "from": "Review",
+      "to": "Done",
+      "by": "사람",
+      "at": "2026-09-17T11:08:33"
+    }
+  ],
+  "cause": "none",
+  "escalate": false,
+  "fail_rounds": 0,
+  "max_rounds": 3
+}

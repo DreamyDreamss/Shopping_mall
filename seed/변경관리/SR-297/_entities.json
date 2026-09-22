@@ -1,0 +1,20 @@
+{
+  "tables": [
+    "MEMBERS",
+    "MEMBER_SIGNUP_RATE_LIMITS"
+  ],
+  "tables_unknown": [],
+  "infs": [],
+  "infs_unmatched": [],
+  "paths": [
+    "/api/members/",
+    "/api/members/password-resets/codes"
+  ],
+  "paths_candidate": [
+    "/api/members/password"
+  ],
+  "screens": [],
+  "uis_ids": [],
+  "terms": [],
+  "entities_arg": "MEMBERS,MEMBER_SIGNUP_RATE_LIMITS,/api/members/,/api/members/password-resets/codes"
+}

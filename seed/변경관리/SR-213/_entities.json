@@ -1,0 +1,16 @@
+{
+  "tables": [],
+  "tables_unknown": [],
+  "infs": [],
+  "infs_unmatched": [],
+  "paths": [],
+  "paths_candidate": [],
+  "screens": [
+    "주문 상세"
+  ],
+  "uis_ids": [
+    "UIS-ORD-001"
+  ],
+  "terms": [],
+  "entities_arg": "주문 상세,UIS-ORD-001"
+}

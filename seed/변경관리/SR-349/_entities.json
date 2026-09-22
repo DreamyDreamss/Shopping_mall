@@ -1,0 +1,31 @@
+{
+  "tables": [
+    "ORDERS"
+  ],
+  "tables_unknown": [
+    "INVALID_STATUS"
+  ],
+  "infs": [
+    "INF-ORD-001"
+  ],
+  "infs_unmatched": [],
+  "paths": [],
+  "paths_candidate": [],
+  "screens": [],
+  "uis_ids": [
+    "UIS-MBR-002",
+    "UIS-ORD-001",
+    "UIS-ORD-002",
+    "UIS-ORD-003",
+    "UIS-ORD-004",
+    "UIS-ORD-005",
+    "UIS-ORD-007",
+    "UIS-ORD-008",
+    "UIS-ORD-009",
+    "UIS-ORD-010",
+    "UIS-ORD-011",
+    "UIS-ORD-012"
+  ],
+  "terms": [],
+  "entities_arg": "ORDERS,INF-ORD-001,UIS-MBR-002,UIS-ORD-001,UIS-ORD-002,UIS-ORD-003,UIS-ORD-004,UIS-ORD-005,UIS-ORD-007,UIS-ORD-008,UIS-ORD-009,UIS-ORD-010,UIS-ORD-011,UIS-ORD-012"
+}

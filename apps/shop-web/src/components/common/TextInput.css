@@ -1,0 +1,7 @@
+/* SR-310 — TextInput `:focus` 테두리색만 CSS로 다룬다(인라인 스타일로는 의사클래스 표현 불가).
+   오류·비활성 스타일은 TextInput.tsx가 prop 기반 인라인 스타일로 처리하므로 이 파일은 최소
+   변경 지점만 담는다. */
+.cmn-text-input:focus {
+  outline: none;
+  border-color: var(--color-info) !important;
+}

@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<!--/* linked_func: FUNC-member-001 — 회원가입 화면(UIS-MBR-001, SR-231)
+     spec: docs/00_FUNC/stories/STORY-FUNC-member-001.md
+     이 화면은 INF-MBR-001(인증코드 발송)·INF-MBR-002(가입 요청+코드검증)를 그대로 소비한다.
+     두 API의 계약은 이 파일에서 재정의하지 않는다(응답 필드명·오류코드는 서버 그대로 표시). */-->
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>회원가입</title>
+  <style>
+    /* 모바일 우선 단일 컬럼(SR-231 UI/UX 요건) */
+    body { font-family: "Malgun Gothic", sans-serif; margin: 0; color: #1c2128; background: #f7f8fa; }
+    .wrap { max-width: 420px; margin: 0 auto; padding: 24px 20px 48px; }
+    h1 { font-size: 18px; margin: 0 0 4px; }
+    .step-indicator { font-size: 13px; color: #6b7280; margin-bottom: 20px; }
+    .card { background: #fff; border: 1px solid #d7dbe0; border-radius: 8px; padding: 18px; }
+    .field { margin-bottom: 14px; }
+    label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+    input[type=text], input[type=password] {
+      width: 100%; box-sizing: border-box; padding: 10px 12px; font-size: 14px;
+      border: 1px solid #d7dbe0; border-radius: 6px;
+    }
+    input.invalid { border-color: #d64545; }
+    .hint { font-size: 12px; color: #6b7280; margin-top: 4px; }
+    .field-error { font-size: 12px; color: #d64545; margin-top: 4px; }
+    .banner-error {
+      background: #fdecec; border: 1px solid #f3b8b8; color: #a12626; font-size: 13px;
+      padding: 10px 12px; border-radius: 6px; margin-bottom: 14px;
+    }
+    .terms { border: 1px solid #d7dbe0; border-radius: 6px; padding: 10px 12px; margin-bottom: 14px; }
+    .terms .all { font-weight: 700; border-bottom: 1px solid #ecedf0; padding-bottom: 8px; margin-bottom: 8px; }
+    .terms label { display: flex; align-items: center; gap: 6px; font-weight: 400; font-size: 13px; margin: 0; }
+    .terms details { margin-top: 4px; font-size: 12px; color: #6b7280; }
+    button {
+      width: 100%; padding: 12px; font-size: 14px; font-weight: 700; border: none;
+      border-radius: 6px; background: #3b5bdb; color: #fff; cursor: pointer;
+    }
+    button:disabled { background: #b9c2d6; cursor: not-allowed; }
+    button.secondary { background: #fff; color: #3b5bdb; border: 1px solid #3b5bdb; margin-top: 8px; }
+    /* round3 재작업(B) — 카운트다운이 실제로 0에 닿아 만료됐을 때(step2-code-expired)만
+       재전송 버튼을 강조한다. 인증 시도 상한 초과(step2-locked, MBR-4093)는 재발송이
+       잠금을 풀지 않으므로(SR-295) 강조하지 않는다 — round2까지는 반대(잠금만 강조)였다. */
+    button.secondary.emphasize { box-shadow: 0 0 0 3px rgba(214, 69, 69, 0.35); border-color: #d64545; color: #d64545; }
+    .countdown { font-size: 13px; color: #6b7280; margin: 6px 0 14px; }
+    .countdown.expired { color: #d64545; font-weight: 700; }
+    a { color: #3b5bdb; text-decoration: none; }
+    .hidden { display: none !important; }
+    .done-icon { font-size: 40px; text-align: center; margin-bottom: 8px; }
+    .coupon-note {
+      background: #f1f6ff; border: 1px solid #c9dcff; border-radius: 6px;
+      padding: 10px 12px; font-size: 13px; margin-top: 12px;
+    }
+  </style>
+</head>
+<!--/* linked_func: FUNC-member-001 — data-screen-state는 §5 표시 조건(10개 상태, round3 재작업
+     B — step2-locked 신설) 식별용. QA/E2E가 이 속성으로 각 상태를 특정해 캡처할 수 있게 한다. */-->
+<body data-screen-state="step1-initial">
+<div class="wrap">
+  <h1>회원가입</h1>
+  <p class="step-indicator" id="stepIndicator">STEP 1/3</p>
+
+  <!--/* linked_func: FUNC-member-001 — 네트워크/서버(5xx) 오류 배너. 필드 단위 오류와 구분해
+       화면 상단에 고정 표시(장애를 화면 뒤에 은폐하지 않는다, project-context.md Critical Rule 1
+       — 이 화면은 5xx를 rethrow할 서버 로직이 없으므로 사용자에게 있는 그대로 안내한다). */-->
+  <div id="bannerError" class="banner-error hidden" role="alert"></div>
+
+  <div class="card">
+
+    <!--/* ===== STEP 1 — 가입 수단 입력 + 약관 동의 ===== */-->
+    <section id="step1">
+      <div class="field">
+        <label for="target">이메일 또는 휴대폰번호</label>
+        <input type="text" id="target" placeholder="user@example.com 또는 01012345678" autocomplete="username">
+        <p class="hint" id="targetHint">이메일 또는 하이픈 없는 휴대폰번호를 입력하세요.</p>
+        <p class="field-error hidden" id="targetError"></p>
+      </div>
+
+      <div class="terms">
+        <label class="all"><input type="checkbox" id="agreeAll"> 전체 동의</label>
+        <label><input type="checkbox" id="agreeTerms"> [필수] 이용약관 동의</label>
+        <details><summary>보기</summary>서비스 이용약관 전문(요약) — 회원은 본 서비스의 이용약관을 준수해야 합니다.</details>
+        <label><input type="checkbox" id="agreePrivacy"> [필수] 개인정보 처리방침 동의</label>
+        <details><summary>보기</summary>개인정보 처리방침 전문(요약) — 수집한 개인정보는 가입·본인확인 목적으로만 사용됩니다.</details>
+      </div>
+
+      <button type="button" id="btnRequestCode" disabled>인증코드 받기</button>
+    </section>
+
+    <!--/* ===== STEP 2 — 인증코드 확인 ===== */-->
+    <section id="step2" class="hidden">
+      <div class="field">
+        <label for="code">인증코드 6자리</label>
+        <input type="text" id="code" inputmode="numeric" maxlength="6" placeholder="000000" autocomplete="one-time-code">
+        <p class="countdown" id="countdown">05:00</p>
+        <p class="field-error hidden" id="codeError"></p>
+      </div>
+      <button type="button" id="btnVerifyNext" disabled>다음</button>
+      <button type="button" id="btnResend" class="secondary hidden">인증코드 재전송</button>
+    </section>
+
+    <!--/* ===== STEP 3 — 비밀번호·이름·마케팅 동의 ===== */-->
+    <section id="step3" class="hidden">
+      <div class="field">
+        <label for="password">비밀번호</label>
+        <input type="password" id="password" autocomplete="new-password">
+        <p class="hint">8~64자, 영문+숫자를 포함하세요.</p>
+        <p class="field-error hidden" id="passwordError"></p>
+      </div>
+      <div class="field">
+        <label for="name">이름</label>
+        <input type="text" id="name" maxlength="50" autocomplete="name">
+        <p class="field-error hidden" id="nameError"></p>
+      </div>
+      <div class="field">
+        <label><input type="checkbox" id="agreeMarketing"> 마케팅 정보 수신 동의(선택)</label>
+      </div>
+      <p class="field-error hidden" id="signupError"></p>
+      <button type="button" id="btnSignup" disabled>가입하기</button>
+    </section>
+
+    <!--/* ===== 가입 완료 ===== */-->
+    <section id="stepDone" class="hidden">
+      <div class="done-icon">🎉</div>
+      <h2 style="text-align:center;font-size:16px;">회원가입이 완료되었습니다</h2>
+      <p style="text-align:center;font-size:13px;color:#6b7280;" id="doneTarget"></p>
+      <div class="coupon-note">가입을 환영합니다 — 환영 쿠폰이 곧 발급됩니다.</div>
+    </section>
+
+  </div>
+</div>
+
+<script th:inline="none">
+/* 클라이언트 마법사 로직(FUNC-member-001). 서버 API 계약(INF-MBR-001/002)을 그대로
+   소비만 하고, 이 스크립트 안에서 회원가입 업무 규칙을 재구현하지 않는다(예: 코드 검증·
+   중복 판정은 서버가 최종 판정 — 이 스크립트는 그 결과를 표시할 뿐이다). */
+(function () {
+  'use strict';
+
+  /* round3 재작업(STORY round2 QA CONCERNS 권고1·2·3 재작업 지시 사람 코멘트(A)(B)) —
+     상태 전이를 goStep(n) 단일 함수로 통일한다. 카운트다운 타이머는 STEP2가 화면에 보일
+     때만 살아있어야 한다: goStep(n)은 n!==2이면 항상 clearInterval하고, n===2로 들어올
+     때만(신규 발송·재전송·STEP3에서 되돌아온 경우 전부 포함) state.expiresAt 기준 잔여시간
+     으로 타이머를 재시작한다 — round2까지는 STEP2→STEP3 전이(btnVerifyNext 클릭)에서
+     타이머를 정지하지 않아 STEP3 체류 중 조용히 만료 상태로 덮어써지는 결함이 있었다
+     (round2 QA CONCERNS 권고1, 재현: 임시 probe로 실측 확정).
+
+     입력 잠금은 오직 data-screen-state === 'step2-locked'일 때만 건다(updateStep2Button
+     참고). MBR-4091(코드 오답, 재시도 허용)은 이 상태로 절대 전이하지 않으므로 어떤 경로
+     에서도 입력을 잠그지 않는다(round2 QA CONCERNS 권고2 재발 방지 — 타이머가 STEP2 재진입
+     시 잔여시간으로 복원되면서 code.disabled가 함께 복구되지 않던 결함이 있었다).
+
+     §5 표시 조건은 이제 10개다(round3 — 사람 결정, QA round2 권고3 채택): 카운트다운이
+     0에 닿아 만료된 경우(step2-code-expired)와 서버가 시도 상한 초과로 거부한 경우
+     (step2-locked, MBR-4093)를 별도 상태로 분리한다. 둘 다 "재전송" 버튼을 보여주지만
+     스타일이 다르다 — 만료는 재전송으로 실제로 회복되므로 강조(emphasize)하고, 잠금은
+     재발송이 시도 횟수를 리셋하지 않아(SR-295) 강조하면 "재전송하면 풀린다"로 오독되므로
+     보통 스타일로 둔다.
+
+     STEP1
+       target 입력/약관 체크 → 형식 유효 && 약관 미동의        → step1-terms-unchecked (진입)
+                             → 형식 무효 또는 값 없음           → step1-initial (진입/복귀)
+                             → 형식 유효 && 약관 모두 동의      → step1-initial (§5-1 해제·복귀)
+       STEP3 제출 409 MBR-4092/4094                             → step1-duplicate-error (진입, goStep(1))
+       위 상태에서 target 재입력 또는 약관 재체크                → 위 3분기 재평가로 자동 해제
+
+     STEP2 (goStep(2) 진입 시에만 타이머 생존)
+       인증코드 발송/재전송 성공                                 → step2-initial (진입, 새 타이머 시작)
+       코드 입력(미잠금 상태)                                    → step2-code-invalid 해제 → step2-initial (복귀)
+       카운트다운 0 도달(잠금 아닐 때만)                          → step2-code-expired (진입, 입력은 잠그지 않음)
+       STEP3 제출 409 MBR-4091(오답, 재시도 허용)                → step2-code-invalid (진입, 입력 유지·절대 잠그지 않음)
+       STEP3 제출 409 MBR-4093(시도 상한, 실제 잠금)             → step2-locked (진입, 입력 잠금·재전송은 보통 스타일)
+       재전송 성공                                               → step2-initial (복귀, 새 타이머 시작)
+
+     STEP3 (goStep(3) 진입 시 타이머 정지 — 만료 이벤트는 STEP2에서만 발생)
+       "다음" 클릭(STEP2→STEP3)                                  → step3-input (진입)
+       비밀번호 규칙 위반                                        → step3-password-invalid (진입)
+       비밀번호가 유효해짐(또는 값을 비움)                        → step3-input (§5-8 해제·복귀)
+
+     완료 (goStep('done') 진입 시 타이머 정지)
+       가입 성공(201)                                            → step-done (진입) */
+
+  var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  var PHONE_RE = /^01[016789]\d{7,8}$/;
+  var PASSWORD_RE = /^(?=.*[A-Za-z])(?=.*[0-9]).{8,64}$/;
+
+  var el = {
+    body: document.body,
+    stepIndicator: document.getElementById('stepIndicator'),
+    bannerError: document.getElementById('bannerError'),
+    step1: document.getElementById('step1'),
+    step2: document.getElementById('step2'),
+    step3: document.getElementById('step3'),
+    stepDone: document.getElementById('stepDone'),
+    target: document.getElementById('target'),
+    targetError: document.getElementById('targetError'),
+    agreeAll: document.getElementById('agreeAll'),
+    agreeTerms: document.getElementById('agreeTerms'),
+    agreePrivacy: document.getElementById('agreePrivacy'),
+    btnRequestCode: document.getElementById('btnRequestCode'),
+    code: document.getElementById('code'),
+    codeError: document.getElementById('codeError'),
+    countdown: document.getElementById('countdown'),
+    btnVerifyNext: document.getElementById('btnVerifyNext'),
+    btnResend: document.getElementById('btnResend'),
+    password: document.getElementById('password'),
+    passwordError: document.getElementById('passwordError'),
+    name: document.getElementById('name'),
+    nameError: document.getElementById('nameError'),
+    agreeMarketing: document.getElementById('agreeMarketing'),
+    signupError: document.getElementById('signupError'),
+    btnSignup: document.getElementById('btnSignup'),
+    doneTarget: document.getElementById('doneTarget')
+  };
+
+  var state = { target: '', countdownTimer: null, expiresAt: 0 };
+
+  function setScreenState(name) {
+    el.body.setAttribute('data-screen-state', name);
+  }
+
+  function showBanner(message) {
+    el.bannerError.textContent = message;
+    el.bannerError.classList.remove('hidden');
+  }
+
+  function hideBanner() {
+    el.bannerError.classList.add('hidden');
+  }
+
+  function setFieldError(node, message) {
+    if (!message) {
+      node.textContent = '';
+      node.classList.add('hidden');
+      return;
+    }
+    node.textContent = message;
+    node.classList.remove('hidden');
+  }
+
+  function isTargetFormatValid(value) {
+    return EMAIL_RE.test(value) || PHONE_RE.test(value);
+  }
+
+  function isPasswordValid(value) {
+    return PASSWORD_RE.test(value) && value.length >= 8 && value.length <= 64;
+  }
+
+  function isSafeRelativePath(url) {
+    // round3 재작업 지시(C) — '/'로 시작하는 상대경로만 안전하다고 본다. '//호스트'(스킴
+    // 상대 URL)는 '/'로 시작하지만 다른 오리진으로 이동시킬 수 있어 함께 제외한다.
+    // round4 재작업 지시(2) — 역슬래시('\')로 시작하는 두 번째 문자도 함께 거부한다. 일부
+    // 브라우저의 URL 파서는 특수 스킴에서 '\'를 '/'로 정규화하므로 "/\evil.com"이 통과하면
+    // 실질적으로 "//evil.com"(외부 오리진)과 동일하게 해석될 수 있다(round3 QA 재게이트 관찰).
+    return typeof url === 'string' && url.charAt(0) === '/'
+        && url.charAt(1) !== '/' && url.charAt(1) !== '\\';
+  }
+
+  function setHidden(node, hidden) {
+    // classList.toggle(token, force)의 2-인자(force) 형태에 기대지 않는다 — 이 프로젝트가
+    // 테스트에 쓰는 HtmlUnit(2.70.0)의 JS 엔진이 force 인자를 무시하고 항상 반전(toggle)만
+    // 수행해, 반복 호출 시 의도와 반대로 뒤집히는 결함을 실측했다(round3 자체 발견 — goStep
+    // 도입 직후 STEP3 섹션이 조용히 hidden 상태로 뒤집혀 btnSignup 클릭이 무반응이 되는
+    // 회귀를 냈다). add/remove로 항상 명시적으로 강제한다.
+    if (hidden) {
+      node.classList.add('hidden');
+    } else {
+      node.classList.remove('hidden');
+    }
+  }
+
+  function goStep(n) {
+    // round3 재작업 지시(A) — 상태 전이 단일 창구. n이 2가 아니면 카운트다운을 반드시
+    // 정지하고, n이 2로 들어올 때만 잔여시간(state.expiresAt) 기준으로 재시작한다(위
+    // 상태 전이표 주석 참고).
+    if (n !== 2 && state.countdownTimer) {
+      clearInterval(state.countdownTimer);
+      state.countdownTimer = null;
+    }
+    setHidden(el.step1, n !== 1);
+    setHidden(el.step2, n !== 2);
+    setHidden(el.step3, n !== 3);
+    setHidden(el.stepDone, n !== 'done');
+    if (n === 'done') {
+      el.stepIndicator.classList.add('hidden');
+    } else {
+      el.stepIndicator.classList.remove('hidden');
+      el.stepIndicator.textContent = 'STEP ' + n + '/3';
+    }
+    if (n === 2) {
+      if (state.countdownTimer) {
+        clearInterval(state.countdownTimer);
+      }
+      state.countdownTimer = setInterval(tickCountdown, 1000);
+      tickCountdown();
+    }
+  }
+
+  // ----- STEP 1 -----
+  function updateStep1Button() {
+    var value = el.target.value.trim();
+    var formatOk = value.length > 0 && isTargetFormatValid(value);
+    setFieldError(el.targetError, (value.length > 0 && !formatOk)
+        ? '이메일 또는 휴대폰번호 형식이 올바르지 않습니다.' : '');
+    var termsOk = el.agreeTerms.checked && el.agreePrivacy.checked;
+    el.btnRequestCode.disabled = !(formatOk && termsOk);
+    if (formatOk && !termsOk) {
+      setScreenState('step1-terms-unchecked');
+    } else {
+      // §5-4 복귀: 약관에 모두 동의(또는 형식이 아직 무효/공백)하면 STEP1의 오류 없는
+      // 대기 상태로 되돌린다(round2 재작업 지시 2 — 진입뿐 아니라 복귀 분기도 둔다).
+      setScreenState('step1-initial');
+    }
+  }
+
+  el.target.addEventListener('input', updateStep1Button);
+  el.agreeTerms.addEventListener('change', function () {
+    el.agreeAll.checked = el.agreeTerms.checked && el.agreePrivacy.checked;
+    updateStep1Button();
+  });
+  el.agreePrivacy.addEventListener('change', function () {
+    el.agreeAll.checked = el.agreeTerms.checked && el.agreePrivacy.checked;
+    updateStep1Button();
+  });
+  el.agreeAll.addEventListener('change', function () {
+    el.agreeTerms.checked = el.agreeAll.checked;
+    el.agreePrivacy.checked = el.agreeAll.checked;
+    updateStep1Button();
+  });
+
+  el.btnRequestCode.addEventListener('click', function () {
+    hideBanner();
+    var target = el.target.value.trim();
+    state.target = target;
+    el.btnRequestCode.disabled = true;
+    fetch('/api/members/signup/verification-codes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ target: target })
+    }).then(function (res) {
+      return res.json().then(function (body) { return { ok: res.ok, status: res.status, body: body }; });
+    }).then(function (result) {
+      if (result.ok) {
+        startStep2(result.body.expiresInSeconds);
+        return;
+      }
+      if (result.status === 400) {
+        setFieldError(el.targetError, result.body.message || '입력값을 확인해주세요.');
+      } else if (result.status === 429) {
+        setFieldError(el.targetError, result.body.message || '잠시 후 다시 시도해주세요.');
+      } else {
+        showBanner(result.body.message || '일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+      }
+      el.btnRequestCode.disabled = false;
+    }).catch(function () {
+      showBanner('네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+      el.btnRequestCode.disabled = false;
+    });
+  });
+
+  // ----- STEP 2 -----
+  function startStep2(expiresInSeconds) {
+    hideBanner();
+    el.code.value = '';
+    setFieldError(el.codeError, '');
+    el.btnResend.classList.add('hidden');
+    el.btnResend.classList.remove('emphasize');
+    el.countdown.classList.remove('expired');
+    state.expiresAt = Date.now() + (expiresInSeconds || 300) * 1000;
+    setScreenState('step2-initial');
+    goStep(2);
+    updateStep2Button();
+  }
+
+  function tickCountdown() {
+    var remaining = Math.max(0, Math.round((state.expiresAt - Date.now()) / 1000));
+    var mm = String(Math.floor(remaining / 60)).padStart(2, '0');
+    var ss = String(remaining % 60).padStart(2, '0');
+    el.countdown.textContent = mm + ':' + ss;
+    if (remaining > 0) {
+      return;
+    }
+    if (state.countdownTimer) {
+      clearInterval(state.countdownTimer);
+      state.countdownTimer = null;
+    }
+    if (el.body.getAttribute('data-screen-state') === 'step2-locked') {
+      // round3 재작업 지시(B) — 잠금(MBR-4093, 시도 상한)은 코드 만료와 원인이 다르다
+      // (재발송이 잠금을 풀지 않는다, SR-295). 카운트다운이 0에 닿아도 잠금 표시를 만료
+      // 표시로 덮어쓰지 않는다.
+      return;
+    }
+    el.countdown.classList.add('expired');
+    el.btnResend.classList.remove('hidden');
+    el.btnResend.classList.add('emphasize');
+    setFieldError(el.codeError, '인증 시간이 지났습니다');
+    setScreenState('step2-code-expired');
+  }
+
+  function updateStep2Button() {
+    // round3 재작업 지시(A) — 입력 잠금은 오직 data-screen-state === 'step2-locked'일 때만
+    // 건다. MBR-4091(코드 오답)은 이 상태로 절대 전이하지 않으므로 어떤 경로로도 입력을
+    // 잠그지 않는다(이전 라운드의 el.code.disabled 산발적 설정을 이 한 곳으로 모았다).
+    var locked = el.body.getAttribute('data-screen-state') === 'step2-locked';
+    el.code.disabled = locked;
+    var digitsOnly = /^\d{6}$/.test(el.code.value);
+    el.btnVerifyNext.disabled = locked || !digitsOnly;
+    if (!locked) {
+      // §5-5 복귀: 잠기지 않은 상태에서 코드를 다시 입력하면 이전 오류(MBR-4091 인라인 안내)를
+      // 지우고 대기 상태로 되돌린다(round2 재작업 지시 1·2 — 재입력 허용 + 정상 복귀 분기).
+      setFieldError(el.codeError, '');
+      setScreenState('step2-initial');
+    }
+  }
+
+  el.code.addEventListener('input', function () {
+    el.code.value = el.code.value.replace(/\D/g, '').slice(0, 6);
+    updateStep2Button();
+  });
+
+  el.btnVerifyNext.addEventListener('click', function () {
+    // 코드 자체를 검증하는 별도 API가 없다(INF-MBR-002가
+    // 코드 검증+가입을 원자적으로 함께 수행 — 존재 오라클 방지 설계, INF-MBR-002.md §비즈니스규칙).
+    // 이 "다음"은 6자리 입력 여부만 클라이언트에서 게이트하고, 실제 코드 검증은 STEP3 제출 시
+    // 서버가 수행한다.
+    // round3 재작업 지시(1) — goStep(3)이 카운트다운 타이머를 정지시킨다. STEP3에 머무는
+    // 동안 코드가 만료돼도(만료 이벤트는 STEP2가 보일 때만 발생) 화면이 조용히 바뀌지 않는다.
+    goStep(3);
+    setScreenState('step3-input');
+    updateStep3Button();
+  });
+
+  el.btnResend.addEventListener('click', function () {
+    hideBanner();
+    el.btnResend.disabled = true;
+    fetch('/api/members/signup/verification-codes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ target: state.target })
+    }).then(function (res) {
+      return res.json().then(function (body) { return { ok: res.ok, status: res.status, body: body }; });
+    }).then(function (result) {
+      el.btnResend.disabled = false;
+      if (result.ok) {
+        el.countdown.classList.remove('expired');
+        startStep2(result.body.expiresInSeconds);
+        return;
+      }
+      if (result.status === 429) {
+        setFieldError(el.codeError, result.body.message || '잠시 후 다시 시도해주세요.');
+      } else {
+        showBanner(result.body.message || '일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+      }
+    }).catch(function () {
+      el.btnResend.disabled = false;
+      showBanner('네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+    });
+  });
+
+  // ----- STEP 3 -----
+  function updateStep3Button() {
+    var passwordOk = isPasswordValid(el.password.value);
+    var nameOk = el.name.value.trim().length > 0 && el.name.value.trim().length <= 50;
+    setFieldError(el.passwordError, (el.password.value.length > 0 && !passwordOk)
+        ? '비밀번호는 8~64자, 영문+숫자를 포함해야 합니다.' : '');
+    setFieldError(el.nameError, (el.name.value.length > 0 && !nameOk)
+        ? '이름을 확인해주세요(최대 50자).' : '');
+    el.btnSignup.disabled = !(passwordOk && nameOk);
+    if (el.password.value.length > 0 && !passwordOk) {
+      setScreenState('step3-password-invalid');
+    } else {
+      // §5-8 복귀: 비밀번호가 유효해지거나(또는 값을 비우면) STEP3 입력 상태로 되돌린다
+      // (round2 재작업 지시 2 — updateStep3Button이 진입만 하고 복귀하지 않던 결함).
+      setScreenState('step3-input');
+    }
+  }
+
+  el.password.addEventListener('input', updateStep3Button);
+  el.name.addEventListener('input', updateStep3Button);
+
+  el.btnSignup.addEventListener('click', function () {
+    hideBanner();
+    setFieldError(el.signupError, '');
+    el.btnSignup.disabled = true;
+    fetch('/api/members/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        target: state.target,
+        code: el.code.value,
+        password: el.password.value,
+        name: el.name.value.trim(),
+        marketingOptIn: el.agreeMarketing.checked
+      })
+    }).then(function (res) {
+      return res.json().then(function (body) { return { ok: res.ok, status: res.status, body: body }; });
+    }).then(function (result) {
+      if (result.ok) {
+        showDone(result.body.target);
+        return;
+      }
+      handleSignupError(result.status, result.body);
+    }).catch(function () {
+      showBanner('네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+      el.btnSignup.disabled = false;
+    });
+  });
+
+  function handleSignupError(status, body) {
+    var code = body.code;
+    if (code === 'MBR-4091') {
+      // round3 재작업 지시(A) — 코드 오답 등 재시도 가능한 실패는 어떤 경로에서도 입력을
+      // 잠그지 않는다(서버는 attempt_count<5까지 재시도를 허용한다, INF-MBR-002 STEP1).
+      // goStep(2)가 잔여시간 기준으로 타이머를 재시작하고, updateStep2Button()은
+      // data-screen-state === 'step2-locked'일 때만 잠그므로 이 분기는 절대 잠그지 않는다
+      // (round2까지는 타이머가 STEP2 재진입 시 복원되면서 code.disabled가 함께 복구되지
+      // 않아 재입력이 막히는 경로가 있었다 — round2 QA CONCERNS 권고2).
+      goStep(2);
+      // round4 재작업 지시(1) — 만료시각이 이미 지난 뒤에 도착한 MBR-4091이면(예: STEP3
+      // 체류 중 만료 → 제출 → 서버가 만료를 4091로 응답) 바로 앞 goStep(2)→tickCountdown이
+      // 띄운 만료 UI(재전송 노출·emphasize·.expired)를 되돌리지 않는다 — 되돌리면 사용자가
+      // 새로고침 외에 새 코드를 받을 수단이 없어진다(round3 QA CONCERNS 권고1 실측). 실제로
+      // 코드가 아직 살아있는 정상 오답(만료 전)에서만 만료 UI를 되돌린다. (A)"타이머는
+      // STEP2에서만 생존"·(B)"MBR-4093과 만료는 별개 상태" 원칙은 그대로 유지한다 — 이 분기는
+      // step2-locked로 전이하지 않고, goStep(2)의 타이머 재시작 로직도 손대지 않는다.
+      if (state.expiresAt > Date.now()) {
+        el.btnResend.classList.add('hidden');
+        el.btnResend.classList.remove('emphasize');
+        el.countdown.classList.remove('expired');
+      }
+      // updateStep2Button()이 내부에서 codeError를 지우고 step2-initial로 되돌리므로(§5-5
+      // 복귀 분기), 반드시 먼저 호출해 버튼 상태만 동기화한 뒤 오류 메시지·상태를 덮어쓴다 —
+      // 순서를 반대로 하면 방금 띄운 오류가 그 자리에서 지워진다.
+      updateStep2Button();
+      if (state.expiresAt <= Date.now()) {
+        // 만료 UI를 유지하는 경우 상태·문구도 "만료"로 남긴다(재전송 강조를 살려 두는 것과
+        // 일관되게) — updateStep2Button()이 되돌린 step2-initial/codeError를 여기서 덮어쓴다.
+        setFieldError(el.codeError, '인증 시간이 지났습니다');
+        setScreenState('step2-code-expired');
+      } else {
+        setFieldError(el.codeError, body.message || '인증코드가 올바르지 않습니다.');
+        setScreenState('step2-code-invalid');
+      }
+    } else if (code === 'MBR-4093') {
+      // round3 재작업 지시(B) — 시도 상한 도달(실제 잠금)은 §5 신규 10번째 상태
+      // step2-locked로 분리한다(round2까지는 step2-code-expired를 공유해 두 화면이 앵커
+      // 하나로 뭉뚱그려졌다 — round2 QA CONCERNS 권고3). 재발송이 잠금을 풀지 않으므로
+      // (SR-295) 재전송 버튼을 강조하지 않는다 — 강조하면 "재전송하면 풀린다"로 오독된다.
+      goStep(2);
+      setScreenState('step2-locked');
+      updateStep2Button();
+      el.countdown.classList.remove('expired');
+      el.btnResend.classList.remove('hidden');
+      el.btnResend.classList.remove('emphasize');
+      setFieldError(el.codeError, body.message || '인증 시도 횟수를 초과했습니다. 잠시 후 다시 시도해 주세요');
+    } else if (code === 'MBR-4092' || code === 'MBR-4094') {
+      // 이메일/휴대폰 중복 — STEP1로 되돌린다(코드 검증을 통과한 뒤에만 나오는 응답이므로
+      // "존재 오라클" 우려 없이 그대로 노출해도 된다, INF-MBR-002.md §비즈니스규칙 참고).
+      // goStep(1)이 진행 중인 카운트다운을 정지한다(재발송 시에만 새로 시작, startStep2 참고).
+      goStep(1);
+      // updateStep1Button()이 내부에서 targetError를 현재 입력값 기준으로 다시 쓰므로(§5-1
+      // 복귀 분기 포함), 반드시 먼저 호출해 버튼 상태만 동기화한 뒤 아래에서 중복 오류
+      // 메시지로 덮어쓴다 — 순서를 반대로 하면 방금 만든 중복 오류·로그인 링크가 지워진다.
+      updateStep1Button();
+      var message = body.message || '이미 가입된 계정입니다.';
+      el.targetError.textContent = '';
+      el.targetError.appendChild(document.createTextNode(message));
+      // round3 재작업 지시(C) — login_url을 href에 넣기 전에 '/'로 시작하는 상대경로인지
+      // 검증한다(스킴을 검증하지 않으면 javascript:/data: URL이 클릭 시 실행될 수 있다).
+      // 검증에 실패하면 링크 자체를 생략하고 메시지만 보여준다 — 현재 값은 서버 상수
+      // (LOGIN_URL="/login")라 통과하지만, 이 가드는 값이 바뀌는 미래를 대비한 것이다.
+      if (isSafeRelativePath(body.login_url)) {
+        el.targetError.appendChild(document.createTextNode(' — '));
+        var loginLink = document.createElement('a');
+        loginLink.setAttribute('href', body.login_url);
+        loginLink.textContent = '로그인하러 가기';
+        el.targetError.appendChild(loginLink);
+      }
+      el.targetError.classList.remove('hidden');
+      setScreenState('step1-duplicate-error');
+    } else if (code === 'MBR-4001') {
+      setFieldError(el.signupError, body.message || '입력값을 확인해주세요.');
+      el.btnSignup.disabled = false;
+    } else {
+      showBanner(body.message || '일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+      el.btnSignup.disabled = false;
+    }
+  }
+
+  function showDone(target) {
+    goStep('done');
+    el.doneTarget.textContent = target ? (target + ' 로 가입이 완료되었습니다.') : '';
+    setScreenState('step-done');
+  }
+}());
+</script>
+</body>
+</html>

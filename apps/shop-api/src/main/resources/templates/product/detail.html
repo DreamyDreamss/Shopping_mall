@@ -1,0 +1,84 @@
+<!--/*
+linked_func: FUNC-order-010
+spec: docs/00_FUNC/stories/STORY-FUNC-order-010.md
+*/-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>상품 상세</title>
+  <style>
+    body { font-family: "Malgun Gothic", sans-serif; margin: 24px; color: #1c2128; }
+    h1 { font-size: 20px; }
+    table { border-collapse: collapse; width: 100%; font-size: 13px; margin-top: 8px; }
+    th, td { border: 1px solid #d7dbe0; padding: 8px 10px; text-align: left; }
+    th { background: #f1f3f6; width: 140px; }
+    a { color: #3b5bdb; }
+    .badge-soldout { display: inline-block; font-size: 12px; color: #fff; background: #c92a2a;
+      border-radius: 3px; padding: 2px 8px; margin-left: 8px; vertical-align: middle; }
+    .disabled-reason { color: #c92a2a; font-size: 13px; margin-left: 8px; }
+  </style>
+</head>
+<body>
+<a href="/product/list">← 목록으로</a>
+
+<!--/* linked_func: FUNC-order-010 — 미존재 SKU: 안내 문구(스택 트레이스 노출 금지), SR-201 AC5 */-->
+<div th:if="${product == null}">
+  <h1>상품 상세</h1>
+  <p>상품을 찾을 수 없습니다</p>
+</div>
+
+<div th:if="${product != null}">
+  <!--/* linked_func: FUNC-order-010 — SR-216 AC1: 재고 0이면 상품명 옆(제목 라인)에 '품절' 배지를
+       띄운다. 아래 표의 "상태" 행(기존, SR-201)과는 별개로 제목에서 바로 보이는 표기다. 재고 > 0이면
+       배지 span 자체가 렌더되지 않아 기존과 완전히 동일하다(회귀, SR-216 AC3). */-->
+  <h1>상품 상세 — <span th:text="${product.sku}">SKU-1001</span>
+    <span th:text="${product.productName}">마우스</span>
+    <span th:if="${product.stockQty == 0}" class="badge-soldout">품절</span>
+  </h1>
+  <table>
+    <tr><th>SKU</th><td th:text="${product.sku}">SKU-1001</td></tr>
+    <tr><th>상품명</th><td th:text="${product.productName}">마우스</td></tr>
+    <tr><th>가격</th><td th:text="${#numbers.formatInteger(product.price, 3, 'COMMA')} + '원'">25,000원</td></tr>
+    <tr><th>재고</th><td th:text="${product.stockQty}">100</td></tr>
+    <!--/* SR-201 D1: DB PRODUCTS에 해당 날짜 컬럼 없음 — 이번 범위에서 제외, 다음 단계 이월 */-->
+    <tr><th>상태</th><td th:text="${product.stockQty == 0} ? '품절' : '판매중'">판매중</td></tr>
+  </table>
+
+  <!--/* linked_func: FUNC-order-010 — SR-202 담기 성공 안내(확인 문구 + 장바구니 링크).
+       r7: PRG 리다이렉트의 RedirectAttributes 플래시로 전달되어 이 GET의 모델에 자동 편입됨 */-->
+  <div th:if="${addToCartSuccess}">
+    <p>장바구니에 담았습니다.
+      <a th:href="@{'/cart?memberId=' + ${addedMemberId}}">장바구니로 이동</a>
+    </p>
+  </div>
+
+  <!--/* linked_func: FUNC-order-010 — SR-202 담기 거부 사유(CartService 계약 그대로 표시, 재검증 금지).
+       r7: PRG 리다이렉트의 RedirectAttributes 플래시로 전달됨(4xx만 — 5xx는 rethrow) */-->
+  <div th:if="${addToCartError != null}">
+    <p th:text="${addToCartError}">담기 실패</p>
+  </div>
+
+  <!--/* linked_func: FUNC-order-010 — SR-202 담기 폼: 회원 셀렉트 + 수량(기본 1·min 1) + [담기].
+       SR-216 AC2: 재고 0이어도 폼 자체는 숨기지 않는다 — 회원 셀렉트·수량 입력·담기 버튼을 모두
+       disabled로 표시하고, 버튼 옆에 비활성 사유를 적는다. 재고 > 0이면 disabled 속성·사유 문구가
+       전혀 렌더되지 않아 기존과 완전히 동일하게 동작한다(회귀, SR-216 AC3). 서버측 재고0 거부
+       (CartService.addItem 409, INF-ORD-010)는 이번 라운드에서 변경하지 않는다 — 화면 비활성은
+       UX 안내일 뿐, disabled 필드는 폼 제출 자체에서 빠지므로 서버 방어가 여전히 최종 방어선이다
+       (SR-216 AC4). */-->
+  <div>
+    <form method="post" th:action="@{'/product/' + ${product.sku} + '/cart'}">
+      <label>회원
+        <select name="memberId" th:disabled="${product.stockQty == 0}">
+          <option th:each="m : ${members}" th:value="${m.memberId}"
+                  th:text="${m.memberName} + ' (' + ${m.memberId} + ')'">김실증 (M-0001)</option>
+        </select>
+      </label>
+      <label>수량 <input type="number" name="qty" min="1" value="1" th:disabled="${product.stockQty == 0}"></label>
+      <button type="submit" th:disabled="${product.stockQty == 0}">담기</button>
+      <span th:if="${product.stockQty == 0}" class="disabled-reason">품절 상품은 담을 수 없습니다</span>
+    </form>
+  </div>
+</div>
+</body>
+</html>

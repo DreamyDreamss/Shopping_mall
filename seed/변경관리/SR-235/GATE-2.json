@@ -1,0 +1,378 @@
+{
+  "func": "FUNC-member-011",
+  "epic": null,
+  "story": "docs/00_FUNC/stories/STORY-FUNC-member-011.md",
+  "gate": "CONCERNS",
+  "reviewer": "qa-agent",
+  "updated": "2026-09-13T20:37:51",
+  "layers": {
+    "spec": "pass",
+    "security": "pass",
+    "regression": "pass",
+    "baseline": "pass",
+    "scope": "pass",
+    "rules": "concerns",
+    "conformance": "pass"
+  },
+  "top_issues": [
+    {
+      "severity": "low",
+      "layer": "regression",
+      "finding": "setDefault()의 멱등 no-op 분기가 락 이전 selectOwned 스냅샷의 is_default로 판정한다 — 이번 라운드에 delete()에서 고친 것과 같은 계열(락 밖 스냅샷 근거 판정). '기본 정확히 1건' 불변식은 깨지 않으나(C02 통과), 동시 setDefault가 겹치면 두 번째 요청이 실제로는 기본이 아니게 된 대상에 대해 no-op 200을 돌려줄 수 있다(조용한 lost update). round 1에도 있던 코드이고 사람 코멘트가 이번 수정 범위를 delete 경로로 명시 한정했으므로 라운드 규율에 따라 low + 후속 TODO로 내린다.",
+      "suggested_action": "후속 SR에서 setDefault()도 락(selectByMemberIdForUpdate) 반환 목록으로 is_default를 재확인한 뒤 멱등 분기를 판정하도록 통일."
+    },
+    {
+      "severity": "low",
+      "layer": "spec",
+      "finding": "MemberAddressService:63-66의 'PHONE_PATTERN을 MemberRegistrationService에서 재사용한다' 주석이 이번 라운드에 삭제된 로컬 상수 자리에 남아 ZIPCODE_PATTERN 선언 위에 붙어 있다. 내용 자체는 사실이나 위치가 '이 상수가 PHONE_PATTERN'이라는 오독을 부른다.",
+      "suggested_action": "주석을 실제 참조 지점(requireValidPhone)으로 옮기거나 클래스 javadoc으로 통합."
+    },
+    {
+      "severity": "low",
+      "layer": "security",
+      "finding": "IDOR 회귀 테스트(memberAddressesRoute_foreignMemberIdQueryParam_forcedToSelf_excludesForeignData)의 단언이 doesNotContain(\"\\\"addressId\\\":\" + foreignAddressId) 문자열 대조다. 자기 소유 배송지의 AUTO_INCREMENT id가 타인 id의 접두가 되는 경우(예: 자기 123 / 타인 12) 거짓 실패가 날 수 있다. 거짓 통과는 불가능하므로 보안상 fail-closed이고 방어 자체는 유효하다.",
+      "suggested_action": "심는 행의 UUID recipient 값으로 대조하거나 JSON을 파싱해 addressId 배열로 단언."
+    },
+    {
+      "severity": "low",
+      "layer": "regression",
+      "finding": "ApiKeyAuthFilter 483줄로 file-size-cap(should, 450) 초과 — 이번 라운드 무변경, 계획이 이미 별도 SR로 이월 명시(기수용).",
+      "suggested_action": "후속 SR에서 필터 파일 분리."
+    },
+    {
+      "severity": "medium",
+      "layer": "rules",
+      "finding": "규칙 위반 [lab/file-size-cap/java-file-cap] modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java:0 — 자바 파일 450줄 초과 — 책임을 나눈다(필터·핸들러·서비스가 한 파일에 자라면 QA가 스코프를 못 가른다)",
+      "suggested_action": "규칙을 지키도록 고치거나, 규칙이 틀렸으면 SpecLens /rules에서 규칙을 고치세요"
+    },
+    {
+      "severity": "low",
+      "layer": "conformance",
+      "finding": "story의 QA round 2 '후속 TODO' 1번이 지적한 setDefault()의 멱등 no-op 분기(MemberAddressService.java:199)는 락 이전 selectOwned 스냅샷의 is_default로 판정한다 — delete()와 같은 계열의 잠재 위험이나, 사람이 이번 재작업 범위를 delete()로 명시 한정했고(재작업 지시 1번 문구, 사람 코멘트) QA가 이미 후속 SR로 이월 처리함. diff 자체는 계획·사람 지시와 어긋나지 않는다(범위 밖으로 명시된 것을 확인).",
+      "suggested_action": "조치 불요(정보성) — 후속 SR에서 setDefault도 같은 방식(락 목록 기반)으로 정합화할 것을 이미 story가 기록함.",
+      "confidence": "high",
+      "file": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberAddressService.java",
+      "line": 199
+    }
+  ],
+  "rounds": [
+    {
+      "round": 1,
+      "gate": "CONCERNS",
+      "human": {
+        "decision": "rework",
+        "by": "사람",
+        "at": "2026-09-13T20:10:42",
+        "comment": "[결정 요약] medium 2건 + low 4건 전부 이번 라운드에 고친다 — 전부 같은 서비스·DAO·테스트 파일이고, 1번은 계획(승계 후보는 락으로 얻은 목록에서)과 다르게 간 것이라 계획 준수 문제다.\n[구현 방식]\n(1) delete(): selectOwned → selectByMemberIdForUpdate(락)의 반환 목록을 그대로 쓴다 — 삭제 대상의 is_default와 승계 후보(대상 제외, last_used_at DESC, created_at DESC 첫 행)를 그 목록에서 고른다. 비잠금 selectNextDefaultCandidate 호출은 delete 경로에서 제거(메서드 자체는 남겨도 됨).\n(2) DAO 실DB 테스트에 del_yn='N' 필터 케이스 추가: 소프트 삭제된 행이 selectList·selectOwned·selectByMemberIdForUpdate 셋 다에서 안 보임을 단언.\n(3) phone 원문 길이 1~20 검증 → 400 MBR-4200(정규화 전에 검사).\n(4) PHONE_PATTERN·normalizePhone은 MemberRegistrationService 것을 참조(가시성만 연다, 복제 삭제).\n(5) 회귀 테스트: ?memberId=타인 으로 GET/PUT/DELETE 호출 시 강제 축소돼 본인 데이터만 보이고 남의 addressId는 404.\n(6) STORY 수용 기준·구현 Task 체크박스 갱신.\n[보안 순서] 락 순서는 계획 그대로(쓰기 전 selectByMemberIdForUpdate 선행) — delete 경로가 락 밖 스냅샷으로 판단하던 것을 락 안 목록으로 옮기는 것이 이번 수정의 전부다. 404 동일 응답·로그 규칙 불변.\n[테스트·완료 조건] 동시성 테스트 2건 추가: delete(기본)‖setDefault(다른 행) 동시 → 최종 기본 배송지 정확히 1건 · delete(기본, 마지막 1건)‖register(새 행) 동시 → 최종 기본 1건(0건 아님). mvn test 전량 통과(476+), 기준선 449/0 유지.\n[후속 SR·이월] ApiKeyAuthFilter 파일 분리는 후속 SR(계획대로). 주문서 last_used_at 갱신·기본 배송지 미리 선택은 SR-255.",
+        "targets": []
+      },
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "delete()의 기본 배송지 승계가 락 이전 스냅샷을 근거로 판정한다 — 계획은 '락으로 얻은 목록에서 조회'라고 못 박았으나 구현은 selectByMemberIdForUpdate 반환값을 버리고(주석 '반환값은 락 확보 목적으로만 쓴다') 락 전에 읽은 owned.getIsDefault()로 승계 여부를 판정하고 후보를 비잠금 selectNextDefaultCandidate로 재조회한다. MariaDB 기본 REPEATABLE READ에서 트랜잭션 스냅샷은 첫 일반 SELECT(selectOwned) 시점에 고정되므로 락 대기 중 커밋된 타 트랜잭션 결과가 보이지 않아 '기본 1개' 불변식이 깨질 수 있다(동시 setDefault와 겹치면 기본 2건, 동시 register와 겹치면 기본 0건).",
+          "suggested_action": "selectByMemberIdForUpdate(잠금 읽기 = 최신 커밋본) 반환 목록을 받아 그 목록에서 is_default 재확인과 승계 후보 선정을 수행하고, delete||setDefault 동시성 케이스를 MemberAddressConcurrencyTest에 1건 추가한다."
+        },
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "소프트 삭제가 실제 조회에서 사라지는지 검증하는 테스트가 없다. 사람 확정 완료조건 'DAO(실 DB): del_yn 필터·정렬' 중 del_yn 필터가 미이행 — MemberAddressDaoTest는 정렬(D01)·제외(D02)·소유(D03) 3건뿐이고, 서비스·컨트롤러 테스트는 DAO/서비스 목업이라 softDelete 후 selectList/selectOwned에서 빠지는지를 어느 층도 확인하지 않는다(수용 기준 '삭제'가 실 SQL 수준 미검증).",
+          "suggested_action": "MemberAddressDaoTest에 softDelete 후 selectList 0건 + selectOwned null을 단언하는 테스트 1건 추가."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "원문 phone 길이를 검증하지 않는다 — normalizePhone이 '-'와 공백만 제거하므로 하이픈을 길게 섞은 입력은 정규화 후 패턴을 통과하지만 원문이 VARCHAR(20)을 넘겨 400 MBR-4200이 아니라 500 MBR-5000이 된다.",
+          "suggested_action": "requireValidPhone에 원문 길이 상한(20) 검증을 추가."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "PHONE_PATTERN을 MemberRegistrationService에서 문자열로 복제했다(현재 두 값은 ^01[016789][0-9]{7,8}$로 동일). normalizePhone은 사람 지시대로 재사용했으므로 실질 위반은 아니나, 한쪽만 바뀌면 형제 API(회원가입)와 검증이 조용히 어긋난다.",
+          "suggested_action": "후속 SR에서 정규식 상수도 normalizePhone과 같은 방식(가시성 개방)으로 재사용."
+        },
+        {
+          "severity": "low",
+          "layer": "security",
+          "finding": "member 키가 ?memberId=타인을 실어 보낸 경우의 SCOPE_TO_SELF 강제 축소를 고정하는 테스트가 없다. 코드는 ForcedMemberIdRequest가 getParameter/getParameterValues/getParameterMap 셋 다 오버라이드해 안전하나(IDOR 없음), 회귀를 막는 테스트가 없어 이후 누군가 오버라이드 하나를 지우면 조용히 뚫린다.",
+          "suggested_action": "ApiKeyAuthIntegrationTest에 /api/members/me/addresses?memberId=타인 → 자기 자신으로 강제 케이스 1건 추가."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "STORY의 ## 수용 기준·## 구현 Task 체크박스가 구현 완료 후에도 '- [ ]' 상태 그대로다(추적 표기 누락).",
+          "suggested_action": "구현 완료분 체크박스를 갱신."
+        }
+      ],
+      "cause": "impl_bug"
+    },
+    {
+      "round": 2,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "setDefault()의 멱등 no-op 분기가 락 이전 selectOwned 스냅샷의 is_default로 판정한다 — 이번 라운드에 delete()에서 고친 것과 같은 계열(락 밖 스냅샷 근거 판정). '기본 정확히 1건' 불변식은 깨지 않으나(C02 통과), 동시 setDefault가 겹치면 두 번째 요청이 실제로는 기본이 아니게 된 대상에 대해 no-op 200을 돌려줄 수 있다(조용한 lost update). round 1에도 있던 코드이고 사람 코멘트가 이번 수정 범위를 delete 경로로 명시 한정했으므로 라운드 규율에 따라 low + 후속 TODO로 내린다.",
+          "suggested_action": "후속 SR에서 setDefault()도 락(selectByMemberIdForUpdate) 반환 목록으로 is_default를 재확인한 뒤 멱등 분기를 판정하도록 통일."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "MemberAddressService:63-66의 'PHONE_PATTERN을 MemberRegistrationService에서 재사용한다' 주석이 이번 라운드에 삭제된 로컬 상수 자리에 남아 ZIPCODE_PATTERN 선언 위에 붙어 있다. 내용 자체는 사실이나 위치가 '이 상수가 PHONE_PATTERN'이라는 오독을 부른다.",
+          "suggested_action": "주석을 실제 참조 지점(requireValidPhone)으로 옮기거나 클래스 javadoc으로 통합."
+        },
+        {
+          "severity": "low",
+          "layer": "security",
+          "finding": "IDOR 회귀 테스트(memberAddressesRoute_foreignMemberIdQueryParam_forcedToSelf_excludesForeignData)의 단언이 doesNotContain(\"\\\"addressId\\\":\" + foreignAddressId) 문자열 대조다. 자기 소유 배송지의 AUTO_INCREMENT id가 타인 id의 접두가 되는 경우(예: 자기 123 / 타인 12) 거짓 실패가 날 수 있다. 거짓 통과는 불가능하므로 보안상 fail-closed이고 방어 자체는 유효하다.",
+          "suggested_action": "심는 행의 UUID recipient 값으로 대조하거나 JSON을 파싱해 addressId 배열로 단언."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "ApiKeyAuthFilter 483줄로 file-size-cap(should, 450) 초과 — 이번 라운드 무변경, 계획이 이미 별도 SR로 이월 명시(기수용).",
+          "suggested_action": "후속 SR에서 필터 파일 분리."
+        }
+      ],
+      "cause": "none"
+    },
+    {
+      "round": 3,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "setDefault()의 멱등 no-op 분기가 락 이전 selectOwned 스냅샷의 is_default로 판정한다 — 이번 라운드에 delete()에서 고친 것과 같은 계열(락 밖 스냅샷 근거 판정). '기본 정확히 1건' 불변식은 깨지 않으나(C02 통과), 동시 setDefault가 겹치면 두 번째 요청이 실제로는 기본이 아니게 된 대상에 대해 no-op 200을 돌려줄 수 있다(조용한 lost update). round 1에도 있던 코드이고 사람 코멘트가 이번 수정 범위를 delete 경로로 명시 한정했으므로 라운드 규율에 따라 low + 후속 TODO로 내린다.",
+          "suggested_action": "후속 SR에서 setDefault()도 락(selectByMemberIdForUpdate) 반환 목록으로 is_default를 재확인한 뒤 멱등 분기를 판정하도록 통일."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "MemberAddressService:63-66의 'PHONE_PATTERN을 MemberRegistrationService에서 재사용한다' 주석이 이번 라운드에 삭제된 로컬 상수 자리에 남아 ZIPCODE_PATTERN 선언 위에 붙어 있다. 내용 자체는 사실이나 위치가 '이 상수가 PHONE_PATTERN'이라는 오독을 부른다.",
+          "suggested_action": "주석을 실제 참조 지점(requireValidPhone)으로 옮기거나 클래스 javadoc으로 통합."
+        },
+        {
+          "severity": "low",
+          "layer": "security",
+          "finding": "IDOR 회귀 테스트(memberAddressesRoute_foreignMemberIdQueryParam_forcedToSelf_excludesForeignData)의 단언이 doesNotContain(\"\\\"addressId\\\":\" + foreignAddressId) 문자열 대조다. 자기 소유 배송지의 AUTO_INCREMENT id가 타인 id의 접두가 되는 경우(예: 자기 123 / 타인 12) 거짓 실패가 날 수 있다. 거짓 통과는 불가능하므로 보안상 fail-closed이고 방어 자체는 유효하다.",
+          "suggested_action": "심는 행의 UUID recipient 값으로 대조하거나 JSON을 파싱해 addressId 배열로 단언."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "ApiKeyAuthFilter 483줄로 file-size-cap(should, 450) 초과 — 이번 라운드 무변경, 계획이 이미 별도 SR로 이월 명시(기수용).",
+          "suggested_action": "후속 SR에서 필터 파일 분리."
+        }
+      ],
+      "layer": "baseline"
+    },
+    {
+      "round": 4,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "pass",
+        "scope": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "setDefault()의 멱등 no-op 분기가 락 이전 selectOwned 스냅샷의 is_default로 판정한다 — 이번 라운드에 delete()에서 고친 것과 같은 계열(락 밖 스냅샷 근거 판정). '기본 정확히 1건' 불변식은 깨지 않으나(C02 통과), 동시 setDefault가 겹치면 두 번째 요청이 실제로는 기본이 아니게 된 대상에 대해 no-op 200을 돌려줄 수 있다(조용한 lost update). round 1에도 있던 코드이고 사람 코멘트가 이번 수정 범위를 delete 경로로 명시 한정했으므로 라운드 규율에 따라 low + 후속 TODO로 내린다.",
+          "suggested_action": "후속 SR에서 setDefault()도 락(selectByMemberIdForUpdate) 반환 목록으로 is_default를 재확인한 뒤 멱등 분기를 판정하도록 통일."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "MemberAddressService:63-66의 'PHONE_PATTERN을 MemberRegistrationService에서 재사용한다' 주석이 이번 라운드에 삭제된 로컬 상수 자리에 남아 ZIPCODE_PATTERN 선언 위에 붙어 있다. 내용 자체는 사실이나 위치가 '이 상수가 PHONE_PATTERN'이라는 오독을 부른다.",
+          "suggested_action": "주석을 실제 참조 지점(requireValidPhone)으로 옮기거나 클래스 javadoc으로 통합."
+        },
+        {
+          "severity": "low",
+          "layer": "security",
+          "finding": "IDOR 회귀 테스트(memberAddressesRoute_foreignMemberIdQueryParam_forcedToSelf_excludesForeignData)의 단언이 doesNotContain(\"\\\"addressId\\\":\" + foreignAddressId) 문자열 대조다. 자기 소유 배송지의 AUTO_INCREMENT id가 타인 id의 접두가 되는 경우(예: 자기 123 / 타인 12) 거짓 실패가 날 수 있다. 거짓 통과는 불가능하므로 보안상 fail-closed이고 방어 자체는 유효하다.",
+          "suggested_action": "심는 행의 UUID recipient 값으로 대조하거나 JSON을 파싱해 addressId 배열로 단언."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "ApiKeyAuthFilter 483줄로 file-size-cap(should, 450) 초과 — 이번 라운드 무변경, 계획이 이미 별도 SR로 이월 명시(기수용).",
+          "suggested_action": "후속 SR에서 필터 파일 분리."
+        }
+      ],
+      "layer": "scope"
+    },
+    {
+      "round": 5,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "pass",
+        "scope": "pass",
+        "rules": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "setDefault()의 멱등 no-op 분기가 락 이전 selectOwned 스냅샷의 is_default로 판정한다 — 이번 라운드에 delete()에서 고친 것과 같은 계열(락 밖 스냅샷 근거 판정). '기본 정확히 1건' 불변식은 깨지 않으나(C02 통과), 동시 setDefault가 겹치면 두 번째 요청이 실제로는 기본이 아니게 된 대상에 대해 no-op 200을 돌려줄 수 있다(조용한 lost update). round 1에도 있던 코드이고 사람 코멘트가 이번 수정 범위를 delete 경로로 명시 한정했으므로 라운드 규율에 따라 low + 후속 TODO로 내린다.",
+          "suggested_action": "후속 SR에서 setDefault()도 락(selectByMemberIdForUpdate) 반환 목록으로 is_default를 재확인한 뒤 멱등 분기를 판정하도록 통일."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "MemberAddressService:63-66의 'PHONE_PATTERN을 MemberRegistrationService에서 재사용한다' 주석이 이번 라운드에 삭제된 로컬 상수 자리에 남아 ZIPCODE_PATTERN 선언 위에 붙어 있다. 내용 자체는 사실이나 위치가 '이 상수가 PHONE_PATTERN'이라는 오독을 부른다.",
+          "suggested_action": "주석을 실제 참조 지점(requireValidPhone)으로 옮기거나 클래스 javadoc으로 통합."
+        },
+        {
+          "severity": "low",
+          "layer": "security",
+          "finding": "IDOR 회귀 테스트(memberAddressesRoute_foreignMemberIdQueryParam_forcedToSelf_excludesForeignData)의 단언이 doesNotContain(\"\\\"addressId\\\":\" + foreignAddressId) 문자열 대조다. 자기 소유 배송지의 AUTO_INCREMENT id가 타인 id의 접두가 되는 경우(예: 자기 123 / 타인 12) 거짓 실패가 날 수 있다. 거짓 통과는 불가능하므로 보안상 fail-closed이고 방어 자체는 유효하다.",
+          "suggested_action": "심는 행의 UUID recipient 값으로 대조하거나 JSON을 파싱해 addressId 배열로 단언."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "ApiKeyAuthFilter 483줄로 file-size-cap(should, 450) 초과 — 이번 라운드 무변경, 계획이 이미 별도 SR로 이월 명시(기수용).",
+          "suggested_action": "후속 SR에서 필터 파일 분리."
+        },
+        {
+          "severity": "medium",
+          "layer": "rules",
+          "finding": "규칙 위반 [lab/file-size-cap/java-file-cap] modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java:0 — 자바 파일 450줄 초과 — 책임을 나눈다(필터·핸들러·서비스가 한 파일에 자라면 QA가 스코프를 못 가른다)",
+          "suggested_action": "규칙을 지키도록 고치거나, 규칙이 틀렸으면 SpecLens /rules에서 규칙을 고치세요"
+        }
+      ],
+      "layer": "rules"
+    },
+    {
+      "round": 6,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "pass",
+        "scope": "pass",
+        "rules": "concerns",
+        "conformance": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "setDefault()의 멱등 no-op 분기가 락 이전 selectOwned 스냅샷의 is_default로 판정한다 — 이번 라운드에 delete()에서 고친 것과 같은 계열(락 밖 스냅샷 근거 판정). '기본 정확히 1건' 불변식은 깨지 않으나(C02 통과), 동시 setDefault가 겹치면 두 번째 요청이 실제로는 기본이 아니게 된 대상에 대해 no-op 200을 돌려줄 수 있다(조용한 lost update). round 1에도 있던 코드이고 사람 코멘트가 이번 수정 범위를 delete 경로로 명시 한정했으므로 라운드 규율에 따라 low + 후속 TODO로 내린다.",
+          "suggested_action": "후속 SR에서 setDefault()도 락(selectByMemberIdForUpdate) 반환 목록으로 is_default를 재확인한 뒤 멱등 분기를 판정하도록 통일."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "MemberAddressService:63-66의 'PHONE_PATTERN을 MemberRegistrationService에서 재사용한다' 주석이 이번 라운드에 삭제된 로컬 상수 자리에 남아 ZIPCODE_PATTERN 선언 위에 붙어 있다. 내용 자체는 사실이나 위치가 '이 상수가 PHONE_PATTERN'이라는 오독을 부른다.",
+          "suggested_action": "주석을 실제 참조 지점(requireValidPhone)으로 옮기거나 클래스 javadoc으로 통합."
+        },
+        {
+          "severity": "low",
+          "layer": "security",
+          "finding": "IDOR 회귀 테스트(memberAddressesRoute_foreignMemberIdQueryParam_forcedToSelf_excludesForeignData)의 단언이 doesNotContain(\"\\\"addressId\\\":\" + foreignAddressId) 문자열 대조다. 자기 소유 배송지의 AUTO_INCREMENT id가 타인 id의 접두가 되는 경우(예: 자기 123 / 타인 12) 거짓 실패가 날 수 있다. 거짓 통과는 불가능하므로 보안상 fail-closed이고 방어 자체는 유효하다.",
+          "suggested_action": "심는 행의 UUID recipient 값으로 대조하거나 JSON을 파싱해 addressId 배열로 단언."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "ApiKeyAuthFilter 483줄로 file-size-cap(should, 450) 초과 — 이번 라운드 무변경, 계획이 이미 별도 SR로 이월 명시(기수용).",
+          "suggested_action": "후속 SR에서 필터 파일 분리."
+        },
+        {
+          "severity": "medium",
+          "layer": "rules",
+          "finding": "규칙 위반 [lab/file-size-cap/java-file-cap] modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java:0 — 자바 파일 450줄 초과 — 책임을 나눈다(필터·핸들러·서비스가 한 파일에 자라면 QA가 스코프를 못 가른다)",
+          "suggested_action": "규칙을 지키도록 고치거나, 규칙이 틀렸으면 SpecLens /rules에서 규칙을 고치세요"
+        },
+        {
+          "severity": "low",
+          "layer": "conformance",
+          "finding": "story의 QA round 2 '후속 TODO' 1번이 지적한 setDefault()의 멱등 no-op 분기(MemberAddressService.java:199)는 락 이전 selectOwned 스냅샷의 is_default로 판정한다 — delete()와 같은 계열의 잠재 위험이나, 사람이 이번 재작업 범위를 delete()로 명시 한정했고(재작업 지시 1번 문구, 사람 코멘트) QA가 이미 후속 SR로 이월 처리함. diff 자체는 계획·사람 지시와 어긋나지 않는다(범위 밖으로 명시된 것을 확인).",
+          "suggested_action": "조치 불요(정보성) — 후속 SR에서 setDefault도 같은 방식(락 목록 기반)으로 정합화할 것을 이미 story가 기록함.",
+          "confidence": "high",
+          "file": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberAddressService.java",
+          "line": 199
+        }
+      ],
+      "layer": "conformance"
+    }
+  ],
+  "waiver": {
+    "active": false
+  },
+  "story_transitions": [
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "SR 승인(SR-235)",
+      "at": "2026-09-13T19:17:15"
+    },
+    {
+      "from": "Approved",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-13T19:43:15"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "사람",
+      "at": "2026-09-13T20:02:47"
+    },
+    {
+      "from": "Review",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-13T20:10:42"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "사람",
+      "at": "2026-09-13T20:23:32"
+    },
+    {
+      "from": "Review",
+      "to": "Done",
+      "by": "사람",
+      "at": "2026-09-13T20:44:19"
+    }
+  ],
+  "cause": "none",
+  "escalate": false,
+  "fail_rounds": 0,
+  "max_rounds": 3,
+  "item": "SR-235.2",
+  "legacy_func": "FUNC-member-011"
+}

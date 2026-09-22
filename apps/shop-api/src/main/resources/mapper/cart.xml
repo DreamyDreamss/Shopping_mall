@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sm.lab.shop.dao.CartDao">
+  <!-- linked_func: FUNC-order-011, FUNC-order-012
+       spec: docs/00_FUNC/stories/STORY-FUNC-order-011.md, docs/00_FUNC/stories/STORY-FUNC-order-012.md -->
+
+  <!-- linked_func: FUNC-order-011 — 품목 단건(상품명·현재 단가 조인) -->
+  <select id="selectItem" resultType="com.sm.lab.shop.domain.CartItem">
+    SELECT c.member_id, c.sku, p.product_name, p.price, c.qty, c.added_at
+      FROM CART_ITEMS c
+      JOIN PRODUCTS p ON c.sku = p.sku
+     WHERE c.member_id = #{memberId}
+       AND c.sku = #{sku}
+  </select>
+
+  <!-- 담은 순(added_at, sku)으로 조회 -->
+  <select id="selectItems" resultType="com.sm.lab.shop.domain.CartItem">
+    SELECT c.member_id, c.sku, p.product_name, p.price, c.qty, c.added_at
+      FROM CART_ITEMS c
+      JOIN PRODUCTS p ON c.sku = p.sku
+     WHERE c.member_id = #{memberId}
+     ORDER BY c.added_at, c.sku
+  </select>
+
+  <insert id="insertItem">
+    INSERT INTO CART_ITEMS (member_id, sku, qty, added_at)
+    VALUES (#{memberId}, #{sku}, #{qty}, NOW())
+  </insert>
+
+  <!-- linked_func: FUNC-order-011 — 담기 합산 원자 UPSERT(round2, QA FAIL round1 필수1).
+       PK(member_id,sku) 충돌을 DB가 원자적으로 흡수 — 애플리케이션 select→분기 read-modify-write를
+       대체해 동시 담기에서도 lost update·PK 중복 500이 발생하지 않는다. -->
+  <insert id="upsertMergeQty">
+    INSERT INTO CART_ITEMS (member_id, sku, qty, added_at)
+    VALUES (#{memberId}, #{sku}, #{qty}, NOW())
+    ON DUPLICATE KEY UPDATE qty = qty + VALUES(qty)
+  </insert>
+
+  <!-- linked_func: FUNC-order-011 — 재담기 합산(D2)·수량변경(D4) 공용 -->
+  <update id="updateQty">
+    UPDATE CART_ITEMS
+       SET qty = #{qty}
+     WHERE member_id = #{memberId}
+       AND sku = #{sku}
+  </update>
+
+  <delete id="deleteItem">
+    DELETE FROM CART_ITEMS
+     WHERE member_id = #{memberId}
+       AND sku = #{sku}
+  </delete>
+
+  <!-- linked_func: FUNC-order-012 — 체크아웃 성공 시 장바구니 전체 비움(SR-203 D6) -->
+  <delete id="deleteAllItems">
+    DELETE FROM CART_ITEMS
+     WHERE member_id = #{memberId}
+  </delete>
+
+  <!-- linked_func: FUNC-order-012 — 체크아웃 동시성 차단(SELECT...FOR UPDATE, QA FAIL round1
+       필수1 재작업). InnoDB 락킹 리드는 트랜잭션 스냅샷이 아니라 최신 커밋 데이터를 읽고 잠그므로,
+       선행 트랜잭션이 이 행들을 삭제·커밋하면 잠금 대기 중이던 후속 트랜잭션은 잠금 해제 후
+       빈 결과를 본다(CartService#checkout 참조). 상품 조인 없이 CART_ITEMS만 잠근다 —
+       재고·판매상태 판정은 별도 productDao 조회(사전 스윕)로 수행한다. -->
+  <select id="selectItemsForUpdate" resultType="com.sm.lab.shop.domain.CartItem">
+    SELECT c.member_id, c.sku, c.qty, c.added_at
+      FROM CART_ITEMS c
+     WHERE c.member_id = #{memberId}
+     ORDER BY c.added_at, c.sku
+       FOR UPDATE
+  </select>
+
+</mapper>

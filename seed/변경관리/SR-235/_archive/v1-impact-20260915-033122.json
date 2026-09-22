@@ -1,0 +1,43 @@
+{
+  "title": "SR-235",
+  "stories": [
+    "FUNC-member-010",
+    "FUNC-member-011",
+    "FUNC-member-012"
+  ],
+  "clarification": "none",
+  "new_funcs": [
+    {
+      "func_id": "FUNC-member-010",
+      "kind": "uis",
+      "spec_id": "UIS-MBR-004",
+      "name": "배송지 관리 화면",
+      "module": "shop-web",
+      "module_path": "{{SRC_SHOP_WEB}}"
+    },
+    {
+      "func_id": "FUNC-member-011",
+      "kind": "inf",
+      "spec_id": "INF-MBR-008",
+      "name": "배송지 CRUD API",
+      "module": "shop-api",
+      "module_path": "{{SRC_SHOP_API}}"
+    },
+    {
+      "func_id": "FUNC-member-012",
+      "kind": "inf",
+      "spec_id": "INF-MBR-009",
+      "name": "우편번호(도로명) 검색 API",
+      "module": "shop-api",
+      "module_path": "{{SRC_SHOP_API}}"
+    }
+  ],
+  "affected": {
+    "inf": [],
+    "sch": [],
+    "uis": [],
+    "bat": []
+  },
+  "story_files": [],
+  "generated_at": "2026-09-13T19:16:59"
+}

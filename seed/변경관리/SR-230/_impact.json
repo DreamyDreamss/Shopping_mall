@@ -1,0 +1,18 @@
+{
+  "title": "SR-230",
+  "stories": [
+    "FUNC-order-009"
+  ],
+  "clarification": "none",
+  "new_funcs": [],
+  "affected": {
+    "inf": [],
+    "sch": [],
+    "uis": [
+      "UIS-ORD-003"
+    ],
+    "bat": []
+  },
+  "story_files": [],
+  "generated_at": "2026-09-11T13:21:19"
+}

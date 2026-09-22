@@ -1,0 +1,85 @@
+server:
+  port: 8087
+  error:
+    # linked_func: FUNC-order-002 — 오류 계약(ORD-4001 등 코드)을 응답 body.message로 노출 (LAB-102)
+    include-message: always
+
+spring:
+  application:
+    name: sl-shop-api
+  datasource:
+    # linked_func: FUNC-member-002 — round5(SR-231 round4 QA FAIL 재작업 지시(1)) —
+    # useAffectedRows=true를 제거했다. round4는 이 전역 커넥션 속성으로 JDBC affected-rows
+    # 반환값의 의미(신규 삽입=1/실제 값 변경=2/무변경=0)를 고정해 레이트리밋 판정에 썼는데,
+    # datasource URL은 이 애플리케이션의 모든 UPDATE에 적용되는 전역 설정이라 이 FUNC 밖
+    # ProductDao.decreaseStock(FUNC-order-002)의 반환값 시맨틱까지 바꿔 qty=0 주문 라인의
+    # POST /api/orders 응답이 200→409로 회귀했다(QA 실측). 레이트리밋 판정은 이제 요청
+    # 토큰(last_token 재조회) 방식으로 바뀌어 이 속성이 더 이상 필요 없다 —
+    # MemberSignupRateLimitDao 참고. 한 FUNC의 필요로 datasource 전역 계약을 바꾸지 않는다.
+    url: jdbc:mariadb://127.0.0.1:3307/sl_lab?useUnicode=true&characterEncoding=utf8
+    username: root
+    password: ""
+    driver-class-name: org.mariadb.jdbc.Driver
+  sql:
+    init:
+      # linked_func: FUNC-member-002 — SR-231 round2(QA FAIL 필수2 재작업). 이 프로젝트에는
+      # 마이그레이션 엔진(Flyway/Liquibase)이 없어(pom.xml 확인) Spring Boot 내장 스키마 초기화
+      # 메커니즘으로 기동 시 DDL을 적용한다. datasource가 임베디드가 아니라서 mode를 명시적으로
+      # always로 켜야 실행된다(기본값은 embedded 전용). 대상 스크립트는 CREATE TABLE IF NOT
+      # EXISTS + ALTER TABLE ... ADD COLUMN IF NOT EXISTS로 작성해 매 기동마다 안전하게
+      # 재실행된다(idempotent) — round4: member_signup_rate_limits.sql(레이트리밋 전용 테이블,
+      # STORY 재작업 지시(A)) 추가.
+      # linked_func: FUNC-member-003 — V3__members_signup.sql(MEMBERS에 email/password_hash/
+      # marketing_opt_in 컬럼 + email/phone UNIQUE 인덱스 추가, STORY-FUNC-member-003.md
+      # "승인된 설계 확정") 추가. 기존 두 파일은 건드리지 않았다(뒤에 이어붙이기만 함).
+      # linked_func: FUNC-member-005 — V4__members_login.sql(MEMBER_LOGIN_ATTEMPTS/
+      # MEMBER_REFRESH_TOKENS/MEMBER_API_KEYS 3테이블 신설, SR-232) 추가. 기존 파일은
+      # 건드리지 않았다(뒤에 이어붙이기만 함).
+      # linked_func: FUNC-member-008 — V5__member_password_resets.sql(MEMBER_PASSWORD_RESETS
+      # 테이블 신설, SR-234) 추가. 기존 4개 항목 순서는 건드리지 않고 목록 맨 끝에 이어붙였다.
+      # linked_func: FUNC-member-009 — V6__member_password_reset_confirmation.sql(MEMBERS.updated_at
+      # 컬럼 추가, SR-234 확정 API) 추가. 기존 5개 항목 순서는 건드리지 않고 목록 맨 끝에 이어붙였다.
+      # linked_func: FUNC-member-011 — V7__member_addresses.sql(MEMBER_ADDRESSES 신설, SR-235
+      # 배송지 CRUD API) 추가. 기존 6개 항목 순서는 건드리지 않고 목록 맨 끝에 이어붙였다.
+      # linked_func: FUNC-member-012 — V8__zipcodes.sql(ZIPCODES 신설 + 시드 100건, SR-235
+      # 우편번호 검색 API) 추가. 기존 7개 항목 순서는 건드리지 않고 목록 맨 끝에 이어붙였다.
+      # linked_func: FUNC-member-012 — round2 재작업(QA FAIL): encoding: UTF-8을 명시한다.
+      # 종전엔 이 키가 없어 기동 스크립트를 JVM 기본 charset(Java 17 + Windows(ko_KR) → MS949)
+      # 으로 읽었고, V8이 이 프로젝트 최초로 한글 *데이터*를 기동 스크립트에 넣은 파일이라(V3~V7의
+      # 한글은 주석뿐) mojibake INSERT로 드러났다(실측: road_address가 '�꽌�슱�듅蹂꾩떆 …').
+      # 이 키는 schema-locations 전체(V3~V8 전부)에 적용되는 초기화 스크립트 인코딩 설정이다 —
+      # V3~V7은 ASCII/영문 데이터뿐이라 UTF-8로 읽어도 내용이 바뀌지 않는다(영향 없음, 확인 완료).
+      # SR-297 #1(BAT-MBR-001) — V9__member_password_reset_rate_limits.sql(MEMBER_PASSWORD_RESET_RATE_LIMITS
+      # 신설) 추가. 기존 8개 항목 순서는 건드리지 않고 목록 맨 끝에 이어붙였다.
+      # SR-306(#2) — V10__product_list_price_image.sql(PRODUCTS.list_price/image_url 컬럼 추가 +
+      # 시드 UPDATE 4문) 추가. 기존 9개 항목 순서는 건드리지 않고 목록 맨 끝에 이어붙였다.
+      encoding: UTF-8
+      mode: always
+      schema-locations: classpath:db/member_signup_verifications.sql,classpath:db/member_signup_rate_limits.sql,classpath:db/V3__members_signup.sql,classpath:db/V4__members_login.sql,classpath:db/V5__member_password_resets.sql,classpath:db/V6__member_password_reset_confirmation.sql,classpath:db/V7__member_addresses.sql,classpath:db/V8__zipcodes.sql,classpath:db/V9__member_password_reset_rate_limits.sql,classpath:db/V10__product_list_price_image.sql
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+
+# linked_func: FUNC-order-013 — SR-204 R-1/R-2/R-3: /api/** 인증 키 매핑 + export 행 상한.
+# 코드에 키를 하드코딩하지 않는다(D13) — ApiKeyAuthFilter가 이 맵을 읽는다.
+# "*" = admin(전 회원 통과), 그 외 값은 그 memberId 자신의 자원만 허용(IDOR 대조).
+lab:
+  api-keys:
+    lab-admin-key: "*"
+    lab-member-0001-key: M-0001
+  export-max-rows: 1000
+  batch:
+    # SR-297 #1(BAT-MBR-001) — 만료된 비밀번호 재설정 코드 행 + 지난 날짜 카운터 행 정리 배치
+    # 주기(확정 문답 bat_idempotent "주기는 설정값" 반영). 새벽 3시, 요청 트래픽과 무관한 시각.
+    password-reset-cleanup:
+      cron: "0 0 3 * * *"
+
+# SR-297 #1 round1 재작업(사람 결정) — 만료된 비밀번호 재설정 코드 행을 즉시 삭제하지 않고
+# 이 보존 기간(ISO-8601 Duration, 기본 7일)이 지난 뒤에만 정리 배치가 지운다. 보존 기간 안에는
+# 만료된 코드로 확정을 시도해도 여전히 410/MBR-4101을 받는다(MemberPasswordResetMaintenanceScheduler
+# 참고) — 즉시 삭제 시 "행 없음=409/MBR-4102(오답)"로 수렴해 확정 API 오류 계약이 바뀌는 회귀를 막는다.
+member:
+  password-reset:
+    purge-retention: P7D

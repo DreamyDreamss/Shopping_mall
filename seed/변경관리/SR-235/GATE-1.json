@@ -1,0 +1,488 @@
+{
+  "func": "FUNC-member-010",
+  "epic": "SR-235",
+  "story": "docs/00_FUNC/stories/STORY-FUNC-member-010.md",
+  "gate": "CONCERNS",
+  "reviewer": "qa-agent",
+  "updated": "2026-09-19T15:22:31",
+  "layers": {
+    "spec": "pass",
+    "security": "pass",
+    "regression": "pass",
+    "baseline": "pass",
+    "scope": "fail",
+    "rules": "concerns",
+    "stories": "pass",
+    "conformance": "pass"
+  },
+  "top_issues": [
+    {
+      "severity": "low",
+      "layer": "regression",
+      "finding": "useZipcodeSearch.close()가 loading을 초기화하지 않고 진행 중 요청을 무효화하지 않아, 검색 중 모달을 닫으면 뒤늦은 응답이 setResults/setError를 실행해 재오픈 시 이전 검색 결과·오류가 보일 수 있다(권고6 잔여 레이스, 표시만 영향)",
+      "suggested_action": "후속 TODO — 요청 id 가드(페이지 requestIdRef와 동일 원리) 추가"
+    },
+    {
+      "severity": "low",
+      "layer": "regression",
+      "finding": "동일한 우편번호 검색 상태 로직이 OrderPage.tsx:93-100에 인라인으로 남아 중복(SR-305 회귀 위험 때문에 이번 스코프에서 제외한 것은 적절)",
+      "suggested_action": "후속 TODO — 다음에 주문서를 수정할 때 useZipcodeSearch로 통합"
+    },
+    {
+      "severity": "low",
+      "layer": "spec",
+      "finding": "file-size-cap(should) — MyAddressesPage.test.tsx 469줄 > 300. 테스트 파일이고 기존 관례 범위(CartPage.test.tsx 456줄)라 프로덕션 상한 취지 밖",
+      "suggested_action": "하네스 차원에서 테스트 파일에 이 규칙을 적용할지 결정(코드 변경 불필요)"
+    },
+    {
+      "severity": "high",
+      "layer": "scope",
+      "finding": "스코프 밖 변경: project.env.bak (M)",
+      "suggested_action": "이 변경이 이 작업 항목에 필요한지 확인하고, 아니면 되돌리세요"
+    },
+    {
+      "severity": "low",
+      "layer": "scope",
+      "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/dao/ZipcodeDaoTest.java — 완료 항목 SR-235.3의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+      "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+    },
+    {
+      "severity": "medium",
+      "layer": "rules",
+      "finding": "규칙 위반 [lab/file-size-cap/tsx-file-cap] modules/shop-web/src/pages/MyAddressesPage.test.tsx:0 — 화면 부품 300줄 초과 — 상태별 부품으로 나누고 각각 스토리를 둔다",
+      "suggested_action": "규칙을 지키도록 고치거나, 규칙이 틀렸으면 SpecLens /rules에서 규칙을 고치세요"
+    },
+    {
+      "severity": "low",
+      "layer": "stories",
+      "finding": "고친 화면 부품에 스토리가 없습니다: src/App.tsx",
+      "suggested_action": "그 부품의 상태를 스토리로 남기세요 — 없으면 다음 사람이 그 상태를 볼 방법이 없습니다. 차단하려면 하네스 규칙 `story-per-component`(pair 검사)를 채택하세요(/rules 제안 탭) — 축 C가 must로 막습니다"
+    },
+    {
+      "severity": "low",
+      "layer": "conformance",
+      "finding": "pages/useZipcodeSearch.ts의 close()가 query/results/error는 초기화하지만 loading은 초기화하지 않고, 진행 중이던 검색 요청도 취소하지 않는다 — 모달을 닫은 직후 이전 요청 응답이 늦게 도착하면 다음에 모달을 다시 열었을 때 잠깐 결과/오류가 보일 수 있는 레이스가 남아있다(코드 직접 확인: close()에 loading 리셋·요청 id 가드 없음). story의 QA 기록도 이를 '후속 TODO(low)'로 이미 인지하고 있다 — 이번 라운드 차단 사유 아님.",
+      "suggested_action": "요청 id 가드(페이지의 requestIdRef와 동일 원리) 1줄 추가로 해소 가능. 이번 게이트를 막을 사유는 아님.",
+      "confidence": "high",
+      "file": "modules/shop-web/src/pages/useZipcodeSearch.ts",
+      "line": 22
+    }
+  ],
+  "rounds": [
+    {
+      "round": 1,
+      "gate": "FAIL",
+      "human": {
+        "decision": "rework",
+        "by": "사람",
+        "at": "2026-09-19T15:01:19",
+        "comment": "필수 수정 3건: (1) MyAddressesPage.tsx:233 오류 표시를 공용 toDisplayMessage(e)로 교체 + 500 mock 테스트로 원문 비노출 고정(보안 차단 사유 — searchZipcodes의 OrderHttpError 원문 메시지가 include-message:always로 유출됨) (2) 자체 정의한 toAddressErrorMessage(:31-33) 삭제, 기존 ALLOWED_MESSAGE_STATUSES(400/404/409)·looksLikeInternalDetail 재사용(새 필터 중복 정의 금지) (3) 등록 후 목록 삽입을 [...rows, saved]에서 [saved, ...rows]로(서버 정렬 last_used_at DESC, 신규 등록분이 맨 앞이 정본) + 첫 행 위치 단언 테스트 추가. 같은 라운드에 권고도 함께 처리: MBR-4202(검색어 2자 미만) 경로 테스트 추가, 404 테스트를 미존재/타인소유 두 요청으로 각각 발사해 구분, 삭제 연타 방지 테스트 추가, 모달 닫을 때 상태 초기화, file-size-cap(should, 302줄) 가능하면 부품 분리로 해소(안되면 사유만 기록). shop-api 워킹트리의 V8__zipcodes.sql·zipcode.xml·ZipcodeDaoTest.java 변경은 형제 항목 SR-235.3(Done)의 산출물이니 건드리지 말고 커밋 스코프에서 제외만 한다. 검색 0건 문구는 AC를 실제 모달 문구('검색 결과가 없습니다')로 정정했으니 모달은 고치지 않는다.",
+        "targets": []
+      },
+      "layers": {
+        "spec": "concerns",
+        "security": "fail",
+        "regression": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "high",
+          "layer": "security",
+          "finding": "MyAddressesPage.tsx:233 우편번호 검색 실패 처리가 공용 필터 toDisplayMessage를 우회하고 e.message를 그대로 렌더 — searchZipcodes는 상태코드 불문 OrderHttpError(서버 {message})를 던지고 application.yml:5가 include-message: always이므로 /api/zipcodes 5xx의 원문 예외 메시지가 모달에 노출된다. 같은 API의 기존 소비처 OrderPage.tsx:98은 toDisplayMessage를 쓰고, 이 필터는 SR-305 round2 QA FAIL 필수3의 산출물(httpErrorMessage.ts 주석: 표시 직전에 반드시 거친다, 중복 정의 금지)이다",
+          "suggested_action": "setZipcodeError(toDisplayMessage(e))로 교체하고, 500 응답 mock에서 모달에 일반 문구만 나오는 것을 테스트로 고정"
+        },
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "MyAddressesPage.tsx:31-33 toAddressErrorMessage가 ApiError 여부만 보고 상태코드를 안 봐서, 계약표(400/404/409) 밖 상태(5xx·Spring 기본 오류 봉투)에서도 서버 문구를 그대로 인라인 노출한다",
+          "suggested_action": "httpErrorMessage.ts의 ALLOWED_MESSAGE_STATUSES + looksLikeInternalDetail을 재사용해 허용목록 통과분만 원문 표시(새 필터 중복 정의 금지). 400 MBR-4200 / 404 MBR-4041 / 409 MBR-4201 원문 유지는 기존 테스트 3건으로 확인"
+        },
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "MyAddressesPage.tsx:161 등록 성공 시 [...rows, saved]로 목록 맨 뒤에 붙인다 — 서버 selectList는 ORDER BY last_used_at DESC, created_at DESC이고 신규 등록분은 last_used_at=created_at=now라 맨 앞이 정본. 등록 직후와 새로고침 후 순서가 달라 AC '목록: 최근 사용 순 정렬'과 어긋난다",
+          "suggested_action": "[saved, ...rows]로 prepend(또는 등록 후 재조회) + 등록 테스트에 첫 행 위치 단언 추가"
+        },
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "검색 0건 문구가 AC·확정 요건 문답의 '검색 결과가 없습니다 — 도로명·건물명으로 다시 검색'이 아니라 재사용 부품의 '검색 결과가 없습니다'다. 구현은 사람이 '파일 수정 없음'으로 승인한 재사용 계획대로이므로 사람 결정이 필요(공유 ZipcodeSearchModal 문구 보강 = SR-305 주문서 동반 변경 vs AC 문구 정정)",
+          "suggested_action": "사람이 (a) 공유 부품 문구 보강 또는 (b) AC 문구 정정 중 택일"
+        },
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "AC의 MBR-4202(검색어 2자 미만) 경로에 테스트가 없다 — 이 경로만 ApiError가 아닌 OrderHttpError 계열을 타므로, 위 필터 수정 과정에서 400 서버 문구가 조용히 일반 문구로 바뀔 수 있는 자리다",
+          "suggested_action": "400 MBR-4202 mock으로 모달 인라인 문구가 서버 문구 그대로인지 고정하는 테스트 1건 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "MyAddressesPage.test.tsx:327 '404 — 미존재/남의 배송지 두 시나리오 모두' 테스트가 이름과 달리 삭제 404 한 경로만 발사한다(수정 PUT 404 미검증). 삭제 연타 방지 테스트도 없다(기본설정만)",
+          "suggested_action": "수정 404 시나리오 추가 또는 테스트 이름을 실제 범위로 축소 + 다이얼로그 [삭제] 2연타 act() 묶음 테스트 1건"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "file-size-cap(should) 위반 — MyAddressesPage.tsx 302줄 > 300(프로덕션 페이지 중 첫 초과, 다음은 OrderPage 229줄). 계획이 '300줄 근접 시 분리'를 미리 정해 뒀다. 부수적으로 모달 닫힘 후 zipcodeQuery/Results/Error가 잔존해 재등록 시 이전 검색 결과·오류가 먼저 보인다(OrderPage도 동일 관례)",
+          "suggested_action": "우편번호 모달 상태 4개를 useZipcodeSearch 훅으로 추출 — 줄 수와 상태 잔존을 한 번에 정리"
+        }
+      ],
+      "cause": "impl_bug"
+    },
+    {
+      "round": 2,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "useZipcodeSearch.close()가 loading을 초기화하지 않고 진행 중 요청을 무효화하지 않아, 검색 중 모달을 닫으면 뒤늦은 응답이 setResults/setError를 실행해 재오픈 시 이전 검색 결과·오류가 보일 수 있다(권고6 잔여 레이스, 표시만 영향)",
+          "suggested_action": "후속 TODO — 요청 id 가드(페이지 requestIdRef와 동일 원리) 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "동일한 우편번호 검색 상태 로직이 OrderPage.tsx:93-100에 인라인으로 남아 중복(SR-305 회귀 위험 때문에 이번 스코프에서 제외한 것은 적절)",
+          "suggested_action": "후속 TODO — 다음에 주문서를 수정할 때 useZipcodeSearch로 통합"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "file-size-cap(should) — MyAddressesPage.test.tsx 469줄 > 300. 테스트 파일이고 기존 관례 범위(CartPage.test.tsx 456줄)라 프로덕션 상한 취지 밖",
+          "suggested_action": "하네스 차원에서 테스트 파일에 이 규칙을 적용할지 결정(코드 변경 불필요)"
+        }
+      ],
+      "cause": "none"
+    },
+    {
+      "round": 3,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "useZipcodeSearch.close()가 loading을 초기화하지 않고 진행 중 요청을 무효화하지 않아, 검색 중 모달을 닫으면 뒤늦은 응답이 setResults/setError를 실행해 재오픈 시 이전 검색 결과·오류가 보일 수 있다(권고6 잔여 레이스, 표시만 영향)",
+          "suggested_action": "후속 TODO — 요청 id 가드(페이지 requestIdRef와 동일 원리) 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "동일한 우편번호 검색 상태 로직이 OrderPage.tsx:93-100에 인라인으로 남아 중복(SR-305 회귀 위험 때문에 이번 스코프에서 제외한 것은 적절)",
+          "suggested_action": "후속 TODO — 다음에 주문서를 수정할 때 useZipcodeSearch로 통합"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "file-size-cap(should) — MyAddressesPage.test.tsx 469줄 > 300. 테스트 파일이고 기존 관례 범위(CartPage.test.tsx 456줄)라 프로덕션 상한 취지 밖",
+          "suggested_action": "하네스 차원에서 테스트 파일에 이 규칙을 적용할지 결정(코드 변경 불필요)"
+        }
+      ],
+      "layer": "baseline"
+    },
+    {
+      "round": 4,
+      "gate": "FAIL",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "pass",
+        "scope": "fail"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "useZipcodeSearch.close()가 loading을 초기화하지 않고 진행 중 요청을 무효화하지 않아, 검색 중 모달을 닫으면 뒤늦은 응답이 setResults/setError를 실행해 재오픈 시 이전 검색 결과·오류가 보일 수 있다(권고6 잔여 레이스, 표시만 영향)",
+          "suggested_action": "후속 TODO — 요청 id 가드(페이지 requestIdRef와 동일 원리) 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "동일한 우편번호 검색 상태 로직이 OrderPage.tsx:93-100에 인라인으로 남아 중복(SR-305 회귀 위험 때문에 이번 스코프에서 제외한 것은 적절)",
+          "suggested_action": "후속 TODO — 다음에 주문서를 수정할 때 useZipcodeSearch로 통합"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "file-size-cap(should) — MyAddressesPage.test.tsx 469줄 > 300. 테스트 파일이고 기존 관례 범위(CartPage.test.tsx 456줄)라 프로덕션 상한 취지 밖",
+          "suggested_action": "하네스 차원에서 테스트 파일에 이 규칙을 적용할지 결정(코드 변경 불필요)"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: project.env.bak (M)",
+          "suggested_action": "이 변경이 이 작업 항목에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/dao/ZipcodeDaoTest.java — 완료 항목 SR-235.3의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        }
+      ],
+      "layer": "scope"
+    },
+    {
+      "round": 5,
+      "gate": "FAIL",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "pass",
+        "scope": "fail",
+        "rules": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "useZipcodeSearch.close()가 loading을 초기화하지 않고 진행 중 요청을 무효화하지 않아, 검색 중 모달을 닫으면 뒤늦은 응답이 setResults/setError를 실행해 재오픈 시 이전 검색 결과·오류가 보일 수 있다(권고6 잔여 레이스, 표시만 영향)",
+          "suggested_action": "후속 TODO — 요청 id 가드(페이지 requestIdRef와 동일 원리) 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "동일한 우편번호 검색 상태 로직이 OrderPage.tsx:93-100에 인라인으로 남아 중복(SR-305 회귀 위험 때문에 이번 스코프에서 제외한 것은 적절)",
+          "suggested_action": "후속 TODO — 다음에 주문서를 수정할 때 useZipcodeSearch로 통합"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "file-size-cap(should) — MyAddressesPage.test.tsx 469줄 > 300. 테스트 파일이고 기존 관례 범위(CartPage.test.tsx 456줄)라 프로덕션 상한 취지 밖",
+          "suggested_action": "하네스 차원에서 테스트 파일에 이 규칙을 적용할지 결정(코드 변경 불필요)"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: project.env.bak (M)",
+          "suggested_action": "이 변경이 이 작업 항목에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/dao/ZipcodeDaoTest.java — 완료 항목 SR-235.3의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "medium",
+          "layer": "rules",
+          "finding": "규칙 위반 [lab/file-size-cap/tsx-file-cap] modules/shop-web/src/pages/MyAddressesPage.test.tsx:0 — 화면 부품 300줄 초과 — 상태별 부품으로 나누고 각각 스토리를 둔다",
+          "suggested_action": "규칙을 지키도록 고치거나, 규칙이 틀렸으면 SpecLens /rules에서 규칙을 고치세요"
+        }
+      ],
+      "layer": "rules"
+    },
+    {
+      "round": 6,
+      "gate": "FAIL",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "pass",
+        "scope": "fail",
+        "rules": "concerns",
+        "stories": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "useZipcodeSearch.close()가 loading을 초기화하지 않고 진행 중 요청을 무효화하지 않아, 검색 중 모달을 닫으면 뒤늦은 응답이 setResults/setError를 실행해 재오픈 시 이전 검색 결과·오류가 보일 수 있다(권고6 잔여 레이스, 표시만 영향)",
+          "suggested_action": "후속 TODO — 요청 id 가드(페이지 requestIdRef와 동일 원리) 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "동일한 우편번호 검색 상태 로직이 OrderPage.tsx:93-100에 인라인으로 남아 중복(SR-305 회귀 위험 때문에 이번 스코프에서 제외한 것은 적절)",
+          "suggested_action": "후속 TODO — 다음에 주문서를 수정할 때 useZipcodeSearch로 통합"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "file-size-cap(should) — MyAddressesPage.test.tsx 469줄 > 300. 테스트 파일이고 기존 관례 범위(CartPage.test.tsx 456줄)라 프로덕션 상한 취지 밖",
+          "suggested_action": "하네스 차원에서 테스트 파일에 이 규칙을 적용할지 결정(코드 변경 불필요)"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: project.env.bak (M)",
+          "suggested_action": "이 변경이 이 작업 항목에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/dao/ZipcodeDaoTest.java — 완료 항목 SR-235.3의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "medium",
+          "layer": "rules",
+          "finding": "규칙 위반 [lab/file-size-cap/tsx-file-cap] modules/shop-web/src/pages/MyAddressesPage.test.tsx:0 — 화면 부품 300줄 초과 — 상태별 부품으로 나누고 각각 스토리를 둔다",
+          "suggested_action": "규칙을 지키도록 고치거나, 규칙이 틀렸으면 SpecLens /rules에서 규칙을 고치세요"
+        },
+        {
+          "severity": "low",
+          "layer": "stories",
+          "finding": "고친 화면 부품에 스토리가 없습니다: src/App.tsx",
+          "suggested_action": "그 부품의 상태를 스토리로 남기세요 — 없으면 다음 사람이 그 상태를 볼 방법이 없습니다. 차단하려면 하네스 규칙 `story-per-component`(pair 검사)를 채택하세요(/rules 제안 탭) — 축 C가 must로 막습니다"
+        }
+      ],
+      "layer": "stories"
+    },
+    {
+      "round": 7,
+      "gate": "FAIL",
+      "human": {
+        "decision": "waiver",
+        "by": "사람",
+        "at": "2026-09-19T15:23:41",
+        "comment": "project.env.bak은 사람이 잡 밖에서 한 워크스페이스 경로 교정(옛 .lab-ws → {{WS}})이며 SR-235.1 diff와 무관 — 원복하지 않고 사람이 운영 커밋으로 별도 처리",
+        "targets": []
+      },
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "pass",
+        "scope": "fail",
+        "rules": "concerns",
+        "stories": "pass",
+        "conformance": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "useZipcodeSearch.close()가 loading을 초기화하지 않고 진행 중 요청을 무효화하지 않아, 검색 중 모달을 닫으면 뒤늦은 응답이 setResults/setError를 실행해 재오픈 시 이전 검색 결과·오류가 보일 수 있다(권고6 잔여 레이스, 표시만 영향)",
+          "suggested_action": "후속 TODO — 요청 id 가드(페이지 requestIdRef와 동일 원리) 추가"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "동일한 우편번호 검색 상태 로직이 OrderPage.tsx:93-100에 인라인으로 남아 중복(SR-305 회귀 위험 때문에 이번 스코프에서 제외한 것은 적절)",
+          "suggested_action": "후속 TODO — 다음에 주문서를 수정할 때 useZipcodeSearch로 통합"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "file-size-cap(should) — MyAddressesPage.test.tsx 469줄 > 300. 테스트 파일이고 기존 관례 범위(CartPage.test.tsx 456줄)라 프로덕션 상한 취지 밖",
+          "suggested_action": "하네스 차원에서 테스트 파일에 이 규칙을 적용할지 결정(코드 변경 불필요)"
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: project.env.bak (M)",
+          "suggested_action": "이 변경이 이 작업 항목에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/dao/ZipcodeDaoTest.java — 완료 항목 SR-235.3의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "medium",
+          "layer": "rules",
+          "finding": "규칙 위반 [lab/file-size-cap/tsx-file-cap] modules/shop-web/src/pages/MyAddressesPage.test.tsx:0 — 화면 부품 300줄 초과 — 상태별 부품으로 나누고 각각 스토리를 둔다",
+          "suggested_action": "규칙을 지키도록 고치거나, 규칙이 틀렸으면 SpecLens /rules에서 규칙을 고치세요"
+        },
+        {
+          "severity": "low",
+          "layer": "stories",
+          "finding": "고친 화면 부품에 스토리가 없습니다: src/App.tsx",
+          "suggested_action": "그 부품의 상태를 스토리로 남기세요 — 없으면 다음 사람이 그 상태를 볼 방법이 없습니다. 차단하려면 하네스 규칙 `story-per-component`(pair 검사)를 채택하세요(/rules 제안 탭) — 축 C가 must로 막습니다"
+        },
+        {
+          "severity": "low",
+          "layer": "conformance",
+          "finding": "pages/useZipcodeSearch.ts의 close()가 query/results/error는 초기화하지만 loading은 초기화하지 않고, 진행 중이던 검색 요청도 취소하지 않는다 — 모달을 닫은 직후 이전 요청 응답이 늦게 도착하면 다음에 모달을 다시 열었을 때 잠깐 결과/오류가 보일 수 있는 레이스가 남아있다(코드 직접 확인: close()에 loading 리셋·요청 id 가드 없음). story의 QA 기록도 이를 '후속 TODO(low)'로 이미 인지하고 있다 — 이번 라운드 차단 사유 아님.",
+          "suggested_action": "요청 id 가드(페이지의 requestIdRef와 동일 원리) 1줄 추가로 해소 가능. 이번 게이트를 막을 사유는 아님.",
+          "confidence": "high",
+          "file": "modules/shop-web/src/pages/useZipcodeSearch.ts",
+          "line": 22
+        }
+      ],
+      "layer": "conformance"
+    }
+  ],
+  "waiver": {
+    "active": true,
+    "by": "사람",
+    "reason": "project.env.bak은 사람이 잡 밖에서 한 워크스페이스 경로 교정(옛 .lab-ws → {{WS}})이며 SR-235.1 diff와 무관 — 원복하지 않고 사람이 운영 커밋으로 별도 처리",
+    "at": "2026-09-19T15:23:41",
+    "layer": "scope"
+  },
+  "story_transitions": [
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "SR 승인(SR-235)",
+      "at": "2026-09-13T19:17:14"
+    },
+    {
+      "from": "Approved",
+      "to": "InProgress",
+      "by": "sl-aidd",
+      "at": "2026-09-19T14:37:47"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "qa-agent",
+      "at": "2026-09-19T14:50:36"
+    },
+    {
+      "from": "Review",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-19T15:01:19"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "qa-agent",
+      "at": "2026-09-19T15:06:45"
+    },
+    {
+      "from": "Review",
+      "to": "Done",
+      "by": "사람",
+      "at": "2026-09-19T15:28:13"
+    }
+  ],
+  "item": "SR-235.1",
+  "legacy_func": "FUNC-member-010",
+  "cause": "none",
+  "escalate": false,
+  "fail_rounds": 1,
+  "max_rounds": 3,
+  "waivers": [
+    {
+      "active": true,
+      "by": "사람",
+      "reason": "project.env.bak은 사람이 잡 밖에서 한 워크스페이스 경로 교정(옛 .lab-ws → {{WS}})이며 SR-235.1 diff와 무관 — 원복하지 않고 사람이 운영 커밋으로 별도 처리",
+      "at": "2026-09-19T15:23:41",
+      "layer": "scope"
+    }
+  ]
+}

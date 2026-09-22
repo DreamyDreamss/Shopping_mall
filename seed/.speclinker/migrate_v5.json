@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "srs": {
+    "SR-235": {
+      "at": "20260915-033122",
+      "archived_impact": "docs/변경관리/SR-235/_archive/v1-impact-20260915-033122.json",
+      "copied": [
+        "docs/변경관리/SR-235/STORY-1.md",
+        "docs/변경관리/SR-235/GATE-1.json",
+        "docs/변경관리/SR-235/STORY-2.md",
+        "docs/변경관리/SR-235/GATE-2.json",
+        "docs/변경관리/SR-235/STORY-3.md",
+        "docs/변경관리/SR-235/GATE-3.json"
+      ],
+      "ledger_funcs_before": [
+        {
+          "func_id": "FUNC-member-010",
+          "story_baseline_fp": "sha1:4a413f2e267941b02d979f9cb36d03e45a579296"
+        },
+        {
+          "func_id": "FUNC-member-011",
+          "story_baseline_fp": "sha1:4a413f2e267941b02d979f9cb36d03e45a579296"
+        },
+        {
+          "func_id": "FUNC-member-012",
+          "story_baseline_fp": "sha1:4a413f2e267941b02d979f9cb36d03e45a579296"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,59 @@
+version: 1
+generated_at: "2026-08-18T00:00:00+09:00"
+confirmed_by: "lab-user"
+confirmed_at: "2026-08-18T00:00:00+09:00"
+
+backend:
+  language: java
+  language_evidence:
+    - "pom.xml: spring-boot-starter-parent 3.3.5, java.version=17"
+    - "src/main/java/**/*.java 13파일"
+  framework: spring-boot
+  framework_evidence:
+    - "@SpringBootApplication (ShopApiApplication.java)"
+    - "@RestController/@GetMapping (controller/*.java)"
+  architecture:
+    pattern: n-tier
+    evidence:
+      - "controller / service / dao 3계층 (com.sm.lab.shop.{controller,service,dao})"
+    business_logic_locations:
+      - "src/main/java/com/sm/lab/shop/service"
+    follow_paths_glob: []
+    skip_paths_glob: []
+  persistence:
+    technologies: [mybatis]
+    evidence:
+      - "mybatis-spring-boot-starter 3.0.3 (pom.xml)"
+      - "src/main/resources/mapper/*.xml (order/product/member)"
+  inbound:
+    api: [rest]
+    evidence:
+      - "@RestController /api/** 9라우트"
+
+frontend:
+  present: true
+  framework: thymeleaf
+  evidence:
+    - "spring-boot-starter-thymeleaf (pom.xml)"
+    - "resources/templates/order/{list,detail}.html — 서버 렌더 운영 화면 2개"
+
+batch:
+  present: false
+
+concerns:
+  auth: unknown
+  observability: unknown
+  cache: unknown
+  messaging: unknown
+
+project_layout:
+  type: single-module
+  evidence:
+    - "SOURCE_COUNT=1 (modules/shop-api)"
+
+overrides: {}
+
+_meta:
+  generated_by: "profile-agent 역할 수행 (실증 사이클 — 세션 직접 저작)"
+  index_snapshot: "_tmp/source_index.json"
+  auto_update: false

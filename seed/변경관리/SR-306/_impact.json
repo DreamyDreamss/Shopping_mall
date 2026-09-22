@@ -1,0 +1,71 @@
+{
+  "schema": 2,
+  "sr": "SR-306",
+  "title": "SR-306",
+  "clarification": "none",
+  "affected": {
+    "inf": [
+      "INF-ORD-008",
+      "INF-ORD-009"
+    ],
+    "sch": [
+      "SCH-ORD-005"
+    ],
+    "uis": [
+      "UIS-ORD-008"
+    ],
+    "bat": []
+  },
+  "new_specs": [],
+  "items": [
+    {
+      "n": 1,
+      "title": "상품 카드에 정가·할인율·이미지 표시",
+      "specs": {
+        "uis": [
+          "UIS-ORD-008"
+        ],
+        "inf": [],
+        "sch": [],
+        "bat": []
+      },
+      "new_specs": [],
+      "module": null,
+      "origin": "manual"
+    },
+    {
+      "n": 2,
+      "title": "정가·이미지 컬럼과 조회 응답 필드 추가(시드 포함)",
+      "specs": {
+        "uis": [],
+        "inf": [
+          "INF-ORD-008",
+          "INF-ORD-009"
+        ],
+        "sch": [
+          "SCH-ORD-005"
+        ],
+        "bat": []
+      },
+      "new_specs": [],
+      "module": null,
+      "origin": "manual"
+    }
+  ],
+  "item_seq": 3,
+  "stories": [
+    "SR-306.1",
+    "SR-306.2"
+  ],
+  "story_files": [
+    "src/features/shop/CategoryShortcuts.stories.tsx",
+    "src/features/shop/Gnb.stories.tsx",
+    "src/features/shop/HeroBannerCarousel.stories.tsx",
+    "src/features/shop/ProductCard.stories.tsx",
+    "src/features/shop/ProductGrid.stories.tsx",
+    "src/features/shop/RankingSection.stories.tsx",
+    "src/features/shop/RecentlyViewed.stories.tsx",
+    "src/features/shop/ShopFooter.stories.tsx"
+  ],
+  "generated_at": "2026-09-17T06:42:54"
+}

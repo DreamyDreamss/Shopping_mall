@@ -1,0 +1,28 @@
+{
+  "recorded_at": "2026-09-17T01:06:44",
+  "git_head": "19b1cef",
+  "suites": {
+    "shop-api": {
+      "type": "maven",
+      "status": "failed",
+      "exit_code": 1,
+      "executed": 552,
+      "passed": 549,
+      "failed": 3,
+      "errors": 0,
+      "skipped": 0,
+      "counts_source": "surefire"
+    },
+    "shop-web": {
+      "type": "node_npm",
+      "status": "passed",
+      "exit_code": 0,
+      "executed": 32,
+      "passed": 32,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "counts_source": "jest"
+    }
+  }
+}

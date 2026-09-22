@@ -1,0 +1,1333 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><title>전수테스트_납품본</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm 20mm; }
+  * { box-sizing: border-box; }
+  body { margin: 0; color: #10141c; background: #fff;
+         font-family: "Pretendard", "Malgun Gothic", "Segoe UI", system-ui, sans-serif;
+         font-size: 10.5pt; line-height: 1.65; }
+  .cover { height: 247mm; display: flex; flex-direction: column; page-break-after: always; }
+  .rule { height: 5px; width: 62px; background: #3b5bdb; border-radius: 2px; }
+  .org { margin-top: 40mm; font-size: 9.5pt; letter-spacing: .15em; color: #5c6773; }
+  .title { margin-top: 6mm; font-size: 30pt; font-weight: 800; line-height: 1.25;
+            letter-spacing: -.02em; }
+  .sub { margin-top: 4mm; font-size: 12pt; color: #4a5462; }
+  .chips { margin-top: 8mm; display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip { border: 1px solid #e3e6ea; border-radius: 4px; padding: 3px 8px;
+           font-size: 8.5pt; color: #4a5462; }
+  .facts { margin-top: auto; font-size: 9.5pt; color: #4a5462; }
+  .facts div { display: flex; } .facts span { width: 22mm; color: #5c6773; }
+  .foot { margin-top: 6mm; border-top: 1px solid #e3e6ea; padding-top: 3mm;
+           display: flex; align-items: center; font-size: 8.5pt; color: #5c6773; }
+  .conf { color: #c92a2a; font-weight: 700; letter-spacing: .12em; }
+  h1.part { page-break-before: always; font-size: 19pt; font-weight: 800;
+             border-bottom: 2px solid #3b5bdb; padding-bottom: 3mm; margin: 0 0 7mm; }
+  .toc { page-break-after: always; }
+  .toc h1 { font-size: 19pt; font-weight: 800; border-bottom: 2px solid #3b5bdb;
+             padding-bottom: 3mm; margin: 0 0 7mm; }
+  .toc ol { list-style: none; padding-left: 0; margin: 0; }
+  .toc ol ol { padding-left: 6mm; }
+  .toc-g { font-weight: 700; margin-top: 5mm; }
+  .toc-n { font-weight: 400; color: #5c6773; font-size: 9pt; }
+  .toc li li { font-weight: 400; font-size: 9.5pt; }
+  .toc a { color: #10141c; text-decoration: none; }
+  .doc { page-break-before: always; }
+  .doc h2 { font-size: 14pt; margin: 0 0 4mm; }
+  .doc-name { font-weight: 500; color: #4a5462; }
+  .note { border-left: 3px solid #d29922; background: #fdf6e3; padding: 3mm 4mm;
+           font-size: 9pt; color: #55452a; margin: 0 0 4mm; }
+  h3 { font-size: 11.5pt; margin: 6mm 0 2mm; }
+  h4 { font-size: 10.5pt; margin: 5mm 0 2mm; }
+  table { border-collapse: collapse; width: 100%; margin: 3mm 0; font-size: 9pt; }
+  th, td { border: 1px solid #dfe3e8; padding: 2mm 2.5mm; text-align: left;
+            vertical-align: top; word-break: break-word; }
+  th { background: #f4f6f8; font-weight: 700; }
+  .rev td, .rev th { font-size: 9.5pt; }
+  pre { background: #f6f8fa; border: 1px solid #e3e6ea; border-radius: 4px;
+         padding: 3mm; overflow-wrap: anywhere; white-space: pre-wrap; font-size: 8.5pt; }
+  code { font-family: Consolas, "JetBrains Mono", monospace; }
+  img { max-width: 100%; }
+</style></head><body>
+<div class="cover">
+  <div class="rule"></div>
+  <div class="org"></div>
+  <div class="title">전수테스트_납품본</div>
+  <div class="sub"></div>
+  <div class="chips"><span class="chip">API 설계서 17</span></div>
+  <div class="facts">
+    <div><span>버전</span>v1.0</div>
+    <div><span>작성일</span>2026-09-21</div>
+    <div><span>작성자</span></div>
+  </div>
+  <div class="foot"></div>
+</div>
+<div class="toc"><h1>목차</h1><ol><li class="toc-g">API 설계서 <span class="toc-n">17건</span><ol><li><a href="#doc-1">INF-ORD-001 회원 목록 조회</a></li><li><a href="#doc-2">INF-ORD-002 회원 상세 조회</a></li><li><a href="#doc-3">INF-ORD-003 주문 목록 조회</a></li><li><a href="#doc-4">INF-ORD-004 주문 상세 조회</a></li><li><a href="#doc-5">INF-ORD-005 주문 생성</a></li><li><a href="#doc-6">INF-ORD-006 주문 취소</a></li><li><a href="#doc-7">INF-ORD-007 주문 배송 목록 조회</a></li><li><a href="#doc-8">INF-ORD-008 판매중 상품 목록 조회</a></li><li><a href="#doc-9">INF-ORD-009 상품 단건 조회</a></li><li><a href="#doc-10">INF-ORD-010 장바구니 담기</a></li><li><a href="#doc-11">INF-ORD-011 장바구니 조회</a></li><li><a href="#doc-12">INF-ORD-012 장바구니 수량 변경</a></li><li><a href="#doc-13">INF-ORD-013 장바구니 품목 삭제</a></li><li><a href="#doc-14">INF-ORD-014 장바구니 체크아웃</a></li><li><a href="#doc-15">INF-ORD-015 주문 목록 CSV 내보내기</a></li><li><a href="#doc-16">INF-ORD-016 api zipcodes</a></li><li><a href="#doc-17">INF-ORD-017 shop spa static serving</a></li></ol></li></ol></div>
+
+<h1 class="part" id="part-INF">API 설계서</h1><section class="doc" id="doc-1"><h2>INF-ORD-001 <span class="doc-name">회원 목록 조회</span></h2><h1>INF-ORD-001: GET /api/members/ — 회원 목록 조회</h1>
+
+<p>&gt; **개요:** 탈퇴하지 않은 회원 전체를 회원ID 순으로 조회한다.</p>
+
+<p>&gt; **근거 소스:** `src/main/java/com/sm/lab/shop/controller/MemberController.java:21-25`</p>
+
+<h2>요청</h2>
+
+<li>Method: GET</li>
+<li>Path: /api/members/</li>
+<li>Content-Type: application/json</li>
+
+<table>
+<tr><td>파라미터</td><td>위치</td><td>타입</td><td>필수</td><td>설명</td></tr>
+<tr><td>(없음)</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
+</table>
+
+<h2>응답 (200 OK)</h2>
+
+<pre><code>
+[
+  {
+    "memberId": "string",
+    "memberName": "string",
+    "grade": "BRONZE | SILVER | GOLD | VIP",
+    "phone": "string",
+    "createdAt": "2026-01-01T00:00:00",
+    "recentOrders": []
+  }
+]
+</code></pre>
+
+<h2>비즈니스 규칙</h2>
+
+<li>`del_yn = 'N'` 상시필터 → 탈퇴 회원은 목록에서 제외</li>
+<li>`recentOrders`는 이 API에서 채워지지 않고 항상 빈 배열([[INF-ORD-002]]에서만 채워짐)</li>
+
+<h2>오류 응답</h2>
+
+<table>
+<tr><td>코드</td><td>사유</td><td>발생 조건</td></tr>
+<tr><td>400</td><td>유효성 실패</td><td>필수 필드 누락</td></tr>
+<tr><td>401</td><td>인증 실패</td><td>토큰 없음/만료</td></tr>
+</table>
+
+<h2>참조 테이블</h2>
+
+<table>
+<tr><td>테이블</td><td>SCH</td></tr>
+<tr><td>MEMBERS</td><td>[[SCH-ORD-001]]</td></tr>
+</table>
+
+<h2>curl 예시</h2>
+
+<pre><code>
+curl -X GET /api/members/ \
+  -H "Content-Type: application/json"
+</code></pre></section><section class="doc" id="doc-2"><h2>INF-ORD-002 <span class="doc-name">회원 상세 조회</span></h2><h1>INF-ORD-002: GET /api/members/{memberId} — 회원 상세 조회</h1>
+
+<p>&gt; **개요:** 회원 상세 정보와 함께 최근 주문 5건 요약을 반환한다. (linked_func: FUNC-order-004, LAB-103)</p>
+
+<p>&gt; **근거 소스:** `modules/shop-api/src/main/java/com/sm/lab/shop/controller/MemberController.java:27-31`</p>
+
+<p>&gt; [반영: FUNC-order-004] SR-207로 신규 화면 `GET /member/{memberId}`(`MemberViewController`)가 이 API의</p>
+<p>&gt; 응답(`MemberService.get` 재사용, HTTP 재호출 없음)을 소비하도록 추가됐다 — 요청/응답/규칙/오류 계약은</p>
+<p>&gt; 변경 없음(AS-IS 유지, qa-agent round2 실측 확인). `screens` 필드는 아직 갱신하지 않았다 — 이 화면의</p>
+<p>&gt; UIS 신규 채번이 아직 안 됐고(STORY-FUNC-order-004 `## 후속 추적(TODO)` #2·#3), 존재하지 않는</p>
+<p>&gt; UIS-ID를 여기 채우면 참조가 끊긴다. UIS 채번 시 `screens: ["UIS-ORD-00X"]`로 갱신할 것.</p>
+
+<h2>요청</h2>
+
+<li>Method: GET</li>
+<li>Path: /api/members/{memberId}</li>
+<li>Content-Type: application/json</li>
+
+<table>
+<tr><td>파라미터</td><td>위치</td><td>타입</td><td>필수</td><td>설명</td></tr>
+<tr><td>memberId</td><td>PathVariable</td><td>string</td><td>Y</td><td>회원 ID</td></tr>
+</table>
+
+<h2>응답 (200 OK)</h2>
+
+<pre><code>
+{
+  "memberId": "string",
+  "memberName": "string",
+  "grade": "BRONZE | SILVER | GOLD | VIP",
+  "phone": "string",
+  "createdAt": "2026-01-01T00:00:00",
+  "recentOrders": [
+    {
+      "orderNo": "string",
+      "orderState": "PLACED | PAID | SHIPPED | PARTIAL_SHIPPED | CANCELED | DONE",
+      "totalAmount": 0,
+      "orderedAt": "2026-01-01T00:00:00"
+    }
+  ]
+}
+</code></pre>
+
+<h2>비즈니스 규칙</h2>
+
+<li>`del_yn = 'N'` 상시필터 → 탈퇴 회원 조회 시 404</li>
+<li>`recentOrders`는 최근 주문 **상위 5건 고정**(`RECENT_ORDER_LIMIT`), `ordered_at DESC, order_no DESC` 순</li>
+<li>주문이 없으면 `recentOrders`는 빈 배열(`null` 금지, Member 도메인 필드 기본값)</li>
+
+<h2>오류 응답</h2>
+
+<table>
+<tr><td>코드</td><td>사유</td><td>발생 조건</td></tr>
+<tr><td>404</td><td>회원 없음</td><td>memberId로 조회된 회원이 없거나 탈퇴 회원</td></tr>
+</table>
+
+<h2>참조 테이블</h2>
+
+<li>`MEMBERS`</li>
+<li>`ORDERS`</li>
+
+<h2>curl 예시</h2>
+
+<pre><code>
+curl -X GET /api/members/M0001 \
+  -H "Content-Type: application/json"
+</code></pre></section><section class="doc" id="doc-3"><h2>INF-ORD-003 <span class="doc-name">주문 목록 조회</span></h2><h1>INF-ORD-003: GET /api/orders — 주문 목록 조회</h1>
+
+<p>&gt; **개요:** 회원·주문상태·조회기간으로 필터링한 주문 목록을 페이징 조회한다. (linked_func: FUNC-order-001, LAB-101)</p>
+<p>&gt; [반영: FUNC-order-001] SR-205 — 조회 기간(startDate/endDate) 필터 추가.</p>
+
+<p>&gt; **근거 소스:** `src/main/java/com/sm/lab/shop/controller/OrderController.java:28-44`</p>
+
+<h2>요청</h2>
+
+<li>Method: GET</li>
+<li>Path: /api/orders</li>
+<li>Content-Type: application/json</li>
+
+<table>
+<tr><td>파라미터</td><td>위치</td><td>타입</td><td>필수</td><td>설명</td></tr>
+<tr><td>memberId</td><td>Query</td><td>string</td><td>N</td><td>회원 ID 필터</td></tr>
+<tr><td>orderState</td><td>Query</td><td>string</td><td>N</td><td>주문상태 필터</td></tr>
+<tr><td>startDate</td><td>Query</td><td>date(ISO-8601)</td><td>N</td><td>조회 시작일. 미제시 시 종료일 기준 30일 전(오늘-30일)으로 독립 보정. [반영: FUNC-order-001]</td></tr>
+<tr><td>endDate</td><td>Query</td><td>date(ISO-8601)</td><td>N</td><td>조회 종료일. 미제시 시 오늘로 독립 보정. `startDate`/`endDate`는 각각 독립적으로 기본값이 적용된다(하나만 제시해도 나머지만 보정). [반영: FUNC-order-001]</td></tr>
+<tr><td>page</td><td>Query</td><td>int</td><td>N</td><td>페이지 번호(기본 1)</td></tr>
+<tr><td>size</td><td>Query</td><td>int</td><td>N</td><td>페이지 크기(기본 20)</td></tr>
+</table>
+
+<p>&gt; **[반영: SR-300]** "오늘"은 `OrderService`에 주입되는 `Clock`으로 계산한다(운영 기본값 = 시스템 시계 — 결과는 AS-IS와 동일). 계약·기본값 의미는 변경 없음, 테스트에서만 고정 시계로 재현 가능해졌다.</p>
+
+<h2>응답 (200 OK)</h2>
+
+<pre><code>
+{
+  "totalCount": 0,
+  "page": 1,
+  "items": [
+    {
+      "orderNo": "string",
+      "memberId": "string",
+      "memberName": "string",
+      "orderState": "PLACED | PAID | SHIPPED | PARTIAL_SHIPPED | CANCELED | DONE",
+      "totalAmount": 0,
+      "orderedAt": "2026-01-01T00:00:00",
+      "items": null,
+      "deliveries": null
+    }
+  ]
+}
+</code></pre>
+
+<h2>비즈니스 규칙</h2>
+
+<li>`del_yn = 'N'` 상시필터 → 논리삭제된 주문 제외</li>
+<li>`memberId` 파라미터가 있으면 해당 회원 주문만, `orderState` 파라미터가 있으면 해당 상태만 필터(LAB-101 추가 요구사항)</li>
+<li>`offset = max(0, page - 1) * size`</li>
+<li>`ORDERS`와 `MEMBERS`를 조인해 `memberName`을 함께 반환(회원 미탈퇴 여부와 무관하게 조인만 수행)</li>
+<li>목록 응답의 각 항목은 `items`/`deliveries`를 채우지 않음(상세는 [[INF-ORD-004]])</li>
+<li>**[반영: FUNC-order-001]** 기간 필터는 `orderState`/`memberId`와 **AND**로 결합되며, `ordered_at`(DATETIME) 기준</li>
+<p>  양끝 날짜를 포함한다(`ordered_at &gt;= startDate AND ordered_at &lt; endDate + 1일`). 응답 스키마(`totalCount`/`page`/`items[]`)는</p>
+<p>  변경하지 않는다 — 요청 측 파라미터만 추가.</p>
+<li>**[반영: FUNC-order-001]** `startDate`/`endDate`는 각각 독립적으로 기본값이 적용된 뒤 유효 구간(`effectiveStart`~`effectiveEnd`)이</li>
+<p>  역전되면(예: `endDate`만 제시해 보정된 `effectiveStart`가 그보다 늦어지는 경우) 조회를 수행하지 않고 400으로 거부한다.</p>
+
+<h2>오류 응답</h2>
+
+<table>
+<tr><td>코드</td><td>사유</td><td>발생 조건</td></tr>
+<tr><td>400</td><td>유효성 실패</td><td>파라미터 타입 오류(날짜 형식 포함) 또는 유효 조회기간 역전(`effectiveStart` &gt; `effectiveEnd`) [반영: FUNC-order-001]</td></tr>
+<tr><td>401</td><td>인증 실패</td><td>토큰 없음/만료</td></tr>
+</table>
+
+<h2>인증·인가 (SR-204 — 전역 정책)</h2>
+<p>&gt; 이 오류 계약은 `/api/**` 전역에 적용되는 횡단 정책이다(구현: `ApiKeyAuthFilter`). 화면</p>
+<p>&gt; 라우트(/product/**·/cart·/order/**)는 무인증 유지. 개별 엔드포인트 INF는 이 정책을 상속한다.</p>
+
+<table>
+<tr><td>조건</td><td>상태</td><td>본문</td></tr>
+<tr><td>`X-Api-Key` 미제시/무효</td><td>401</td><td>`{"error":"unauthorized"}`</td></tr>
+<tr><td>member 스코프 키로 타 회원 자원 접근(소유권 불일치)</td><td>403</td><td>`{"error":"forbidden"}`</td></tr>
+<tr><td>회원 목록·주문 export 등 관리 자원에 member 키</td><td>403</td><td>admin 키 전용</td></tr>
+</table>
+
+<li>키 매핑은 앱 설정 `lab.api-keys`(admin→`*`, member→회원ID). 경로 판정은 서블릿 정규화 경로</li>
+<p>  기준(퍼센트 인코딩·matrix 파라미터 우회 차단, default-deny). 소유권은 자원의 실제 member_id를</p>
+<p>  DB 대조(orders/{orderNo}) — 토큰 문자열 대조가 아니다(SR-204 D15).</p>
+
+<h2>참조 테이블</h2>
+
+<table>
+<tr><td>테이블</td><td>SCH</td></tr>
+<tr><td>ORDERS</td><td>[[SCH-ORD-004]]</td></tr>
+<tr><td>MEMBERS</td><td>[[SCH-ORD-001]]</td></tr>
+</table>
+
+<h2>curl 예시</h2>
+
+<pre><code>
+curl -X GET "/api/orders?memberId=M0001&amp;orderState=PLACED&amp;page=1&amp;size=20" \
+  -H "Content-Type: application/json"
+</code></pre>
+
+<h2>변경 이력</h2>
+<p>&lt;!-- spec-history: machine-managed --&gt;</p>
+<table>
+<tr><td>일자</td><td>SR</td><td>항목</td><td>변경 요약</td><td>커밋</td></tr>
+<tr><td>2026-09-19</td><td>SR-300</td><td>#1</td><td>'오늘' 계산을 주입 가능한 Clock으로 변경(운영 기본값=시스템 시계, 계약·응답 불변) — anchors 줄번호 OrderService.java:76-90으로 갱신</td><td>shop-api@416b260</td></tr>
+</table></section><section class="doc" id="doc-4"><h2>INF-ORD-004 <span class="doc-name">주문 상세 조회</span></h2><h1>INF-ORD-004: GET /api/orders/{orderNo} — 주문 상세 조회</h1>
+
+<p>&gt; **개요:** 주문 1건을 라인(아이템)·배송 정보를 포함해 조회한다.</p>
+
+<p>&gt; **근거 소스:** `src/main/java/com/sm/lab/shop/controller/OrderController.java:46-50`</p>
+
+<h2>요청</h2>
+
+<li>Method: GET</li>
+<li>Path: /api/orders/{orderNo}</li>
+<li>Content-Type: application/json</li>
+
+<table>
+<tr><td>파라미터</td><td>위치</td><td>타입</td><td>필수</td><td>설명</td></tr>
+<tr><td>orderNo</td><td>PathVariable</td><td>string</td><td>Y</td><td>주문번호</td></tr>
+</table>
+
+<h2>응답 (200 OK)</h2>
+
+<pre><code>
+{
+  "orderNo": "string",
+  "memberId": "string",
+  "memberName": "string",
+  "orderState": "PLACED | PAID | SHIPPED | PARTIAL_SHIPPED | CANCELED | DONE",
+  "totalAmount": 0,
+  "orderedAt": "2026-01-01T00:00:00",
+  "items": [
+    {
+      "orderNo": "string",
+      "lineNo": 1,
+      "sku": "string",
+      "productName": "string",
+      "qty": 0,
+      "unitPrice": 0
+    }
+  ],
+  "deliveries": [
+    {
+      "deliveryNo": "string",
+      "orderNo": "string",
+      "deliveryState": "READY | SHIPPED | DELIVERED | CANCELED",
+      "invoiceNo": "string",
+      "shippedAt": "2026-01-01T00:00:00"
+    }
+  ]
+}
+</code></pre>
+
+<h2>비즈니스 규칙</h2>
+
+<li>`del_yn = 'N'` 상시필터 → 논리삭제된 주문 조회 시 404</li>
+<li>`items`는 `ORDER_ITEMS`와 `PRODUCTS`를 조인해 `productName`을 함께 반환</li>
+<li>`deliveries`는 배송이 없으면 빈 배열</li>
+
+<h2>오류 응답</h2>
+
+<table>
+<tr><td>코드</td><td>사유</td><td>발생 조건</td></tr>
+<tr><td>404</td><td>주문 없음</td><td>orderNo로 조회된 주문이 없거나 삭제됨</td></tr>
+<tr><td>401</td><td>인증 실패</td><td>토큰 없음/만료</td></tr>
+<tr><td>403</td><td>인가 실패</td><td>member 스코프 키가 타 회원 주문에 접근</td></tr>
+</table>
+
+<h2>인증·인가 (SR-204 — 전역 정책)</h2>
+<p>&gt; 이 오류 계약은 `/api/**` 전역에 적용되는 횡단 정책이다(구현: `ApiKeyAuthFilter`). 화면</p>
+<p>&gt; 라우트(/product/**·/cart·/order/**)는 무인증 유지. 개별 엔드포인트 INF는 이 정책을 상속한다.</p>
+
+<table>
+<tr><td>조건</td><td>상태</td><td>본문</td></tr>
+<tr><td>`X-Api-Key` 미제시/무효</td><td>401</td><td>`{"error":"unauthorized"}`</td></tr>
+<tr><td>member 스코프 키로 타 회원 주문 접근(소유권 불일치)</td><td>403</td><td>`{"error":"forbidden"}`</td></tr>
+</table>
+
+<li>소유권 판정은 `orderNo`로 `OrderDao.selectByOrderNo`를 조회한 실제 `member_id`와 요청 키의</li>
+<p>  스코프를 대조한다(토큰 문자열 대조가 아님, SR-204 D15). admin 스코프(`*`) 키는 이 필터를</p>
+<p>  통과해 컨트롤러의 404 분기까지 도달하지만, member 스코프 키는 주문이 없어도(조회 결과 null)</p>
+<p>  소유권을 확인할 수 없으므로 컨트롤러 도달 전에 403으로 거부된다(즉 member 키로는 존재하지</p>
+<p>  않는 orderNo도 404가 아니라 403으로 응답됨).</p>
+
+<h2>참조 테이블</h2>
+
+<table>
+<tr><td>테이블</td><td>SCH</td></tr>
+<tr><td>ORDERS</td><td>[[SCH-ORD-004]]</td></tr>
+<tr><td>MEMBERS</td><td>[[SCH-ORD-001]]</td></tr>
+<tr><td>ORDER_ITEMS</td><td>[[SCH-ORD-003]]</td></tr>
+<tr><td>PRODUCTS</td><td>[[SCH-ORD-005]]</td></tr>
+<tr><td>ORDER_DELIVERY</td><td>[[SCH-ORD-002]]</td></tr>
+</table>
+
+<h2>curl 예시</h2>
+
+<pre><code>
+curl -X GET /api/orders/20260101-0101 \
+  -H "Content-Type: application/json"
+</code></pre></section><section class="doc" id="doc-5"><h2>INF-ORD-005 <span class="doc-name">주문 생성</span></h2><h1>INF-ORD-005: POST /api/orders — 주문 생성</h1>
+
+<p>&gt; **개요:** 요청된 상품 라인들을 검증·재고 차감한 뒤 신규 주문을 생성한다.</p>
+
+<p>&gt; **근거 소스:** `modules/shop-api/src/main/java/com/sm/lab/shop/controller/OrderController.java:52-56`</p>
+
+<h2>요청</h2>
+
+<li>Method: POST</li>
+<li>Path: /api/orders</li>
+<li>Content-Type: application/json</li>
+
+<pre><code>
+{
+  "memberId": "string",
+  "items": [
+    { "sku": "string", "qty": 0 }
+  ]
+}
+</code></pre>
+
+<table>
+<tr><td>파라미터</td><td>위치</td><td>타입</td><td>필수</td><td>설명</td></tr>
+<tr><td>memberId</td><td>Body</td><td>string</td><td>Y</td><td>회원 ID</td></tr>
+<tr><td>items</td><td>Body</td><td>array</td><td>Y</td><td>주문 라인 목록(sku, qty)</td></tr>
+</table>
+
+<h2>응답 (200 OK)</h2>
+
+<pre><code>
+{
+  "orderNo": "string",
+  "memberId": "string",
+  "memberName": "string",
+  "orderState": "PLACED",
+  "totalAmount": 0,
+  "orderedAt": "2026-01-01T00:00:00",
+  "items": [ { "orderNo": "string", "lineNo": 1, "sku": "string", "productName": "string", "qty": 0, "unitPrice": 0 } ],
+  "deliveries": []
+}
+</code></pre>
+
+<h2>비즈니스 규칙</h2>
+
+<li>각 라인의 상품이 `sale_yn = 'Y'`(판매중)가 아니면 400</li>
+<li>재고 차감(`decreaseStock`)이 0행이면 재고 부족으로 409 — `WHERE stock_qty &gt;= qty` 조건부 UPDATE로 동시성 가드</li>
+<li>주문번호(`orderNo`)는 `yyyyMMdd-{4자리 시퀀스}` 형식으로 채번(`AtomicInteger`, 시작값 100 — 인스턴스 내 메모리 채번, 재기동 시 초기화)</li>
+<li>신규 주문 상태는 항상 `PLACED`</li>
+<li>`totalAmount`는 각 라인 `단가 × 수량`의 합</li>
+
+<h2>트랜잭션 순서</h2>
+
+<p>1. 라인별로 `PRODUCTS` 조회 → 판매상태 검증 → 재고 조건부 차감(`UPDATE ... WHERE stock_qty &gt;= qty`)</p>
+<p>2. `ORDERS` INSERT (order_state='PLACED')</p>
+<p>3. 라인별 `ORDER_ITEMS` INSERT</p>
+<p>4. 생성된 주문을 [[INF-ORD-004]]와 동일한 조회(`selectByOrderNo` + `selectItems` + `selectDeliveries`)로 재조회하여 반환</p>
+
+<h2>오류 응답</h2>
+
+<table>
+<tr><td>코드</td><td>사유</td><td>발생 조건</td></tr>
+<tr><td>400</td><td>판매 중인 상품이 아님</td><td>상품 미존재 또는 `sale_yn != 'Y'`</td></tr>
+<tr><td>409</td><td>재고 부족</td><td>차감 대상 수량이 현재 재고보다 많음</td></tr>
+</table>
+
+<h2>참조 테이블</h2>
+
+<table>
+<tr><td>테이블</td><td>SCH</td></tr>
+<tr><td>PRODUCTS</td><td>[[SCH-ORD-005]]</td></tr>
+<tr><td>ORDERS</td><td>[[SCH-ORD-004]]</td></tr>
+<tr><td>ORDER_ITEMS</td><td>[[SCH-ORD-003]]</td></tr>
+<tr><td>MEMBERS</td><td>[[SCH-ORD-001]]</td></tr>
+<tr><td>ORDER_DELIVERY</td><td>[[SCH-ORD-002]]</td></tr>
+</table>
+
+<h2>curl 예시</h2>
+
+<pre><code>
+curl -X POST /api/orders \
+  -H "Content-Type: application/json" \
+  -d '{"memberId":"M0001","items":[{"sku":"SKU001","qty":2}]}'
+</code></pre></section><section class="doc" id="doc-6"><h2>INF-ORD-006 <span class="doc-name">주문 취소</span></h2><h1>INF-ORD-006: PATCH /api/orders/{orderNo}/cancel — 주문 취소</h1>
+
+<p>&gt; **개요:** 주문을 취소 상태로 바꾸고, 이미 취소·완료 상태이거나 출고 완료된 배송이 있으면 거부하며, 취소 성공 시 라인별 재고를 원복한다.</p>
+
+<p>&gt; **근거 소스:** `modules/shop-api/src/main/java/com/sm/lab/shop/controller/OrderController.java:59-61`</p>
+
+<h2>요청</h2>
+
+<li>Method: PATCH</li>
+<li>Path: /api/orders/{orderNo}/cancel</li>
+<li>Content-Type: application/json</li>
+
+<table>
+<tr><td>파라미터</td><td>위치</td><td>타입</td><td>필수</td><td>설명</td></tr>
+<tr><td>orderNo</td><td>PathVariable</td><td>String</td><td>Y</td><td>취소할 주문번호</td></tr>
+</table>
+
+<h2>응답 (200 OK)</h2>
+
+<pre><code>
+{
+  "orderNo": "20260907-0101",
+  "memberId": "M0001",
+  "memberName": "홍길동",
+  "orderState": "CANCELED",
+  "totalAmount": 45000,
+  "orderedAt": "2026-09-01T10:20:30",
+  "items": [
+    {
+      "orderNo": "20260907-0101",
+      "lineNo": 1,
+      "sku": "SKU-001",
+      "productName": "상품A",
+      "qty": 2,
+      "unitPrice": 15000
+    }
+  ],
+  "deliveries": [
+    {
+      "deliveryNo": "D0001",
+      "orderNo": "20260907-0101",
+      "deliveryState": "READY",
+      "invoiceNo": null,
+      "shippedAt": null
+    }
+  ]
+}
+</code></pre>
+
+<p>취소 완료 후의 주문 상세(items·deliveries 포함)를 그대로 반환한다. `deliveries`가 없는 주문은 빈 배열.</p>
+
+<h2>비즈니스 규칙</h2>
+
+<li>주문 상태가 `CANCELED` 또는 `DONE`이면 → 409 거부(이미 종결된 주문)</li>
+<li>배송 중 하나라도 `SHIPPED` 또는 `DELIVERED` 상태이면 → 409 거부(코드 `ORD-4001`, 출고 완료 배송은 취소 불가)</li>
+<li>상태 전이(UPDATE)는 `order_state NOT IN ('CANCELED','DONE')` 조건부 쿼리로 실행 — 동시 요청 중 하나가 먼저 선점하면 0행이 되어 409로 거부(레이스 가드, 재고는 원복하지 않음)</li>
+<li>상태 전이가 성공한 뒤에만 라인별 재고를 원복한다 (linked_func: FUNC-order-002)</li>
+
+<h2>트랜잭션 순서</h2>
+
+<p>1. `ORDERS`+`MEMBERS` 조회(주문 존재·현재 상태 확인) — 없으면 404</p>
+<p>2. `ORDER_ITEMS`+`PRODUCTS`, `ORDER_DELIVERY` 조회(라인·배송 상태 확인)</p>
+<p>3. `ORDERS.order_state`를 `CANCELED`로 조건부 UPDATE (미종결 상태일 때만, 레이스 가드)</p>
+<p>4. 주문 라인마다 `PRODUCTS.stock_qty` 증가(재고 원복)</p>
+<p>5. `ORDERS`+`MEMBERS`, `ORDER_ITEMS`+`PRODUCTS`, `ORDER_DELIVERY` 재조회 후 응답</p>
+
+<h2>사이드이펙트</h2>
+
+<li>취소 성공 시: 주문에 포함된 각 라인의 `sku`만큼 `PRODUCTS.stock_qty`를 증가시킨다(메인 목적인 `ORDERS` 상태 변경 외 추가 처리).</li>
+
+<h2>오류 응답</h2>
+
+<table>
+<tr><td>코드</td><td>사유</td><td>발생 조건</td></tr>
+<tr><td>404</td><td>주문 없음</td><td>`orderNo`에 해당하는 주문이 없음</td></tr>
+<tr><td>409</td><td>취소 불가 상태</td><td>주문 상태가 이미 `CANCELED` 또는 `DONE`</td></tr>
+<tr><td>409</td><td>출고 완료 배송 존재 (ORD-4001)</td><td>배송 중 `SHIPPED`/`DELIVERED` 상태가 하나라도 있음</td></tr>
+<tr><td>409</td><td>취소 불가 상태(동시 처리됨)</td><td>상태 전이 UPDATE가 0행 — 동시 요청이 먼저 취소·완료 처리함</td></tr>
+</table>
+
+<h2>참조 테이블</h2>
+
+<li>`ORDERS`</li>
+<li>`MEMBERS`</li>
+<li>`ORDER_ITEMS`</li>
+<li>`PRODUCTS`</li>
+<li>`ORDER_DELIVERY`</li>
+
+<h2>curl 예시</h2>
+
+<pre><code>
+curl -X PATCH /api/orders/20260907-0101/cancel \
+  -H "Content-Type: application/json"
+</code></pre></section><section class="doc" id="doc-7"><h2>INF-ORD-007 <span class="doc-name">주문 배송 목록 조회</span></h2><h1>INF-ORD-007: GET /api/orders/{orderNo}/deliveries — 주문 배송 목록 조회</h1>
+
+<p>&gt; **개요:** 주문 1건의 배송 목록만 반환한다.</p>
+
+<p>&gt; **근거 소스:** `modules/shop-api/src/main/java/com/sm/lab/shop/controller/OrderController.java:64-68`</p>
+
+<h2>요청</h2>
+
+<li>Method: GET</li>
+<li>Path: /api/orders/{orderNo}/deliveries</li>
+<li>Content-Type: application/json</li>
+
+<table>
+<tr><td>파라미터</td><td>위치</td><td>타입</td><td>필수</td><td>설명</td></tr>
+<tr><td>orderNo</td><td>PathVariable</td><td>string</td><td>Y</td><td>주문번호</td></tr>
+</table>
+
+<h2>응답 (200 OK)</h2>
+
+<pre><code>
+[
+  {
+    "deliveryNo": "string",
+    "orderNo": "string",
+    "deliveryState": "READY | SHIPPED | DELIVERED | CANCELED",
+    "invoiceNo": "string",
+    "shippedAt": "2026-01-01T00:00:00"
+  }
+]
+</code></pre>
+
+<h2>비즈니스 규칙</h2>
+
+<li>내부적으로 [[INF-ORD-004]]와 동일한 `OrderService.detail()`을 호출한다 — `ORDER_ITEMS`(`PRODUCTS` 조인 포함)도</li>
+<p>  함께 조회되지만 응답에는 `deliveries`만 반환된다(불필요한 내부 조회이나 기능상 영향 없음)</p>
+<li>배송 목록은 `shipped_at DESC, delivery_no DESC`로 정렬(미발송 `READY` 건은 `shipped_at`이 NULL이라 하단 — LAB-113)</li>
+<li>배송이 없으면 빈 배열</li>
+
+<h2>오류 응답</h2>
+
+<table>
+<tr><td>코드</td><td>사유</td><td>발생 조건</td></tr>
+<tr><td>404</td><td>주문 없음</td><td>orderNo로 조회된 주문이 없음</td></tr>
+</table>
+
+<h2>참조 테이블</h2>
+
+<table>
+<tr><td>테이블</td><td>SCH</td></tr>
+<tr><td>ORDERS</td><td>[[SCH-ORD-004]]</td></tr>
+<tr><td>MEMBERS</td><td>[[SCH-ORD-001]]</td></tr>
+<tr><td>ORDER_ITEMS</td><td>[[SCH-ORD-003]]</td></tr>
+<tr><td>PRODUCTS</td><td>[[SCH-ORD-005]]</td></tr>
+<tr><td>ORDER_DELIVERY</td><td>[[SCH-ORD-002]]</td></tr>
+</table>
+
+<h2>curl 예시</h2>
+
+<pre><code>
+curl -X GET /api/orders/20260101-0101/deliveries \
+  -H "Content-Type: application/json"
+</code></pre>
+
+<h2>변경 이력</h2>
+
+<table>
+<tr><td>날짜</td><td>변경 내용</td><td>변경자</td></tr>
+<tr><td>2026-08-23</td><td>배송 이력 정렬을 최신순으로(shipped_at DESC, 미발송 null은 하단 · tie는 delivery_no DESC) — LAB-113, linked_func: FUNC-order-006</td><td>/sl-change --quick (auto)</td></tr>
+</table></section><section class="doc" id="doc-8"><h2>INF-ORD-008 <span class="doc-name">판매중 상품 목록 조회</span></h2><p>&gt; [변경: SR-201] 2026-08-22</p>
+
+<h1>INF-ORD-008: GET /api/products — 판매중 상품 목록 조회</h1>
+
+<p>&gt; **개요:** 판매중 상태인 상품 전체를 SKU 순으로 조회한다.</p>
+
+<p>&gt; **근거 소스:** `src/main/java/com/sm/lab/shop/controller/ProductController.java:24-31`</p>
+
+<h2>요청</h2>
+
+<li>Method: GET</li>
+<li>Path: /api/products</li>
+<li>Content-Type: application/json</li>
+
+<table>
+<tr><td>파라미터</td><td>위치</td><td>타입</td><td>필수</td><td>설명</td></tr>
+<tr><td>keyword</td><td>Query</td><td>string</td><td>N</td><td>상품명 부분 일치 검색어. 미지정 시 전체(판매중) 목록 반환(하위 호환) — [반영: FUNC-order-007] 2026-08-22</td></tr>
+<tr><td>inStock</td><td>Query</td><td>boolean</td><td>N</td><td>true면 재고 1 이상(`stock_qty &gt;= 1`)인 상품만 반환. 미지정/false는 기존 동작과 동일(하위 호환) — [반영: FUNC-order-007](SR-220) 2026-09-09. non-boolean 값은 Spring 바인딩 실패로 400</td></tr>
+</table>
+
+<h2>응답 (200 OK)</h2>
+
+<pre><code>
+[
+  {
+    "sku": "string",
+    "productName": "string",
+    "price": 0,
+    "stockQty": 0,
+    "saleYn": "Y",
+    "listPrice": 0,
+    "imageUrl": "string"
+  }
+]
+</code></pre>
+
+<p>&gt; [변경: SR-306] 2026-09-17 — `listPrice`(정가, number|null)·`imageUrl`(대표 이미지 경로, string|null) 필드</p>
+<p>&gt; 추가(필드 추가만, 기존 5필드 이름·순서·타입 불변, 하위호환). 값이 없는 상품은 `null`로 내려간다 —</p>
+<p>&gt; 화면은 이때 정가 취소선·할인 배지를 그리지 않는다(할인율은 저장하지 않고 화면이 `price`와 비교 계산).</p>
+<p>&gt; `imageUrl`은 앱이 서빙하는 정적 경로(`/images/products/...`)이며 외부 URL이 아니다.</p>
+
+<h2>비즈니스 규칙</h2>
+
+<li>`sale_yn = 'Y'` 상시필터 → 판매중 상품만 반환(단건 조회인 [[INF-ORD-009]]는 이 필터가 없음)</li>
+<li>[반영: FUNC-order-007] `keyword` 파라미터가 있으면 `product_name` 부분 일치(LIKE) 검색 —</li>
+<p>  `sale_yn = 'Y'` 상시필터와 AND 결합. `keyword` 미지정 시 기존과 동일하게 전체(판매중) 목록 반환(하위 호환,</p>
+<p>  기존 소비처 무영향). 응답 스키마(`sku`/`productName`/`price`/`stockQty`/`saleYn`) 변경 없음 —</p>
+<p>  "품절" 판정은 화면(UIS-ORD-003) 몫으로 `stockQty` 값을 그대로 사용.</p>
+<li>[반영: FUNC-order-007](SR-220) `inStock=true`면 `stock_qty &gt;= 1` 조건을 `sale_yn = 'Y'` 상시필터와</li>
+<p>  AND 결합해 품절 상품을 제외한다. `inStock` 미지정 또는 `false`는 기존 동작 그대로(하위 호환).</p>
+<p>  별도 count 쿼리·페이징이 없어 목록 결과와 총 건수가 항상 일치한다. 응답 스키마 변경 없음.</p>
+<li>[반영: SR-306] `listPrice`·`imageUrl`은 표시 전용 — 주문·장바구니 금액 계산은 종전대로 `price`만 쓴다.</li>
+
+<h2>인증</h2>
+
+<p>&gt; [변경: SR-307] 2026-09-17 — 무키(X-Api-Key 헤더 자체 없음) GET 요청은 인증 없이 공개된다(`ApiKeyAuthFilter`가</p>
+<p>&gt; `isOpenRoute` 화이트리스트가 아니라 `doFilterInternal`에서 "무키일 때만" 예외 처리 — 필터는 항상 실행된다).</p>
+<p>&gt; **키를 보낸 요청(무효 키 포함)은 이 예외를 타지 않고 종전과 동일한 인증·인가 판정을 그대로 거친다** —</p>
+<p>&gt; 예: member 키로 `?memberId=타인`을 보내면 종전과 동일하게 403. GET 외 메서드(POST/PATCH/DELETE)는</p>
+<p>&gt; 이 예외 대상이 아니라 무키 시 401 그대로.</p>
+
+<h2>오류 응답</h2>
+
+<table>
+<tr><td>코드</td><td>사유</td><td>발생 조건</td></tr>
+<tr><td>400</td><td>유효성 실패</td><td>필수 필드 누락</td></tr>
+<tr><td>401</td><td>인증 실패</td><td>키가 있으나 무효, 또는 GET 외 메서드로 무키 요청(위 "인증" 절 참고)</td></tr>
+</table>
+
+<h2>참조 테이블</h2>
+
+<table>
+<tr><td>테이블</td><td>SCH</td></tr>
+<tr><td>PRODUCTS</td><td>[[SCH-ORD-005]]</td></tr>
+</table>
+
+<h2>curl 예시</h2>
+
+<pre><code>
+curl -X GET /api/products \
+  -H "Content-Type: application/json"
+</code></pre>
+
+<p>[반영: FUNC-order-007] `keyword` 검색 예시:</p>
+
+<pre><code>
+curl -X GET "/api/products?keyword=셔츠" \
+  -H "Content-Type: application/json"
+</code></pre>
+
+<p>[반영: FUNC-order-007](SR-220) `inStock` 필터 예시(품절 제외):</p>
+
+<pre><code>
+curl -X GET "/api/products?inStock=true" \
+  -H "Content-Type: application/json"
+</code></pre>
+
+<h2>변경 이력(이전 기록)</h2>
+<table>
+<tr><td>날짜</td><td>변경 내용</td><td>변경자</td></tr>
+<tr><td>2026-08-22</td><td>SR-201: keyword 부분일치 검색 파라미터 추가(구현 반영 — FUNC-order-007). path 표기를 실측 라우트(/api/products — 트레일링 슬래시 404)로 정정</td><td>sl-aidd STEP 5.5 재동기화</td></tr>
+<tr><td>2026-09-09</td><td>SR-220: inStock 쿼리 파라미터 추가(재고 1 이상만 조회, 미지정 시 하위호환) — 구현 반영(FUNC-order-007)</td><td>sl-aidd STEP 5.5 재동기화</td></tr>
+<tr><td>2026-09-17</td><td>SR-307: 무키 GET 공개(앱 서빙 /shop 401 해소) — 쿼리·응답 스키마 불변, "인증" 절 신설</td><td>sl-aidd STEP 5.5 재동기화</td></tr>
+</table>
+
+<h2>변경 이력</h2>
+<p>&lt;!-- spec-history: machine-managed --&gt;</p>
+<table>
+<tr><td>일자</td><td>SR</td><td>항목</td><td>변경 요약</td><td>커밋</td></tr>
+<tr><td>2026-09-17</td><td>SR-307</td><td>#1</td><td>무키 GET 공개(앱 서빙 /shop 401 해소) — 인증 절 신설, 쿼리·응답 스키마 불변</td><td>shop-api@cd859a1</td></tr>
+<tr><td>2026-09-17</td><td>SR-306</td><td>#2</td><td>응답에 listPrice·imageUrl 필드 추가(필드 추가만, 하위호환, 값 없으면 null)</td><td>shop-api, shop-api@7eebc9f, shop-api@e1d18da, shop-web@cbe9816</td></tr>
+</table></section><section class="doc" id="doc-9"><h2>INF-ORD-009 <span class="doc-name">상품 단건 조회</span></h2><h1>INF-ORD-009: GET /api/products/{sku} — 상품 단건 조회</h1>
+
+<p>&gt; **개요:** SKU로 상품 1건을 조회한다.</p>
+
+<p>&gt; **근거 소스:** `src/main/java/com/sm/lab/shop/controller/ProductController.java:27-31`</p>
+
+<h2>요청</h2>
+
+<li>Method: GET</li>
+<li>Path: /api/products/{sku}</li>
+<li>Content-Type: application/json</li>
+
+<table>
+<tr><td>파라미터</td><td>위치</td><td>타입</td><td>필수</td><td>설명</td></tr>
+<tr><td>sku</td><td>PathVariable</td><td>string</td><td>Y</td><td>상품 SKU</td></tr>
+</table>
+
+<h2>응답 (200 OK)</h2>
+
+<pre><code>
+{
+  "sku": "string",
+  "productName": "string",
+  "price": 0,
+  "stockQty": 0,
+  "saleYn": "Y",
+  "listPrice": 0,
+  "imageUrl": "string"
+}
+</code></pre>
+
+<p>&gt; [변경: SR-306] 2026-09-17 — `listPrice`(정가, number|null)·`imageUrl`(대표 이미지 경로, string|null) 필드</p>
+<p>&gt; 추가(필드 추가만, 기존 5필드 이름·순서·타입 불변, 하위호환). 값이 없으면 `null`. [[INF-ORD-008]]과 동일 계약.</p>
+
+<h2>비즈니스 규칙</h2>
+
+<li>목록 조회([[INF-ORD-008]])와 달리 `sale_yn` 필터가 없다 — 판매종료 상품도 SKU를 알면 조회 가능</li>
+<li>[반영: SR-306] `listPrice`·`imageUrl`은 표시 전용 — 주문·장바구니 금액 계산은 종전대로 `price`만 쓴다.</li>
+
+<h2>인증</h2>
+
+<p>&gt; [변경: SR-307] 2026-09-17 — [[INF-ORD-008]]과 동일: 무키 GET은 공개(`ApiKeyAuthFilter` doFilterInternal</p>
+<p>&gt; 예외), 키를 보낸 요청은 종전 판정 그대로. **공개 대상 SKU 형식은 `SKU-` 접두사 + 영숫자·하이픈**</p>
+<p>&gt; (`^/api/products/(SKU-[A-Za-z0-9-]+)$`)으로 한정된다 — 이 형식과 맞지 않는 세그먼트(예: 미래에 추가될</p>
+<p>&gt; `/api/products/export` 같은 서브리소스)는 이 경로 패턴에 매치되지 않아 무키 401(fail-closed)로 남는다.</p>
+
+<h2>오류 응답</h2>
+
+<table>
+<tr><td>코드</td><td>사유</td><td>발생 조건</td></tr>
+<tr><td>401</td><td>인증 실패</td><td>키가 있으나 무효, 또는 GET 외 메서드로 무키 요청, 또는 sku가 `SKU-` 형식이 아니어서 공개 판정에 매치되지 않음(위 "인증" 절 참고)</td></tr>
+<tr><td>404</td><td>상품 없음</td><td>sku로 조회된 상품이 없음</td></tr>
+</table>
+
+<h2>참조 테이블</h2>
+
+<table>
+<tr><td>테이블</td><td>SCH</td></tr>
+<tr><td>PRODUCTS</td><td>[[SCH-ORD-005]]</td></tr>
+</table>
+
+<h2>curl 예시</h2>
+
+<pre><code>
+curl -X GET /api/products/SKU001 \
+  -H "Content-Type: application/json"
+</code></pre>
+
+<h2>변경 이력(이전 기록)</h2>
+<table>
+<tr><td>날짜</td><td>변경 내용</td><td>변경자</td></tr>
+<tr><td>2026-09-17</td><td>SR-307: 무키 GET 공개(앱 서빙 /shop 401 해소) + 공개 대상 SKU 형식(`SKU-` 접두사) 명시 — 쿼리·응답 스키마 불변, "인증" 절 신설</td><td>sl-aidd STEP 5.5 재동기화</td></tr>
+</table>
+
+<h2>변경 이력</h2>
+<p>&lt;!-- spec-history: machine-managed --&gt;</p>
+<table>
+<tr><td>일자</td><td>SR</td><td>항목</td><td>변경 요약</td><td>커밋</td></tr>
+<tr><td>2026-09-17</td><td>SR-307</td><td>#1</td><td>무키 GET 공개 + 공개 대상 SKU 형식(SKU- 접두사) 명시 — 쿼리·응답 스키마 불변</td><td>shop-api@cd859a1</td></tr>
+<tr><td>2026-09-17</td><td>SR-306</td><td>#2</td><td>응답에 listPrice·imageUrl 필드 추가(필드 추가만, 하위호환, 값 없으면 null)</td><td>shop-api, shop-api@7eebc9f, shop-api@e1d18da, shop-web@cbe9816</td></tr>
+</table></section><section class="doc" id="doc-10"><h2>INF-ORD-010 <span class="doc-name">장바구니 담기</span></h2><h1>INF-ORD-010: POST /api/cart/items — 장바구니 담기</h1>
+
+<p>&gt; **개요:** 회원 장바구니에 상품을 담는다. 같은 상품을 재담기하면 기존 수량에 합산된다.</p>
+
+<p>&gt; **근거 소스:** `src/main/java/com/sm/lab/shop/controller/CartController.java:22-26`</p>
+
+<h2>요청</h2>
+
+<li>Method: POST</li>
+<li>Path: /api/cart/items</li>
+<li>Content-Type: application/json</li>
+
+<table>
+<tr><td>파라미터</td><td>위치</td><td>타입</td><td>필수</td><td>설명</td></tr>
+<tr><td>memberId</td><td>Body</td><td>string</td><td>Y</td><td>회원 ID</td></tr>
+<tr><td>sku</td><td>Body</td><td>string</td><td>Y</td><td>상품 SKU</td></tr>
+<tr><td>qty</td><td>Body</td><td>int</td><td>Y</td><td>담을 수량 (1 이상)</td></tr>
+</table>
+
+<h2>응답 (200 OK)</h2>
+
+<pre><code>
+{
+  "memberId": "string",
+  "sku": "string",
+  "productName": "string",
+  "price": 0,
+  "qty": 0,
+  "addedAt": "2026-08-23T10:00:00",
+  "lineTotal": 0
+}
+</code></pre>
+
+<h2>비즈니스 규칙</h2>
+
+<li>같은 상품 재담기는 DB 원자 UPSERT(`INSERT ... ON DUPLICATE KEY UPDATE qty = qty + VALUES(qty)`)로 수량 합산(PK `member_id,sku`) — 동시 담기에도 lost update·PK 중복 500 없음</li>
+<li>판매중지(`sale_yn='N')` 상품은 담기 거부(409)</li>
+<li>품절(`stock_qty=0`)은 UPSERT 이전에 조기 거부(409) — 합산·원복 사이클 자체가 불필요</li>
+<li>UPSERT 직후 최종(합산) qty가 재고를 초과하면, 방금 더한 만큼만 되돌리고(원복값 0 이하면 행 삭제) 409 — UPSERT가 잡은 행 잠금이 트랜잭션 종료까지 유지되어 판정·원복 사이 다른 트랜잭션 개입 불가</li>
+<li>담기는 재고를 차감하지 않는다(보관 전용)</li>
+
+<h2>트랜잭션 순서</h2>
+
+<p>1. CART_ITEMS UPSERT(수량 합산)</p>
+<p>2. CART_ITEMS 병합 결과 SELECT(상품명·현재 단가 조인)</p>
+<p>3. (재고 초과 시) CART_ITEMS 원복 — 복원값 &gt; 0이면 UPDATE, 0 이하면 DELETE</p>
+
+<h2>오류 응답</h2>
+
+<table>
+<tr><td>코드</td><td>사유</td><td>발생 조건</td></tr>
+<tr><td>400</td><td>유효성 실패</td><td>qty &lt; 1</td></tr>
+<tr><td>404</td><td>회원 없음</td><td>memberId로 조회된 회원 없음</td></tr>
+<tr><td>404</td><td>상품 없음</td><td>sku로 조회된 상품 없음</td></tr>
+<tr><td>409</td><td>판매중지 상품</td><td>상품의 sale_yn = 'N'</td></tr>
+<tr><td>409</td><td>품절 상품</td><td>상품의 stock_qty = 0</td></tr>
+<tr><td>409</td><td>재고 초과</td><td>합산된 qty가 가용 재고 초과</td></tr>
+</table>
+
+<h2>참조 테이블</h2>
+
+<table>
+<tr><td>테이블</td><td>SCH</td></tr>
+<tr><td>CART_ITEMS</td><td>[[SCH-ORD-006]]</td></tr>
+<tr><td>PRODUCTS</td><td>[[SCH-ORD-005]]</td></tr>
+<tr><td>MEMBERS</td><td>[[SCH-ORD-001]]</td></tr>
+</table>
+
+<h2>curl 예시</h2>
+
+<pre><code>
+curl -X POST /api/cart/items \
+  -H "Content-Type: application/json" \
+  -d '{"memberId":"M001","sku":"SKU001","qty":2}'
+</code></pre></section><section class="doc" id="doc-11"><h2>INF-ORD-011 <span class="doc-name">장바구니 조회</span></h2><h1>INF-ORD-011: GET /api/cart/ — 장바구니 조회</h1>
+
+<p>&gt; **개요:** 회원의 장바구니 품목 전체와 총액을 조회한다.</p>
+
+<p>&gt; **근거 소스:** `src/main/java/com/sm/lab/shop/controller/CartController.java:28-32`</p>
+
+<h2>요청</h2>
+
+<li>Method: GET</li>
+<li>Path: /api/cart/</li>
+<li>Content-Type: application/json</li>
+
+<table>
+<tr><td>파라미터</td><td>위치</td><td>타입</td><td>필수</td><td>설명</td></tr>
+<tr><td>memberId</td><td>Query</td><td>string</td><td>Y</td><td>회원 ID</td></tr>
+</table>
+
+<h2>응답 (200 OK)</h2>
+
+<pre><code>
+{
+  "items": [
+    {
+      "memberId": "string",
+      "sku": "string",
+      "productName": "string",
+      "price": 0,
+      "qty": 0,
+      "addedAt": "2026-08-23T10:00:00",
+      "lineTotal": 0
+    }
+  ],
+  "totalAmount": 0
+}
+</code></pre>
+
+<h2>비즈니스 규칙</h2>
+
+<li>품목은 담은 순(`added_at, sku`)으로 정렬된다</li>
+<li>`totalAmount`는 각 품목의 `price × qty`(lineTotal) 합계로, 조회 시점에 애플리케이션에서 계산한다(저장 컬럼 아님)</li>
+
+<h2>오류 응답</h2>
+
+<table>
+<tr><td>코드</td><td>사유</td><td>발생 조건</td></tr>
+<tr><td>404</td><td>회원 없음</td><td>memberId로 조회된 회원 없음</td></tr>
+</table>
+
+<h2>참조 테이블</h2>
+
+<table>
+<tr><td>테이블</td><td>SCH</td></tr>
+<tr><td>CART_ITEMS</td><td>[[SCH-ORD-006]]</td></tr>
+<tr><td>PRODUCTS</td><td>[[SCH-ORD-005]]</td></tr>
+<tr><td>MEMBERS</td><td>[[SCH-ORD-001]]</td></tr>
+</table>
+
+<h2>curl 예시</h2>
+
+<pre><code>
+curl -X GET "/api/cart/?memberId=M001" \
+  -H "Content-Type: application/json"
+</code></pre></section><section class="doc" id="doc-12"><h2>INF-ORD-012 <span class="doc-name">장바구니 수량 변경</span></h2><h1>INF-ORD-012: PATCH /api/cart/items/{sku} — 장바구니 수량 변경</h1>
+
+<p>&gt; **개요:** 장바구니에 담긴 품목의 수량을 변경한다.</p>
+
+<p>&gt; **근거 소스:** `src/main/java/com/sm/lab/shop/controller/CartController.java:34-39`</p>
+
+<h2>요청</h2>
+
+<li>Method: PATCH</li>
+<li>Path: /api/cart/items/{sku}</li>
+<li>Content-Type: application/json</li>
+
+<table>
+<tr><td>파라미터</td><td>위치</td><td>타입</td><td>필수</td><td>설명</td></tr>
+<tr><td>sku</td><td>PathVariable</td><td>string</td><td>Y</td><td>상품 SKU</td></tr>
+<tr><td>memberId</td><td>Query</td><td>string</td><td>Y</td><td>회원 ID</td></tr>
+<tr><td>qty</td><td>Body</td><td>int</td><td>Y</td><td>변경할 수량 (1 이상)</td></tr>
+</table>
+
+<h2>응답 (200 OK)</h2>
+
+<pre><code>
+{
+  "memberId": "string",
+  "sku": "string",
+  "productName": "string",
+  "price": 0,
+  "qty": 0,
+  "addedAt": "2026-08-23T10:00:00",
+  "lineTotal": 0
+}
+</code></pre>
+
+<h2>비즈니스 규칙</h2>
+
+<li>qty &lt; 1은 400으로 거부한다 — 삭제는 명시적 DELETE로만 수행(실수 삭제 방지)</li>
+<li>요청 qty가 상품 재고를 초과하거나 상품이 품절(stock_qty=0)이면 409</li>
+
+<h2>트랜잭션 순서</h2>
+
+<p>1. CART_ITEMS UPDATE(qty 변경)</p>
+<p>2. CART_ITEMS SELECT(변경 결과 반환용, 상품명·현재 단가 조인)</p>
+
+<h2>오류 응답</h2>
+
+<table>
+<tr><td>코드</td><td>사유</td><td>발생 조건</td></tr>
+<tr><td>400</td><td>유효성 실패</td><td>qty &lt; 1</td></tr>
+<tr><td>404</td><td>장바구니 품목 없음</td><td>memberId+sku 조합의 품목 없음</td></tr>
+<tr><td>404</td><td>상품 없음</td><td>sku로 조회된 상품 없음</td></tr>
+<tr><td>409</td><td>재고 초과/품절</td><td>요청 qty가 가용 재고 초과 또는 상품 품절</td></tr>
+</table>
+
+<h2>참조 테이블</h2>
+
+<table>
+<tr><td>테이블</td><td>SCH</td></tr>
+<tr><td>CART_ITEMS</td><td>[[SCH-ORD-006]]</td></tr>
+<tr><td>PRODUCTS</td><td>[[SCH-ORD-005]]</td></tr>
+</table>
+
+<h2>curl 예시</h2>
+
+<pre><code>
+curl -X PATCH "/api/cart/items/SKU001?memberId=M001" \
+  -H "Content-Type: application/json" \
+  -d '{"qty":3}'
+</code></pre></section><section class="doc" id="doc-13"><h2>INF-ORD-013 <span class="doc-name">장바구니 품목 삭제</span></h2><h1>INF-ORD-013: DELETE /api/cart/items/{sku} — 장바구니 품목 삭제</h1>
+
+<p>&gt; **개요:** 장바구니에서 품목 1건을 삭제한다.</p>
+
+<p>&gt; **근거 소스:** `src/main/java/com/sm/lab/shop/controller/CartController.java:41-46`</p>
+
+<h2>요청</h2>
+
+<li>Method: DELETE</li>
+<li>Path: /api/cart/items/{sku}</li>
+<li>Content-Type: application/json</li>
+
+<table>
+<tr><td>파라미터</td><td>위치</td><td>타입</td><td>필수</td><td>설명</td></tr>
+<tr><td>sku</td><td>PathVariable</td><td>string</td><td>Y</td><td>상품 SKU</td></tr>
+<tr><td>memberId</td><td>Query</td><td>string</td><td>Y</td><td>회원 ID</td></tr>
+</table>
+
+<h2>응답 (204 No Content)</h2>
+
+<p>응답 본문 없음.</p>
+
+<h2>오류 응답</h2>
+
+<table>
+<tr><td>코드</td><td>사유</td><td>발생 조건</td></tr>
+<tr><td>404</td><td>장바구니 품목 없음</td><td>memberId+sku 조합의 품목 없음</td></tr>
+</table>
+
+<h2>참조 테이블</h2>
+
+<table>
+<tr><td>테이블</td><td>SCH</td></tr>
+<tr><td>CART_ITEMS</td><td>[[SCH-ORD-006]]</td></tr>
+<tr><td>PRODUCTS</td><td>[[SCH-ORD-005]]</td></tr>
+</table>
+
+<h2>curl 예시</h2>
+
+<pre><code>
+curl -X DELETE "/api/cart/items/SKU001?memberId=M001" \
+  -H "Content-Type: application/json"
+</code></pre></section><section class="doc" id="doc-14"><h2>INF-ORD-014 <span class="doc-name">장바구니 체크아웃</span></h2><h1>INF-ORD-014: POST /api/cart/checkout — 장바구니 체크아웃</h1>
+
+<p>&gt; **개요:** 장바구니 전체 품목을 기존 주문 생성 규칙으로 전환해 주문을 만들고 장바구니를 비운다.</p>
+
+<p>&gt; **근거 소스:** `src/main/java/com/sm/lab/shop/controller/CartController.java:53-56`</p>
+
+<h2>요청</h2>
+
+<li>Method: POST</li>
+<li>Path: /api/cart/checkout</li>
+<li>Content-Type: application/json</li>
+
+<table>
+<tr><td>파라미터</td><td>위치</td><td>타입</td><td>필수</td><td>설명</td></tr>
+<tr><td>memberId</td><td>Body</td><td>string</td><td>Y</td><td>회원 ID</td></tr>
+</table>
+
+<pre><code>
+{
+  "memberId": "M001"
+}
+</code></pre>
+
+<h2>응답 (200 OK)</h2>
+
+<pre><code>
+{
+  "orderNo": "20260823-0101",
+  "totalAmount": 0,
+  "itemCount": 0
+}
+</code></pre>
+
+<h2>비즈니스 규칙</h2>
+
+<li>주문 생성은 새 규칙을 만들지 않고 `OrderService.create`를 그대로 재사용한다(채번·PLACED 상태·재고 차감 — 검증/차감 로직 미복제)</li>
+<li>장바구니 조회는 `SELECT ... FOR UPDATE`로 잠근다 — 동일 회원의 동시 체크아웃에서 스냅샷이 아닌 최신 커밋 데이터를 잠그므로, 중복 주문이 발생하지 않는다</li>
+<li>잠금 직후 전 품목을 사전 스윕하여 상품없음·판매중지(`sale_yn='N'`)·재고부족을 한 번에 모아 409 사유 목록 하나로 응답한다(품목별 사유, 부분 주문 없이 전량 거부)</li>
+<li>사전 스윕을 통과해도 `OrderService.create`의 실제 재고 차감(`decreaseStock`) 실패가 최종 판정이다(스윕-차감 사이 시점 차 대비)</li>
+<li>장바구니는 주문 생성이 트랜잭션 내에서 확정된 뒤에만 비운다(실패 시 품목 보존)</li>
+
+<h2>트랜잭션 순서</h2>
+
+<p>1. `CART_ITEMS` 잠금 조회(`FOR UPDATE`) — 비어 있으면 400</p>
+<p>2. 품목별 `PRODUCTS` 사전 스윕(상품없음/판매중지/재고부족) — 이슈 있으면 409</p>
+<p>3. `OrderService.create` 위임: `PRODUCTS.stock_qty` 차감 → `ORDERS` 1건 INSERT → `ORDER_ITEMS` N건 INSERT (동일 트랜잭션 참여)</p>
+<p>4. `CART_ITEMS` 전체 삭제 (주문 확정 후)</p>
+
+<h2>사이드이펙트</h2>
+
+<li>체크아웃 성공 시 품목별로 `PRODUCTS.stock_qty`가 차감된다(`OrderService.create` → `decreaseStock`)</li>
+<li>체크아웃 성공 시 `CART_ITEMS`에서 해당 회원의 품목이 전부 삭제된다(`deleteAllItems`)</li>
+
+<h2>오류 응답</h2>
+
+<table>
+<tr><td>코드</td><td>사유</td><td>발생 조건</td></tr>
+<tr><td>400</td><td>빈 장바구니</td><td>memberId의 장바구니에 품목 없음</td></tr>
+<tr><td>400</td><td>판매 중인 상품이 아님</td><td>`OrderService.create` 내부 판정 — 사전 스윕 통과 후 시점 차로 발생 가능</td></tr>
+<tr><td>404</td><td>회원 없음</td><td>memberId로 조회된 회원 없음</td></tr>
+<tr><td>409</td><td>재고 부족/판매중지/상품없음</td><td>사전 스윕에서 품목별 사유 목록으로 응답(가용재고/요청수량 포함)</td></tr>
+<tr><td>409</td><td>재고 부족(차감 실패)</td><td>`OrderService.create`의 `decreaseStock` 0건 — 스윕 이후 경합</td></tr>
+</table>
+
+<h2>참조 테이블</h2>
+
+<li>`CART_ITEMS`</li>
+<li>`MEMBERS`</li>
+<li>`PRODUCTS`</li>
+<li>`ORDERS`</li>
+<li>`ORDER_ITEMS`</li>
+
+<h2>curl 예시</h2>
+
+<pre><code>
+curl -X POST /api/cart/checkout \
+  -H "Content-Type: application/json" \
+  -d '{"memberId": "M001"}'
+</code></pre></section><section class="doc" id="doc-15"><h2>INF-ORD-015 <span class="doc-name">주문 목록 CSV 내보내기</span></h2><h1>INF-ORD-015: GET /api/orders/export — 주문 목록 CSV 내보내기</h1>
+
+<p>&gt; **개요:** [[INF-ORD-003]]과 동일한 필터·정렬·상시필터로 조회한 주문 목록을 CSV 파일로 내려받는다. (linked_func: FUNC-order-013, LAB-104)</p>
+
+<p>&gt; **근거 소스:** `src/main/java/com/sm/lab/shop/controller/OrderController.java:79-90`</p>
+
+<h2>요청</h2>
+
+<li>Method: GET</li>
+<li>Path: /api/orders/export</li>
+<li>Content-Type: application/json</li>
+
+<table>
+<tr><td>파라미터</td><td>위치</td><td>타입</td><td>필수</td><td>설명</td></tr>
+<tr><td>memberId</td><td>Query</td><td>string</td><td>N</td><td>회원 ID 필터</td></tr>
+<tr><td>orderState</td><td>Query</td><td>string</td><td>N</td><td>주문상태 필터(정본)</td></tr>
+<tr><td>status</td><td>Query</td><td>string</td><td>N</td><td>주문상태 필터 별칭 — `orderState`와 동시에 오면 `orderState` 우선(D11, QA r1 FAIL 정정)</td></tr>
+</table>
+
+<h2>응답 (200 OK)</h2>
+
+<p>`Content-Type: text/csv; charset=UTF-8`, `Content-Disposition: attachment; filename="orders_{yyyyMMdd_HHmmss}.csv"`</p>
+
+<p>UTF-8 BOM(`EF BB BF`)으로 시작하는 CSV 바이너리. 헤더 행 + [[INF-ORD-003]] 목록 조회 결과를 행 단위로 직렬화(페이징 미적용 — 전체 건).</p>
+
+<pre><code>
+주문번호,회원,상태,금액,주문일시
+2026082300001-0101,M0001,PLACED,15000,2026-08-23T10:00:00
+</code></pre>
+
+<p>&gt; **헤더 라벨(SR-223)**: 데이터 컬럼 순서·필드명·타입·의미(`orderNo,memberId,status,totalAmount,orderedAt`)는</p>
+<p>&gt; 그대로다. 헤더 텍스트만 같은 위치의 한글 라벨로 1:1 치환했다(주문번호↔orderNo, 회원↔memberId,</p>
+<p>&gt; 상태↔status, 금액↔totalAmount, 주문일시↔orderedAt). 근거: `docs/변경관리/SR-223/00_요구사항.md`</p>
+<p>&gt; 확정 문답 `header_label_order`.</p>
+
+<h2>비즈니스 규칙</h2>
+
+<li>조회 규칙은 [[INF-ORD-003]]과 완전히 동일(`OrderDao.selectOrders` 재사용) — 별도 조회 규칙 없음. `del_yn = 'N'` 상시필터 포함</li>
+<li>페이징 미적용: `offset=0`, `size=Integer.MAX_VALUE`로 고정 호출(전체 건 CSV화)</li>
+<li>`orderedAt`은 `ISO_LOCAL_DATE_TIME` 고정 패턴으로 직렬화(가변폭 금지)</li>
+<li>CSV 필드는 RFC 4180 인용 규칙 적용(콤마·큰따옴표·개행 포함 시 큰따옴표로 감싸고 내부 큰따옴표는 이중화)</li>
+<li>CSV 수식 인젝션 방어: 필드 선두 문자가 `=`,`+`,`-`,`@`이면 작은따옴표(`'`)를 앞에 붙여 Excel이 수식으로 해석하지 않게 함(D11)</li>
+<li>파일 본문은 UTF-8 BOM 프리픽스 포함(Excel에서 한글 깨짐 방지)</li>
+
+<h2>오류 응답</h2>
+
+<table>
+<tr><td>코드</td><td>사유</td><td>발생 조건</td></tr>
+<tr><td>400</td><td>유효성 실패</td><td>파라미터 타입 오류</td></tr>
+<tr><td>401</td><td>인증 실패</td><td>토큰 없음/만료</td></tr>
+</table>
+
+<h2>인증·인가 (SR-204 — 전역 정책)</h2>
+<p>&gt; 이 오류 계약은 `/api/**` 전역에 적용되는 횡단 정책이다(구현: `ApiKeyAuthFilter`). 화면</p>
+<p>&gt; 라우트(/product/**·/cart·/order/**)는 무인증 유지. 개별 엔드포인트 INF는 이 정책을 상속한다.</p>
+
+<table>
+<tr><td>조건</td><td>상태</td><td>본문</td></tr>
+<tr><td>`X-Api-Key` 미제시/무효</td><td>401</td><td>`{"error":"unauthorized"}`</td></tr>
+<tr><td>member 스코프 키로 타 회원 자원 접근(소유권 불일치)</td><td>403</td><td>`{"error":"forbidden"}`</td></tr>
+<tr><td>회원 목록·주문 export 등 관리 자원에 member 키</td><td>403</td><td>admin 키 전용</td></tr>
+</table>
+
+<li>키 매핑은 앱 설정 `lab.api-keys`(admin→`*`, member→회원ID). 경로 판정은 서블릿 정규화 경로</li>
+<p>  기준(퍼센트 인코딩·matrix 파라미터 우회 차단, default-deny). 소유권은 자원의 실제 member_id를</p>
+<p>  DB 대조(orders/{orderNo}) — 토큰 문자열 대조가 아니다(SR-204 D15).</p>
+
+<h2>반출 상한 (SR-204 R-3)</h2>
+<li>결과 1000행 초과 → **413** `{"error":"payload_too_large","limit":1000}` (부분 반출 위장 없이 전량 거부, CSV 조립 전 판정). 이 엔드포인트는 **admin 키 전용**.</li>
+
+<h2>참조 테이블</h2>
+
+<li>ORDERS</li>
+<li>MEMBERS</li>
+
+<h2>curl 예시</h2>
+
+<pre><code>
+curl -X GET "/api/orders/export?memberId=M0001&amp;orderState=PLACED" \
+  -o orders.csv
+</code></pre></section><section class="doc" id="doc-16"><h2>INF-ORD-016 <span class="doc-name">api zipcodes</span></h2><h1>INF-ORD-016: GET /api/zipcodes</h1>
+
+<p>&gt; 코드(핸들러) 기준 재동기화 골격(zero-LLM) — 요청·응답·오류 계약은 보강 대상</p>
+
+<h2>개요</h2>
+
+<p>[TBD]</p>
+
+<h2>요청</h2>
+
+<p>[TBD]</p>
+
+<h2>응답</h2>
+
+<p>[TBD]</p>
+
+<h2>오류</h2>
+
+<p>[TBD]</p>
+
+<p>&gt; 보강: `/sl-sync --apply --kind=inf` 또는 ddd-api-agent</p>
+
+<h2>변경 이력</h2>
+<p>&lt;!-- spec-history: machine-managed --&gt;</p>
+<table>
+<tr><td>일자</td><td>SR</td><td>항목</td><td>변경 요약</td><td>커밋</td></tr>
+<tr><td>2026-09-19</td><td>SR-235</td><td>#3</td><td>GET /api/zipcodes 우편번호(도로명) 검색 API 구현 — 200 {items:[{zipcode,roadAddress,sido,sigungu}]}(0건 포함), 400 MBR-4202(검색어 정규화 후 2~50자 범위 밖), 숫자 검색어는 zipcode 전방일치도 포함(OR)</td><td>shop-api@1c82e8c, shop-web@8e1e3e3</td></tr>
+</table></section><section class="doc" id="doc-17"><h2>INF-ORD-017 <span class="doc-name">shop spa static serving</span></h2><h1>INF-ORD-017: GET /shop/** — 쇼핑 SPA 정적 서빙 + 딥링크 폴백</h1>
+
+<p>&gt; **개요:** shop-web(React/Vite) 빌드 산출물(`dist`)을 shop-api가 `/shop/**` 경로로 직접 서빙한다.</p>
+<p>&gt; 별도 개발 서버(:5273) 재기동 없이, shop-api 재기동 한 번으로 화면 변경이 반영되게 하는 것이 목적(SR-301).</p>
+<p>&gt; 새 REST 엔드포인트가 아니라 정적 리소스 매핑 + SPA 딥링크 폴백이며, 새 오류 코드·인증 계약 변경은 없다.</p>
+
+<p>&gt; **근거 소스:** `modules/shop-api/src/main/java/com/sm/lab/shop/web/ShopStaticResourceConfig.java:75-95`,</p>
+<p>&gt; `modules/shop-api/src/main/java/com/sm/lab/shop/controller/ShopIndexController.java:46-56`</p>
+
+<h2>요청</h2>
+
+<li>Method: GET</li>
+<li>Path 패턴 2종(경로 특이도로 자동 우선순위 결정, 등록 순서 무관):</li>
+<li>`/shop/assets/**` — Vite 빌드 산출물 중 해시 붙은 JS/CSS(장기 캐시 대상)</li>
+<li>`/shop/**` — 그 외 전부(정적 파일이 실재하면 그 파일, 없으면 SPA 딥링크로 간주)</li>
+<li>`/shop`·`/shop/`(경로 세그먼트 없음, 정확 일치) — `ShopIndexController`가 전담(아래 "구현 세부" 참고)</li>
+<li>인증: 무인증(`ApiKeyAuthFilter.isOpenRoute`에 `/shop`·`/shop/**` 화이트리스트, `modules/shop-api/.../ApiKeyAuthFilter.java:230`). 실제 데이터 접근은 여전히 `/api/**`(불변)에서만 일어나므로 이 화이트리스트가 자격 판정을 우회하지 않는다.</li>
+
+<h2>응답</h2>
+
+<table>
+<tr><td>요청 형태</td><td>응답</td></tr>
+<tr><td>`/shop/assets/{해시파일}` (실재)</td><td>200, 원본 Content-Type, `Cache-Control: max-age=31536000, public, immutable`</td></tr>
+<tr><td>`/shop`, `/shop/`, `/shop/index.html`</td><td>200, `text/html`, `Cache-Control: no-cache`, index.html 본문</td></tr>
+<tr><td>`/shop/{미매칭 딥링크}`(예: `/shop/products/123`)</td><td>200, `text/html`, `Cache-Control: no-cache`, index.html 본문(SPA 클라이언트 라우팅 위임)</td></tr>
+<tr><td>빌드 산출물 자체가 없음(`index.html` 부재)</td><td>404(Spring 표준, `NoResourceFoundException` 계열) — 200으로 위장하지 않는다</td></tr>
+<tr><td>`/shop/assets/{존재하지 않는 파일}`</td><td>404(자산은 폴백하지 않는다 — MIME 오류를 index.html로 감추지 않는다)</td></tr>
+</table>
+
+<h2>비즈니스 규칙</h2>
+
+<li>정적 자산(`/shop/assets/**`)과 SPA 폴백(`/shop/**`)은 서로 다른 캐시 정책을 쓴다: 해시 붙은 자산은 불변으로 간주(1년, `immutable`), `index.html`은 배포 직후 옛 화면이 남지 않도록 `no-cache`.</li>
+<li>SPA 폴백은 `PathResourceResolver`를 확장해 `super.getResource()`(Spring 내장 위치-이탈 방지)로 실제 파일을 먼저 찾고, 없을 때만 `index.html`로 대체한다 — 새 경로 순회(traversal) 표면을 만들지 않는다.</li>
+<li>`ResourceHttpRequestHandler`는 매핑 패턴을 벗겨낸 나머지 경로가 빈 문자열이면(정확히 `/shop`·`/shop/`) 리졸버 체인 진입 전에 자체 가드로 404를 내는 실측 제약이 있다 — 이 두 정확 경로만 `ShopIndexController`(`@GetMapping({"/shop","/shop/"})`)가 별도로 index.html을 직접 읽어 반환한다. 하위 미매칭 경로(`/shop/products/123` 등)는 리소스 경로가 비어있지 않으므로 `ShopStaticResourceConfig`의 폴백 리졸버가 정상 처리한다.</li>
+<li>빌드 산출물이 없어도 shop-api 기동은 성공한다 — 기동 시 1회(`@PostConstruct`) `index.html` 존재를 확인해 없으면 WARN 로그("...해결: modules/shop-web에서 npm run build 실행 후 shop-api 재빌드·재기동.")를 남기고, 요청마다 반복 로깅하지 않는다.</li>
+<li>`shop.static-location` 프로퍼티(기본값 `classpath:/static/shop/`)는 후행 슬래시 유무와 무관하게 정규화되어 동작한다(`ShopStaticResourceConfig`·`ShopIndexController` 양쪽 생성자에서 동일하게 보정).</li>
+<li>`/shop`으로 시작하지만 `/shop/`이 아닌 경로(예: `/shopkeeper`)는 화이트리스트 오매칭 없이 여전히 401(`ApiKeyAuthFilter`가 `equals("/shop") || startsWith("/shop/")` 정확 조합 사용).</li>
+<li>**클라이언트 진입 규칙(SR-302.1, 서버 계약 불변)**: 이 엔드포인트가 `index.html`을 반환한 뒤, 그 안의 SPA가 해시 없이 최초 로드되면 쇼핑 홈(`UIS-ORD-008`)으로 1회 이동하고 이후 `#/`는 주문 목록이다 — 자세한 내용은 `UIS-ORD-008`의 "진입/라우팅" 참고. 이 문서의 요청·응답·앵커 줄 범위는 변경되지 않았다(클라이언트 라우팅은 이 서버 엔드포인트 밖의 동작).</li>
+
+<h2>빌드·배포 절차 (AC "빌드 산출물 위치·갱신 방법" 확정값)</h2>
+
+<p>1. `modules/shop-web`에서 `npm run build` 실행 → `modules/shop-web/dist` 생성. 이때 `vite.config.ts`의 `base`가 `command==='build'`일 때만 `/shop/`으로 설정되어(개발 서버 `npm run dev`, :5273은 `base:'/'` 그대로 무변경) 산출물의 자산 참조 경로가 `/shop/assets/...`로 나온다.</p>
+<p>2. `modules/shop-api`에서 Maven 빌드(`mvnw` 등) 시 `generate-resources` 단계에서 `maven-resources-plugin`(`pom.xml:93-119`, 실행 id `copy-shop-spa-dist`)이 `../shop-web/dist`를 `target/classes/static/shop`으로 복사한다. `src/main/resources`(소스 트리)는 건드리지 않으므로 `.gitignore` 변경 불필요.</p>
+<p>3. `shop-web/dist`가 없는 환경(예: 아직 한 번도 빌드하지 않음)에서도 이 복사 단계는 조용히 건너뛰고 빌드·기동이 실패하지 않는다.</p>
+<p>4. 화면을 갱신하려면: shop-web에서 `npm run build` 재실행 → shop-api 재빌드·재기동 1회. (SR-301의 목적 — 별도 개발 서버 재기동 불필요)</p>
+
+<h2>오류 응답</h2>
+
+<p>새 오류 코드는 만들지 않는다(`{code,message}` 오류 계약 대상 아님 — 정적 리소스 표준 응답만 사용).</p>
+
+<table>
+<tr><td>상태</td><td>조건</td></tr>
+<tr><td>404</td><td>요청 경로에 대응하는 정적 파일·`index.html` 모두 없음(빌드 산출물 없음)</td></tr>
+<tr><td>404</td><td>`/shop/assets/**` 하위 자산 요청인데 실제 파일 없음(SPA 폴백 대상 아님)</td></tr>
+<tr><td>401</td><td>`/shop`·`/shop/**` 밖의 경로(`/api/**` 등)를 인증 헤더 없이 요청(기존 계약 불변)</td></tr>
+</table>
+
+<h2>범위 밖</h2>
+
+<li>빌드된 SPA가 실제로 `/api/**`를 호출해 정상 동작하는지(런타임 API 연동)는 이 SR 범위 밖 — 후속 SR 후보.</li>
+<li>`npm run build` + Maven 빌드를 한 명령으로 묶는 배포 자동화는 이 SR 범위 밖.</li>
+<li>개발 서버(:5273)의 `server.proxy` 등 구성 변경 없음 — `vite.config.ts`는 `base`(빌드 전용) 한 줄만 조건부 변경.</li>
+
+<h2>스펙 ID 참고</h2>
+
+<p>`INF-ORD-017`은 SR-212(`docs/00_FUNC/stories/STORY-FUNC-order-016.md`, "상품 리뷰 API")가 과거 예약했던 것과 같은 번호이나, SR-212는 원장에서 SUPERSEDED(대체)되어 그 예약이 살아있는 점유가 아니고(claim 해제됨, v5.1부터 실행 불가한 레거시 FUNC STORY로 읽기 전용 이력), 실제 `INF-ORD-017.md` 스펙 파일 자체가 이 SR 이전까지 존재하지 않았다(사람 확인·승인 — SR-301.1 STORY `## Dev 기록`).</p>
+
+<h2>curl 예시</h2>
+
+<pre><code>
+curl -i http://localhost:8087/shop/
+curl -i http://localhost:8087/shop/products/123
+curl -i http://localhost:8087/shop/assets/index-9yozd6aq.js
+</code></pre>
+
+<h2>변경 이력</h2>
+<p>&lt;!-- spec-history: machine-managed --&gt;</p>
+<table>
+<tr><td>일자</td><td>SR</td><td>항목</td><td>변경 요약</td><td>커밋</td></tr>
+<tr><td>2026-09-17</td><td>SR-301</td><td>#1</td><td>신규: shop-web 빌드 산출물을 /shop/**로 정적 서빙 + SPA 딥링크 폴백(ShopStaticResourceConfig·ShopIndexController), /shop 인증 화이트리스트, maven-resources-plugin dist 복사, vite base 조건부 변경</td><td>shop-api@0f75df7, shop-web@7feb578</td></tr>
+<tr><td>2026-09-17</td><td>SR-302</td><td>#1</td><td>클라이언트 진입 규칙 각주 추가(서버 계약·앵커 불변) — index.html 반환 후 SPA가 쇼핑 홈으로 이동하는 규칙을 UIS-ORD-008에 위임</td><td>shop-web@efd0e7c</td></tr>
+</table></section>
+</body></html>

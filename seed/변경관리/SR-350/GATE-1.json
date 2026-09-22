@@ -1,0 +1,124 @@
+{
+  "func": "SR-350.1",
+  "epic": null,
+  "story": "docs/변경관리/SR-350/STORY-1.md",
+  "gate": "PASS",
+  "reviewer": "qa-agent",
+  "updated": "2026-09-21T12:44:48",
+  "layers": {
+    "rules": "pass",
+    "scope": "pass"
+  },
+  "top_issues": [
+    {
+      "severity": "low",
+      "layer": "scope",
+      "finding": "판정 불능: 워킹트리에 변경이 없습니다(SR-350.1) — 이미 반영(커밋)됐거나 아직 시작하지 않았습니다. 이 축은 HEAD 대비 변경을 봅니다",
+      "suggested_action": "커밋 뒤라면 정상입니다. 아직이라면 구현을 시작하세요"
+    }
+  ],
+  "rounds": [
+    {
+      "round": 1,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "rules": "pass"
+      },
+      "top_issues": [],
+      "layer": "rules"
+    },
+    {
+      "round": 2,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "rules": "pass",
+        "scope": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "판정 불능: 워킹트리에 변경이 없습니다(SR-350.1) — 이미 반영(커밋)됐거나 아직 시작하지 않았습니다. 이 축은 HEAD 대비 변경을 봅니다",
+          "suggested_action": "커밋 뒤라면 정상입니다. 아직이라면 구현을 시작하세요"
+        }
+      ],
+      "layer": "scope"
+    },
+    {
+      "round": 3,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "rules": "pass",
+        "scope": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "판정 불능: 워킹트리에 변경이 없습니다(SR-350.1) — 이미 반영(커밋)됐거나 아직 시작하지 않았습니다. 이 축은 HEAD 대비 변경을 봅니다",
+          "suggested_action": "커밋 뒤라면 정상입니다. 아직이라면 구현을 시작하세요"
+        }
+      ],
+      "layer": "rules"
+    },
+    {
+      "round": 4,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "rules": "pass",
+        "scope": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "판정 불능: 워킹트리에 변경이 없습니다(SR-350.1) — 이미 반영(커밋)됐거나 아직 시작하지 않았습니다. 이 축은 HEAD 대비 변경을 봅니다",
+          "suggested_action": "커밋 뒤라면 정상입니다. 아직이라면 구현을 시작하세요"
+        }
+      ],
+      "layer": "scope"
+    }
+  ],
+  "waiver": {
+    "active": false
+  },
+  "story_transitions": [
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "SR 승인(SR-350)",
+      "at": "2026-09-21T09:00:56"
+    },
+    {
+      "from": "Approved",
+      "to": "InProgress",
+      "by": "기능점검",
+      "at": "2026-09-21T09:09:15",
+      "forced": true,
+      "force_reason": "기능 전수 점검 — 실제 구현 없이 화면 흐름만 확인한다"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "기능점검",
+      "at": "2026-09-21T09:09:15",
+      "forced": true,
+      "force_reason": "기능 전수 점검 — 실제 구현 없이 화면 흐름만 확인한다"
+    },
+    {
+      "from": "Review",
+      "to": "Done",
+      "by": "기능점검",
+      "at": "2026-09-21T09:09:16",
+      "forced": true,
+      "force_reason": "기능 전수 점검 — 실제 구현 없이 화면 흐름만 확인한다"
+    }
+  ],
+  "escalate": false,
+  "fail_rounds": 0,
+  "max_rounds": 3
+}

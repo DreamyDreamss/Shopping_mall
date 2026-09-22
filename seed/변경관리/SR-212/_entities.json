@@ -1,0 +1,17 @@
+{
+  "tables": [],
+  "tables_unknown": [],
+  "infs": [],
+  "infs_unmatched": [],
+  "paths": [],
+  "paths_candidate": [],
+  "screens": [
+    "상품 목록",
+    "상품 상세"
+  ],
+  "uis_ids": [
+    "UIS-ORD-004"
+  ],
+  "terms": [],
+  "entities_arg": "상품 목록,상품 상세,UIS-ORD-004"
+}

@@ -1,0 +1,57 @@
+/* SR-310 — Button 3종. :hover/:focus-visible 의사클래스는 인라인 스타일로 표현할 수 없어
+   이 파일로 분리한다(값은 전부 tokens.css의 CSS 변수를 참조 — 실값을 여기 다시 적지 않는다). */
+.cmn-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-5);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.cmn-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.cmn-btn--primary {
+  background: var(--color-text);
+  color: #fff;
+}
+.cmn-btn--primary:hover:not(:disabled) {
+  opacity: 0.85;
+}
+.cmn-btn--primary:focus-visible {
+  outline: 2px solid var(--color-info);
+  outline-offset: 2px;
+}
+
+.cmn-btn--secondary {
+  background: #fff;
+  color: var(--color-text);
+  border-color: var(--color-text-tertiary);
+}
+.cmn-btn--secondary:hover:not(:disabled) {
+  background: var(--color-surface-2);
+}
+.cmn-btn--secondary:focus-visible {
+  outline: 2px solid var(--color-info);
+  outline-offset: 2px;
+}
+
+.cmn-btn--purchase {
+  background: var(--gradient-primary);
+  color: #fff;
+}
+.cmn-btn--purchase:hover:not(:disabled) {
+  opacity: 0.9;
+}
+.cmn-btn--purchase:focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: 2px;
+}

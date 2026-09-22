@@ -1,0 +1,41 @@
+{
+ "generated_at": "2026-08-23T05:30:44",
+ "fks": [
+  {
+   "table": "cart_items",
+   "column": "member_id",
+   "ref_table": "members",
+   "ref_column": "member_id"
+  },
+  {
+   "table": "cart_items",
+   "column": "sku",
+   "ref_table": "products",
+   "ref_column": "sku"
+  },
+  {
+   "table": "order_delivery",
+   "column": "order_no",
+   "ref_table": "orders",
+   "ref_column": "order_no"
+  },
+  {
+   "table": "order_items",
+   "column": "order_no",
+   "ref_table": "orders",
+   "ref_column": "order_no"
+  },
+  {
+   "table": "order_items",
+   "column": "sku",
+   "ref_table": "products",
+   "ref_column": "sku"
+  },
+  {
+   "table": "orders",
+   "column": "member_id",
+   "ref_table": "members",
+   "ref_column": "member_id"
+  }
+ ]
+}

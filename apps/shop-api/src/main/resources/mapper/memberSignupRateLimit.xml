@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- linked_func: FUNC-member-002 -->
+<!-- spec: docs/00_FUNC/stories/STORY-FUNC-member-002.md -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sm.lab.shop.dao.MemberSignupRateLimitDao">
+
+  <!-- round4(사람 결정, STORY 재작업 지시(A)) — 원자 판정 UPSERT. 조건 미달 시 IF의 else
+       분기가 "기존 값 그대로"를 대입해 실제 행 변경이 없게 만든다. day_key가 PK의 일부라
+       날짜가 바뀌면 새 행이 INSERT되어 daily_count가 자연히 1부터 다시 시작한다(day
+       rollover를 별도 수식으로 판정할 필요가 없음).
+       round5(사람 결정, STORY 재작업 지시(1)) — last_token 컬럼을 같은 조건으로 함께 갱신한다.
+       판정은 이 문장의 반환값(affected rows)이 아니라, 뒤이은 selectRateLimit이 읽는
+       last_token(내 토큰이 저장돼 있으면 허용)으로 한다 — datasource useAffectedRows
+       설정에 더 이상 의존하지 않는다(그 설정이 FUNC-order-002 ProductDao.decreaseStock의
+       반환값 시맨틱까지 바꿔 qty=0 주문 라인 회귀를 냈다).
+       round6(사람 결정, round5 QA CONCERNS 재작업 지시 1) — round5는 세 컬럼
+       (daily_count/last_requested_at/last_token)의 IF 조건을 각자 다시 써서, 뒤에 오는
+       표현식이 앞서 갱신된 컬럼의 새 값을 보는 문제(SET 목록 좌→우 평가 — 이것 자체는
+       MySQL/MariaDB가 문서화한 동작)를 세션 변수(@msrl_admit)로 우회했었다. 그런데 세션
+       변수를 같은 문장 안에서 대입하고 곧바로 읽는 패턴은 별개의 문제다 — MySQL/MariaDB
+       매뉴얼은 "SET 문 밖에서 사용자 변수에 값을 대입하고 그 값을 같은 문장에서 읽는
+       것의 평가 순서는 정의되지 않는다"고 명시 경고한다(round5의 매퍼 주석이 이 세션
+       변수 사용까지 "문서화된 동작"이라 적은 것은 부정확했다 — 정정한다). round6은 세션
+       변수를 완전히 없애고, SET 목록의 좌→우 평가만으로 결정적인 형태로 다시 썼다:
+       (1) last_token을 SET 목록 맨 앞에서, 아직 갱신되지 않은 원본 last_requested_at·
+       daily_count만 보고 갱신한다. (2) 이어지는 last_requested_at·daily_count는 "방금
+       이 문장에서 기록된 last_token이 내 토큰과 같은가"만으로 조건 분기한다 — 이 두
+       번째 판정은 last_token이 이미 갱신된 뒤의 값을 참조하므로(SET 목록 좌→우 평가,
+       실제로 문서화된 동작) 세션 변수의 대입/읽기 순서 문제와는 무관하게 결정적이다.
+       INSERT 브랜치(신규 target+day_key)는 이 조건 분기 자체가 없다 — 신규 행이므로
+       당연히 허용, last_token을 이번 요청 토큰으로 바로 넣는다. -->
+  <insert id="touchRateLimit">
+    INSERT INTO MEMBER_SIGNUP_RATE_LIMITS (target, day_key, daily_count, last_requested_at, last_token)
+    VALUES (#{target}, #{dayKey}, 1, #{now}, #{token})
+    ON DUPLICATE KEY UPDATE
+      last_token = IF(last_requested_at &lt;= #{now} - INTERVAL #{cooldownSeconds} SECOND
+                        AND daily_count &lt; #{dailyLimit}, #{token}, last_token),
+      last_requested_at = IF(last_token = #{token}, #{now}, last_requested_at),
+      daily_count = IF(last_token = #{token}, daily_count + 1, daily_count)
+  </insert>
+
+  <select id="selectRateLimit" resultType="com.sm.lab.shop.domain.MemberSignupRateLimit">
+    SELECT target, day_key, daily_count, last_requested_at, last_token
+      FROM MEMBER_SIGNUP_RATE_LIMITS
+     WHERE target = #{target}
+       AND day_key = #{dayKey}
+  </select>
+
+  <delete id="deleteRateLimit">
+    DELETE FROM MEMBER_SIGNUP_RATE_LIMITS
+     WHERE target = #{target}
+       AND day_key = #{dayKey}
+  </delete>
+
+  <!-- round4(STORY 재작업 지시(B)) — 배치 전용. 오늘보다 이전 날짜 행만 삭제. -->
+  <delete id="purgeOldRows">
+    DELETE FROM MEMBER_SIGNUP_RATE_LIMITS
+     WHERE day_key &lt; #{beforeDay}
+  </delete>
+
+</mapper>

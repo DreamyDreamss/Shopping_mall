@@ -1,0 +1,20 @@
+{
+  "title": "주문 목록 CSV 내보내기",
+  "stories": [
+    "FUNC-order-013"
+  ],
+  "clarification": "none",
+  "new_funcs": [
+    {
+      "func_id": "FUNC-order-013",
+      "kind": "inf",
+      "spec_id": "INF-ORD-015"
+    }
+  ],
+  "affected": {
+    "inf": [],
+    "sch": [],
+    "uis": []
+  },
+  "generated_at": "2026-08-23T07:48:12"
+}

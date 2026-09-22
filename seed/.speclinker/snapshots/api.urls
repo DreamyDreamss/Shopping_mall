@@ -1,0 +1,13 @@
+# 응답 값 대조 주소록(축 D) — 한 줄 한 요청. GET은 경로만, POST는 `POST /경로 {json}`.
+# 조회 전용 엔드포인트만 둔다(캡처가 데이터를 바꾸면 안 된다). 인증은 project.env SNAP_AUTH_HEADER.
+# 2026-09-16 — 주문 조회는 기간을 명시한다: 기본 조회창이 "오늘-30일"이라 날짜만 흘러도 값이 바뀐다(SR-300).
+# 파라미터 이름은 컨트롤러 시그니처 그대로(ProductController keyword/inStock · OrderController startDate/endDate/page/size).
+/api/products
+/api/products?inStock=true
+/api/products?keyword=%EC%83%81%ED%92%88
+/api/orders?startDate=2026-01-01&endDate=2026-12-31
+/api/orders?startDate=2026-01-01&endDate=2026-12-31&page=1&size=10
+/api/orders?startDate=2026-01-01&endDate=2026-12-31&page=1&size=20
+/api/orders?startDate=2026-01-01&endDate=2026-12-31&orderState=PAID
+/api/members
+/api/members/grades

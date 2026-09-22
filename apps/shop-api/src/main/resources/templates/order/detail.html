@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>주문 상세</title>
+  <style>
+    body { font-family: "Malgun Gothic", sans-serif; margin: 24px; color: #1c2128; }
+    h1 { font-size: 20px; } h2 { font-size: 15px; margin-top: 24px; }
+    table { border-collapse: collapse; width: 100%; font-size: 13px; margin-top: 8px; }
+    th, td { border: 1px solid #d7dbe0; padding: 8px 10px; text-align: left; }
+    th { background: #f1f3f6; width: 140px; }
+    .btn { display: inline-block; margin-top: 16px; padding: 8px 14px; background: #c92a2a; color: #fff;
+           border: none; font-size: 13px; cursor: pointer; }
+    a { color: #3b5bdb; }
+  </style>
+</head>
+<body>
+<a href="/order/list">← 주문 목록</a>
+<h1>주문 상세 — <span th:text="${order.orderNo}">20260817-0001</span></h1>
+
+<table>
+  <tr><th>회원</th><td th:text="${order.memberName} + ' (' + ${order.memberId} + ')'">김실증</td></tr>
+  <tr><th>상태</th><td th:text="${order.orderState}">PLACED</td></tr>
+  <tr><th>총액</th><td th:text="${#numbers.formatInteger(order.totalAmount, 3, 'COMMA')} + '원'">129,000원</td></tr>
+  <tr><th>주문일시</th><td th:text="${#temporals.format(order.orderedAt, 'yyyy-MM-dd HH:mm')}">2026-08-17 09:00</td></tr>
+</table>
+
+<h2>주문 상품</h2>
+<table>
+  <thead><tr><th>라인</th><th>SKU</th><th>상품명</th><th>수량</th><th>단가</th></tr></thead>
+  <tbody>
+  <tr th:each="i : ${order.items}">
+    <td th:text="${i.lineNo}">1</td>
+    <td th:text="${i.sku}">SKU-1002</td>
+    <td th:text="${i.productName}">기계식 키보드</td>
+    <td th:text="${i.qty}">1</td>
+    <td th:text="${#numbers.formatInteger(i.unitPrice, 3, 'COMMA')} + '원'">129,000원</td>
+  </tr>
+  </tbody>
+</table>
+
+<h2>배송</h2>
+<table>
+  <thead><tr><th>배송번호</th><th>상태</th><th>송장</th><th>출고일시</th></tr></thead>
+  <tbody>
+  <tr th:each="d : ${order.deliveries}">
+    <td th:text="${d.deliveryNo}">D-0816-1</td>
+    <td th:text="${d.deliveryState}">SHIPPED</td>
+    <td th:text="${d.invoiceNo} ?: '—'">INV-88031</td>
+    <td th:text="${d.shippedAt != null} ? ${#temporals.format(d.shippedAt, 'yyyy-MM-dd HH:mm')} : '—'">—</td>
+  </tr>
+  <tr th:if="${#lists.isEmpty(order.deliveries)}"><td colspan="4">배송 없음</td></tr>
+  </tbody>
+</table>
+
+<button class="btn" id="btnCancel"
+        th:attr="onclick=|fetch('/api/orders/${order.orderNo}/cancel', {method: 'PATCH'}).then(function () { location.reload() })|">
+  주문 취소
+</button>
+</body>
+</html>

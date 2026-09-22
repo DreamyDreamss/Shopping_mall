@@ -1,0 +1,22 @@
+{
+  "title": "SR-227",
+  "stories": [
+    "FUNC-order-001"
+  ],
+  "clarification": "none",
+  "new_funcs": [],
+  "affected": {
+    "inf": [],
+    "sch": [],
+    "uis": [
+      "UIS-ORD-001"
+    ],
+    "bat": []
+  },
+  "story_files": [
+    "src/components/DeliveryBadge.stories.tsx",
+    "src/components/OrderFilters.stories.tsx",
+    "src/components/OrderTable.stories.tsx"
+  ],
+  "generated_at": "2026-09-11T13:21:15"
+}

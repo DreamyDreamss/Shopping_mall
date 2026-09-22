@@ -1,0 +1,117 @@
+[
+  {
+    "domain": "order",
+    "domainCode": "ORD",
+    "domainDescription": "주문 생성·조회·취소·배송 조회를 축으로 회원(Member)·상품(Product) 조회까지 포함하는 단일 도메인. Member/Order/Product 3개 컨트롤러는 개념적으로 구분되지만, controller/service/dao/domain 전 계층이 com.sm.lab.shop 패키지 하위에 layer-by-type(계층별)으로 flat 배치되어 있어(도메인별 하위 디렉토리 없음) 디렉토리 경로 기준으로는 분리되지 않는다. rootPaths는 prefix 매칭(in_roots)만 지원하므로 3개 도메인에 동일 경로를 배정하면 각 도메인이 17개 파일을 전부 중복 매칭하게 되어 기계적으로 성립하지 않는다. 파일수 기준(10개 미만 인접 도메인 흡수)으로도 Member(4개: Controller/Service/Dao/Member.java)·Product(4개)는 흡수 대상이라 Order(8개: Controller/ViewController/Service/Dao/Order·OrderDelivery·OrderItem·OrderSummary.java)에 통합한다.",
+    "layer": "",
+    "filePath": "{{SRC_SHOP_API}}/src/main/java/com/sm/lab/shop/controller/CartController.java",
+    "infIdStart": 16,
+    "apiRoutes": [
+      {
+        "method": "POST",
+        "path": "/api/cart/items",
+        "handler": "addItem"
+      },
+      {
+        "method": "GET",
+        "path": "/api/cart",
+        "handler": "get"
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/cart/items/{sku}",
+        "handler": "updateQty"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/cart/items/{sku}",
+        "handler": "delete"
+      },
+      {
+        "method": "POST",
+        "path": "/api/cart/checkout",
+        "handler": "checkout"
+      }
+    ]
+  },
+  {
+    "domain": "order",
+    "domainCode": "ORD",
+    "domainDescription": "주문 생성·조회·취소·배송 조회를 축으로 회원(Member)·상품(Product) 조회까지 포함하는 단일 도메인. Member/Order/Product 3개 컨트롤러는 개념적으로 구분되지만, controller/service/dao/domain 전 계층이 com.sm.lab.shop 패키지 하위에 layer-by-type(계층별)으로 flat 배치되어 있어(도메인별 하위 디렉토리 없음) 디렉토리 경로 기준으로는 분리되지 않는다. rootPaths는 prefix 매칭(in_roots)만 지원하므로 3개 도메인에 동일 경로를 배정하면 각 도메인이 17개 파일을 전부 중복 매칭하게 되어 기계적으로 성립하지 않는다. 파일수 기준(10개 미만 인접 도메인 흡수)으로도 Member(4개: Controller/Service/Dao/Member.java)·Product(4개)는 흡수 대상이라 Order(8개: Controller/ViewController/Service/Dao/Order·OrderDelivery·OrderItem·OrderSummary.java)에 통합한다.",
+    "layer": "",
+    "filePath": "{{SRC_SHOP_API}}/src/main/java/com/sm/lab/shop/controller/MemberController.java",
+    "infIdStart": 16,
+    "apiRoutes": [
+      {
+        "method": "GET",
+        "path": "/api/members",
+        "handler": "list"
+      },
+      {
+        "method": "GET",
+        "path": "/api/members/{memberId}",
+        "handler": "get"
+      }
+    ]
+  },
+  {
+    "domain": "order",
+    "domainCode": "ORD",
+    "domainDescription": "주문 생성·조회·취소·배송 조회를 축으로 회원(Member)·상품(Product) 조회까지 포함하는 단일 도메인. Member/Order/Product 3개 컨트롤러는 개념적으로 구분되지만, controller/service/dao/domain 전 계층이 com.sm.lab.shop 패키지 하위에 layer-by-type(계층별)으로 flat 배치되어 있어(도메인별 하위 디렉토리 없음) 디렉토리 경로 기준으로는 분리되지 않는다. rootPaths는 prefix 매칭(in_roots)만 지원하므로 3개 도메인에 동일 경로를 배정하면 각 도메인이 17개 파일을 전부 중복 매칭하게 되어 기계적으로 성립하지 않는다. 파일수 기준(10개 미만 인접 도메인 흡수)으로도 Member(4개: Controller/Service/Dao/Member.java)·Product(4개)는 흡수 대상이라 Order(8개: Controller/ViewController/Service/Dao/Order·OrderDelivery·OrderItem·OrderSummary.java)에 통합한다.",
+    "layer": "",
+    "filePath": "{{SRC_SHOP_API}}/src/main/java/com/sm/lab/shop/controller/OrderController.java",
+    "infIdStart": 16,
+    "apiRoutes": [
+      {
+        "method": "GET",
+        "path": "/api/orders",
+        "handler": "list"
+      },
+      {
+        "method": "GET",
+        "path": "/api/orders/{orderNo}",
+        "handler": "detail"
+      },
+      {
+        "method": "POST",
+        "path": "/api/orders",
+        "handler": "create"
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/orders/{orderNo}/cancel",
+        "handler": "cancel"
+      },
+      {
+        "method": "GET",
+        "path": "/api/orders/{orderNo}/deliveries",
+        "handler": "deliveries"
+      },
+      {
+        "method": "GET",
+        "path": "/api/orders/export",
+        "handler": "export"
+      }
+    ]
+  },
+  {
+    "domain": "order",
+    "domainCode": "ORD",
+    "domainDescription": "주문 생성·조회·취소·배송 조회를 축으로 회원(Member)·상품(Product) 조회까지 포함하는 단일 도메인. Member/Order/Product 3개 컨트롤러는 개념적으로 구분되지만, controller/service/dao/domain 전 계층이 com.sm.lab.shop 패키지 하위에 layer-by-type(계층별)으로 flat 배치되어 있어(도메인별 하위 디렉토리 없음) 디렉토리 경로 기준으로는 분리되지 않는다. rootPaths는 prefix 매칭(in_roots)만 지원하므로 3개 도메인에 동일 경로를 배정하면 각 도메인이 17개 파일을 전부 중복 매칭하게 되어 기계적으로 성립하지 않는다. 파일수 기준(10개 미만 인접 도메인 흡수)으로도 Member(4개: Controller/Service/Dao/Member.java)·Product(4개)는 흡수 대상이라 Order(8개: Controller/ViewController/Service/Dao/Order·OrderDelivery·OrderItem·OrderSummary.java)에 통합한다.",
+    "layer": "",
+    "filePath": "{{SRC_SHOP_API}}/src/main/java/com/sm/lab/shop/controller/ProductController.java",
+    "infIdStart": 16,
+    "apiRoutes": [
+      {
+        "method": "GET",
+        "path": "/api/products",
+        "handler": "list"
+      },
+      {
+        "method": "GET",
+        "path": "/api/products/{sku}",
+        "handler": "get"
+      }
+    ]
+  }
+]

@@ -1,0 +1,19 @@
+{
+  "generated_at": "2026-09-15T03:33:47",
+  "generator": "quick_sr",
+  "types": [
+    "quick"
+  ],
+  "items": [
+    {
+      "id": "quick_scope",
+      "type": "quick",
+      "required": true,
+      "state": "확정",
+      "question": "이번 변경에서 하는 것은?",
+      "answer": "로그인 실패 5회 잠금 안내 문구를 '잠시 후 다시 시도'로 바꾼다",
+      "by": "quick",
+      "at": "2026-09-15T03:33:47"
+    }
+  ]
+}

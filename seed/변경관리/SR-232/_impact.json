@@ -1,0 +1,43 @@
+{
+  "title": "SR-232",
+  "stories": [
+    "FUNC-member-004",
+    "FUNC-member-005",
+    "FUNC-member-006"
+  ],
+  "clarification": "none",
+  "new_funcs": [
+    {
+      "func_id": "FUNC-member-004",
+      "kind": "uis",
+      "spec_id": "UIS-MBR-002",
+      "name": "로그인 화면",
+      "module": "shop-web",
+      "module_path": "{{SRC_SHOP_WEB}}"
+    },
+    {
+      "func_id": "FUNC-member-005",
+      "kind": "inf",
+      "spec_id": "INF-MBR-003",
+      "name": "로그인 API",
+      "module": "shop-api",
+      "module_path": "{{SRC_SHOP_API}}"
+    },
+    {
+      "func_id": "FUNC-member-006",
+      "kind": "inf",
+      "spec_id": "INF-MBR-004",
+      "name": "로그아웃·자동 로그인 토큰 API",
+      "module": "shop-api",
+      "module_path": "{{SRC_SHOP_API}}"
+    }
+  ],
+  "affected": {
+    "inf": [],
+    "sch": [],
+    "uis": [],
+    "bat": []
+  },
+  "story_files": [],
+  "generated_at": "2026-09-12T19:59:23"
+}

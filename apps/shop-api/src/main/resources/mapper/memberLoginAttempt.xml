@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- linked_func: FUNC-member-005 -->
+<!-- spec: docs/00_FUNC/stories/STORY-FUNC-member-005.md -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sm.lab.shop.dao.MemberLoginAttemptDao">
+
+  <!-- 원자 UPSERT(사람 결정, 세션변수 금지 — 사례집 r3/r6 재발 방지 — SET 목록 좌→우 평가만
+       사용). fail_count를 먼저 갱신하고, 이어지는 locked_until 계산에서 그 새 값을 그대로
+       읽는다(SET 목록 좌→우 평가는 MySQL/MariaDB가 문서화한 동작 — memberSignupRateLimit.xml
+       round6과 동일 관용구, 세션 변수는 전혀 쓰지 않는다). -->
+  <insert id="touchFailure">
+    INSERT INTO MEMBER_LOGIN_ATTEMPTS (email, fail_count, locked_until, last_failed_at)
+    VALUES (#{email}, 1, NULL, #{now})
+    ON DUPLICATE KEY UPDATE
+      fail_count = IF(locked_until IS NOT NULL AND locked_until &lt;= #{now}, 1, fail_count + 1),
+      locked_until = IF(fail_count &gt;= #{maxAttempts}, TIMESTAMPADD(MINUTE, #{lockMinutes}, #{now}), NULL),
+      last_failed_at = #{now}
+  </insert>
+
+  <select id="selectAttempt" resultType="com.sm.lab.shop.domain.MemberLoginAttempt">
+    SELECT email, fail_count, locked_until, last_failed_at
+      FROM MEMBER_LOGIN_ATTEMPTS
+     WHERE email = #{email}
+  </select>
+
+  <delete id="reset">
+    DELETE FROM MEMBER_LOGIN_ATTEMPTS WHERE email = #{email}
+  </delete>
+
+</mapper>

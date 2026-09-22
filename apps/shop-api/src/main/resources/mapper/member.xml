@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sm.lab.shop.dao.MemberDao">
+
+  <!-- 탈퇴 회원 제외 상시필터 -->
+  <select id="selectMembers" resultType="com.sm.lab.shop.domain.Member">
+    SELECT m.member_id, m.member_name, m.grade, m.phone, m.created_at
+      FROM MEMBERS m
+     WHERE m.del_yn = 'N'
+     ORDER BY m.member_id
+  </select>
+
+  <select id="selectById" resultType="com.sm.lab.shop.domain.Member">
+    SELECT m.member_id, m.member_name, m.grade, m.phone, m.created_at
+      FROM MEMBERS m
+     WHERE m.del_yn = 'N'
+       AND m.member_id = #{memberId}
+  </select>
+
+  <!-- linked_func: FUNC-member-003 — round3(사람 결정) STEP 0 사전 판정(비트랜잭션, 안내용).
+       email/phone_norm 중 요청 채널에 해당하지 않는 쪽은 항상 null로 넘어와 그 조건은 매치되지
+       않는다(SQL '=' 비교는 null과 절대 같지 않음). del_yn 필터를 두지 않는 이유는 MemberDao
+       인터페이스 javadoc 참고 — 최종 UNIQUE 인덱스와 판정 결과를 일치시키기 위함. -->
+  <select id="selectMemberIdByEmailOrPhoneNorm" resultType="java.lang.String">
+    SELECT member_id
+      FROM MEMBERS
+     WHERE email = #{email}
+        OR phone_norm = #{phoneNorm}
+     LIMIT 1
+  </select>
+
+  <!-- linked_func: FUNC-member-003 — SR-231 가입 요청 API 회원 생성. email/phone_norm UNIQUE
+       인덱스(V3__members_signup.sql, round2)가 중복을 원자적으로 막는다(선조회 없음). del_yn은
+       테이블 기본값 'N'을 그대로 사용(이 INSERT 문이 명시하지 않음 — 회귀: 기존 조회의
+       "탈퇴 제외" 상시필터 의미가 그대로 성립). round2 — phone_norm(숫자만 정규화)을 함께
+       저장한다(V3__members_signup.sql round2 참고, 원문 phone 컬럼·값은 그대로 유지). -->
+  <insert id="insertMember">
+    INSERT INTO MEMBERS (member_id, member_name, grade, email, phone, phone_norm, password_hash, marketing_opt_in, created_at)
+    VALUES (#{memberId}, #{memberName}, #{grade}, #{email}, #{phone}, #{phoneNorm}, #{passwordHash}, #{marketingOptIn}, #{createdAt})
+  </insert>
+
+  <!-- linked_func: FUNC-member-003 — 테스트 정리 전용(위 insertMember 참고) -->
+  <delete id="deleteById">
+    DELETE FROM MEMBERS WHERE member_id = #{memberId}
+  </delete>
+
+  <!-- linked_func: FUNC-member-003 — round2(사람 결정) 회원 ID 원자 채번. ID_SEQUENCES는
+       V3__members_signup.sql round2가 만들고 기존 최대 member_id 번호로 시드한다. INSERT
+       브랜치에도 LAST_INSERT_ID(1)을 명시해, (이론상으로만 가능한) 시드 누락 상황에서도
+       SELECT LAST_INSERT_ID()가 항상 이 문장이 실제로 넣은/올린 값을 반환하게 한다. -->
+  <insert id="touchMemberIdSeq">
+    INSERT INTO ID_SEQUENCES (name, next_val) VALUES ('MEMBER_ID', LAST_INSERT_ID(1))
+    ON DUPLICATE KEY UPDATE next_val = LAST_INSERT_ID(next_val + 1)
+  </insert>
+
+  <!-- linked_func: FUNC-member-003 — 위 touchMemberIdSeq 직후, 같은 커넥션(같은 @Transactional)
+       안에서만 호출해야 하는 세션 스코프 조회. -->
+  <select id="selectLastMemberIdSeq" resultType="long">
+    SELECT LAST_INSERT_ID()
+  </select>
+
+  <!-- linked_func: FUNC-member-005 — 로그인 인증 전용 조회. del_yn 필터 없음(MemberDao 인터페이스
+       javadoc 참고 — 탈퇴 회원도 조회해 서비스가 "회원 없음"과 동일한 401로 응답하게 하기 위함,
+       존재 판정 오라클 방지). -->
+  <select id="selectAuthByEmail" resultType="com.sm.lab.shop.domain.MemberCredential">
+    SELECT m.member_id, m.member_name, m.grade, m.password_hash, m.del_yn
+      FROM MEMBERS m
+     WHERE m.email = #{email}
+  </select>
+
+  <!-- linked_func: FUNC-member-009 — 비밀번호 재설정 확정 전용 조회. LOWER(email)로 명시 비교
+       (호출측이 이미 소문자화한 값을 넘긴다 — DB collation 대소문자 구분 여부에 매칭을 맡기지
+       않는다). phone_norm은 정확 일치. del_yn='N' 상시필터(자격 변경 행위로 이어지므로). -->
+  <select id="selectMemberIdByResetTarget" resultType="java.lang.String">
+    SELECT member_id
+      FROM MEMBERS
+     WHERE del_yn = 'N'
+       AND (LOWER(email) = #{email} OR phone_norm = #{phoneNorm})
+     LIMIT 1
+  </select>
+
+  <!-- linked_func: FUNC-member-009 — 비밀번호 반영 + updated_at 갱신. del_yn='N' 방어적 이중 확인. -->
+  <update id="updatePasswordHash">
+    UPDATE MEMBERS
+       SET password_hash = #{passwordHash},
+           updated_at = #{updatedAt}
+     WHERE member_id = #{memberId}
+       AND del_yn = 'N'
+  </update>
+
+</mapper>

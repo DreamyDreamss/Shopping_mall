@@ -1,0 +1,18 @@
+{
+  "tables": [
+    "MEMBER_PASSWORD_RESETS",
+    "MEMBER_SIGNUP_RATE_LIMITS"
+  ],
+  "tables_unknown": [],
+  "infs": [
+    "INF-MBR-001",
+    "INF-MBR-002"
+  ],
+  "infs_unmatched": [],
+  "paths": [],
+  "paths_candidate": [],
+  "screens": [],
+  "uis_ids": [],
+  "terms": [],
+  "entities_arg": "MEMBER_PASSWORD_RESETS,MEMBER_SIGNUP_RATE_LIMITS,INF-MBR-001,INF-MBR-002"
+}

@@ -1,0 +1,14 @@
+# 단계 전이 게이트 — 기본 게이트(플러그인 scripts/stage_gates.py BUILTIN)에 이 프로젝트의 조건을 덧붙인다.
+# must = 전이 차단(force+사유로만 통과) · should = 경고 · info = 안내
+add:
+  DEPLOYED:
+    - id: rollback_doc
+      label: "롤백 절차 문서(04_ROLLBACK.md) 존재"
+      kind: file
+      path: "{CHANGE}/{SR}/04_ROLLBACK.md"
+      severity: should
+    - id: tc_doc
+      label: "TC 문서(03_TC.md) 존재"
+      kind: file
+      path: "{CHANGE}/{SR}/03_TC.md"
+      severity: should

@@ -1,0 +1,132 @@
+{
+  "generated_at": "2026-09-09T07:36:05",
+  "generator": "build_clarify@1",
+  "types": [
+    "api",
+    "db",
+    "screen"
+  ],
+  "items": [
+    {
+      "id": "scope_freeze",
+      "type": "common",
+      "required": true,
+      "state": "확정",
+      "question": "이번 SR에서 하는 것과 명시적으로 빼는 것은 무엇인가?",
+      "hint": "범위가 문장으로 고정돼야 승인 이후 scope 검증(대조 검증)이 기준을 갖는다",
+      "options": [],
+      "proposed": "포함: 재고가 0인데 [장바구니 담기]가 눌린다. 누르면 오류가 나서 사용자가 이유를 모른다. - 재고 0이면 상품명 옆에 '품절' 배지를 띄운다 - 담기 버튼을 비활성화하고 이유를 옆에 적는다 - 서버도 재고 0이면 담기를 거부한다(화면만 막으면 API 직접 호출로 뚫린다) / 제외: 요구 본문에 적히지 않은 것 전부",
+      "evidence": "00_요구사항.md §요구 요지",
+      "proposed_by": "clarify_prefill@1",
+      "answer": "포함: 재고가 0인데 [장바구니 담기]가 눌린다. 누르면 오류가 나서 사용자가 이유를 모른다. - 재고 0이면 상품명 옆에 '품절' 배지를 띄운다 - 담기 버튼을 비활성화하고 이유를 옆에 적는다 - 서버도 재고 0이면 담기를 거부한다(화면만 막으면 API 직접 호출로 뚫린다) / 제외: 요구 본문에 적히지 않은 것 전부",
+      "by": "viewer(제안 확정)",
+      "at": "2026-09-09T07:36:05"
+    },
+    {
+      "id": "regression_keep",
+      "type": "common",
+      "required": true,
+      "state": "확정",
+      "question": "반드시 유지돼야 하는 기존 동작(회귀 범위)은 무엇인가?",
+      "hint": "회귀 TC의 근거 — \"기존과 동일\"이 구체적으로 무엇인지",
+      "options": [
+        "기존 조회 결과 전부",
+        "특정 화면/API만(명시)"
+      ],
+      "answer": "기존 조회 결과·응답 형식·건수는 그대로여야 한다. 이번 변경 밖의 화면·API는 무변경.",
+      "by": "viewer",
+      "at": "2026-09-09T07:36:05"
+    },
+    {
+      "id": "api_compat",
+      "type": "api",
+      "required": true,
+      "state": "확정",
+      "question": "기존 클라이언트와의 하위호환이 필요한가?",
+      "hint": "필드 추가만인지, 형식·의미 변경(호환 파괴)이 있는지",
+      "options": [
+        "필요 — 필드 추가만",
+        "호환 파괴 있음(마이그레이션 계획 필요)"
+      ],
+      "answer": "필드 추가·표시 변경만이라 하위호환이 유지된다. 기존 필드명·타입·의미는 그대로 둔다.",
+      "by": "viewer",
+      "at": "2026-09-09T07:36:05"
+    },
+    {
+      "id": "api_error",
+      "type": "api",
+      "required": true,
+      "state": "확정",
+      "question": "오류 응답 계약(코드·메시지)은 무엇인가?",
+      "hint": "실패 케이스별 HTTP 상태·오류 코드 — TC가 이 계약을 검증한다",
+      "options": [],
+      "answer": "이 SR은 새 오류 계약을 만들지 않는다(요구 본문에 코드가 명시된 경우 그 코드를 따른다). 기존 오류 응답 형식·상태코드는 그대로다.",
+      "by": "viewer",
+      "at": "2026-09-09T07:36:05"
+    },
+    {
+      "id": "db_ripple",
+      "type": "db",
+      "required": true,
+      "state": "확정",
+      "question": "타 도메인 테이블·집계(정산·통계류)에 파급이 있는가?",
+      "hint": "이 테이블을 참조하는 다른 도메인의 쿼리·배치 — CIA 관찰 조인 확인",
+      "options": [
+        "없음",
+        "있음 — 범위 명시"
+      ],
+      "answer": "없음",
+      "by": "viewer",
+      "at": "2026-09-09T07:36:05"
+    },
+    {
+      "id": "db_migration",
+      "type": "db",
+      "required": true,
+      "state": "확정",
+      "question": "기존 데이터 이관·백필이 필요한가?",
+      "hint": "새 컬럼의 기존 행 값, 제약 변경 시 위반 데이터 처리",
+      "options": [
+        "불필요(신규 데이터만)",
+        "필요 — 이관 스크립트"
+      ],
+      "answer": "불필요(신규 데이터만) — 스키마를 바꾸지 않는다.",
+      "by": "viewer",
+      "at": "2026-09-09T07:36:05"
+    },
+    {
+      "id": "scr_scope",
+      "type": "screen",
+      "required": true,
+      "state": "확정",
+      "question": "변경 대상 화면이 전부 나열됐는가? (누락 화면 없음 확인)",
+      "hint": "같은 데이터를 쓰는 다른 화면(목록/상세/팝업)이 함께 바뀌어야 하는지",
+      "options": [
+        "나열된 화면이 전부",
+        "추가 화면 있음(명시)"
+      ],
+      "proposed": "나열된 화면이 전부: UIS-ORD-001, UIS-ORD-002, UIS-ORD-003, UIS-ORD-004, UIS-ORD-005",
+      "evidence": "cia-derive 화면 후보(요구 본문 ↔ UIS 제목 매칭)",
+      "proposed_by": "clarify_prefill@1",
+      "answer": "나열된 화면이 전부: UIS-ORD-001, UIS-ORD-002, UIS-ORD-003, UIS-ORD-004, UIS-ORD-005",
+      "by": "viewer(제안 확정)",
+      "at": "2026-09-09T07:36:05"
+    },
+    {
+      "id": "scr_empty_state",
+      "type": "screen",
+      "required": true,
+      "state": "확정",
+      "question": "빈 값·오류 상태의 화면 표기는 무엇인가?",
+      "hint": "데이터 없음/권한 없음/로딩 실패 시 사용자에게 보일 것",
+      "options": [],
+      "answer": "빈 값은 '-'로, 조회 결과 0건은 안내 문구로 표시한다. 오류는 배너로 따로 알린다.",
+      "by": "viewer",
+      "at": "2026-09-09T07:36:05"
+    }
+  ],
+  "prefill": {
+    "proposed": 2,
+    "by": "clarify_prefill@1"
+  }
+}

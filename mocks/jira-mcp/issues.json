@@ -1,0 +1,51 @@
+{
+  "project": "LAB",
+  "issues": [
+    {
+      "key": "LAB-101",
+      "summary": "주문 목록에 주문상태 필터 추가",
+      "description": "## 배경\n운영팀이 취소 건만 따로 보려면 매번 눈으로 걸러야 한다.\n\n## 요구사항\n- GET /api/orders 에 orderState 파라미터를 추가한다 (PLACED/PAID/SHIPPED/PARTIAL_SHIPPED/CANCELED/DONE).\n- 주문 목록 화면(/order/list)에 상태 셀렉트 필터를 노출한다.\n\n## 수용 기준\n- 필터 미지정 시 기존과 동일하게 전체(삭제 제외)가 나온다.\n- CANCELED 선택 시 취소 주문만 나온다.",
+      "status": "To Do",
+      "priority": "High",
+      "labels": ["SR", "order"],
+      "assignee": "lab-user",
+      "updated": "2026-08-16T11:00:00",
+      "comments": [
+        {"at": "2026-08-16T11:05:00", "author": "pm.park", "body": "9월 정기 배포 목표입니다."}
+      ]
+    },
+    {
+      "key": "LAB-102",
+      "summary": "주문 취소 시 재고 원복 처리",
+      "description": "## 배경\n주문을 취소해도 상품 재고(stock_qty)가 복구되지 않아 재고가 실물과 어긋난다.\n\n## 요구사항\n- PATCH /api/orders/{orderNo}/cancel 처리 시 주문 라인 수량만큼 PRODUCTS.stock_qty를 원복한다.\n- 이미 출고(SHIPPED)된 배송이 있는 주문은 취소를 거부한다(에러 코드 ORD-4001).\n\n## 수용 기준\n- 취소 성공 시 라인별 재고가 정확히 증가한다.\n- 출고 포함 주문 취소 시 409 + ORD-4001.",
+      "status": "To Do",
+      "priority": "Highest",
+      "labels": ["SR", "order", "stock"],
+      "assignee": "lab-user",
+      "updated": "2026-08-17T09:30:00",
+      "comments": []
+    },
+    {
+      "key": "LAB-103",
+      "summary": "회원 상세에 최근 주문 5건 노출",
+      "description": "## 배경\nCS 응대 시 회원의 최근 주문을 별도 화면에서 다시 검색해야 한다.\n\n## 요구사항\n- GET /api/members/{memberId} 응답에 recentOrders(최근 5건: 주문번호·상태·금액·일시)를 포함한다.\n\n## 수용 기준\n- 삭제(del_yn='Y') 주문은 제외된다.\n- 주문이 없으면 빈 배열.",
+      "status": "To Do",
+      "priority": "Medium",
+      "labels": ["SR", "member"],
+      "assignee": "lab-user",
+      "updated": "2026-08-17T10:00:00",
+      "comments": []
+    },
+    {
+      "key": "LAB-90",
+      "summary": "지난 스프린트: 배송 조회 API 타임아웃 수정",
+      "description": "완료된 표본 이슈 — jira_search의 status != Done 필터 실증용.",
+      "status": "Done",
+      "priority": "Medium",
+      "labels": ["SR", "order"],
+      "assignee": "lab-user",
+      "updated": "2026-08-10T15:00:00",
+      "comments": []
+    }
+  ]
+}

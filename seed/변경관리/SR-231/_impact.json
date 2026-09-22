@@ -1,0 +1,34 @@
+{
+  "title": "SR-231",
+  "stories": [
+    "FUNC-member-001",
+    "FUNC-member-002",
+    "FUNC-member-003"
+  ],
+  "clarification": "none",
+  "new_funcs": [
+    {
+      "func_id": "FUNC-member-001",
+      "kind": "uis",
+      "spec_id": "UIS-MBR-001"
+    },
+    {
+      "func_id": "FUNC-member-002",
+      "kind": "inf",
+      "spec_id": "INF-MBR-001"
+    },
+    {
+      "func_id": "FUNC-member-003",
+      "kind": "inf",
+      "spec_id": "INF-MBR-002"
+    }
+  ],
+  "affected": {
+    "inf": [],
+    "sch": [],
+    "uis": [],
+    "bat": []
+  },
+  "story_files": [],
+  "generated_at": "2026-09-12T01:57:34"
+}

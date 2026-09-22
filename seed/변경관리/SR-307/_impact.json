@@ -1,0 +1,40 @@
+{
+  "schema": 2,
+  "sr": "SR-307",
+  "title": "SR-307",
+  "clarification": "none",
+  "affected": {
+    "inf": [
+      "INF-ORD-008",
+      "INF-ORD-009"
+    ],
+    "sch": [],
+    "uis": [],
+    "bat": []
+  },
+  "new_specs": [],
+  "items": [
+    {
+      "n": 1,
+      "title": "상품 조회 GET 공개 경로 허용",
+      "specs": {
+        "uis": [],
+        "inf": [
+          "INF-ORD-008",
+          "INF-ORD-009"
+        ],
+        "sch": [],
+        "bat": []
+      },
+      "new_specs": [],
+      "module": null,
+      "origin": "manual"
+    }
+  ],
+  "item_seq": 2,
+  "stories": [
+    "SR-307.1"
+  ],
+  "story_files": [],
+  "generated_at": "2026-09-17T06:35:50"
+}

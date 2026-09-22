@@ -1,0 +1,292 @@
+{
+  "func": "SR-301.1",
+  "epic": "SR-301",
+  "story": "docs/변경관리/SR-301/STORY-1.md",
+  "gate": "CONCERNS",
+  "reviewer": "qa-agent",
+  "updated": "2026-09-17T01:00:10",
+  "layers": {
+    "spec": "pass",
+    "security": "pass",
+    "regression": "pass",
+    "baseline": "fail",
+    "scope": "pass",
+    "rules": "concerns",
+    "conformance": "pass"
+  },
+  "top_issues": [
+    {
+      "severity": "high",
+      "layer": "baseline",
+      "finding": "테스트 기준선 악화: shop-api: 실패+오류 2→3 증가",
+      "suggested_action": "사라진 테스트(수집 실패·import 깨짐)나 새 실패를 고치세요. 의도한 삭제면 `/sl-test --baseline --force`로 기준선을 다시 뜨고 사유를 남기세요"
+    },
+    {
+      "severity": "medium",
+      "layer": "rules",
+      "finding": "규칙 위반 [lab/file-size-cap/java-file-cap] modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java:0 — 자바 파일 450줄 초과 — 책임을 나눈다(필터·핸들러·서비스가 한 파일에 자라면 QA가 스코프를 못 가른다)",
+      "suggested_action": "규칙을 지키도록 고치거나, 규칙이 틀렸으면 SpecLens /rules에서 규칙을 고치세요"
+    },
+    {
+      "severity": "low",
+      "layer": "conformance",
+      "finding": "TO-BE 문서(02_변경명세.md)가 [미상]으로 남긴 INF-ORD-017 ID 충돌(SR-212/STORY-FUNC-order-016 예약분과 동일 ID)이 diff의 javadoc 다수 위치(ShopStaticResourceConfig, ShopIndexController, ApiKeyAuthFilter 주석, 테스트 2종)에 그대로 반영돼 있다.",
+      "suggested_action": "STORY 재작업 지시·QA 기록에 이미 사람 승인(\"그대로 진행\")과 판단 근거가 문서화돼 있어 이번 verify에서는 재판정하지 않음 — STEP 5.5 스펙 역생성 시 이 근거를 스펙 변경 이력에 반영만 확인하면 된다.",
+      "confidence": "high",
+      "file": "modules/shop-api/src/main/java/com/sm/lab/shop/web/ShopStaticResourceConfig.java",
+      "line": 20
+    },
+    {
+      "severity": "low",
+      "layer": "conformance",
+      "finding": "diff에 modules/shop-web/tsconfig.tsbuildinfo가 포함돼 있는데 이는 tsc 증분 빌드 캐시(빌드 산출물)로, AC 근거가 아니라 vite.config.ts 변경 후 npm test(타입체크) 실행의 부산물이다.",
+      "suggested_action": "조치 불필요 — 소스 변경이 아님을 기록만 해 둔다.",
+      "confidence": "high",
+      "file": "modules/shop-web/tsconfig.tsbuildinfo",
+      "line": 0
+    }
+  ],
+  "rounds": [
+    {
+      "round": 1,
+      "gate": "CONCERNS",
+      "human": {
+        "decision": "rework",
+        "by": "사람",
+        "at": "2026-09-17T00:41:02",
+        "comment": "QA CONCERNS 처리: 이번에 함께 고치기.\n\n[medium #1 — INF-ORD-017 ID] 그대로 진행(사유 있음): SR-212는 원장에서 SUPERSEDED(대체됨)이고 claim(UIS-ORD-004)도 해제됨. STORY-FUNC-order-016은 v5.1부터 실행 불가한 레거시 FUNC STORY(읽기 전용 이력)라 살아있는 점유가 아니다. INF-ORD-017은 스펙 파일 자체가 없어 실제로 비어 있다. 이 판단 근거를 STORY '## Dev 기록'과 STEP 5.5 스펙 변경 이력에 남길 것(재작업 아님 — 문서화만).\n\n[medium #2 — 패키지 위치] 재작업 대상: ShopIndexController를 com.sm.lab.shop.controller 패키지로 옮기고, controller-has-test 규칙대로 ShopIndexControllerTest(MockMvc)를 신규 추가한다. 기존 ShopStaticResourceServingTest·ShopStaticResourceMissingTest는 그대로 둔다.\n\n[low 2건 — 함께 고치기] WARN 로그 메시지에 조치 안내 한 줄 추가. shop.static-location 프로퍼티 값의 후행 슬래시 미보정 처리(둘 다 한 줄 수준).\n\n[low 1건 — SR-300 이월] 이 SR과 무관, 기준선 처리 대상이라 이번 재작업 범위 아님.\n\n완료 조건: ShopIndexControllerTest - GET /shop 200 + content-type text/html, GET /shop/products/1 같은 딥링크 200(index.html), 정적 자원 없을 때 404. 기존 테스트 전부(신규 포함) 통과.",
+        "targets": []
+      },
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "INF-ORD-017 ID 충돌 미해소 — SR-212(STORY-FUNC-order-016, status Approved, approved_sha bb709b28d4bd)가 같은 ID를 '상품 리뷰 등록/목록 API'로 이미 예약 중이고 spec_index.json·SR-212/_impact.json에도 남아 있다. 02_변경명세.md가 이 충돌을 [미상] 승인권자 확인 필요로 명시했는데 해소 없이 구현돼, 그 ID가 코드 javadoc 7곳(ShopStaticResourceConfig·ShopIndexController·ApiKeyAuthFilter 주석·테스트 2종·vite.config.ts)에 박혔다. STEP 5.5가 INF-ORD-017.md를 정적 서빙 내용으로 역생성하면 SR-212 예약분이 조용히 덮여 스펙 그래프·커버리지가 어긋난다.",
+          "suggested_action": "어느 배정이 유효한지 사람이 판정하고 SR-301 쪽을 새 ID(예: INF-ORD-018)로 재배정한 뒤 주석 7곳을 일괄 치환한다. 5.5(스펙 역생성) 전에 처리."
+        },
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "계획에 없던 ShopIndexController.java가 기존 컨트롤러 17개가 전부 사는 com.sm.lab.shop.controller가 아니라 web 패키지에 놓였고(web에는 필터·예외핸들러만 있었다), Dev 기록이 그 배치 근거로 'controller 패키지가 아니므로 controller-has-test 규칙 대상 아님'을 명시했다 — must 규칙(paths **/controller/*.java)을 배치로 회피한 형태다. 규칙 검사기는 통과하고 실질 검증 공백도 없지만(두 Shop 테스트가 /shop·/shop/를 HTTP 레벨로 단언) 패키지 관례가 깨지고 이후 컨트롤러도 같은 사각지대를 쓸 수 있다.",
+          "suggested_action": "controller 패키지로 옮기고 ShopIndexControllerTest(MockMvc) 페어를 만들거나, 옮기지 않기로 한다면 그 예외를 규칙 문서·STORY에 합의된 예외로 명시 기록한다."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "테스트 기준선(.speclinker/test_baseline.json: 539 executed / 2 failed, git_head 97f28bc)과 현재(549 / 3 failed)가 어긋난다. 늘어난 실패 1건(ApiKeyAuthIntegrationTest.memberApiKey_ordersListWithoutMemberIdParam_returnsOnlyOwnOrders)은 실측 확인 결과 이번 변경과 무관한 SR-300 이월 결함 — 시드 주문일(20260816)이 '오늘-30일'(2026-08-18) 창을 벗어나 목록이 빈 배열이 됐다. 사례집 마지막 항목이 그대로 재발 중이며, 원인을 두면 다음 SR에서 또 다른 테스트가 같은 방식으로 넘어간다.",
+          "suggested_action": "이 SR 종료 시 기준선 재기록과 별개로, 시드를 상대 날짜로 만들거나 테스트 시계를 고정하는 SR-300 후속 TODO를 남긴다."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "기동 WARN이 원인만 알리고 조치를 안내하지 않는다('shop-web 빌드 산출물 없음: {loc}index.html — /shop 접근은 404'). AC 문구는 충족하나, 이 SR의 목적(재기동 한 번으로 화면 반영)을 쓰려면 shop-web에서 npm run build 선행이 필요하다는 절차가 코드에도 문서에도 없다.",
+          "suggested_action": "WARN 메시지 끝에 'modules/shop-web에서 npm run build 후 재빌드·재기동' 한 문장을 덧붙이고, 같은 절차를 INF 본문(5.5)에 적는다."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "shop.static-location 프로퍼티를 후행 슬래시 없이 지정하면(classpath:/static/shop) ShopStaticResourceConfig의 shopLocation + \"assets/\" 문자열 연결이 .../shopassets/ 로 깨져 해시 자산 장기 캐시 핸들러가 통째로 무효가 된다. 기본값에는 슬래시가 있어 현재 실동작 영향은 없다.",
+          "suggested_action": "생성자에서 후행 슬래시를 보정하는 한 줄(endsWith(\"/\") ? loc : loc + \"/\")을 넣는다."
+        }
+      ],
+      "cause": "spec_gap"
+    },
+    {
+      "round": 2,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass"
+      },
+      "top_issues": [],
+      "cause": "none"
+    },
+    {
+      "round": 3,
+      "gate": "FAIL",
+      "human": {
+        "decision": "waiver",
+        "by": "사람",
+        "at": "2026-09-17T00:57:20",
+        "comment": "SR-300 이월 날짜창 드리프트(오늘-30일 조회창) — 실패 3건(OrderListEndToEndIntegrationTest x2, ApiKeyAuthIntegrationTest x1) 전부 시드 주문번호 20260816/20260817이 조회창 밖으로 밀려난 것으로 QA·test-agent가 원인 확인. SR-301.1 diff(/shop 정적서빙·pom.xml·vite.config.ts)는 주문 조회·날짜 로직 무관. 기준선은 이 항목 종료 후 별도로 재채록.",
+        "targets": []
+      },
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "fail"
+      },
+      "top_issues": [
+        {
+          "severity": "high",
+          "layer": "baseline",
+          "finding": "테스트 기준선 악화: shop-api: 실패+오류 2→3 증가",
+          "suggested_action": "사라진 테스트(수집 실패·import 깨짐)나 새 실패를 고치세요. 의도한 삭제면 `/sl-test --baseline --force`로 기준선을 다시 뜨고 사유를 남기세요"
+        }
+      ],
+      "layer": "baseline"
+    },
+    {
+      "round": 4,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "fail",
+        "scope": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "high",
+          "layer": "baseline",
+          "finding": "테스트 기준선 악화: shop-api: 실패+오류 2→3 증가",
+          "suggested_action": "사라진 테스트(수집 실패·import 깨짐)나 새 실패를 고치세요. 의도한 삭제면 `/sl-test --baseline --force`로 기준선을 다시 뜨고 사유를 남기세요"
+        }
+      ],
+      "layer": "scope"
+    },
+    {
+      "round": 5,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "fail",
+        "scope": "pass",
+        "rules": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "high",
+          "layer": "baseline",
+          "finding": "테스트 기준선 악화: shop-api: 실패+오류 2→3 증가",
+          "suggested_action": "사라진 테스트(수집 실패·import 깨짐)나 새 실패를 고치세요. 의도한 삭제면 `/sl-test --baseline --force`로 기준선을 다시 뜨고 사유를 남기세요"
+        },
+        {
+          "severity": "medium",
+          "layer": "rules",
+          "finding": "규칙 위반 [lab/file-size-cap/java-file-cap] modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java:0 — 자바 파일 450줄 초과 — 책임을 나눈다(필터·핸들러·서비스가 한 파일에 자라면 QA가 스코프를 못 가른다)",
+          "suggested_action": "규칙을 지키도록 고치거나, 규칙이 틀렸으면 SpecLens /rules에서 규칙을 고치세요"
+        }
+      ],
+      "layer": "rules"
+    },
+    {
+      "round": 6,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "fail",
+        "scope": "pass",
+        "rules": "concerns",
+        "conformance": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "high",
+          "layer": "baseline",
+          "finding": "테스트 기준선 악화: shop-api: 실패+오류 2→3 증가",
+          "suggested_action": "사라진 테스트(수집 실패·import 깨짐)나 새 실패를 고치세요. 의도한 삭제면 `/sl-test --baseline --force`로 기준선을 다시 뜨고 사유를 남기세요"
+        },
+        {
+          "severity": "medium",
+          "layer": "rules",
+          "finding": "규칙 위반 [lab/file-size-cap/java-file-cap] modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java:0 — 자바 파일 450줄 초과 — 책임을 나눈다(필터·핸들러·서비스가 한 파일에 자라면 QA가 스코프를 못 가른다)",
+          "suggested_action": "규칙을 지키도록 고치거나, 규칙이 틀렸으면 SpecLens /rules에서 규칙을 고치세요"
+        },
+        {
+          "severity": "low",
+          "layer": "conformance",
+          "finding": "TO-BE 문서(02_변경명세.md)가 [미상]으로 남긴 INF-ORD-017 ID 충돌(SR-212/STORY-FUNC-order-016 예약분과 동일 ID)이 diff의 javadoc 다수 위치(ShopStaticResourceConfig, ShopIndexController, ApiKeyAuthFilter 주석, 테스트 2종)에 그대로 반영돼 있다.",
+          "suggested_action": "STORY 재작업 지시·QA 기록에 이미 사람 승인(\"그대로 진행\")과 판단 근거가 문서화돼 있어 이번 verify에서는 재판정하지 않음 — STEP 5.5 스펙 역생성 시 이 근거를 스펙 변경 이력에 반영만 확인하면 된다.",
+          "confidence": "high",
+          "file": "modules/shop-api/src/main/java/com/sm/lab/shop/web/ShopStaticResourceConfig.java",
+          "line": 20
+        },
+        {
+          "severity": "low",
+          "layer": "conformance",
+          "finding": "diff에 modules/shop-web/tsconfig.tsbuildinfo가 포함돼 있는데 이는 tsc 증분 빌드 캐시(빌드 산출물)로, AC 근거가 아니라 vite.config.ts 변경 후 npm test(타입체크) 실행의 부산물이다.",
+          "suggested_action": "조치 불필요 — 소스 변경이 아님을 기록만 해 둔다.",
+          "confidence": "high",
+          "file": "modules/shop-web/tsconfig.tsbuildinfo",
+          "line": 0
+        }
+      ],
+      "layer": "conformance"
+    }
+  ],
+  "waiver": {
+    "active": true,
+    "by": "사람",
+    "reason": "SR-300 이월 날짜창 드리프트(오늘-30일 조회창) — 실패 3건(OrderListEndToEndIntegrationTest x2, ApiKeyAuthIntegrationTest x1) 전부 시드 주문번호 20260816/20260817이 조회창 밖으로 밀려난 것으로 QA·test-agent가 원인 확인. SR-301.1 diff(/shop 정적서빙·pom.xml·vite.config.ts)는 주문 조회·날짜 로직 무관. 기준선은 이 항목 종료 후 별도로 재채록.",
+    "at": "2026-09-17T00:57:20",
+    "layer": "baseline"
+  },
+  "story_transitions": [
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "SR 승인(SR-301)",
+      "at": "2026-09-16T23:59:59"
+    },
+    {
+      "from": "Approved",
+      "to": "InProgress",
+      "by": "sl-aidd",
+      "at": "2026-09-17T00:17:34"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "qa-agent",
+      "at": "2026-09-17T00:28:50"
+    },
+    {
+      "from": "Review",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-17T00:41:02"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "qa-agent",
+      "at": "2026-09-17T00:45:54"
+    },
+    {
+      "from": "Review",
+      "to": "Done",
+      "by": "사람",
+      "at": "2026-09-17T01:04:29"
+    }
+  ],
+  "cause": "none",
+  "escalate": false,
+  "fail_rounds": 0,
+  "max_rounds": 3,
+  "waivers": [
+    {
+      "active": true,
+      "by": "사람",
+      "reason": "SR-300 이월 날짜창 드리프트(오늘-30일 조회창) — 실패 3건(OrderListEndToEndIntegrationTest x2, ApiKeyAuthIntegrationTest x1) 전부 시드 주문번호 20260816/20260817이 조회창 밖으로 밀려난 것으로 QA·test-agent가 원인 확인. SR-301.1 diff(/shop 정적서빙·pom.xml·vite.config.ts)는 주문 조회·날짜 로직 무관. 기준선은 이 항목 종료 후 별도로 재채록.",
+      "at": "2026-09-17T00:57:20",
+      "layer": "baseline"
+    }
+  ]
+}

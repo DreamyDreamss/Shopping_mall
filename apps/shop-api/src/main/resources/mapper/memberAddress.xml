@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sm.lab.shop.dao.MemberAddressDao">
+  <!-- linked_func: FUNC-member-011
+       spec: docs/00_FUNC/stories/STORY-FUNC-member-011.md -->
+
+  <!-- linked_func: FUNC-member-011 — 목록, 최근 사용 순(del_yn='N' 상시필터, no-select-star) -->
+  <select id="selectList" resultType="com.sm.lab.shop.domain.MemberAddress">
+    SELECT address_id, member_id, recipient, phone, phone_norm, zipcode, road_address, detail_address,
+           entrance_method, delivery_memo, is_default, last_used_at, created_at, updated_at
+      FROM MEMBER_ADDRESSES
+     WHERE member_id = #{memberId}
+       AND del_yn = 'N'
+     ORDER BY last_used_at DESC, created_at DESC
+  </select>
+
+  <!-- linked_func: FUNC-member-011 — 존재+소유 단일 SQL(사례집 SR-231 r5 — 존재 오라클 방지) -->
+  <select id="selectOwned" resultType="com.sm.lab.shop.domain.MemberAddress">
+    SELECT address_id, member_id, recipient, phone, phone_norm, zipcode, road_address, detail_address,
+           entrance_method, delivery_memo, is_default, last_used_at, created_at, updated_at
+      FROM MEMBER_ADDRESSES
+     WHERE member_id = #{memberId}
+       AND address_id = #{addressId}
+       AND del_yn = 'N'
+  </select>
+
+  <!-- linked_func: FUNC-member-011 — 락 지점(SELECT...FOR UPDATE). register/delete/setDefault
+       전부 이 한 메서드만을 락 획득 지점으로 공유한다(사례집 SR-231 r3 — 락 순서를 한 곳에 고정).
+       created_at은 delete()가 이 목록에서 승계 후보를 고를 때 쓰는 2차 정렬 키다(재작업 round 2). -->
+  <select id="selectByMemberIdForUpdate" resultType="com.sm.lab.shop.domain.MemberAddress">
+    SELECT address_id, is_default, last_used_at, created_at
+      FROM MEMBER_ADDRESSES
+     WHERE member_id = #{memberId}
+       AND del_yn = 'N'
+       FOR UPDATE
+  </select>
+
+  <!-- linked_func: FUNC-member-011 — address_id는 이 SR 전용 신규 AUTO_INCREMENT PK(V7 DDL 참고,
+       ID_SEQUENCES 원자채번은 접두 포맷 PK 전용이라 여기서는 불필요) -->
+  <insert id="insertAddress" useGeneratedKeys="true" keyProperty="addressId">
+    INSERT INTO MEMBER_ADDRESSES (member_id, recipient, phone, phone_norm, zipcode, road_address,
+      detail_address, entrance_method, delivery_memo, is_default, last_used_at, created_at, updated_at)
+    VALUES (#{memberId}, #{recipient}, #{phone}, #{phoneNorm}, #{zipcode}, #{roadAddress},
+      #{detailAddress}, #{entranceMethod}, #{deliveryMemo}, #{isDefault}, #{lastUsedAt}, #{createdAt}, #{updatedAt})
+  </insert>
+
+  <update id="updateAddress">
+    UPDATE MEMBER_ADDRESSES
+       SET recipient = #{recipient}, phone = #{phone}, phone_norm = #{phoneNorm}, zipcode = #{zipcode},
+           road_address = #{roadAddress}, detail_address = #{detailAddress},
+           entrance_method = #{entranceMethod}, delivery_memo = #{deliveryMemo}, updated_at = #{updatedAt}
+     WHERE member_id = #{memberId}
+       AND address_id = #{addressId}
+       AND del_yn = 'N'
+  </update>
+
+  <update id="softDelete">
+    UPDATE MEMBER_ADDRESSES
+       SET del_yn = 'Y', updated_at = #{updatedAt}
+     WHERE member_id = #{memberId}
+       AND address_id = #{addressId}
+       AND del_yn = 'N'
+  </update>
+
+  <update id="clearDefaultForMember">
+    UPDATE MEMBER_ADDRESSES
+       SET is_default = 'N'
+     WHERE member_id = #{memberId}
+       AND is_default = 'Y'
+       AND del_yn = 'N'
+  </update>
+
+  <update id="setDefault">
+    UPDATE MEMBER_ADDRESSES
+       SET is_default = 'Y'
+     WHERE member_id = #{memberId}
+       AND address_id = #{addressId}
+       AND del_yn = 'N'
+  </update>
+
+  <!-- linked_func: FUNC-member-011 — 기본 배송지 삭제 시 승계 후보(삭제 대상 제외) -->
+  <select id="selectNextDefaultCandidate" resultType="com.sm.lab.shop.domain.MemberAddress">
+    SELECT address_id, member_id, recipient, phone, phone_norm, zipcode, road_address, detail_address,
+           entrance_method, delivery_memo, is_default, last_used_at, created_at, updated_at
+      FROM MEMBER_ADDRESSES
+     WHERE member_id = #{memberId}
+       AND del_yn = 'N'
+       AND address_id != #{excludeAddressId}
+     ORDER BY last_used_at DESC, created_at DESC
+     LIMIT 1
+  </select>
+
+</mapper>

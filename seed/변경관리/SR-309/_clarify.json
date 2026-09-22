@@ -1,0 +1,141 @@
+{
+  "generated_at": "2026-09-19T16:05:06",
+  "generator": "build_clarify@1",
+  "types": [
+    "db",
+    "screen"
+  ],
+  "items": [
+    {
+      "id": "scope_freeze",
+      "type": "common",
+      "required": true,
+      "state": "확정",
+      "question": "이번 SR에서 하는 것과 명시적으로 빼는 것은 무엇인가?",
+      "hint": "범위가 문장으로 고정돼야 승인 이후 scope 검증(대조 검증)이 기준을 갖는다",
+      "options": [],
+      "proposed": "포함: 쇼핑 SPA 전 화면이 공유할 디자인 토큰(CSS 변수)과 Pretendard 웹폰트(저장소 번들)를 도입한다. 값은 KT알파쇼핑 실측 톤을 따른다: 본문 #101010·14px, 보조 #767676/#AAAAAA, 면 #F2F2F2/#F5F5F5/#F9F9F9, 포인트 보라 #713FC5(배경 #F2EBFF), 링크 파랑 #177BC3, 할인·가격 빨강 #FF5259, 브랜드 레드 #ED1C24, 딤 rgba(16,16,16,.3). / 제외: 요구 본문에 적히지 않은 것 전부",
+      "evidence": "00_요구사항.md §요구 요지",
+      "proposed_by": "clarify_prefill@1",
+      "answer": "포함: shop-web 전역 디자인 토큰(CSS 변수 한 파일 — 색·그라데이션 2종·타이포 스케일 8단·굵기 3종·간격 4px 배수·radius 3종·그림자 3종·z-index·본문 폭 750px)과 Pretendard woff2 서브셋 저장소 번들(OFL, font-display: swap, 시스템 한글 폰트 폴백), 스토리북 'Tokens' 문서 페이지(색 견본·대비 표·타이포 견본). 값은 KT알파쇼핑 실측(#101010·#767676·#AAAAAA·#F2F2F2·#F5F5F5·#F9F9F9·#713FC5/#F2EBFF·#177BC3·#FF5259·#ED1C24·딤 rgba(16,16,16,.3)). 제외: 기존 화면·컴포넌트의 스타일 교체(SR-310 공통 컴포넌트·SR-311 앱 셸·SR-322/326 리스킨에서), 다크 모드, 백엔드 변경.",
+      "by": "viewer",
+      "at": "2026-09-19T15:52:11"
+    },
+    {
+      "id": "regression_keep",
+      "type": "common",
+      "required": true,
+      "state": "확정",
+      "question": "반드시 유지돼야 하는 기존 동작(회귀 범위)은 무엇인가?",
+      "hint": "회귀 TC의 근거 — \"기존과 동일\"이 구체적으로 무엇인지",
+      "options": [
+        "기존 조회 결과 전부",
+        "특정 화면/API만(명시)"
+      ],
+      "proposed": "기존 조회 결과 전부(데이터 계약 불변)",
+      "evidence": "도출 후보에 SCH 0건·테이블 0건, 본문에 삭제/형식 변경 단서 없음",
+      "proposed_by": "clarify_prefill@1",
+      "answer": "기존 화면의 동작·문구·레이아웃과 기존 테스트(shop-web jest·스토리북 빌드) 전부 불변. 토큰은 새로 추가만 하고 기존 스타일은 이 SR에서 바꾸지 않는다(전역 body 폰트를 Pretendard로 바꾸는 것만 허용 — 폰트 교체로 인한 레이아웃 붕괴가 없어야 한다).",
+      "by": "viewer",
+      "at": "2026-09-19T15:52:11"
+    },
+    {
+      "id": "db_ripple",
+      "type": "db",
+      "required": true,
+      "state": "해당없음",
+      "question": "타 도메인 테이블·집계(정산·통계류)에 파급이 있는가?",
+      "hint": "이 테이블을 참조하는 다른 도메인의 쿼리·배치 — CIA 관찰 조인 확인",
+      "options": [
+        "없음",
+        "있음 — 범위 명시"
+      ],
+      "proposed": "없음",
+      "evidence": "도출 후보에 SCH 0건·테이블 0건",
+      "proposed_by": "clarify_prefill@1",
+      "answer": "해당 없음 — 화면 스타일 토큰 SR이라 DB·테이블 변경이 없다(요구사항의 '대비 표'가 테이블 신호로 잡힌 것).",
+      "by": "viewer",
+      "at": "2026-09-19T15:52:11"
+    },
+    {
+      "id": "db_migration",
+      "type": "db",
+      "required": true,
+      "state": "해당없음",
+      "question": "기존 데이터 이관·백필이 필요한가?",
+      "hint": "새 컬럼의 기존 행 값, 제약 변경 시 위반 데이터 처리",
+      "options": [
+        "불필요(신규 데이터만)",
+        "필요 — 이관 스크립트"
+      ],
+      "proposed": "불필요(신규 데이터만)",
+      "evidence": "스키마 변경 후보 0건, 본문에 이관/백필 단서 없음",
+      "proposed_by": "clarify_prefill@1",
+      "answer": "해당 없음 — DB 변경이 없어 이관·백필 대상이 없다.",
+      "by": "viewer",
+      "at": "2026-09-19T15:52:11"
+    },
+    {
+      "id": "scr_scope",
+      "type": "screen",
+      "required": true,
+      "state": "확정",
+      "question": "변경 대상 화면이 전부 나열됐는가? (누락 화면 없음 확인)",
+      "hint": "같은 데이터를 쓰는 다른 화면(목록/상세/팝업)이 함께 바뀌어야 하는지",
+      "options": [
+        "나열된 화면이 전부",
+        "추가 화면 있음(명시)"
+      ],
+      "proposed": "나열된 화면이 전부: UIS-ORD-008 shop",
+      "evidence": "cia-derive 화면 후보(요구 본문 ↔ UIS 제목 매칭)",
+      "proposed_by": "clarify_prefill@1",
+      "answer": "화면 내용 변경 없음 — 전역 토큰 파일·폰트 로드(index.html/전역 CSS)와 스토리북 Tokens 문서 페이지만 추가한다. UIS 화면설계서 대상 화면은 없다.",
+      "by": "viewer",
+      "at": "2026-09-19T15:52:11"
+    },
+    {
+      "id": "scr_empty_state",
+      "type": "screen",
+      "required": true,
+      "state": "해당없음",
+      "question": "빈 값·오류 상태의 화면 표기는 무엇인가?",
+      "hint": "데이터 없음/권한 없음/로딩 실패 시 사용자에게 보일 것",
+      "options": [],
+      "answer": "해당 없음 — 새 화면·데이터 표기가 없는 토큰 SR이라 빈 값·오류 상태가 생기지 않는다(빈/오류 상태 규격은 SR-310 공통 컴포넌트에서).",
+      "by": "viewer",
+      "at": "2026-09-19T15:52:11"
+    },
+    {
+      "id": "scr_states",
+      "type": "screen",
+      "required": true,
+      "state": "확정",
+      "question": "이 변경으로 생기거나 바뀌는 화면 상태 중 스토리(상태별 실물)로 남길 것은 무엇인가?",
+      "hint": "예: 목록 있음/0건/조회 실패/권한 없음. 대상에 스토리북이 없으면 \"해당없음\" — 화면설계서 §5 표시 조건이 정본",
+      "options": [
+        "모든 표시 조건(§5)을 스토리로",
+        "바뀌는 상태만",
+        "해당없음(스토리북 미사용)"
+      ],
+      "answer": "스토리북 'Design Tokens' 문서 페이지 1개: 색 견본(토큰명·값·용도)·배경×본문 명도 대비 표(4.5:1 미달 조합 표시)·타이포 스케일 견본·간격/radius/그림자 견본.",
+      "by": "viewer",
+      "at": "2026-09-19T15:52:11"
+    },
+    {
+      "id": "scr_entry",
+      "type": "screen",
+      "required": true,
+      "state": "해당없음",
+      "question": "이 화면에 어디서 들어오는가? (진입점이 이번 범위에 포함되는가)",
+      "hint": "메뉴·버튼·링크·다른 화면의 이동 — 없으면 주소를 직접 쳐야만 도달한다. 신규 화면이면 최소 한 곳은 이번에 연결한다",
+      "options": [
+        "기존 화면에서 이동(어디서인지 명시)",
+        "이번에 진입점도 만든다(어디에)",
+        "진입점 없음 — 사유 명시"
+      ],
+      "answer": "해당 없음 — 사용자 진입 화면이 아니다 — 개발자용 스토리북 문서 페이지뿐이다.",
+      "by": "viewer",
+      "at": "2026-09-19T15:52:11"
+    }
+  ]
+}

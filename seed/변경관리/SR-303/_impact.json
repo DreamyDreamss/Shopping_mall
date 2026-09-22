@@ -1,0 +1,45 @@
+{
+  "schema": 2,
+  "sr": "SR-303",
+  "title": "SR-303",
+  "clarification": "none",
+  "affected": {
+    "inf": [],
+    "sch": [],
+    "uis": [],
+    "bat": []
+  },
+  "new_specs": [
+    {
+      "kind": "UIS",
+      "id": "UIS-ORD-009",
+      "domain": "order",
+      "name": "쇼핑 상품 목록(검색·필터)",
+      "module": "shop-web",
+      "module_path": "{{SRC_SHOP_WEB}}"
+    }
+  ],
+  "items": [
+    {
+      "n": 1,
+      "title": "쇼핑 상품 목록(검색·필터)",
+      "specs": {
+        "uis": [],
+        "inf": [],
+        "sch": [],
+        "bat": []
+      },
+      "new_specs": [
+        "UIS-ORD-009"
+      ],
+      "module": "shop-web",
+      "origin": "auto:new"
+    }
+  ],
+  "item_seq": 1,
+  "stories": [
+    "SR-303.1"
+  ],
+  "story_files": [],
+  "generated_at": "2026-09-17T00:22:39"
+}

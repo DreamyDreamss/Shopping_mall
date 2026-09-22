@@ -1,0 +1,13 @@
+* text=auto
+
+# 리눅스에서 실행되는 것은 반드시 LF — CRLF면 `bash: \r: command not found` 로 죽는다
+*.sh   text eol=lf
+*.sql  text eol=lf
+
+# Windows PowerShell 5.1은 BOM 없는 UTF-8 .ps1의 한글을 ANSI로 읽어 파싱이 깨진다
+*.ps1  text eol=crlf
+
+*.png  binary
+*.jpg  binary
+*.svg  text
+*.pdf  binary

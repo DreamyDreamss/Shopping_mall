@@ -1,0 +1,29 @@
+{
+  "title": "상품 카탈로그 화면 신설",
+  "stories": [
+    "FUNC-order-007",
+    "FUNC-order-009",
+    "FUNC-order-010"
+  ],
+  "clarification": "resolved",
+  "new_funcs": [
+    {
+      "func_id": "FUNC-order-009",
+      "kind": "uis",
+      "spec_id": "UIS-ORD-003"
+    },
+    {
+      "func_id": "FUNC-order-010",
+      "kind": "uis",
+      "spec_id": "UIS-ORD-004"
+    }
+  ],
+  "affected": {
+    "inf": [
+      "INF-ORD-008"
+    ],
+    "sch": [],
+    "uis": []
+  },
+  "generated_at": "2026-08-22T19:03:22"
+}

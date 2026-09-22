@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<!--/* linked_func: FUNC-order-004 — 회원 상세 화면(마이페이지, SR-207)
+     spec: docs/00_FUNC/stories/STORY-FUNC-order-004.md */-->
+<head>
+  <meta charset="UTF-8">
+  <title>회원 상세</title>
+  <style>
+    body { font-family: "Malgun Gothic", sans-serif; margin: 24px; color: #1c2128; }
+    h1 { font-size: 20px; } h2 { font-size: 15px; margin-top: 24px; }
+    table { border-collapse: collapse; width: 100%; font-size: 13px; margin-top: 8px; }
+    th, td { border: 1px solid #d7dbe0; padding: 8px 10px; text-align: left; }
+    th { background: #f1f3f6; width: 140px; }
+    .state { font-weight: 700; }
+    a { color: #3b5bdb; text-decoration: none; }
+  </style>
+</head>
+<body>
+<a href="/order/list">← 주문 목록</a>
+
+<!--/* linked_func: FUNC-order-004 — 회원 없음(404 흡수)/탈퇴 회원: 친화 안내 문구만 표시하고
+     아래 상세 마크업은 렌더하지 않는다 */-->
+<div th:if="${member == null}">
+  <h1>회원 상세</h1>
+  <p th:text="${notFoundMessage != null} ? ${notFoundMessage} : '회원을 찾을 수 없습니다.'">회원을 찾을 수 없습니다.</p>
+</div>
+
+<div th:if="${member != null}">
+  <h1>회원 상세 — <span th:text="${member.memberName}">김실증</span></h1>
+
+  <table>
+    <tr><th>회원 ID</th><td th:text="${member.memberId}">M-0001</td></tr>
+    <tr><th>회원명</th><td th:text="${member.memberName}">김실증</td></tr>
+    <tr><th>등급</th><td th:text="${member.grade}">GOLD</td></tr>
+    <tr><th>연락처</th><td th:text="${member.phone}">010-0000-0000</td></tr>
+    <tr><th>가입일시</th><td th:text="${#temporals.format(member.createdAt, 'yyyy-MM-dd HH:mm')}">2026-01-01 00:00</td></tr>
+  </table>
+
+  <h2>최근 주문</h2>
+  <table>
+    <thead><tr><th>주문번호</th><th>주문일시</th><th>상태</th><th>총액</th></tr></thead>
+    <tbody>
+    <tr th:each="o : ${member.recentOrders}">
+      <td><a th:href="@{'/order/' + ${o.orderNo}}" th:text="${o.orderNo}">20260817-0001</a></td>
+      <td th:text="${#temporals.format(o.orderedAt, 'yyyy-MM-dd HH:mm')}">2026-08-17 09:00</td>
+      <td class="state" th:text="${o.orderState}">PLACED</td>
+      <td th:text="${#numbers.formatInteger(o.totalAmount, 3, 'COMMA')} + '원'">129,000원</td>
+    </tr>
+    </tbody>
+  </table>
+  <!--/* linked_func: FUNC-order-004 — recentOrders 빈 배열(신규 회원/주문 없음) 안내 문구 */-->
+  <p th:if="${#lists.isEmpty(member.recentOrders)}">최근 주문 없음</p>
+</div>
+</body>
+</html>

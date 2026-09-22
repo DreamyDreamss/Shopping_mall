@@ -1,0 +1,506 @@
+{
+  "generated_at": "2026-09-22T00:25:47",
+  "tables": [
+    {
+      "table": "ID_SEQUENCES",
+      "domain": "member",
+      "sources": [
+        "inf",
+        "sch"
+      ],
+      "used_by_inf": [
+        "INF-MBR-002"
+      ],
+      "used_by_screens": [],
+      "sch_id": "SCH-MBR-001",
+      "generated": true
+    },
+    {
+      "table": "MEMBERS",
+      "domain": "member",
+      "sources": [
+        "inf",
+        "uis"
+      ],
+      "used_by_inf": [
+        "INF-MBR-002",
+        "INF-MBR-003",
+        "INF-MBR-005"
+      ],
+      "used_by_screens": [
+        "UIS-MBR-002"
+      ],
+      "sch_id": null,
+      "generated": false
+    },
+    {
+      "table": "MEMBER_ADDRESSES",
+      "domain": "member",
+      "sources": [
+        "inf",
+        "sch"
+      ],
+      "used_by_inf": [
+        "INF-MBR-008"
+      ],
+      "used_by_screens": [],
+      "sch_id": "SCH-MBR-002",
+      "generated": true
+    },
+    {
+      "table": "MEMBER_API_KEYS",
+      "domain": "member",
+      "sources": [
+        "inf",
+        "sch",
+        "uis"
+      ],
+      "used_by_inf": [
+        "INF-MBR-003",
+        "INF-MBR-004",
+        "INF-MBR-005"
+      ],
+      "used_by_screens": [
+        "UIS-MBR-002"
+      ],
+      "sch_id": "SCH-MBR-003",
+      "generated": true
+    },
+    {
+      "table": "MEMBER_LOGIN_ATTEMPTS",
+      "domain": "member",
+      "sources": [
+        "inf",
+        "sch",
+        "uis"
+      ],
+      "used_by_inf": [
+        "INF-MBR-003"
+      ],
+      "used_by_screens": [
+        "UIS-MBR-002"
+      ],
+      "sch_id": "SCH-MBR-004",
+      "generated": true
+    },
+    {
+      "table": "MEMBER_PASSWORD_RESETS",
+      "domain": "member",
+      "sources": [
+        "inf",
+        "sch",
+        "uis"
+      ],
+      "used_by_inf": [
+        "INF-MBR-006",
+        "INF-MBR-007"
+      ],
+      "used_by_screens": [
+        "UIS-MBR-003"
+      ],
+      "sch_id": "SCH-MBR-005",
+      "generated": true
+    },
+    {
+      "table": "MEMBER_PASSWORD_RESET_RATE_LIMITS",
+      "domain": "member",
+      "sources": [
+        "inf",
+        "sch",
+        "uis"
+      ],
+      "used_by_inf": [
+        "INF-MBR-006"
+      ],
+      "used_by_screens": [
+        "UIS-MBR-003"
+      ],
+      "sch_id": "SCH-MBR-009",
+      "generated": true
+    },
+    {
+      "table": "MEMBER_REFRESH_TOKENS",
+      "domain": "member",
+      "sources": [
+        "inf",
+        "sch",
+        "uis"
+      ],
+      "used_by_inf": [
+        "INF-MBR-003",
+        "INF-MBR-004",
+        "INF-MBR-005"
+      ],
+      "used_by_screens": [
+        "UIS-MBR-002"
+      ],
+      "sch_id": "SCH-MBR-006",
+      "generated": true
+    },
+    {
+      "table": "MEMBER_SIGNUP_RATE_LIMITS",
+      "domain": "member",
+      "sources": [
+        "inf",
+        "sch"
+      ],
+      "used_by_inf": [
+        "INF-MBR-001"
+      ],
+      "used_by_screens": [],
+      "sch_id": "SCH-MBR-007",
+      "generated": true
+    },
+    {
+      "table": "MEMBER_SIGNUP_VERIFICATIONS",
+      "domain": "member",
+      "sources": [
+        "inf",
+        "sch"
+      ],
+      "used_by_inf": [
+        "INF-MBR-001",
+        "INF-MBR-002"
+      ],
+      "used_by_screens": [],
+      "sch_id": "SCH-MBR-008",
+      "generated": true
+    },
+    {
+      "table": "CART_ITEMS",
+      "domain": "order",
+      "sources": [
+        "inf",
+        "sch",
+        "uis"
+      ],
+      "used_by_inf": [
+        "INF-ORD-010",
+        "INF-ORD-011",
+        "INF-ORD-012",
+        "INF-ORD-013",
+        "INF-ORD-014"
+      ],
+      "used_by_screens": [
+        "UIS-ORD-004",
+        "UIS-ORD-005",
+        "UIS-ORD-010",
+        "UIS-ORD-011",
+        "UIS-ORD-012"
+      ],
+      "sch_id": "SCH-ORD-006",
+      "generated": true
+    },
+    {
+      "table": "MEMBERS",
+      "domain": "order",
+      "sources": [
+        "inf",
+        "sch",
+        "uis"
+      ],
+      "used_by_inf": [
+        "INF-ORD-001",
+        "INF-ORD-002",
+        "INF-ORD-003",
+        "INF-ORD-004",
+        "INF-ORD-005",
+        "INF-ORD-006",
+        "INF-ORD-007",
+        "INF-ORD-010",
+        "INF-ORD-011",
+        "INF-ORD-014",
+        "INF-ORD-015"
+      ],
+      "used_by_screens": [
+        "UIS-ORD-002",
+        "UIS-ORD-004",
+        "UIS-ORD-005",
+        "UIS-ORD-010",
+        "UIS-ORD-011",
+        "UIS-ORD-012"
+      ],
+      "sch_id": "SCH-ORD-001",
+      "generated": true
+    },
+    {
+      "table": "ORDERS",
+      "domain": "order",
+      "sources": [
+        "inf",
+        "sch",
+        "uis"
+      ],
+      "used_by_inf": [
+        "INF-ORD-002",
+        "INF-ORD-003",
+        "INF-ORD-004",
+        "INF-ORD-005",
+        "INF-ORD-006",
+        "INF-ORD-007",
+        "INF-ORD-014",
+        "INF-ORD-015"
+      ],
+      "used_by_screens": [
+        "UIS-ORD-002",
+        "UIS-ORD-005",
+        "UIS-ORD-011"
+      ],
+      "sch_id": "SCH-ORD-004",
+      "generated": true
+    },
+    {
+      "table": "ORDER_DELIVERY",
+      "domain": "order",
+      "sources": [
+        "inf",
+        "sch",
+        "uis"
+      ],
+      "used_by_inf": [
+        "INF-ORD-004",
+        "INF-ORD-005",
+        "INF-ORD-006",
+        "INF-ORD-007"
+      ],
+      "used_by_screens": [
+        "UIS-ORD-002"
+      ],
+      "sch_id": "SCH-ORD-002",
+      "generated": true
+    },
+    {
+      "table": "ORDER_ITEMS",
+      "domain": "order",
+      "sources": [
+        "inf",
+        "sch",
+        "uis"
+      ],
+      "used_by_inf": [
+        "INF-ORD-004",
+        "INF-ORD-005",
+        "INF-ORD-006",
+        "INF-ORD-007",
+        "INF-ORD-014"
+      ],
+      "used_by_screens": [
+        "UIS-ORD-002",
+        "UIS-ORD-005",
+        "UIS-ORD-011"
+      ],
+      "sch_id": "SCH-ORD-003",
+      "generated": true
+    },
+    {
+      "table": "PRODUCTS",
+      "domain": "order",
+      "sources": [
+        "inf",
+        "sch",
+        "uis"
+      ],
+      "used_by_inf": [
+        "INF-ORD-004",
+        "INF-ORD-005",
+        "INF-ORD-006",
+        "INF-ORD-007",
+        "INF-ORD-008",
+        "INF-ORD-009",
+        "INF-ORD-010",
+        "INF-ORD-011",
+        "INF-ORD-012",
+        "INF-ORD-013",
+        "INF-ORD-014"
+      ],
+      "used_by_screens": [
+        "UIS-ORD-002",
+        "UIS-ORD-004",
+        "UIS-ORD-005",
+        "UIS-ORD-009",
+        "UIS-ORD-010",
+        "UIS-ORD-011",
+        "UIS-ORD-012"
+      ],
+      "sch_id": "SCH-ORD-005",
+      "generated": true
+    },
+    {
+      "table": "ZIPCODES",
+      "domain": "order",
+      "sources": [
+        "sch"
+      ],
+      "used_by_inf": [],
+      "used_by_screens": [],
+      "sch_id": "SCH-ORD-007",
+      "generated": true
+    }
+  ],
+  "manifest": {
+    "inf": [
+      {
+        "id": "INF-ORD-016",
+        "label": "POST /api/cart/items",
+        "domain": "order",
+        "method": "POST",
+        "path": "/api/cart/items"
+      },
+      {
+        "id": "INF-ORD-017",
+        "label": "GET /api/cart",
+        "domain": "order",
+        "method": "GET",
+        "path": "/api/cart"
+      },
+      {
+        "id": "INF-ORD-018",
+        "label": "PATCH /api/cart/items/{sku}",
+        "domain": "order",
+        "method": "PATCH",
+        "path": "/api/cart/items/{sku}"
+      },
+      {
+        "id": "INF-ORD-019",
+        "label": "DELETE /api/cart/items/{sku}",
+        "domain": "order",
+        "method": "DELETE",
+        "path": "/api/cart/items/{sku}"
+      },
+      {
+        "id": "INF-ORD-020",
+        "label": "POST /api/cart/checkout",
+        "domain": "order",
+        "method": "POST",
+        "path": "/api/cart/checkout"
+      },
+      {
+        "id": "INF-ORD-016",
+        "label": "GET /api/members",
+        "domain": "order",
+        "method": "GET",
+        "path": "/api/members"
+      },
+      {
+        "id": "INF-ORD-017",
+        "label": "GET /api/members/{memberId}",
+        "domain": "order",
+        "method": "GET",
+        "path": "/api/members/{memberId}"
+      },
+      {
+        "id": "INF-ORD-016",
+        "label": "GET /api/orders",
+        "domain": "order",
+        "method": "GET",
+        "path": "/api/orders"
+      },
+      {
+        "id": "INF-ORD-017",
+        "label": "GET /api/orders/{orderNo}",
+        "domain": "order",
+        "method": "GET",
+        "path": "/api/orders/{orderNo}"
+      },
+      {
+        "id": "INF-ORD-018",
+        "label": "POST /api/orders",
+        "domain": "order",
+        "method": "POST",
+        "path": "/api/orders"
+      },
+      {
+        "id": "INF-ORD-019",
+        "label": "PATCH /api/orders/{orderNo}/cancel",
+        "domain": "order",
+        "method": "PATCH",
+        "path": "/api/orders/{orderNo}/cancel"
+      },
+      {
+        "id": "INF-ORD-020",
+        "label": "GET /api/orders/{orderNo}/deliveries",
+        "domain": "order",
+        "method": "GET",
+        "path": "/api/orders/{orderNo}/deliveries"
+      },
+      {
+        "id": "INF-ORD-021",
+        "label": "GET /api/orders/export",
+        "domain": "order",
+        "method": "GET",
+        "path": "/api/orders/export"
+      },
+      {
+        "id": "INF-ORD-016",
+        "label": "GET /api/products",
+        "domain": "order",
+        "method": "GET",
+        "path": "/api/products"
+      },
+      {
+        "id": "INF-ORD-017",
+        "label": "GET /api/products/{sku}",
+        "domain": "order",
+        "method": "GET",
+        "path": "/api/products/{sku}"
+      }
+    ],
+    "uis": [
+      {
+        "id": "cart",
+        "label": "cart (/cart)",
+        "domain": "order",
+        "route": "/cart"
+      },
+      {
+        "id": "updateQty",
+        "label": "updateQty (/cart/items/{sku}/update)",
+        "domain": "order",
+        "route": "/cart/items/{sku}/update"
+      },
+      {
+        "id": "delete",
+        "label": "delete (/cart/items/{sku}/delete)",
+        "domain": "order",
+        "route": "/cart/items/{sku}/delete"
+      },
+      {
+        "id": "checkout",
+        "label": "checkout (/cart/checkout)",
+        "domain": "order",
+        "route": "/cart/checkout"
+      },
+      {
+        "id": "orderList",
+        "label": "orderList (/order/list)",
+        "domain": "order",
+        "route": "/order/list"
+      },
+      {
+        "id": "orderDetail",
+        "label": "orderDetail (/order/{orderNo})",
+        "domain": "order",
+        "route": "/order/{orderNo}"
+      },
+      {
+        "id": "productList",
+        "label": "productList (/product/list)",
+        "domain": "order",
+        "route": "/product/list"
+      },
+      {
+        "id": "productDetail",
+        "label": "productDetail (/product/{sku})",
+        "domain": "order",
+        "route": "/product/{sku}"
+      },
+      {
+        "id": "addToCart",
+        "label": "addToCart (/product/{sku}/cart)",
+        "domain": "order",
+        "route": "/product/{sku}/cart"
+      }
+    ],
+    "generated_at": "2026-09-22T00:25:47"
+  }
+}

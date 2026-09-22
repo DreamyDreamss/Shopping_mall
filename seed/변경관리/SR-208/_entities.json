@@ -1,0 +1,20 @@
+{
+  "tables": [
+    "ORDERS"
+  ],
+  "tables_unknown": [],
+  "infs": [],
+  "infs_unmatched": [],
+  "paths": [],
+  "paths_candidate": [],
+  "screens": [],
+  "uis_ids": [
+    "UIS-ORD-001",
+    "UIS-ORD-002",
+    "UIS-ORD-003",
+    "UIS-ORD-004",
+    "UIS-ORD-005"
+  ],
+  "terms": [],
+  "entities_arg": "ORDERS,UIS-ORD-001,UIS-ORD-002,UIS-ORD-003,UIS-ORD-004,UIS-ORD-005"
+}

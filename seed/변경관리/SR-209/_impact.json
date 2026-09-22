@@ -1,0 +1,18 @@
+{
+  "title": "SR-209",
+  "stories": [
+    "FUNC-order-001"
+  ],
+  "clarification": "none",
+  "new_funcs": [],
+  "affected": {
+    "inf": [
+      "INF-ORD-003"
+    ],
+    "sch": [],
+    "uis": [
+      "UIS-ORD-001"
+    ]
+  },
+  "generated_at": "2026-09-08T10:39:07"
+}

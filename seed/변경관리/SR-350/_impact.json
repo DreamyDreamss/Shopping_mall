@@ -1,0 +1,47 @@
+{
+  "schema": 2,
+  "sr": "SR-350",
+  "title": "SR-350",
+  "clarification": "none",
+  "affected": {
+    "inf": [
+      "INF-ORD-003"
+    ],
+    "sch": [],
+    "uis": [
+      "UIS-ORD-001"
+    ],
+    "bat": []
+  },
+  "new_specs": [],
+  "items": [
+    {
+      "n": 1,
+      "title": "주문 목록",
+      "specs": {
+        "uis": [
+          "UIS-ORD-001"
+        ],
+        "inf": [
+          "INF-ORD-003"
+        ],
+        "sch": [],
+        "bat": []
+      },
+      "new_specs": [],
+      "module": null,
+      "origin": "auto:uis"
+    }
+  ],
+  "item_seq": 1,
+  "stories": [
+    "SR-350.1"
+  ],
+  "story_files": [
+    "src/components/DeliveryBadge.stories.tsx",
+    "src/components/OrderFilters.stories.tsx",
+    "src/components/OrderSummaryCard.stories.tsx",
+    "src/components/OrderTable.stories.tsx"
+  ],
+  "generated_at": "2026-09-21T08:59:41"
+}

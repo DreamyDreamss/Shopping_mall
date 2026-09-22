@@ -1,0 +1,22 @@
+{
+  "tables": [
+    "CART_ITEMS",
+    "ORDERS",
+    "ORDER_ITEMS"
+  ],
+  "tables_unknown": [],
+  "infs": [],
+  "infs_unmatched": [],
+  "paths": [],
+  "paths_candidate": [
+    "/ORDER_ITEMS/CART_ITEMS",
+    "/api/orders"
+  ],
+  "screens": [
+    "장바구니",
+    "주문 상세"
+  ],
+  "uis_ids": [],
+  "terms": [],
+  "entities_arg": "CART_ITEMS,ORDERS,ORDER_ITEMS,장바구니,주문 상세"
+}

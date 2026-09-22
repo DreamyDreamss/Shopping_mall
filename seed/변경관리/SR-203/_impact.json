@@ -1,0 +1,23 @@
+{
+  "title": "체크아웃 — 장바구니를 주문으로 전환",
+  "stories": [
+    "FUNC-order-011",
+    "FUNC-order-012"
+  ],
+  "clarification": "resolved",
+  "new_funcs": [
+    {
+      "func_id": "FUNC-order-012",
+      "kind": "inf",
+      "spec_id": "INF-ORD-014"
+    }
+  ],
+  "affected": {
+    "inf": [],
+    "sch": [],
+    "uis": [
+      "UIS-ORD-005"
+    ]
+  },
+  "generated_at": "2026-08-23T06:05:24"
+}

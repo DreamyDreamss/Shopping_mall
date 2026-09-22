@@ -1,0 +1,270 @@
+{
+  "func": "SR-295.1",
+  "epic": "SR-295",
+  "story": "docs/변경관리/SR-295/STORY-1.md",
+  "gate": "PASS",
+  "reviewer": "qa-agent",
+  "updated": "2026-09-15T19:42:53",
+  "layers": {
+    "spec": "pass",
+    "security": "pass",
+    "regression": "pass",
+    "baseline": "pass",
+    "scope": "pass",
+    "rules": "pass",
+    "conformance": "pass"
+  },
+  "top_issues": [
+    {
+      "severity": "low",
+      "layer": "regression",
+      "finding": "round1 권고3(ApiKeyAuthIntegrationTest 레이트리밋 정리 누락)은 오탐이다 — 같은 클래스 @AfterEach 139~140행이 HEAD 기준 이미 newbie@example.com·01099998888 두 target의 deleteRateLimit을 호출하고 있고 SR-231 round4 주석이 그 의도를 명시한다. dev가 지시대로 이월한 판단은 옳았으나 이월처 SR-299가 존재하지 않는 결함으로 접수돼 있다.",
+      "suggested_action": "SR-299를 무효(invalid)로 종결한다. 그대로 두면 다음 SR에서 사람이 빈 결함에 한 라운드를 쓴다."
+    },
+    {
+      "severity": "low",
+      "layer": "spec",
+      "finding": "MemberRegistrationService 클래스 javadoc 말미가 아직 '재발송이 consumed_at/attempt_count를 리셋하지 않는다 … 근본 해결은 후속 SR-295로 접수돼 있다'고 서술해 구현된 현재 동작과 어긋난다. INF-MBR-002 파일 무수정은 AC·계획대로라 이번 라운드 결함은 아니다.",
+      "suggested_action": "다음 member SR에서 해당 한 문단만 SR-295 반영으로 갱신한다(후속 TODO — 이번 라운드 수정 대상 아님)."
+    },
+    {
+      "severity": "low",
+      "layer": "conformance",
+      "finding": "MemberRegistrationCompletionFlowTest 클래스 상단 javadoc(SR-295 절)이 '(c)'가 다시 409 MBR-4092로 바뀐다고 서술 — 실제 diff의 assertion 변경(retry.getBody() contains MBR-4092 + login_url)과 정확히 일치. 계획·구현·문서 3자가 모두 일치함을 재확인(문제 없음, 관찰 기록용)",
+      "suggested_action": "조치 불필요 — 정합 확인 완료",
+      "confidence": "high"
+    }
+  ],
+  "rounds": [
+    {
+      "round": 1,
+      "gate": "CONCERNS",
+      "human": {
+        "decision": "rework",
+        "by": "사람",
+        "at": "2026-09-15T19:27:24",
+        "comment": "[결정 요약] 권고 1(medium)은 이번에 고친다 — 신규 HTTP 테스트 @AfterEach에 레이트리밋 행 정리. 권고 2는 범위 밖(레이트리밋 정책) 근거 기록으로 수용. 권고 3은 후속 SR로. [구현 방식] 저장소 선례(MemberSignupRateLimitConcurrencyTest:71-74)대로 @AfterEach에 rateLimitDao.deleteRateLimit(target, LocalDate.now()) 추가. 신규 테스트가 쓰는 모든 리터럴 target에 대해. [테스트·완료 조건] MemberRegistrationCompletionFlowTest를 연속 2회 실행해 둘 다 통과(60초 이내 재실행 포함). shop-api 전체 스위트 기준선 대비 악화 0. [후속 SR·이월] SR-299 — ApiKeyAuthIntegrationTest 380·392행 같은 형태 잠복 이슈(권고 3).",
+        "targets": []
+      },
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "신규 통합테스트 wrongCodeFiveTimesThenCorrect_thenResendRecovers_newCodeSucceeds가 이 클래스에서 처음으로 레이트리밋이 걸린 실제 엔드포인트(POST /api/members/signup/verification-codes)를 리터럴 target으로 호출하는데, MemberRegistrationCompletionFlowTest의 @AfterEach(75~83행)가 MEMBER_SIGNUP_RATE_LIMITS 행을 지우지 않는다. (target, day_key) 행이 실행을 가로질러 남아 60초 내 재실행은 쿨다운 429, 같은 날 6번째 허용 실행은 일일상한 429가 되어 resend==200 단언이 깨진다(dev가 검증 중 실제로 429를 겪었으나 기존 관례로 오분류 — 이 클래스의 기존 테스트는 모두 writeCode를 직접 불러 레이트리밋을 우회하므로 기존 @AfterEach가 이 경우를 덮지 못한다). antipatterns.all.md SR-232 r2 재발이며, 구현 계획 105행이 '위험 없음'으로 단언한 지점이다.",
+          "suggested_action": "선례 MemberSignupRateLimitConcurrencyTest:71-74처럼 MemberSignupRateLimitDao를 autowire하고 정리 대상 target 필드를 추가한 뒤 @AfterEach에서 rateLimitDao.deleteRateLimit(target, LocalDate.now())를 호출한다."
+        },
+        {
+          "severity": "low",
+          "layer": "security",
+          "finding": "잠금 리셋으로 target당 코드 대입 예산이 '코드 수명당 5회'에서 '재발송 5회/일 x 5회 = 약 25~30회/일'로 확대된다(코드 공간 10^6). 보상 통제는 변경되지 않은 일일 재발송 상한 5회다. 레이트리밋 정책은 확정 문답에서 범위 밖으로 명시돼 이번 SR의 결함은 아니다.",
+          "suggested_action": "이번 라운드 수정 대상 아님 — 향후 레이트리밋 상한 재검토 시 근거로 기록만 남긴다."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "ApiKeyAuthIntegrationTest:380,392도 같은 레이트리밋 엔드포인트를 리터럴 target(newbie@example.com, 01099998888)으로 호출하면서 MEMBER_SIGNUP_RATE_LIMITS를 정리하지 않는다 — 권고1과 동일한 잠복 형태이나 SR-295 이전부터 존재한 기존 코드다.",
+          "suggested_action": "후속 TODO로 분리 — 이번 재작업에 묶지 않는다."
+        }
+      ],
+      "cause": "plan_gap"
+    },
+    {
+      "round": 2,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "round1 권고3(ApiKeyAuthIntegrationTest 레이트리밋 정리 누락)은 오탐이다 — 같은 클래스 @AfterEach 139~140행이 HEAD 기준 이미 newbie@example.com·01099998888 두 target의 deleteRateLimit을 호출하고 있고 SR-231 round4 주석이 그 의도를 명시한다. dev가 지시대로 이월한 판단은 옳았으나 이월처 SR-299가 존재하지 않는 결함으로 접수돼 있다.",
+          "suggested_action": "SR-299를 무효(invalid)로 종결한다. 그대로 두면 다음 SR에서 사람이 빈 결함에 한 라운드를 쓴다."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "MemberRegistrationService 클래스 javadoc 말미가 아직 '재발송이 consumed_at/attempt_count를 리셋하지 않는다 … 근본 해결은 후속 SR-295로 접수돼 있다'고 서술해 구현된 현재 동작과 어긋난다. INF-MBR-002 파일 무수정은 AC·계획대로라 이번 라운드 결함은 아니다.",
+          "suggested_action": "다음 member SR에서 해당 한 문단만 SR-295 반영으로 갱신한다(후속 TODO — 이번 라운드 수정 대상 아님)."
+        }
+      ],
+      "cause": "none"
+    },
+    {
+      "round": 3,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "round1 권고3(ApiKeyAuthIntegrationTest 레이트리밋 정리 누락)은 오탐이다 — 같은 클래스 @AfterEach 139~140행이 HEAD 기준 이미 newbie@example.com·01099998888 두 target의 deleteRateLimit을 호출하고 있고 SR-231 round4 주석이 그 의도를 명시한다. dev가 지시대로 이월한 판단은 옳았으나 이월처 SR-299가 존재하지 않는 결함으로 접수돼 있다.",
+          "suggested_action": "SR-299를 무효(invalid)로 종결한다. 그대로 두면 다음 SR에서 사람이 빈 결함에 한 라운드를 쓴다."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "MemberRegistrationService 클래스 javadoc 말미가 아직 '재발송이 consumed_at/attempt_count를 리셋하지 않는다 … 근본 해결은 후속 SR-295로 접수돼 있다'고 서술해 구현된 현재 동작과 어긋난다. INF-MBR-002 파일 무수정은 AC·계획대로라 이번 라운드 결함은 아니다.",
+          "suggested_action": "다음 member SR에서 해당 한 문단만 SR-295 반영으로 갱신한다(후속 TODO — 이번 라운드 수정 대상 아님)."
+        }
+      ],
+      "layer": "baseline"
+    },
+    {
+      "round": 4,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "pass",
+        "scope": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "round1 권고3(ApiKeyAuthIntegrationTest 레이트리밋 정리 누락)은 오탐이다 — 같은 클래스 @AfterEach 139~140행이 HEAD 기준 이미 newbie@example.com·01099998888 두 target의 deleteRateLimit을 호출하고 있고 SR-231 round4 주석이 그 의도를 명시한다. dev가 지시대로 이월한 판단은 옳았으나 이월처 SR-299가 존재하지 않는 결함으로 접수돼 있다.",
+          "suggested_action": "SR-299를 무효(invalid)로 종결한다. 그대로 두면 다음 SR에서 사람이 빈 결함에 한 라운드를 쓴다."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "MemberRegistrationService 클래스 javadoc 말미가 아직 '재발송이 consumed_at/attempt_count를 리셋하지 않는다 … 근본 해결은 후속 SR-295로 접수돼 있다'고 서술해 구현된 현재 동작과 어긋난다. INF-MBR-002 파일 무수정은 AC·계획대로라 이번 라운드 결함은 아니다.",
+          "suggested_action": "다음 member SR에서 해당 한 문단만 SR-295 반영으로 갱신한다(후속 TODO — 이번 라운드 수정 대상 아님)."
+        }
+      ],
+      "layer": "scope"
+    },
+    {
+      "round": 5,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "pass",
+        "scope": "pass",
+        "rules": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "round1 권고3(ApiKeyAuthIntegrationTest 레이트리밋 정리 누락)은 오탐이다 — 같은 클래스 @AfterEach 139~140행이 HEAD 기준 이미 newbie@example.com·01099998888 두 target의 deleteRateLimit을 호출하고 있고 SR-231 round4 주석이 그 의도를 명시한다. dev가 지시대로 이월한 판단은 옳았으나 이월처 SR-299가 존재하지 않는 결함으로 접수돼 있다.",
+          "suggested_action": "SR-299를 무효(invalid)로 종결한다. 그대로 두면 다음 SR에서 사람이 빈 결함에 한 라운드를 쓴다."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "MemberRegistrationService 클래스 javadoc 말미가 아직 '재발송이 consumed_at/attempt_count를 리셋하지 않는다 … 근본 해결은 후속 SR-295로 접수돼 있다'고 서술해 구현된 현재 동작과 어긋난다. INF-MBR-002 파일 무수정은 AC·계획대로라 이번 라운드 결함은 아니다.",
+          "suggested_action": "다음 member SR에서 해당 한 문단만 SR-295 반영으로 갱신한다(후속 TODO — 이번 라운드 수정 대상 아님)."
+        }
+      ],
+      "layer": "rules"
+    },
+    {
+      "round": 6,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "pass",
+        "scope": "pass",
+        "rules": "pass",
+        "conformance": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "round1 권고3(ApiKeyAuthIntegrationTest 레이트리밋 정리 누락)은 오탐이다 — 같은 클래스 @AfterEach 139~140행이 HEAD 기준 이미 newbie@example.com·01099998888 두 target의 deleteRateLimit을 호출하고 있고 SR-231 round4 주석이 그 의도를 명시한다. dev가 지시대로 이월한 판단은 옳았으나 이월처 SR-299가 존재하지 않는 결함으로 접수돼 있다.",
+          "suggested_action": "SR-299를 무효(invalid)로 종결한다. 그대로 두면 다음 SR에서 사람이 빈 결함에 한 라운드를 쓴다."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "MemberRegistrationService 클래스 javadoc 말미가 아직 '재발송이 consumed_at/attempt_count를 리셋하지 않는다 … 근본 해결은 후속 SR-295로 접수돼 있다'고 서술해 구현된 현재 동작과 어긋난다. INF-MBR-002 파일 무수정은 AC·계획대로라 이번 라운드 결함은 아니다.",
+          "suggested_action": "다음 member SR에서 해당 한 문단만 SR-295 반영으로 갱신한다(후속 TODO — 이번 라운드 수정 대상 아님)."
+        },
+        {
+          "severity": "low",
+          "layer": "conformance",
+          "finding": "MemberRegistrationCompletionFlowTest 클래스 상단 javadoc(SR-295 절)이 '(c)'가 다시 409 MBR-4092로 바뀐다고 서술 — 실제 diff의 assertion 변경(retry.getBody() contains MBR-4092 + login_url)과 정확히 일치. 계획·구현·문서 3자가 모두 일치함을 재확인(문제 없음, 관찰 기록용)",
+          "suggested_action": "조치 불필요 — 정합 확인 완료",
+          "confidence": "high"
+        }
+      ],
+      "layer": "conformance"
+    }
+  ],
+  "waiver": {
+    "active": false
+  },
+  "story_transitions": [
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "SR 승인(SR-295)",
+      "at": "2026-09-15T19:00:44"
+    },
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "RUN12 재생성 후 재승인",
+      "at": "2026-09-15T19:02:04"
+    },
+    {
+      "from": "Approved",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-15T19:11:31"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "사람",
+      "at": "2026-09-15T19:19:39"
+    },
+    {
+      "from": "Review",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-15T19:27:24"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "사람",
+      "at": "2026-09-15T19:30:16"
+    },
+    {
+      "from": "Review",
+      "to": "Done",
+      "by": "사람",
+      "at": "2026-09-15T19:49:08"
+    }
+  ],
+  "cause": "none",
+  "escalate": false,
+  "fail_rounds": 0,
+  "max_rounds": 3
+}

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- linked_func: FUNC-member-005, FUNC-member-006 -->
+<!-- spec: docs/00_FUNC/stories/STORY-FUNC-member-005.md, docs/00_FUNC/stories/STORY-FUNC-member-006.md -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sm.lab.shop.dao.MemberApiKeyDao">
+
+  <select id="selectByMemberId" resultType="java.lang.String">
+    SELECT api_key FROM MEMBER_API_KEYS WHERE member_id = #{memberId}
+  </select>
+
+  <!-- linked_func: FUNC-member-006 — GATE-005 round2 경계표(사람 확정): no-op UPSERT를 조건부
+       rotate로 확장했다. 단일 원자 UPSERT 문장 하나로 read-modify-write 없이 3경우를 처리한다
+       (project-context Critical Rule 3 준수) — 행 없음(INSERT) / revoked_at IS NOT NULL(새
+       api_key+issued_at으로 교체하고 revoked_at을 NULL로 되돌림, 006 로그아웃 후 재로그인·refresh
+       rotate) / revoked_at IS NULL(완전 no-op, 005의 기존 계약 그대로). MariaDB VALUES() 함수로
+       "이번에 넣으려던 값"을 참조한다(MariaDB는 8.0.20+ deprecation 대상이 아님).
+
+       ⚠ QA round1 재작업 지시 3(사람 확정) — 아래 세 대입의 순서를 바꾸지 말 것. revoked_at은
+       반드시 마지막 대입이어야 한다. MySQL/MariaDB는 UPDATE의 SET 절을 좌→우로 평가하되, 어떤
+       컬럼이 이미 이 문장 안에서 갱신됐으면 그 뒤 대입은 "갱신 전 원본 값"이 아니라 "이미
+       갱신된 값"을 본다. 만약 revoked_at을 먼저 NULL로 대입하면, 바로 다음 api_key/issued_at의
+       IF(revoked_at IS NOT NULL, ...)가 이미 NULL이 된 revoked_at을 보게 되어 항상 false로
+       평가되고, rotate가 조용히 반쪽(키·발급시각은 그대로, revoked_at만 NULL로 풀림)이 된다.
+       이 회귀는 `MemberApiKeyDaoTest#issueIfAbsent_afterRevoke_rotatesToNewCandidateAndClearsRevokedAt`
+       (TC-FUNC-member-006-12)이 실 SQL로 잡는다 — 이 세 줄의 순서를 바꾸면 그 테스트가 실패한다. -->
+  <insert id="issueIfAbsent">
+    INSERT INTO MEMBER_API_KEYS (member_id, api_key, issued_at, revoked_at)
+    VALUES (#{memberId}, #{apiKey}, #{issuedAt}, NULL)
+    ON DUPLICATE KEY UPDATE
+      api_key = IF(revoked_at IS NOT NULL, VALUES(api_key), api_key),
+      issued_at = IF(revoked_at IS NOT NULL, VALUES(issued_at), issued_at),
+      revoked_at = IF(revoked_at IS NOT NULL, NULL, revoked_at)
+  </insert>
+
+  <!-- linked_func: FUNC-member-006 — 로그아웃 시 이 회원의 API 키 폐기(DELETE 아님). 이미
+       폐기됐으면(revoked_at IS NOT NULL) 이 UPDATE는 0행 영향으로 안전하게 재실행된다(idempotent). -->
+  <update id="revokeByMemberId">
+    UPDATE MEMBER_API_KEYS
+       SET revoked_at = #{now}
+     WHERE member_id = #{memberId}
+       AND revoked_at IS NULL
+  </update>
+
+  <!-- round 9(재작업 지시 2, QA FAIL 필수2) — 탈퇴·폐기 회원의 키를 더 이상 통과시키지 않는다.
+       MEMBERS 조인 + del_yn='N'으로 탈퇴 회원을 걸러내고(로그인이 del_yn='Y'를 401로 막는 것과
+       동일 규칙), revoked_at IS NULL로 폐기된 키를 걸러낸다(폐기는 FUNC-006 소관 — revoked_at을
+       세팅하면 이 조회가 즉시 그 키를 거부한다). 둘 중 하나라도 걸리면 결과 없음 → 호출부
+       (ApiKeyAuthFilter)가 종전과 동일한 401 unauthorized로 응답한다(fail-closed, 무효 키와 동일
+       취급 — 정보 노출 없음). -->
+  <select id="selectMemberIdByApiKey" resultType="java.lang.String">
+    SELECT k.member_id
+      FROM MEMBER_API_KEYS k
+      JOIN MEMBERS m ON m.member_id = k.member_id
+     WHERE k.api_key = #{apiKey}
+       AND m.del_yn = 'N'
+       AND k.revoked_at IS NULL
+  </select>
+
+</mapper>

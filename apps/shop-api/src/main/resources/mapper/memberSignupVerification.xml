@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- linked_func: FUNC-member-002 -->
+<!-- spec: docs/00_FUNC/stories/STORY-FUNC-member-002.md -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sm.lab.shop.dao.MemberSignupVerificationDao">
+
+  <!-- round4 — 레이트리밋 판정(별도 테이블) 통과 후에만 호출되는 코드 원자 UPSERT.
+       재발송(ON DUPLICATE KEY UPDATE 분기)은 attempt_count/consumed_at도 함께 리셋한다
+       (SR-295 — MBR-4093 잠금 회복 경로). INSERT 브랜치는 손대지 않는다 — 신규 행은 이미
+       DDL 기본값으로 consumed_at IS NULL·attempt_count=0이라 리셋할 대상이 없다. -->
+  <insert id="writeCode">
+    INSERT INTO MEMBER_SIGNUP_VERIFICATIONS (channel, target, code, expires_at, verified_at, last_requested_at)
+    VALUES (#{channel}, #{target}, #{code}, #{expiresAt}, NULL, #{now})
+    ON DUPLICATE KEY UPDATE
+      code = #{code},
+      expires_at = #{expiresAt},
+      verified_at = NULL,
+      last_requested_at = #{now},
+      attempt_count = 0,
+      consumed_at = NULL
+  </insert>
+
+  <select id="selectByChannelAndTarget" resultType="com.sm.lab.shop.domain.MemberSignupVerification">
+    SELECT channel, target, code, expires_at, verified_at, last_requested_at, attempt_count
+      FROM MEMBER_SIGNUP_VERIFICATIONS
+     WHERE channel = #{channel}
+       AND target = #{target}
+  </select>
+
+  <delete id="deleteByChannelAndTarget">
+    DELETE FROM MEMBER_SIGNUP_VERIFICATIONS
+     WHERE channel = #{channel}
+       AND target = #{target}
+  </delete>
+
+  <!-- round4(STORY 재작업 지시(B)) — 요청 경로 밖(배치)에서만 호출. 코드가 실제로 만료된
+       행만 삭제(카운터는 이 테이블에 없으므로 함께 지워질 걱정이 없다). -->
+  <delete id="purgeExpiredCodes">
+    DELETE FROM MEMBER_SIGNUP_VERIFICATIONS
+     WHERE expires_at IS NOT NULL
+       AND expires_at &lt; #{now}
+  </delete>
+
+</mapper>

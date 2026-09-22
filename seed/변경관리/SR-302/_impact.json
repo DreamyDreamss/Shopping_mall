@@ -1,0 +1,45 @@
+{
+  "schema": 2,
+  "sr": "SR-302",
+  "title": "SR-302",
+  "clarification": "none",
+  "affected": {
+    "inf": [],
+    "sch": [],
+    "uis": [],
+    "bat": []
+  },
+  "new_specs": [
+    {
+      "kind": "UIS",
+      "id": "UIS-ORD-008",
+      "domain": "order",
+      "name": "쇼핑 홈(메인)",
+      "module": "shop-web",
+      "module_path": "{{SRC_SHOP_WEB}}"
+    }
+  ],
+  "items": [
+    {
+      "n": 1,
+      "title": "쇼핑 홈(메인)",
+      "specs": {
+        "uis": [],
+        "inf": [],
+        "sch": [],
+        "bat": []
+      },
+      "new_specs": [
+        "UIS-ORD-008"
+      ],
+      "module": "shop-web",
+      "origin": "auto:new"
+    }
+  ],
+  "item_seq": 1,
+  "stories": [
+    "SR-302.1"
+  ],
+  "story_files": [],
+  "generated_at": "2026-09-17T00:22:37"
+}

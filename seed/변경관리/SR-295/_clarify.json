@@ -1,0 +1,73 @@
+{
+  "generated_at": "2026-09-15T18:47:14",
+  "generator": "build_clarify@1",
+  "types": [
+    "api"
+  ],
+  "items": [
+    {
+      "id": "scope_freeze",
+      "type": "common",
+      "required": true,
+      "state": "확정",
+      "question": "이번 SR에서 하는 것과 명시적으로 빼는 것은 무엇인가?",
+      "hint": "범위가 문장으로 고정돼야 승인 이후 scope 검증(대조 검증)이 기준을 갖는다",
+      "options": [],
+      "proposed": "포함: [유형: API] SR-231 FUNC-member-003 QA round 3 권고 2. attempt_count>=5로 잠긴 target은 '재발송 필요(MBR-4093)'를 받지만 INF-MBR-001 재발송(writeCode)이 attempt_count를 리셋하지 않아 영구 잠금이다. 재발송 성공 시 새 코드 행의 attempt_count=0으로 시작하고 이전 행은 폐기한다. 수용 기준: 5회 오답 잠금 → 재발송 → 새 코드로 가입 성공 · 잠금 전 코드는 재발송 후 무효. / 제외: 요구 본문에 적히지 않은 것 전부",
+      "evidence": "00_요구사항.md §요구 요지",
+      "proposed_by": "clarify_prefill@1",
+      "answer": "포함: 재발송(INF-MBR-001 writeCode) 시 같은 채널·타깃 행의 attempt_count=0, consumed_at=NULL, verified_at=NULL로 새 코드 시작 — 잠금(MBR-4093) 회복 경로. 제외: 비밀번호 재설정 코드(MEMBER_PASSWORD_RESETS)·레이트리밋 정책·화면.",
+      "by": "viewer",
+      "at": "2026-09-15T18:48:26"
+    },
+    {
+      "id": "regression_keep",
+      "type": "common",
+      "required": true,
+      "state": "확정",
+      "question": "반드시 유지돼야 하는 기존 동작(회귀 범위)은 무엇인가?",
+      "hint": "회귀 TC의 근거 — \"기존과 동일\"이 구체적으로 무엇인지",
+      "options": [
+        "기존 조회 결과 전부",
+        "특정 화면/API만(명시)"
+      ],
+      "answer": "재발송 레이트리밋(MEMBER_SIGNUP_RATE_LIMITS)·코드 만료(expires_at)·5회 오답 잠금 판정(INF-MBR-002)·가입 성공 시 코드 소비는 그대로. INF-MBR-001/002 응답 형식 불변.",
+      "by": "viewer",
+      "at": "2026-09-15T18:48:30"
+    },
+    {
+      "id": "api_compat",
+      "type": "api",
+      "required": true,
+      "state": "확정",
+      "question": "기존 클라이언트와의 하위호환이 필요한가?",
+      "hint": "필드 추가만인지, 형식·의미 변경(호환 파괴)이 있는지",
+      "options": [
+        "필요 — 필드 추가만",
+        "호환 파괴 있음(마이그레이션 계획 필요)"
+      ],
+      "proposed": "필요 — 필드 추가만(기존 호출 그대로 동작)",
+      "evidence": "본문에 추가/필터/파라미터 단서, 삭제·형식 변경 단서 없음 · 대상 INF-MBR-001, INF-MBR-002",
+      "proposed_by": "clarify_prefill@1",
+      "answer": "필요 — 요청·응답 형식 변경 없음(서버 동작만 변경: 재발송이 시도 횟수·소비 표시를 초기화).",
+      "by": "viewer",
+      "at": "2026-09-15T18:48:33"
+    },
+    {
+      "id": "api_error",
+      "type": "api",
+      "required": true,
+      "state": "확정",
+      "question": "오류 응답 계약(코드·메시지)은 무엇인가?",
+      "hint": "실패 케이스별 HTTP 상태·오류 코드 — TC가 이 계약을 검증한다",
+      "options": [],
+      "answer": "변경 없음 — 기존 오류 계약 유지(MBR-4093 시도 초과 등). 재발송 뒤에는 새 코드로 정상 검증되어 MBR-4093이 나오지 않아야 한다.",
+      "by": "viewer",
+      "at": "2026-09-15T18:48:36"
+    }
+  ],
+  "prefill": {
+    "proposed": 2,
+    "by": "clarify_prefill@1"
+  }
+}

@@ -1,0 +1,512 @@
+{
+  "func": "SR-297.2",
+  "epic": "SR-297",
+  "story": "docs/변경관리/SR-297/STORY-2.md",
+  "gate": "PASS",
+  "reviewer": "qa-agent",
+  "updated": "2026-09-16T05:16:01",
+  "layers": {
+    "spec": "pass",
+    "security": "pass",
+    "regression": "pass",
+    "baseline": "fail",
+    "scope": "pass",
+    "rules": "pass",
+    "conformance": "pass"
+  },
+  "top_issues": [
+    {
+      "severity": "high",
+      "layer": "baseline",
+      "finding": "테스트 기준선 악화: shop-api: 실패+오류 1→2 증가",
+      "suggested_action": "사라진 테스트(수집 실패·import 깨짐)나 새 실패를 고치세요. 의도한 삭제면 `/sl-test --baseline --force`로 기준선을 다시 뜨고 사유를 남기세요"
+    },
+    {
+      "severity": "low",
+      "layer": "scope",
+      "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberSignupCompletionDao.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+      "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+    },
+    {
+      "severity": "low",
+      "layer": "scope",
+      "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberPasswordResetConfirmationService.java — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+      "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+    },
+    {
+      "severity": "low",
+      "layer": "scope",
+      "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberRegistrationService.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+      "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+    },
+    {
+      "severity": "low",
+      "layer": "scope",
+      "finding": "소속 불명(막지 않음): modules/shop-api/src/main/resources/mapper/memberSignupCompletion.xml — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+      "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+    },
+    {
+      "severity": "low",
+      "layer": "scope",
+      "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/MemberPasswordResetConfirmationFlowTest.java — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+      "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+    },
+    {
+      "severity": "low",
+      "layer": "scope",
+      "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/MemberRegistrationConcurrencyTest.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+      "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+    },
+    {
+      "severity": "low",
+      "layer": "scope",
+      "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/dao/MemberPasswordResetDaoTest.java — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+      "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+    },
+    {
+      "severity": "low",
+      "layer": "scope",
+      "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/dao/MemberSignupCompletionDaoTest.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+      "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+    },
+    {
+      "severity": "low",
+      "layer": "scope",
+      "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/service/MemberPasswordResetConfirmationServiceTest.java — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+      "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+    },
+    {
+      "severity": "low",
+      "layer": "scope",
+      "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/service/MemberRegistrationServiceTest.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+      "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+    },
+    {
+      "severity": "low",
+      "layer": "scope",
+      "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/MemberPasswordResetConfirmationConcurrencyTest.java — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+      "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+    },
+    {
+      "severity": "low",
+      "layer": "conformance",
+      "finding": "STORY '재동기화 입력(STEP 5.5)' 목록 중 SCH-MBR-009.md(inf: [], 컬럼설명 '이 항목은 쓰지 않음' 등)는 이번 세션에서 아직 갱신되지 않은 상태로 남아 있다. story 자체가 이를 '권고 아님, STEP 5.5 몫'이라 명시했으므로 이 항목(#2)의 AC 미달은 아니며 verify-agent 소관도 아니다(스펙 문서 수정은 STEP 5.5).",
+      "suggested_action": "STEP 5.5 재동기화 단계에서 SCH-MBR-009.md·INF-MBR-006 anchors/tables를 갱신할 것(이미 story에 목록화됨).",
+      "confidence": "high"
+    },
+    {
+      "severity": "low",
+      "layer": "conformance",
+      "finding": "결정 2(이중 쿨다운 유지)로 인해 쿨다운 판정이 코드 테이블(created_at)과 카운터 테이블(last_requested_at) 두 곳에 존재하게 된다 — story가 이를 의도된 설계로 명시하고 자정 경계 알려진 동작도 문서화했으므로 결함이 아니라 사실 기록임.",
+      "suggested_action": "없음(참고 사실).",
+      "confidence": "high"
+    }
+  ],
+  "rounds": [
+    {
+      "round": 1,
+      "gate": "CONCERNS",
+      "human": {
+        "decision": "rework",
+        "by": "사람",
+        "at": "2026-09-16T05:00:44",
+        "comment": "QA CONCERNS round1 재작업 — 권고 1+2 둘 다 반영.\n1) 거부 로그 사유 분기: MemberPasswordResetService 일일상한 거부 로그를, 재조회한 dailyCount >= DAILY_REQUEST_LIMIT 이면 \"일일 상한 초과\", 아니면 \"쿨다운\"으로 갈라 남긴다(형제 MemberSignupService#rejectionFor와 같은 판별 방식, PII 마스킹 유지). 각 사유별 로그 단언 테스트 1건씩 추가.\n2) 자정 경계 테스트: lenient 허용 스텁에 기대지 말고 touchDailyLimit 호출 인자(dayKey=새 날짜, now=주입 시각)를 ArgumentCaptor로 실제 단언하도록 재작성 — 현재는 게이트 로직을 실제로 행사하지 않은 채 통과한다.\n범위 밖(이번 라운드에서 하지 않음): 재동기화 입력(INF-MBR-006/SCH-MBR-009 문구 갱신)은 STEP 5.5 몫, 기준선 실패 2건(Order 도메인 시드 무관)은 잡이 건드리지 않는다(사람/별건 몫).\n완료 조건: 기존 테스트 전부 통과 + 신규 사유분기 테스트 2건 + 자정 경계 테스트가 실제로 인자 단언.",
+        "targets": []
+      },
+      "layers": {
+        "spec": "concerns",
+        "security": "pass",
+        "regression": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "거부 경로 로그가 쿨다운 거부까지 '일일 상한 초과'로 기록한다(MemberPasswordResetService.java:177). admitted=false는 쿨다운·일일상한 두 사유 모두에서 발생하는데 문구는 상한 초과로 고정 — 발급 직후 60초 내 재클릭(최빈 케이스)이 dailyCount=1인데도 '상한 초과'로 남는다. 확정 문답상 이 로그가 기능의 유일한 관측 신호이며, 계획이 이식하라고 지목한 참조 구현 MemberSignupService#rejectionFor는 dailyCount >= DAILY_REQUEST_LIMIT로 사유를 가른다(신규 DAO javadoc도 '거부 사유(쿨다운 vs 일일상한) 판별'이라 적어 뒀으나 서비스만 누락).",
+          "suggested_action": "rateLimit.getDailyCount() >= DAILY_REQUEST_LIMIT로 로그 문구를 가르거나(가입과 동형) 중립 문구로 변경하고, 쿨다운 거부 경로를 타는 단위 테스트를 추가한다(현재 withinCooldown 테스트는 기본 허용 스텁 때문에 이 경로를 타지 않는다)."
+        },
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "자정 경계 단위 테스트(MemberPasswordResetServiceTest#requestPasswordResetCode_midnightBoundary_...)의 주입 시계가 무력하다 — 게이트가 기본 lenient 허용 스텁으로 무조건 admit하고 단언이 202 바디·touchRequest 호출·로그 없음뿐이라 Clock.fixed(2026-09-17 00:00:10)을 시스템 시계로 바꿔도 동일하게 통과한다. STEP 3-0에서 사람이 명시 요구한 '시계 주입 자정 경계 1건'이 이름만 충족된 상태.",
+          "suggested_action": "verify(rateLimitDao).touchDailyLimit(eq(target), eq(LocalDate.of(2026,9,17)), eq(LocalDateTime.of(2026,9,17,0,0,10)), ...)로 day_key가 주입 시계에서 파생됨을 단언한다(구현은 이미 올바르므로 단언만 추가)."
+        }
+      ],
+      "cause": "impl_bug"
+    },
+    {
+      "round": 2,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass"
+      },
+      "top_issues": [],
+      "cause": "none"
+    },
+    {
+      "round": 3,
+      "gate": "FAIL",
+      "human": {
+        "decision": "waiver",
+        "by": "사람",
+        "at": "2026-09-16T05:13:59",
+        "comment": "기준선 악화(1->2건 실패)는 Order 도메인 날짜 드리프트(OrderService 30일 조회창) 원인, SR-300 접수됨. 이 항목(SR-297.2) diff와 무관 확인(round1/2 QA 실측). 기준선은 SR-298/SR-297 종료 후 사람이 재측정.",
+        "targets": []
+      },
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "fail"
+      },
+      "top_issues": [
+        {
+          "severity": "high",
+          "layer": "baseline",
+          "finding": "테스트 기준선 악화: shop-api: 실패+오류 1→2 증가",
+          "suggested_action": "사라진 테스트(수집 실패·import 깨짐)나 새 실패를 고치세요. 의도한 삭제면 `/sl-test --baseline --force`로 기준선을 다시 뜨고 사유를 남기세요"
+        }
+      ],
+      "layer": "baseline"
+    },
+    {
+      "round": 4,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "fail",
+        "scope": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "high",
+          "layer": "baseline",
+          "finding": "테스트 기준선 악화: shop-api: 실패+오류 1→2 증가",
+          "suggested_action": "사라진 테스트(수집 실패·import 깨짐)나 새 실패를 고치세요. 의도한 삭제면 `/sl-test --baseline --force`로 기준선을 다시 뜨고 사유를 남기세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberSignupCompletionDao.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberPasswordResetConfirmationService.java — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberRegistrationService.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/resources/mapper/memberSignupCompletion.xml — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/MemberPasswordResetConfirmationFlowTest.java — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/MemberRegistrationConcurrencyTest.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/dao/MemberPasswordResetDaoTest.java — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/dao/MemberSignupCompletionDaoTest.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/service/MemberPasswordResetConfirmationServiceTest.java — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/service/MemberRegistrationServiceTest.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/MemberPasswordResetConfirmationConcurrencyTest.java — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        }
+      ],
+      "layer": "scope"
+    },
+    {
+      "round": 5,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "fail",
+        "scope": "pass",
+        "rules": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "high",
+          "layer": "baseline",
+          "finding": "테스트 기준선 악화: shop-api: 실패+오류 1→2 증가",
+          "suggested_action": "사라진 테스트(수집 실패·import 깨짐)나 새 실패를 고치세요. 의도한 삭제면 `/sl-test --baseline --force`로 기준선을 다시 뜨고 사유를 남기세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberSignupCompletionDao.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberPasswordResetConfirmationService.java — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberRegistrationService.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/resources/mapper/memberSignupCompletion.xml — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/MemberPasswordResetConfirmationFlowTest.java — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/MemberRegistrationConcurrencyTest.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/dao/MemberPasswordResetDaoTest.java — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/dao/MemberSignupCompletionDaoTest.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/service/MemberPasswordResetConfirmationServiceTest.java — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/service/MemberRegistrationServiceTest.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/MemberPasswordResetConfirmationConcurrencyTest.java — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        }
+      ],
+      "layer": "rules"
+    },
+    {
+      "round": 6,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "fail",
+        "scope": "pass",
+        "rules": "pass",
+        "conformance": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "high",
+          "layer": "baseline",
+          "finding": "테스트 기준선 악화: shop-api: 실패+오류 1→2 증가",
+          "suggested_action": "사라진 테스트(수집 실패·import 깨짐)나 새 실패를 고치세요. 의도한 삭제면 `/sl-test --baseline --force`로 기준선을 다시 뜨고 사유를 남기세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberSignupCompletionDao.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberPasswordResetConfirmationService.java — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberRegistrationService.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/resources/mapper/memberSignupCompletion.xml — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/MemberPasswordResetConfirmationFlowTest.java — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/MemberRegistrationConcurrencyTest.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/dao/MemberPasswordResetDaoTest.java — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/dao/MemberSignupCompletionDaoTest.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/service/MemberPasswordResetConfirmationServiceTest.java — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/service/MemberRegistrationServiceTest.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/MemberPasswordResetConfirmationConcurrencyTest.java — 완료 항목 SR-298.2의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "conformance",
+          "finding": "STORY '재동기화 입력(STEP 5.5)' 목록 중 SCH-MBR-009.md(inf: [], 컬럼설명 '이 항목은 쓰지 않음' 등)는 이번 세션에서 아직 갱신되지 않은 상태로 남아 있다. story 자체가 이를 '권고 아님, STEP 5.5 몫'이라 명시했으므로 이 항목(#2)의 AC 미달은 아니며 verify-agent 소관도 아니다(스펙 문서 수정은 STEP 5.5).",
+          "suggested_action": "STEP 5.5 재동기화 단계에서 SCH-MBR-009.md·INF-MBR-006 anchors/tables를 갱신할 것(이미 story에 목록화됨).",
+          "confidence": "high"
+        },
+        {
+          "severity": "low",
+          "layer": "conformance",
+          "finding": "결정 2(이중 쿨다운 유지)로 인해 쿨다운 판정이 코드 테이블(created_at)과 카운터 테이블(last_requested_at) 두 곳에 존재하게 된다 — story가 이를 의도된 설계로 명시하고 자정 경계 알려진 동작도 문서화했으므로 결함이 아니라 사실 기록임.",
+          "suggested_action": "없음(참고 사실).",
+          "confidence": "high"
+        }
+      ],
+      "layer": "conformance"
+    }
+  ],
+  "waiver": {
+    "active": true,
+    "by": "사람",
+    "reason": "기준선 악화(1->2건 실패)는 Order 도메인 날짜 드리프트(OrderService 30일 조회창) 원인, SR-300 접수됨. 이 항목(SR-297.2) diff와 무관 확인(round1/2 QA 실측). 기준선은 SR-298/SR-297 종료 후 사람이 재측정.",
+    "at": "2026-09-16T05:13:59",
+    "layer": "baseline"
+  },
+  "story_transitions": [
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "사람",
+      "at": "2026-09-16T04:32:40"
+    },
+    {
+      "from": "Approved",
+      "to": "InProgress",
+      "by": "sl-aidd",
+      "at": "2026-09-16T04:40:46"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "qa-agent",
+      "at": "2026-09-16T04:52:55"
+    },
+    {
+      "from": "Review",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-16T05:00:44"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "qa-agent",
+      "at": "2026-09-16T05:03:16"
+    },
+    {
+      "from": "Review",
+      "to": "Done",
+      "by": "사람",
+      "at": "2026-09-16T05:18:42"
+    }
+  ],
+  "cause": "none",
+  "escalate": false,
+  "fail_rounds": 0,
+  "max_rounds": 3,
+  "waivers": [
+    {
+      "active": true,
+      "by": "사람",
+      "reason": "기준선 악화(1->2건 실패)는 Order 도메인 날짜 드리프트(OrderService 30일 조회창) 원인, SR-300 접수됨. 이 항목(SR-297.2) diff와 무관 확인(round1/2 QA 실측). 기준선은 SR-298/SR-297 종료 후 사람이 재측정.",
+      "at": "2026-09-16T05:13:59",
+      "layer": "baseline"
+    }
+  ]
+}

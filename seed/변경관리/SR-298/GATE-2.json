@@ -1,0 +1,664 @@
+{
+  "func": "SR-298.2",
+  "epic": "SR-298",
+  "story": "docs/변경관리/SR-298/STORY-2.md",
+  "gate": "CONCERNS",
+  "reviewer": "qa-agent",
+  "updated": "2026-09-16T03:05:54",
+  "layers": {
+    "spec": "concerns",
+    "security": "pass",
+    "regression": "concerns",
+    "baseline": "fail",
+    "scope": "pass",
+    "rules": "pass",
+    "conformance": "pass"
+  },
+  "top_issues": [
+    {
+      "severity": "medium",
+      "layer": "spec",
+      "finding": "INF-MBR-007.md가 SR-298.2 미반영 — '## 트랜잭션 순서' 3항이 '0행이면 재조회(selectByTarget)로 사유 판별'만 서술해 원자 증가 선행 단계가 통째로 빠졌다. 액면대로 읽으면 이 SR이 제거한 select->분기->update(read-modify-write)를 그대로 재구현하게 된다. '## 비즈니스 규칙'에도 5회 상한 보장 주체가 incrementAttemptCount의 attempt_count < maxAttempts 조건절로 옮겨갔다는 문장이 없다(INF-MBR-002는 STORY-1 스펙 이력에서 '병렬 버스트 우회 차단(SR-298)' 불릿을 받았으나 MBR-007은 대응 불릿 없음). 변경 이력 표도 없다.",
+      "suggested_action": "스펙 재동기화 단계에서 INF-MBR-002의 SR-298 편집과 대칭으로 갱신 — 트랜잭션 순서 3항 + 병렬 버스트 우회 차단 불릿 + 변경 이력 행 추가",
+      "confidence": "high",
+      "file": "docs/05_설계서/member/INF/INF-MBR-007.md",
+      "line": 73
+    },
+    {
+      "severity": "medium",
+      "layer": "spec",
+      "finding": "INF-MBR-007 frontmatter anchors가 이번 변경 라인을 절단한다. v5는 코드에 추적 주석을 두지 않으므로 anchors가 코드->스펙 유일 링크인데: memberPasswordReset.xml:35-57은 57행(AND consumed_at IS NULL)에서 끊겨 이 SR의 핵심 산출물인 59행 AND attempt_count < #{maxAttempts}를 못 보여준다. MemberPasswordResetDao.java:41-63은 javadoc만 담고 64~65행 시그니처(신규 maxAttempts 파라미터)를 잘라낸다. MemberPasswordResetConfirmationService.java:139-162는 162행에서 끊겨 0행 4갈래 분류의 410/4103/폴백 분기(163~170)를 잘라낸다.",
+      "suggested_action": "anchors를 memberPasswordReset.xml:35-60 · MemberPasswordResetDao.java:41-65 · MemberPasswordResetConfirmationService.java:139-171로 갱신",
+      "confidence": "high",
+      "file": "docs/05_설계서/member/INF/INF-MBR-007.md",
+      "line": 21
+    },
+    {
+      "severity": "medium",
+      "layer": "regression",
+      "finding": ".speclinker/test_baseline.json이 git_head c29747e(SR-295 이전) 시점 510/1이라 실측 518/2와 8건·1실패 어긋난다. STORY-1이 515/2 시점에 같은 항목을 올렸고 아직 재기록되지 않았으며 이 story가 3건을 더 늘렸다. 실패 2건이 사람 waive 상태여도, 기준선이 낡은 동안은 다음 게이트의 baseline 축이 신규 실패와 waive된 기존 실패를 가를 수 없다.",
+      "suggested_action": "SR-300 조회창 드리프트 처리 후 test_baseline_ws.py record . --force로 518/2 재기록",
+      "confidence": "high",
+      "file": ".speclinker/test_baseline.json",
+      "line": 1
+    },
+    {
+      "severity": "low",
+      "layer": "spec",
+      "finding": "MemberPasswordResetDao.java javadoc에 이번 변경으로 거짓이 된 절이 남았다 — '위 confirmIfCodeMatches가 0행일 때만 서비스가 호출한다(\"행 없음\"이면 증가시킬 행이 없으므로 호출하지 않는다)'. TO-BE는 행 존재 여부를 보지 않고 무조건 호출하며, 판정을 UPDATE의 WHERE절에 맡기는 것이 이 SR의 요지다. 나머지 javadoc은 SR-298로 갱신됐는데 이 괄호절만 살아남았다. 다음 에이전트가 이 문장을 근거로 증가 앞에 selectByTarget != null 가드를 되돌리면 read-then-write 레이스가 그대로 복원된다 — 저위험이나 원복 벡터로는 가장 직접적.",
+      "suggested_action": "javadoc 55~56행의 '(\"행 없음\"이면 증가시킬 행이 없으므로 호출하지 않는다)' 괄호절 삭제",
+      "confidence": "high",
+      "file": "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberPasswordResetDao.java",
+      "line": 55
+    },
+    {
+      "severity": "low",
+      "layer": "spec",
+      "finding": "handleConfirmFailure 폴백 분기의 '이론상 도달 불가능' 주석은 과장이다. 실제 도달 경로가 있다 — 0행 증가 직후 진단용 selectByTarget 사이에 INF-MBR-006 재요청(쿨다운 60초 경과)이 끼면 touchRequest가 같은 행의 attempt_count를 0, consumed_at을 NULL, expires_at을 +10분으로 리셋하므로 세 분류 조건이 모두 거짓이 되어 폴백에 도달한다. 결과는 여전히 옳다(진짜 오답이므로 409 MBR-4102) — 코드 변경 불필요, 주석 문구와 '테스트 면제' 근거만 부정확하다.",
+      "suggested_action": "주석을 '동시 재발송 리셋이 끼어들면 도달 가능, 결과는 오답과 동일'로 문구 정정(코드 변경 불필요)",
+      "confidence": "high",
+      "file": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberPasswordResetConfirmationService.java",
+      "line": 168
+    },
+    {
+      "severity": "low",
+      "layer": "security",
+      "finding": "문장 수 비대칭의 방향이 뒤집혔다 — TO-BE: 단순 오답 2문장(confirm+increment, SELECT 없음) / 0행 4갈래 3문장(+selectByTarget). AS-IS: 행 없음 2문장 / 그 외 3문장. 크기는 동일한 PK 조회 1회 차이이고 양쪽 모두 MEMBERS를 조회하지 않는다. 드러나는 것은 '이 target으로 재설정을 요청한 적 있는가'뿐이며, INF-MBR-006(requestPasswordResetCode)은 MEMBERS를 조회하지 않고 어떤 target에든 202를 반환하므로 재설정 행 존재는 회원 존재 신호가 아니다 — 존재 오라클 AC 유지. STORY-1 권고 5와 동일 관찰.",
+      "suggested_action": "권고 1의 스펙 갱신 시 문장 수 차이를 함께 명문화(코드 변경 불필요)",
+      "confidence": "medium",
+      "file": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberPasswordResetConfirmationService.java",
+      "line": 149
+    },
+    {
+      "severity": "high",
+      "layer": "baseline",
+      "finding": "테스트 기준선 악화: shop-api: 실패+오류 1→2 증가",
+      "suggested_action": "사라진 테스트(수집 실패·import 깨짐)나 새 실패를 고치세요. 의도한 삭제면 `/sl-test --baseline --force`로 기준선을 다시 뜨고 사유를 남기세요"
+    },
+    {
+      "severity": "low",
+      "layer": "scope",
+      "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberSignupCompletionDao.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+      "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+    },
+    {
+      "severity": "low",
+      "layer": "scope",
+      "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberRegistrationService.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+      "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+    },
+    {
+      "severity": "low",
+      "layer": "scope",
+      "finding": "소속 불명(막지 않음): modules/shop-api/src/main/resources/mapper/memberSignupCompletion.xml — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+      "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+    },
+    {
+      "severity": "low",
+      "layer": "scope",
+      "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/MemberRegistrationConcurrencyTest.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+      "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+    },
+    {
+      "severity": "low",
+      "layer": "scope",
+      "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/dao/MemberSignupCompletionDaoTest.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+      "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+    },
+    {
+      "severity": "low",
+      "layer": "scope",
+      "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/service/MemberRegistrationServiceTest.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+      "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+    },
+    {
+      "severity": "low",
+      "layer": "conformance",
+      "finding": "STORY-2.md QA 권고 4(및 GATE-2.json round1~4)가 'MemberPasswordResetDao.java:55-56 javadoc에 거짓이 된 절이 남아있다'고 기록했으나, 직접 Read한 현재 파일(55-62행)에는 그 구절(\"행 없음이면 증가시킬 행이 없으므로 호출하지 않는다\")이 이미 없다 — diff 상에서도 해당 구절이 삭제되고 새 서술로 교체된 것으로 확인됨. QA 기록이 실제 소스보다 오래된 상태를 가리키는 것으로 보이나, 코드 자체는 AC 위반이 아니라 conformance 판정에는 영향 없음(참고용 기록차이).",
+      "suggested_action": "STORY QA 절/GATE-2.json 권고 4가 최신 소스와 어긋나는지 확인 — 이미 해결됐다면 해당 권고를 닫음 처리",
+      "confidence": "high",
+      "file": "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberPasswordResetDao.java",
+      "line": 56
+    }
+  ],
+  "rounds": [
+    {
+      "round": 1,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "concerns",
+        "security": "pass",
+        "regression": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "INF-MBR-007.md가 SR-298.2 미반영 — '## 트랜잭션 순서' 3항이 '0행이면 재조회(selectByTarget)로 사유 판별'만 서술해 원자 증가 선행 단계가 통째로 빠졌다. 액면대로 읽으면 이 SR이 제거한 select->분기->update(read-modify-write)를 그대로 재구현하게 된다. '## 비즈니스 규칙'에도 5회 상한 보장 주체가 incrementAttemptCount의 attempt_count < maxAttempts 조건절로 옮겨갔다는 문장이 없다(INF-MBR-002는 STORY-1 스펙 이력에서 '병렬 버스트 우회 차단(SR-298)' 불릿을 받았으나 MBR-007은 대응 불릿 없음). 변경 이력 표도 없다.",
+          "suggested_action": "스펙 재동기화 단계에서 INF-MBR-002의 SR-298 편집과 대칭으로 갱신 — 트랜잭션 순서 3항 + 병렬 버스트 우회 차단 불릿 + 변경 이력 행 추가",
+          "confidence": "high",
+          "file": "docs/05_설계서/member/INF/INF-MBR-007.md",
+          "line": 73
+        },
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "INF-MBR-007 frontmatter anchors가 이번 변경 라인을 절단한다. v5는 코드에 추적 주석을 두지 않으므로 anchors가 코드->스펙 유일 링크인데: memberPasswordReset.xml:35-57은 57행(AND consumed_at IS NULL)에서 끊겨 이 SR의 핵심 산출물인 59행 AND attempt_count < #{maxAttempts}를 못 보여준다. MemberPasswordResetDao.java:41-63은 javadoc만 담고 64~65행 시그니처(신규 maxAttempts 파라미터)를 잘라낸다. MemberPasswordResetConfirmationService.java:139-162는 162행에서 끊겨 0행 4갈래 분류의 410/4103/폴백 분기(163~170)를 잘라낸다.",
+          "suggested_action": "anchors를 memberPasswordReset.xml:35-60 · MemberPasswordResetDao.java:41-65 · MemberPasswordResetConfirmationService.java:139-171로 갱신",
+          "confidence": "high",
+          "file": "docs/05_설계서/member/INF/INF-MBR-007.md",
+          "line": 21
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": ".speclinker/test_baseline.json이 git_head c29747e(SR-295 이전) 시점 510/1이라 실측 518/2와 8건·1실패 어긋난다. STORY-1이 515/2 시점에 같은 항목을 올렸고 아직 재기록되지 않았으며 이 story가 3건을 더 늘렸다. 실패 2건이 사람 waive 상태여도, 기준선이 낡은 동안은 다음 게이트의 baseline 축이 신규 실패와 waive된 기존 실패를 가를 수 없다.",
+          "suggested_action": "SR-300 조회창 드리프트 처리 후 test_baseline_ws.py record . --force로 518/2 재기록",
+          "confidence": "high",
+          "file": ".speclinker/test_baseline.json",
+          "line": 1
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "MemberPasswordResetDao.java javadoc에 이번 변경으로 거짓이 된 절이 남았다 — '위 confirmIfCodeMatches가 0행일 때만 서비스가 호출한다(\"행 없음\"이면 증가시킬 행이 없으므로 호출하지 않는다)'. TO-BE는 행 존재 여부를 보지 않고 무조건 호출하며, 판정을 UPDATE의 WHERE절에 맡기는 것이 이 SR의 요지다. 나머지 javadoc은 SR-298로 갱신됐는데 이 괄호절만 살아남았다. 다음 에이전트가 이 문장을 근거로 증가 앞에 selectByTarget != null 가드를 되돌리면 read-then-write 레이스가 그대로 복원된다 — 저위험이나 원복 벡터로는 가장 직접적.",
+          "suggested_action": "javadoc 55~56행의 '(\"행 없음\"이면 증가시킬 행이 없으므로 호출하지 않는다)' 괄호절 삭제",
+          "confidence": "high",
+          "file": "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberPasswordResetDao.java",
+          "line": 55
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "handleConfirmFailure 폴백 분기의 '이론상 도달 불가능' 주석은 과장이다. 실제 도달 경로가 있다 — 0행 증가 직후 진단용 selectByTarget 사이에 INF-MBR-006 재요청(쿨다운 60초 경과)이 끼면 touchRequest가 같은 행의 attempt_count를 0, consumed_at을 NULL, expires_at을 +10분으로 리셋하므로 세 분류 조건이 모두 거짓이 되어 폴백에 도달한다. 결과는 여전히 옳다(진짜 오답이므로 409 MBR-4102) — 코드 변경 불필요, 주석 문구와 '테스트 면제' 근거만 부정확하다.",
+          "suggested_action": "주석을 '동시 재발송 리셋이 끼어들면 도달 가능, 결과는 오답과 동일'로 문구 정정(코드 변경 불필요)",
+          "confidence": "high",
+          "file": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberPasswordResetConfirmationService.java",
+          "line": 168
+        },
+        {
+          "severity": "low",
+          "layer": "security",
+          "finding": "문장 수 비대칭의 방향이 뒤집혔다 — TO-BE: 단순 오답 2문장(confirm+increment, SELECT 없음) / 0행 4갈래 3문장(+selectByTarget). AS-IS: 행 없음 2문장 / 그 외 3문장. 크기는 동일한 PK 조회 1회 차이이고 양쪽 모두 MEMBERS를 조회하지 않는다. 드러나는 것은 '이 target으로 재설정을 요청한 적 있는가'뿐이며, INF-MBR-006(requestPasswordResetCode)은 MEMBERS를 조회하지 않고 어떤 target에든 202를 반환하므로 재설정 행 존재는 회원 존재 신호가 아니다 — 존재 오라클 AC 유지. STORY-1 권고 5와 동일 관찰.",
+          "suggested_action": "권고 1의 스펙 갱신 시 문장 수 차이를 함께 명문화(코드 변경 불필요)",
+          "confidence": "medium",
+          "file": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberPasswordResetConfirmationService.java",
+          "line": 149
+        }
+      ],
+      "cause": "env"
+    },
+    {
+      "round": 2,
+      "gate": "FAIL",
+      "human": null,
+      "layers": {
+        "spec": "concerns",
+        "security": "pass",
+        "regression": "concerns",
+        "baseline": "fail"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "INF-MBR-007.md가 SR-298.2 미반영 — '## 트랜잭션 순서' 3항이 '0행이면 재조회(selectByTarget)로 사유 판별'만 서술해 원자 증가 선행 단계가 통째로 빠졌다. 액면대로 읽으면 이 SR이 제거한 select->분기->update(read-modify-write)를 그대로 재구현하게 된다. '## 비즈니스 규칙'에도 5회 상한 보장 주체가 incrementAttemptCount의 attempt_count < maxAttempts 조건절로 옮겨갔다는 문장이 없다(INF-MBR-002는 STORY-1 스펙 이력에서 '병렬 버스트 우회 차단(SR-298)' 불릿을 받았으나 MBR-007은 대응 불릿 없음). 변경 이력 표도 없다.",
+          "suggested_action": "스펙 재동기화 단계에서 INF-MBR-002의 SR-298 편집과 대칭으로 갱신 — 트랜잭션 순서 3항 + 병렬 버스트 우회 차단 불릿 + 변경 이력 행 추가",
+          "confidence": "high",
+          "file": "docs/05_설계서/member/INF/INF-MBR-007.md",
+          "line": 73
+        },
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "INF-MBR-007 frontmatter anchors가 이번 변경 라인을 절단한다. v5는 코드에 추적 주석을 두지 않으므로 anchors가 코드->스펙 유일 링크인데: memberPasswordReset.xml:35-57은 57행(AND consumed_at IS NULL)에서 끊겨 이 SR의 핵심 산출물인 59행 AND attempt_count < #{maxAttempts}를 못 보여준다. MemberPasswordResetDao.java:41-63은 javadoc만 담고 64~65행 시그니처(신규 maxAttempts 파라미터)를 잘라낸다. MemberPasswordResetConfirmationService.java:139-162는 162행에서 끊겨 0행 4갈래 분류의 410/4103/폴백 분기(163~170)를 잘라낸다.",
+          "suggested_action": "anchors를 memberPasswordReset.xml:35-60 · MemberPasswordResetDao.java:41-65 · MemberPasswordResetConfirmationService.java:139-171로 갱신",
+          "confidence": "high",
+          "file": "docs/05_설계서/member/INF/INF-MBR-007.md",
+          "line": 21
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": ".speclinker/test_baseline.json이 git_head c29747e(SR-295 이전) 시점 510/1이라 실측 518/2와 8건·1실패 어긋난다. STORY-1이 515/2 시점에 같은 항목을 올렸고 아직 재기록되지 않았으며 이 story가 3건을 더 늘렸다. 실패 2건이 사람 waive 상태여도, 기준선이 낡은 동안은 다음 게이트의 baseline 축이 신규 실패와 waive된 기존 실패를 가를 수 없다.",
+          "suggested_action": "SR-300 조회창 드리프트 처리 후 test_baseline_ws.py record . --force로 518/2 재기록",
+          "confidence": "high",
+          "file": ".speclinker/test_baseline.json",
+          "line": 1
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "MemberPasswordResetDao.java javadoc에 이번 변경으로 거짓이 된 절이 남았다 — '위 confirmIfCodeMatches가 0행일 때만 서비스가 호출한다(\"행 없음\"이면 증가시킬 행이 없으므로 호출하지 않는다)'. TO-BE는 행 존재 여부를 보지 않고 무조건 호출하며, 판정을 UPDATE의 WHERE절에 맡기는 것이 이 SR의 요지다. 나머지 javadoc은 SR-298로 갱신됐는데 이 괄호절만 살아남았다. 다음 에이전트가 이 문장을 근거로 증가 앞에 selectByTarget != null 가드를 되돌리면 read-then-write 레이스가 그대로 복원된다 — 저위험이나 원복 벡터로는 가장 직접적.",
+          "suggested_action": "javadoc 55~56행의 '(\"행 없음\"이면 증가시킬 행이 없으므로 호출하지 않는다)' 괄호절 삭제",
+          "confidence": "high",
+          "file": "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberPasswordResetDao.java",
+          "line": 55
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "handleConfirmFailure 폴백 분기의 '이론상 도달 불가능' 주석은 과장이다. 실제 도달 경로가 있다 — 0행 증가 직후 진단용 selectByTarget 사이에 INF-MBR-006 재요청(쿨다운 60초 경과)이 끼면 touchRequest가 같은 행의 attempt_count를 0, consumed_at을 NULL, expires_at을 +10분으로 리셋하므로 세 분류 조건이 모두 거짓이 되어 폴백에 도달한다. 결과는 여전히 옳다(진짜 오답이므로 409 MBR-4102) — 코드 변경 불필요, 주석 문구와 '테스트 면제' 근거만 부정확하다.",
+          "suggested_action": "주석을 '동시 재발송 리셋이 끼어들면 도달 가능, 결과는 오답과 동일'로 문구 정정(코드 변경 불필요)",
+          "confidence": "high",
+          "file": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberPasswordResetConfirmationService.java",
+          "line": 168
+        },
+        {
+          "severity": "low",
+          "layer": "security",
+          "finding": "문장 수 비대칭의 방향이 뒤집혔다 — TO-BE: 단순 오답 2문장(confirm+increment, SELECT 없음) / 0행 4갈래 3문장(+selectByTarget). AS-IS: 행 없음 2문장 / 그 외 3문장. 크기는 동일한 PK 조회 1회 차이이고 양쪽 모두 MEMBERS를 조회하지 않는다. 드러나는 것은 '이 target으로 재설정을 요청한 적 있는가'뿐이며, INF-MBR-006(requestPasswordResetCode)은 MEMBERS를 조회하지 않고 어떤 target에든 202를 반환하므로 재설정 행 존재는 회원 존재 신호가 아니다 — 존재 오라클 AC 유지. STORY-1 권고 5와 동일 관찰.",
+          "suggested_action": "권고 1의 스펙 갱신 시 문장 수 차이를 함께 명문화(코드 변경 불필요)",
+          "confidence": "medium",
+          "file": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberPasswordResetConfirmationService.java",
+          "line": 149
+        },
+        {
+          "severity": "high",
+          "layer": "baseline",
+          "finding": "테스트 기준선 악화: shop-api: 실패+오류 1→2 증가",
+          "suggested_action": "사라진 테스트(수집 실패·import 깨짐)나 새 실패를 고치세요. 의도한 삭제면 `/sl-test --baseline --force`로 기준선을 다시 뜨고 사유를 남기세요"
+        }
+      ],
+      "layer": "baseline"
+    },
+    {
+      "round": 3,
+      "gate": "FAIL",
+      "human": null,
+      "layers": {
+        "spec": "concerns",
+        "security": "pass",
+        "regression": "concerns",
+        "baseline": "fail",
+        "scope": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "INF-MBR-007.md가 SR-298.2 미반영 — '## 트랜잭션 순서' 3항이 '0행이면 재조회(selectByTarget)로 사유 판별'만 서술해 원자 증가 선행 단계가 통째로 빠졌다. 액면대로 읽으면 이 SR이 제거한 select->분기->update(read-modify-write)를 그대로 재구현하게 된다. '## 비즈니스 규칙'에도 5회 상한 보장 주체가 incrementAttemptCount의 attempt_count < maxAttempts 조건절로 옮겨갔다는 문장이 없다(INF-MBR-002는 STORY-1 스펙 이력에서 '병렬 버스트 우회 차단(SR-298)' 불릿을 받았으나 MBR-007은 대응 불릿 없음). 변경 이력 표도 없다.",
+          "suggested_action": "스펙 재동기화 단계에서 INF-MBR-002의 SR-298 편집과 대칭으로 갱신 — 트랜잭션 순서 3항 + 병렬 버스트 우회 차단 불릿 + 변경 이력 행 추가",
+          "confidence": "high",
+          "file": "docs/05_설계서/member/INF/INF-MBR-007.md",
+          "line": 73
+        },
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "INF-MBR-007 frontmatter anchors가 이번 변경 라인을 절단한다. v5는 코드에 추적 주석을 두지 않으므로 anchors가 코드->스펙 유일 링크인데: memberPasswordReset.xml:35-57은 57행(AND consumed_at IS NULL)에서 끊겨 이 SR의 핵심 산출물인 59행 AND attempt_count < #{maxAttempts}를 못 보여준다. MemberPasswordResetDao.java:41-63은 javadoc만 담고 64~65행 시그니처(신규 maxAttempts 파라미터)를 잘라낸다. MemberPasswordResetConfirmationService.java:139-162는 162행에서 끊겨 0행 4갈래 분류의 410/4103/폴백 분기(163~170)를 잘라낸다.",
+          "suggested_action": "anchors를 memberPasswordReset.xml:35-60 · MemberPasswordResetDao.java:41-65 · MemberPasswordResetConfirmationService.java:139-171로 갱신",
+          "confidence": "high",
+          "file": "docs/05_설계서/member/INF/INF-MBR-007.md",
+          "line": 21
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": ".speclinker/test_baseline.json이 git_head c29747e(SR-295 이전) 시점 510/1이라 실측 518/2와 8건·1실패 어긋난다. STORY-1이 515/2 시점에 같은 항목을 올렸고 아직 재기록되지 않았으며 이 story가 3건을 더 늘렸다. 실패 2건이 사람 waive 상태여도, 기준선이 낡은 동안은 다음 게이트의 baseline 축이 신규 실패와 waive된 기존 실패를 가를 수 없다.",
+          "suggested_action": "SR-300 조회창 드리프트 처리 후 test_baseline_ws.py record . --force로 518/2 재기록",
+          "confidence": "high",
+          "file": ".speclinker/test_baseline.json",
+          "line": 1
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "MemberPasswordResetDao.java javadoc에 이번 변경으로 거짓이 된 절이 남았다 — '위 confirmIfCodeMatches가 0행일 때만 서비스가 호출한다(\"행 없음\"이면 증가시킬 행이 없으므로 호출하지 않는다)'. TO-BE는 행 존재 여부를 보지 않고 무조건 호출하며, 판정을 UPDATE의 WHERE절에 맡기는 것이 이 SR의 요지다. 나머지 javadoc은 SR-298로 갱신됐는데 이 괄호절만 살아남았다. 다음 에이전트가 이 문장을 근거로 증가 앞에 selectByTarget != null 가드를 되돌리면 read-then-write 레이스가 그대로 복원된다 — 저위험이나 원복 벡터로는 가장 직접적.",
+          "suggested_action": "javadoc 55~56행의 '(\"행 없음\"이면 증가시킬 행이 없으므로 호출하지 않는다)' 괄호절 삭제",
+          "confidence": "high",
+          "file": "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberPasswordResetDao.java",
+          "line": 55
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "handleConfirmFailure 폴백 분기의 '이론상 도달 불가능' 주석은 과장이다. 실제 도달 경로가 있다 — 0행 증가 직후 진단용 selectByTarget 사이에 INF-MBR-006 재요청(쿨다운 60초 경과)이 끼면 touchRequest가 같은 행의 attempt_count를 0, consumed_at을 NULL, expires_at을 +10분으로 리셋하므로 세 분류 조건이 모두 거짓이 되어 폴백에 도달한다. 결과는 여전히 옳다(진짜 오답이므로 409 MBR-4102) — 코드 변경 불필요, 주석 문구와 '테스트 면제' 근거만 부정확하다.",
+          "suggested_action": "주석을 '동시 재발송 리셋이 끼어들면 도달 가능, 결과는 오답과 동일'로 문구 정정(코드 변경 불필요)",
+          "confidence": "high",
+          "file": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberPasswordResetConfirmationService.java",
+          "line": 168
+        },
+        {
+          "severity": "low",
+          "layer": "security",
+          "finding": "문장 수 비대칭의 방향이 뒤집혔다 — TO-BE: 단순 오답 2문장(confirm+increment, SELECT 없음) / 0행 4갈래 3문장(+selectByTarget). AS-IS: 행 없음 2문장 / 그 외 3문장. 크기는 동일한 PK 조회 1회 차이이고 양쪽 모두 MEMBERS를 조회하지 않는다. 드러나는 것은 '이 target으로 재설정을 요청한 적 있는가'뿐이며, INF-MBR-006(requestPasswordResetCode)은 MEMBERS를 조회하지 않고 어떤 target에든 202를 반환하므로 재설정 행 존재는 회원 존재 신호가 아니다 — 존재 오라클 AC 유지. STORY-1 권고 5와 동일 관찰.",
+          "suggested_action": "권고 1의 스펙 갱신 시 문장 수 차이를 함께 명문화(코드 변경 불필요)",
+          "confidence": "medium",
+          "file": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberPasswordResetConfirmationService.java",
+          "line": 149
+        },
+        {
+          "severity": "high",
+          "layer": "baseline",
+          "finding": "테스트 기준선 악화: shop-api: 실패+오류 1→2 증가",
+          "suggested_action": "사라진 테스트(수집 실패·import 깨짐)나 새 실패를 고치세요. 의도한 삭제면 `/sl-test --baseline --force`로 기준선을 다시 뜨고 사유를 남기세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberSignupCompletionDao.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberRegistrationService.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/resources/mapper/memberSignupCompletion.xml — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/MemberRegistrationConcurrencyTest.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/dao/MemberSignupCompletionDaoTest.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/service/MemberRegistrationServiceTest.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        }
+      ],
+      "layer": "scope"
+    },
+    {
+      "round": 4,
+      "gate": "FAIL",
+      "human": null,
+      "layers": {
+        "spec": "concerns",
+        "security": "pass",
+        "regression": "concerns",
+        "baseline": "fail",
+        "scope": "pass",
+        "rules": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "INF-MBR-007.md가 SR-298.2 미반영 — '## 트랜잭션 순서' 3항이 '0행이면 재조회(selectByTarget)로 사유 판별'만 서술해 원자 증가 선행 단계가 통째로 빠졌다. 액면대로 읽으면 이 SR이 제거한 select->분기->update(read-modify-write)를 그대로 재구현하게 된다. '## 비즈니스 규칙'에도 5회 상한 보장 주체가 incrementAttemptCount의 attempt_count < maxAttempts 조건절로 옮겨갔다는 문장이 없다(INF-MBR-002는 STORY-1 스펙 이력에서 '병렬 버스트 우회 차단(SR-298)' 불릿을 받았으나 MBR-007은 대응 불릿 없음). 변경 이력 표도 없다.",
+          "suggested_action": "스펙 재동기화 단계에서 INF-MBR-002의 SR-298 편집과 대칭으로 갱신 — 트랜잭션 순서 3항 + 병렬 버스트 우회 차단 불릿 + 변경 이력 행 추가",
+          "confidence": "high",
+          "file": "docs/05_설계서/member/INF/INF-MBR-007.md",
+          "line": 73
+        },
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "INF-MBR-007 frontmatter anchors가 이번 변경 라인을 절단한다. v5는 코드에 추적 주석을 두지 않으므로 anchors가 코드->스펙 유일 링크인데: memberPasswordReset.xml:35-57은 57행(AND consumed_at IS NULL)에서 끊겨 이 SR의 핵심 산출물인 59행 AND attempt_count < #{maxAttempts}를 못 보여준다. MemberPasswordResetDao.java:41-63은 javadoc만 담고 64~65행 시그니처(신규 maxAttempts 파라미터)를 잘라낸다. MemberPasswordResetConfirmationService.java:139-162는 162행에서 끊겨 0행 4갈래 분류의 410/4103/폴백 분기(163~170)를 잘라낸다.",
+          "suggested_action": "anchors를 memberPasswordReset.xml:35-60 · MemberPasswordResetDao.java:41-65 · MemberPasswordResetConfirmationService.java:139-171로 갱신",
+          "confidence": "high",
+          "file": "docs/05_설계서/member/INF/INF-MBR-007.md",
+          "line": 21
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": ".speclinker/test_baseline.json이 git_head c29747e(SR-295 이전) 시점 510/1이라 실측 518/2와 8건·1실패 어긋난다. STORY-1이 515/2 시점에 같은 항목을 올렸고 아직 재기록되지 않았으며 이 story가 3건을 더 늘렸다. 실패 2건이 사람 waive 상태여도, 기준선이 낡은 동안은 다음 게이트의 baseline 축이 신규 실패와 waive된 기존 실패를 가를 수 없다.",
+          "suggested_action": "SR-300 조회창 드리프트 처리 후 test_baseline_ws.py record . --force로 518/2 재기록",
+          "confidence": "high",
+          "file": ".speclinker/test_baseline.json",
+          "line": 1
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "MemberPasswordResetDao.java javadoc에 이번 변경으로 거짓이 된 절이 남았다 — '위 confirmIfCodeMatches가 0행일 때만 서비스가 호출한다(\"행 없음\"이면 증가시킬 행이 없으므로 호출하지 않는다)'. TO-BE는 행 존재 여부를 보지 않고 무조건 호출하며, 판정을 UPDATE의 WHERE절에 맡기는 것이 이 SR의 요지다. 나머지 javadoc은 SR-298로 갱신됐는데 이 괄호절만 살아남았다. 다음 에이전트가 이 문장을 근거로 증가 앞에 selectByTarget != null 가드를 되돌리면 read-then-write 레이스가 그대로 복원된다 — 저위험이나 원복 벡터로는 가장 직접적.",
+          "suggested_action": "javadoc 55~56행의 '(\"행 없음\"이면 증가시킬 행이 없으므로 호출하지 않는다)' 괄호절 삭제",
+          "confidence": "high",
+          "file": "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberPasswordResetDao.java",
+          "line": 55
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "handleConfirmFailure 폴백 분기의 '이론상 도달 불가능' 주석은 과장이다. 실제 도달 경로가 있다 — 0행 증가 직후 진단용 selectByTarget 사이에 INF-MBR-006 재요청(쿨다운 60초 경과)이 끼면 touchRequest가 같은 행의 attempt_count를 0, consumed_at을 NULL, expires_at을 +10분으로 리셋하므로 세 분류 조건이 모두 거짓이 되어 폴백에 도달한다. 결과는 여전히 옳다(진짜 오답이므로 409 MBR-4102) — 코드 변경 불필요, 주석 문구와 '테스트 면제' 근거만 부정확하다.",
+          "suggested_action": "주석을 '동시 재발송 리셋이 끼어들면 도달 가능, 결과는 오답과 동일'로 문구 정정(코드 변경 불필요)",
+          "confidence": "high",
+          "file": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberPasswordResetConfirmationService.java",
+          "line": 168
+        },
+        {
+          "severity": "low",
+          "layer": "security",
+          "finding": "문장 수 비대칭의 방향이 뒤집혔다 — TO-BE: 단순 오답 2문장(confirm+increment, SELECT 없음) / 0행 4갈래 3문장(+selectByTarget). AS-IS: 행 없음 2문장 / 그 외 3문장. 크기는 동일한 PK 조회 1회 차이이고 양쪽 모두 MEMBERS를 조회하지 않는다. 드러나는 것은 '이 target으로 재설정을 요청한 적 있는가'뿐이며, INF-MBR-006(requestPasswordResetCode)은 MEMBERS를 조회하지 않고 어떤 target에든 202를 반환하므로 재설정 행 존재는 회원 존재 신호가 아니다 — 존재 오라클 AC 유지. STORY-1 권고 5와 동일 관찰.",
+          "suggested_action": "권고 1의 스펙 갱신 시 문장 수 차이를 함께 명문화(코드 변경 불필요)",
+          "confidence": "medium",
+          "file": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberPasswordResetConfirmationService.java",
+          "line": 149
+        },
+        {
+          "severity": "high",
+          "layer": "baseline",
+          "finding": "테스트 기준선 악화: shop-api: 실패+오류 1→2 증가",
+          "suggested_action": "사라진 테스트(수집 실패·import 깨짐)나 새 실패를 고치세요. 의도한 삭제면 `/sl-test --baseline --force`로 기준선을 다시 뜨고 사유를 남기세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberSignupCompletionDao.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberRegistrationService.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/resources/mapper/memberSignupCompletion.xml — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/MemberRegistrationConcurrencyTest.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/dao/MemberSignupCompletionDaoTest.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/service/MemberRegistrationServiceTest.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        }
+      ],
+      "layer": "rules"
+    },
+    {
+      "round": 5,
+      "gate": "FAIL",
+      "human": {
+        "decision": "waiver",
+        "by": "sl-aidd(사람 조건부 사전 승인)",
+        "at": "2026-09-16T03:06:55",
+        "comment": "기준선 악화(1→2 실패)는 SR-298.2 diff 밖의 기존 이월 실패 2건(OrderListEndToEndIntegrationTest, ApiKeyAuthIntegrationTest — OrderService 30일 조회창 날짜 드리프트, SR-300/299 이월) 때문임을 surefire 리포트로 실측 확인. SR-298.2 영향 범위(member 도메인) 31/31 전부 통과. 사람이 QA CONCERNS 게이트에서 조건부 사전 승인(원인이 기존 이월 2건이면 waive).",
+        "targets": []
+      },
+      "layers": {
+        "spec": "concerns",
+        "security": "pass",
+        "regression": "concerns",
+        "baseline": "fail",
+        "scope": "pass",
+        "rules": "pass",
+        "conformance": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "INF-MBR-007.md가 SR-298.2 미반영 — '## 트랜잭션 순서' 3항이 '0행이면 재조회(selectByTarget)로 사유 판별'만 서술해 원자 증가 선행 단계가 통째로 빠졌다. 액면대로 읽으면 이 SR이 제거한 select->분기->update(read-modify-write)를 그대로 재구현하게 된다. '## 비즈니스 규칙'에도 5회 상한 보장 주체가 incrementAttemptCount의 attempt_count < maxAttempts 조건절로 옮겨갔다는 문장이 없다(INF-MBR-002는 STORY-1 스펙 이력에서 '병렬 버스트 우회 차단(SR-298)' 불릿을 받았으나 MBR-007은 대응 불릿 없음). 변경 이력 표도 없다.",
+          "suggested_action": "스펙 재동기화 단계에서 INF-MBR-002의 SR-298 편집과 대칭으로 갱신 — 트랜잭션 순서 3항 + 병렬 버스트 우회 차단 불릿 + 변경 이력 행 추가",
+          "confidence": "high",
+          "file": "docs/05_설계서/member/INF/INF-MBR-007.md",
+          "line": 73
+        },
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "INF-MBR-007 frontmatter anchors가 이번 변경 라인을 절단한다. v5는 코드에 추적 주석을 두지 않으므로 anchors가 코드->스펙 유일 링크인데: memberPasswordReset.xml:35-57은 57행(AND consumed_at IS NULL)에서 끊겨 이 SR의 핵심 산출물인 59행 AND attempt_count < #{maxAttempts}를 못 보여준다. MemberPasswordResetDao.java:41-63은 javadoc만 담고 64~65행 시그니처(신규 maxAttempts 파라미터)를 잘라낸다. MemberPasswordResetConfirmationService.java:139-162는 162행에서 끊겨 0행 4갈래 분류의 410/4103/폴백 분기(163~170)를 잘라낸다.",
+          "suggested_action": "anchors를 memberPasswordReset.xml:35-60 · MemberPasswordResetDao.java:41-65 · MemberPasswordResetConfirmationService.java:139-171로 갱신",
+          "confidence": "high",
+          "file": "docs/05_설계서/member/INF/INF-MBR-007.md",
+          "line": 21
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": ".speclinker/test_baseline.json이 git_head c29747e(SR-295 이전) 시점 510/1이라 실측 518/2와 8건·1실패 어긋난다. STORY-1이 515/2 시점에 같은 항목을 올렸고 아직 재기록되지 않았으며 이 story가 3건을 더 늘렸다. 실패 2건이 사람 waive 상태여도, 기준선이 낡은 동안은 다음 게이트의 baseline 축이 신규 실패와 waive된 기존 실패를 가를 수 없다.",
+          "suggested_action": "SR-300 조회창 드리프트 처리 후 test_baseline_ws.py record . --force로 518/2 재기록",
+          "confidence": "high",
+          "file": ".speclinker/test_baseline.json",
+          "line": 1
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "MemberPasswordResetDao.java javadoc에 이번 변경으로 거짓이 된 절이 남았다 — '위 confirmIfCodeMatches가 0행일 때만 서비스가 호출한다(\"행 없음\"이면 증가시킬 행이 없으므로 호출하지 않는다)'. TO-BE는 행 존재 여부를 보지 않고 무조건 호출하며, 판정을 UPDATE의 WHERE절에 맡기는 것이 이 SR의 요지다. 나머지 javadoc은 SR-298로 갱신됐는데 이 괄호절만 살아남았다. 다음 에이전트가 이 문장을 근거로 증가 앞에 selectByTarget != null 가드를 되돌리면 read-then-write 레이스가 그대로 복원된다 — 저위험이나 원복 벡터로는 가장 직접적.",
+          "suggested_action": "javadoc 55~56행의 '(\"행 없음\"이면 증가시킬 행이 없으므로 호출하지 않는다)' 괄호절 삭제",
+          "confidence": "high",
+          "file": "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberPasswordResetDao.java",
+          "line": 55
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "handleConfirmFailure 폴백 분기의 '이론상 도달 불가능' 주석은 과장이다. 실제 도달 경로가 있다 — 0행 증가 직후 진단용 selectByTarget 사이에 INF-MBR-006 재요청(쿨다운 60초 경과)이 끼면 touchRequest가 같은 행의 attempt_count를 0, consumed_at을 NULL, expires_at을 +10분으로 리셋하므로 세 분류 조건이 모두 거짓이 되어 폴백에 도달한다. 결과는 여전히 옳다(진짜 오답이므로 409 MBR-4102) — 코드 변경 불필요, 주석 문구와 '테스트 면제' 근거만 부정확하다.",
+          "suggested_action": "주석을 '동시 재발송 리셋이 끼어들면 도달 가능, 결과는 오답과 동일'로 문구 정정(코드 변경 불필요)",
+          "confidence": "high",
+          "file": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberPasswordResetConfirmationService.java",
+          "line": 168
+        },
+        {
+          "severity": "low",
+          "layer": "security",
+          "finding": "문장 수 비대칭의 방향이 뒤집혔다 — TO-BE: 단순 오답 2문장(confirm+increment, SELECT 없음) / 0행 4갈래 3문장(+selectByTarget). AS-IS: 행 없음 2문장 / 그 외 3문장. 크기는 동일한 PK 조회 1회 차이이고 양쪽 모두 MEMBERS를 조회하지 않는다. 드러나는 것은 '이 target으로 재설정을 요청한 적 있는가'뿐이며, INF-MBR-006(requestPasswordResetCode)은 MEMBERS를 조회하지 않고 어떤 target에든 202를 반환하므로 재설정 행 존재는 회원 존재 신호가 아니다 — 존재 오라클 AC 유지. STORY-1 권고 5와 동일 관찰.",
+          "suggested_action": "권고 1의 스펙 갱신 시 문장 수 차이를 함께 명문화(코드 변경 불필요)",
+          "confidence": "medium",
+          "file": "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberPasswordResetConfirmationService.java",
+          "line": 149
+        },
+        {
+          "severity": "high",
+          "layer": "baseline",
+          "finding": "테스트 기준선 악화: shop-api: 실패+오류 1→2 증가",
+          "suggested_action": "사라진 테스트(수집 실패·import 깨짐)나 새 실패를 고치세요. 의도한 삭제면 `/sl-test --baseline --force`로 기준선을 다시 뜨고 사유를 남기세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberSignupCompletionDao.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberRegistrationService.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/resources/mapper/memberSignupCompletion.xml — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/MemberRegistrationConcurrencyTest.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/dao/MemberSignupCompletionDaoTest.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/test/java/com/sm/lab/shop/service/MemberRegistrationServiceTest.java — 완료 항목 SR-298.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "conformance",
+          "finding": "STORY-2.md QA 권고 4(및 GATE-2.json round1~4)가 'MemberPasswordResetDao.java:55-56 javadoc에 거짓이 된 절이 남아있다'고 기록했으나, 직접 Read한 현재 파일(55-62행)에는 그 구절(\"행 없음이면 증가시킬 행이 없으므로 호출하지 않는다\")이 이미 없다 — diff 상에서도 해당 구절이 삭제되고 새 서술로 교체된 것으로 확인됨. QA 기록이 실제 소스보다 오래된 상태를 가리키는 것으로 보이나, 코드 자체는 AC 위반이 아니라 conformance 판정에는 영향 없음(참고용 기록차이).",
+          "suggested_action": "STORY QA 절/GATE-2.json 권고 4가 최신 소스와 어긋나는지 확인 — 이미 해결됐다면 해당 권고를 닫음 처리",
+          "confidence": "high",
+          "file": "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberPasswordResetDao.java",
+          "line": 56
+        }
+      ],
+      "layer": "conformance"
+    }
+  ],
+  "waiver": {
+    "active": true,
+    "by": "sl-aidd(사람 조건부 사전 승인)",
+    "reason": "기준선 악화(1→2 실패)는 SR-298.2 diff 밖의 기존 이월 실패 2건(OrderListEndToEndIntegrationTest, ApiKeyAuthIntegrationTest — OrderService 30일 조회창 날짜 드리프트, SR-300/299 이월) 때문임을 surefire 리포트로 실측 확인. SR-298.2 영향 범위(member 도메인) 31/31 전부 통과. 사람이 QA CONCERNS 게이트에서 조건부 사전 승인(원인이 기존 이월 2건이면 waive).",
+    "at": "2026-09-16T03:06:55",
+    "layer": "baseline"
+  },
+  "story_transitions": [
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "SR 승인(SR-298)",
+      "at": "2026-09-16T01:03:11"
+    },
+    {
+      "from": "Approved",
+      "to": "InProgress",
+      "by": "sl-aidd",
+      "at": "2026-09-16T02:40:19"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "qa-agent",
+      "at": "2026-09-16T02:46:02"
+    },
+    {
+      "from": "Review",
+      "to": "Done",
+      "by": "사람",
+      "at": "2026-09-16T03:09:39"
+    }
+  ],
+  "cause": "env",
+  "escalate": false,
+  "fail_rounds": 0,
+  "max_rounds": 3,
+  "waivers": [
+    {
+      "active": true,
+      "by": "sl-aidd(사람 조건부 사전 승인)",
+      "reason": "기준선 악화(1→2 실패)는 SR-298.2 diff 밖의 기존 이월 실패 2건(OrderListEndToEndIntegrationTest, ApiKeyAuthIntegrationTest — OrderService 30일 조회창 날짜 드리프트, SR-300/299 이월) 때문임을 surefire 리포트로 실측 확인. SR-298.2 영향 범위(member 도메인) 31/31 전부 통과. 사람이 QA CONCERNS 게이트에서 조건부 사전 승인(원인이 기존 이월 2건이면 waive).",
+      "at": "2026-09-16T03:06:55",
+      "layer": "baseline"
+    }
+  ]
+}

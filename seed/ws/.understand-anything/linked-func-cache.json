@@ -1,0 +1,591 @@
+{
+  "modules/shop-api/src/main/java/com/sm/lab/shop/controller/CartController.java": [
+    "FUNC-order-011",
+    "FUNC-order-012"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/controller/CartViewController.java": [
+    "FUNC-order-011",
+    "FUNC-order-012"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/controller/MemberAddressController.java": [
+    "FUNC-member-011"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/controller/MemberController.java": [
+    "FUNC-order-017"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/controller/MemberLoginController.java": [
+    "FUNC-member-005"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/controller/MemberPasswordResetConfirmationController.java": [
+    "FUNC-member-009"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/controller/MemberPasswordResetController.java": [
+    "FUNC-member-008"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/controller/MemberRegistrationController.java": [
+    "FUNC-member-003"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/controller/MemberSessionController.java": [
+    "FUNC-member-006"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/controller/MemberSignupController.java": [
+    "FUNC-member-002"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/controller/MemberSignupViewController.java": [
+    "FUNC-member-001"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/controller/MemberViewController.java": [
+    "FUNC-order-004"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/controller/OrderController.java": [
+    "FUNC-order-001",
+    "FUNC-order-013"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/controller/OrderViewController.java": [
+    "FUNC-order-001"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/controller/ProductController.java": [
+    "FUNC-order-007"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/controller/ProductViewController.java": [
+    "FUNC-order-009",
+    "FUNC-order-010"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/controller/ZipcodeController.java": [
+    "FUNC-member-012"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/dao/CartDao.java": [
+    "FUNC-order-011",
+    "FUNC-order-012"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberAddressDao.java": [
+    "FUNC-member-011"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberApiKeyDao.java": [
+    "FUNC-member-005",
+    "FUNC-member-006"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberDao.java": [
+    "FUNC-member-003",
+    "FUNC-member-005",
+    "FUNC-member-009"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberLoginAttemptDao.java": [
+    "FUNC-member-005"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberPasswordResetDao.java": [
+    "FUNC-member-008",
+    "FUNC-member-009"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberRefreshTokenDao.java": [
+    "FUNC-member-005",
+    "FUNC-member-006"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberSignupCompletionDao.java": [
+    "FUNC-member-003"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberSignupRateLimitDao.java": [
+    "FUNC-member-002"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/dao/MemberSignupVerificationDao.java": [
+    "FUNC-member-002"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/dao/OrderDao.java": [
+    "FUNC-order-001",
+    "FUNC-order-004",
+    "FUNC-order-006"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/dao/ProductDao.java": [
+    "FUNC-order-007",
+    "FUNC-order-002",
+    "FUNC-order-009"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/dao/ZipcodeDao.java": [
+    "FUNC-member-012"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/domain/CartItem.java": [
+    "FUNC-order-011"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/domain/Member.java": [
+    "FUNC-order-004"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/domain/MemberAddress.java": [
+    "FUNC-member-011"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/domain/MemberCredential.java": [
+    "FUNC-member-005"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/domain/MemberGrade.java": [
+    "FUNC-order-017"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/domain/MemberLoginAttempt.java": [
+    "FUNC-member-005"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/domain/MemberPasswordReset.java": [
+    "FUNC-member-008"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/domain/MemberSignupRateLimit.java": [
+    "FUNC-member-002"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/domain/MemberSignupVerification.java": [
+    "FUNC-member-002"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/domain/OrderSummary.java": [
+    "FUNC-order-004"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/domain/Zipcode.java": [
+    "FUNC-member-012"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/ShopApiApplication.java": [
+    "FUNC-member-002"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/service/CartService.java": [
+    "FUNC-order-011",
+    "FUNC-order-012"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/service/ExportRowLimitExceededException.java": [
+    "FUNC-order-013"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberAddressApiException.java": [
+    "FUNC-member-011"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberAddressService.java": [
+    "FUNC-member-011"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberLoginApiException.java": [
+    "FUNC-member-005"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberLoginService.java": [
+    "FUNC-member-005"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberPasswordResetApiException.java": [
+    "FUNC-member-008"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberPasswordResetConfirmationApiException.java": [
+    "FUNC-member-009"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberPasswordResetConfirmationService.java": [
+    "FUNC-member-009"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberPasswordResetConfirmationWriter.java": [
+    "FUNC-member-009"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberPasswordResetService.java": [
+    "FUNC-member-008",
+    "FUNC-member-009"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberRegistrationApiException.java": [
+    "FUNC-member-003"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberRegistrationService.java": [
+    "FUNC-member-003",
+    "FUNC-member-009",
+    "FUNC-member-011"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberService.java": [
+    "FUNC-order-017",
+    "FUNC-order-004"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberSessionApiException.java": [
+    "FUNC-member-006"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberSessionService.java": [
+    "FUNC-member-006"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberSignedUpEvent.java": [
+    "FUNC-member-003"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberSignedUpEventLogger.java": [
+    "FUNC-member-003"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberSignupApiException.java": [
+    "FUNC-member-002"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberSignupCompletionWriter.java": [
+    "FUNC-member-003"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberSignupMaintenanceScheduler.java": [
+    "FUNC-member-002"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberSignupSchedulingConfig.java": [
+    "FUNC-member-002"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/service/MemberSignupService.java": [
+    "FUNC-member-002"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/service/OrderService.java": [
+    "FUNC-order-001",
+    "FUNC-order-013",
+    "FUNC-order-002"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/service/ProductService.java": [
+    "FUNC-order-007",
+    "FUNC-order-009"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/service/ZipcodeApiException.java": [
+    "FUNC-member-012"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/service/ZipcodeService.java": [
+    "FUNC-member-012"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiExceptionHandler.java": [
+    "FUNC-order-011"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java": [
+    "FUNC-order-013",
+    "FUNC-order-004",
+    "FUNC-order-017",
+    "FUNC-member-002",
+    "FUNC-member-003"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/web/MemberAddressExceptionHandler.java": [
+    "FUNC-member-011"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/web/MemberLoginExceptionHandler.java": [
+    "FUNC-member-005"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/web/MemberPasswordResetConfirmationExceptionHandler.java": [
+    "FUNC-member-009"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/web/MemberPasswordResetExceptionHandler.java": [
+    "FUNC-member-008"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/web/MemberRegistrationExceptionHandler.java": [
+    "FUNC-member-003"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/web/MemberSessionExceptionHandler.java": [
+    "FUNC-member-006"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/web/MemberSignupExceptionHandler.java": [
+    "FUNC-member-002"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/web/OrderApiExceptionHandler.java": [
+    "FUNC-order-013"
+  ],
+  "modules/shop-api/src/main/java/com/sm/lab/shop/web/ZipcodeExceptionHandler.java": [
+    "FUNC-member-012"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/CartConcurrencyTest.java": [
+    "FUNC-order-011"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/CheckoutAtomicityTest.java": [
+    "FUNC-order-012"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/CheckoutConcurrencyTest.java": [
+    "FUNC-order-012"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/controller/CartControllerTest.java": [
+    "FUNC-order-011",
+    "FUNC-order-012"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/controller/CartViewControllerTest.java": [
+    "FUNC-order-011",
+    "FUNC-order-012"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/controller/MemberAddressControllerTest.java": [
+    "FUNC-member-011"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/controller/MemberControllerTest.java": [
+    "FUNC-order-017"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/controller/MemberLoginControllerTest.java": [
+    "FUNC-member-005"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/controller/MemberPasswordResetConfirmationControllerTest.java": [
+    "FUNC-member-009"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/controller/MemberPasswordResetControllerTest.java": [
+    "FUNC-member-008"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/controller/MemberQueryRegressionTest.java": [
+    "FUNC-member-003"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/controller/MemberRegistrationControllerTest.java": [
+    "FUNC-member-003"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/controller/MemberSessionControllerTest.java": [
+    "FUNC-member-006"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/controller/MemberSignupControllerTest.java": [
+    "FUNC-member-002"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/controller/MemberSignupScreenStateTest.java": [
+    "FUNC-member-001"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/controller/MemberSignupViewControllerTest.java": [
+    "FUNC-member-001"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/controller/MemberViewControllerTest.java": [
+    "FUNC-order-004"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/controller/OrderControllerTest.java": [
+    "FUNC-order-013",
+    "FUNC-order-001"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/controller/OrderListEndToEndIntegrationTest.java": [
+    "FUNC-order-001"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/controller/OrderViewControllerTest.java": [
+    "FUNC-order-001"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/controller/ProductControllerTest.java": [
+    "FUNC-order-007"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/controller/ProductViewControllerTest.java": [
+    "FUNC-order-009",
+    "FUNC-order-010"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/controller/ZipcodeControllerTest.java": [
+    "FUNC-member-012"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/dao/CartDaoTest.java": [
+    "FUNC-order-011"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/dao/MemberAddressDaoTest.java": [
+    "FUNC-member-011"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/dao/MemberApiKeyDaoTest.java": [
+    "FUNC-member-005",
+    "FUNC-member-006"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/dao/MemberIdSequenceDaoTest.java": [
+    "FUNC-member-003"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/dao/MemberLoginAttemptDaoTest.java": [
+    "FUNC-member-005"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/dao/MemberPasswordResetDaoTest.java": [
+    "FUNC-member-008",
+    "FUNC-member-009"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/dao/MemberRefreshTokenDaoTest.java": [
+    "FUNC-member-005",
+    "FUNC-member-006"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/dao/MemberSignupCompletionDaoTest.java": [
+    "FUNC-member-003"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/dao/MemberSignupRateLimitDaoTest.java": [
+    "FUNC-member-002"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/dao/MemberSignupVerificationDaoTest.java": [
+    "FUNC-member-002"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/dao/OrderDaoTest.java": [
+    "FUNC-order-006",
+    "FUNC-order-001"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/dao/ProductDaoTest.java": [
+    "FUNC-order-007",
+    "FUNC-order-009"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/dao/ZipcodeDaoTest.java": [
+    "FUNC-member-012"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/MemberAddressConcurrencyTest.java": [
+    "FUNC-member-011"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/MemberLoginConcurrencyTest.java": [
+    "FUNC-member-005"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/MemberPasswordResetConfirmationFlowTest.java": [
+    "FUNC-member-009"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/MemberRegistrationCompletionFlowTest.java": [
+    "FUNC-member-003"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/MemberRegistrationConcurrencyTest.java": [
+    "FUNC-member-003"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/MemberRegistrationPhoneNormalizationTest.java": [
+    "FUNC-member-003"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/MemberSessionIntegrationTest.java": [
+    "FUNC-member-006"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/MemberSignupRateLimitConcurrencyTest.java": [
+    "FUNC-member-002"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/OrderCreateQtyZeroRegressionTest.java": [
+    "FUNC-member-002"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/service/CartServiceTest.java": [
+    "FUNC-order-011",
+    "FUNC-order-012"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/service/MemberAddressServiceTest.java": [
+    "FUNC-member-011"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/service/MemberLoginServiceTest.java": [
+    "FUNC-member-005"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/service/MemberPasswordResetConfirmationServiceTest.java": [
+    "FUNC-member-009"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/service/MemberPasswordResetConfirmationWriterTest.java": [
+    "FUNC-member-009"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/service/MemberPasswordResetServiceTest.java": [
+    "FUNC-member-008"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/service/MemberRegistrationServiceTest.java": [
+    "FUNC-member-003"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/service/MemberSessionServiceTest.java": [
+    "FUNC-member-006"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/service/MemberSignupRateLimitTest.java": [
+    "FUNC-member-002"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/service/MemberSignupSchedulingConfigTest.java": [
+    "FUNC-member-002"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/service/MemberSignupServiceTest.java": [
+    "FUNC-member-002"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/service/OrderCancelIntegrationTest.java": [
+    "FUNC-order-002"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/service/OrderExportIntegrationTest.java": [
+    "FUNC-order-013"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/service/OrderServiceTest.java": [
+    "FUNC-order-013",
+    "FUNC-order-001",
+    "FUNC-order-002"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/service/ProductServiceTest.java": [
+    "FUNC-order-007",
+    "FUNC-order-009"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/service/ZipcodeServiceTest.java": [
+    "FUNC-member-012"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/support/AdminApiKeyTestConfig.java": [
+    "FUNC-order-013"
+  ],
+  "modules/shop-api/src/test/java/com/sm/lab/shop/web/ApiKeyAuthIntegrationTest.java": [
+    "FUNC-order-013",
+    "FUNC-order-004",
+    "FUNC-member-003",
+    "FUNC-member-005",
+    "FUNC-member-006"
+  ],
+  "modules/shop-web/src/api.ts": [
+    "FUNC-order-001",
+    "FUNC-member-004",
+    "FUNC-member-007"
+  ],
+  "modules/shop-web/src/App.tsx": [
+    "FUNC-member-004",
+    "FUNC-member-007"
+  ],
+  "modules/shop-web/src/components/DeliveryBadge.stories.tsx": [
+    "FUNC-order-001"
+  ],
+  "modules/shop-web/src/components/DeliveryBadge.tsx": [
+    "FUNC-order-001"
+  ],
+  "modules/shop-web/src/components/LoginForm.stories.tsx": [
+    "FUNC-member-004"
+  ],
+  "modules/shop-web/src/components/LoginForm.tsx": [
+    "FUNC-member-004"
+  ],
+  "modules/shop-web/src/components/OrderDetailCard.stories.tsx": [
+    "FUNC-order-002"
+  ],
+  "modules/shop-web/src/components/OrderDetailCard.tsx": [
+    "FUNC-order-002"
+  ],
+  "modules/shop-web/src/components/OrderFilters.stories.tsx": [
+    "FUNC-order-001"
+  ],
+  "modules/shop-web/src/components/OrderFilters.tsx": [
+    "FUNC-order-001"
+  ],
+  "modules/shop-web/src/components/OrderSummaryCard.stories.tsx": [
+    "FUNC-order-001"
+  ],
+  "modules/shop-web/src/components/OrderSummaryCard.tsx": [
+    "FUNC-order-001"
+  ],
+  "modules/shop-web/src/components/OrderTable.stories.tsx": [
+    "FUNC-order-001"
+  ],
+  "modules/shop-web/src/components/OrderTable.tsx": [
+    "FUNC-order-001"
+  ],
+  "modules/shop-web/src/features/member/PasswordResetCodeStep.stories.tsx": [
+    "FUNC-member-007"
+  ],
+  "modules/shop-web/src/features/member/PasswordResetCodeStep.tsx": [
+    "FUNC-member-007"
+  ],
+  "modules/shop-web/src/features/member/PasswordResetDoneStep.stories.tsx": [
+    "FUNC-member-007"
+  ],
+  "modules/shop-web/src/features/member/PasswordResetDoneStep.tsx": [
+    "FUNC-member-007"
+  ],
+  "modules/shop-web/src/features/member/PasswordResetPasswordStep.stories.tsx": [
+    "FUNC-member-007"
+  ],
+  "modules/shop-web/src/features/member/PasswordResetPasswordStep.tsx": [
+    "FUNC-member-007"
+  ],
+  "modules/shop-web/src/features/member/PasswordResetRequestStep.stories.tsx": [
+    "FUNC-member-007"
+  ],
+  "modules/shop-web/src/features/member/PasswordResetRequestStep.tsx": [
+    "FUNC-member-007"
+  ],
+  "modules/shop-web/src/features/member/requestCodeOnce.ts": [
+    "FUNC-member-007"
+  ],
+  "modules/shop-web/src/features/member/requestCodeOnce.unit.test.ts": [
+    "FUNC-member-007"
+  ],
+  "modules/shop-web/src/main.tsx": [
+    "FUNC-member-004"
+  ],
+  "modules/shop-web/src/pages/LoginPage.tsx": [
+    "FUNC-member-004",
+    "FUNC-member-007"
+  ],
+  "modules/shop-web/src/pages/OrderDetailPage.tsx": [
+    "FUNC-order-002"
+  ],
+  "modules/shop-web/src/pages/OrderListPage.tsx": [
+    "FUNC-order-001"
+  ],
+  "modules/shop-web/src/pages/PasswordResetPage.test.tsx": [
+    "FUNC-member-007"
+  ],
+  "modules/shop-web/src/pages/PasswordResetPage.tsx": [
+    "FUNC-member-007"
+  ],
+  "modules/shop-web/src/redirectTarget.ts": [
+    "FUNC-member-004"
+  ],
+  "modules/shop-web/src/redirectTarget.unit.test.ts": [
+    "FUNC-member-004"
+  ],
+  "modules/shop-web/src/refreshOnce.ts": [
+    "FUNC-member-004"
+  ],
+  "modules/shop-web/src/refreshOnce.unit.test.ts": [
+    "FUNC-member-004"
+  ],
+  "modules/shop-web/src/session.ts": [
+    "FUNC-member-004"
+  ],
+  "modules/shop-web/src/types.ts": [
+    "FUNC-order-001",
+    "FUNC-member-004",
+    "FUNC-member-007"
+  ],
+  "modules/shop-web/vite.config.ts": [
+    "FUNC-member-004"
+  ]
+}

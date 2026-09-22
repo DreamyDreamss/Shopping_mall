@@ -1,0 +1,22 @@
+{
+  "tables": [
+    "MEMBERS",
+    "ORDERS"
+  ],
+  "tables_unknown": [
+    "MEMBER_ADDRESSES"
+  ],
+  "infs": [],
+  "infs_unmatched": [],
+  "paths": [
+    "/api/members/"
+  ],
+  "paths_candidate": [
+    "/api/members/me/addresses",
+    "/api/zipcodes"
+  ],
+  "screens": [],
+  "uis_ids": [],
+  "terms": [],
+  "entities_arg": "MEMBERS,ORDERS,/api/members/"
+}

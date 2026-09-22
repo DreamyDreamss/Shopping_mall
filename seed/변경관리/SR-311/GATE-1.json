@@ -1,0 +1,666 @@
+{
+  "func": "SR-311.1",
+  "epic": "SR-311",
+  "story": "docs/변경관리/SR-311/STORY-1.md",
+  "gate": "CONCERNS",
+  "reviewer": "qa-agent",
+  "updated": "2026-09-19T21:32:09",
+  "layers": {
+    "spec": "pass",
+    "security": "pass",
+    "regression": "concerns",
+    "baseline": "pass",
+    "scope": "fail",
+    "rules": "pass",
+    "stories": "pass",
+    "conformance": "pass"
+  },
+  "top_issues": [
+    {
+      "severity": "low",
+      "layer": "regression",
+      "finding": "AppShell.tsx:77 minmax(0,1fr)로 좌우 트랙 min-content 하한을 0으로 만든 대가로, 1200~1237px 대역에서 RightRail(width:220, flexShrink:0)이 칸 밖·뷰포트 밖으로 최대 19px 넘쳐 가로 스크롤이 생긴다(QA 실브라우저 실측: 1200px에서 scrollWidth 1219 > clientWidth 1200, 1240px 이상 0). 본문 좌표는 레일 유무·폭과 무관하게 전 구간 정확히 가운데(0px)로 round3 필수수정 1은 완전 해소됐고, 이 절충은 round3 QA 수정안·사람 지시 1이 이미 승인한 것이라 이번 라운드 결함으로 올리지 않는다.",
+      "suggested_action": "후속 TODO — 정리하려면 RightRail railStyle에 maxWidth:'100%'(또는 flexShrink:1)를 더해 좁은 데스크톱에서 레일이 칸에 맞춰 줄게 한다(카드 내용이 텍스트뿐이라 축소해도 깨지지 않는다)."
+    },
+    {
+      "severity": "low",
+      "layer": "regression",
+      "finding": "본문 정렬을 실좌표로 재는 유일한 가드인 AppShell.stories.tsx:50-59 assertMainCentered(play)가 AIDD 축E에서 실행되지 않는다 — project.env에 STORYBOOK_TEST_CMD가 없어 story_gate.py:179가 내장 storybook_render.js로 폴백하고, 그 폴백은 스토리를 렌더해 콘솔 오류만 볼 뿐 play를 돌리지 않는다. 나머지 자동 가드인 AppShell.test.tsx:91-92는 gridTemplateColumns 문자열 동등성이라 구조상 레이아웃을 못 잡는다(round3에서 '1fr … 1fr'을 그대로 통과시킨 단언). round3 FAIL의 근인(test-storybook 미실행)도 이 구멍에서 나왔다.",
+      "suggested_action": "project.env에 STORYBOOK_TEST_CMD=npm run test-storybook -- --url {URL} --maxWorkers=1 을 추가해 축E가 play까지 돌게 한다(워커를 여럿 두고 단일 스레드 정적 서버에 붙이면 경합으로 22 suites가 타임아웃 오탐 — QA 실측)."
+    },
+    {
+      "severity": "low",
+      "layer": "regression",
+      "finding": "ProductListPage.tsx:93-99의 'state 소거'(navigate(pathname+search,{replace:true}))를 QA가 무력화하고 스위트 전체를 돌렸더니 41 suites / 312 tests가 전부 그대로 통과했다 — 사람 지시 2의 후반부('뒤로가기로 다시 포커스되지 않게 state를 소거한다')에 가드가 없다. 동작 자체는 QA 임시 테스트로 정상 확인(소거 후 location.state.focusSearch=false)이라 결함이 아니라 커버리지 구멍이다.",
+      "suggested_action": "후속 TODO — SearchFocusHandoff.test.tsx에 useLocation 프로브 한 줄을 더해 도착 후 location.state.focusSearch가 소거됐는지 단언한다."
+    },
+    {
+      "severity": "high",
+      "layer": "scope",
+      "finding": "스코프 밖 변경: project.env (M)",
+      "suggested_action": "이 변경이 이 작업 항목에 필요한지 확인하고, 아니면 되돌리세요"
+    },
+    {
+      "severity": "low",
+      "layer": "stories",
+      "finding": "고친 화면 부품에 스토리가 없습니다: src/components/common/Tabs.test.tsx",
+      "suggested_action": "그 부품의 상태를 스토리로 남기세요 — 없으면 다음 사람이 그 상태를 볼 방법이 없습니다. 차단하려면 하네스 규칙 `story-per-component`(pair 검사)를 채택하세요(/rules 제안 탭) — 축 C가 must로 막습니다"
+    },
+    {
+      "severity": "low",
+      "layer": "stories",
+      "finding": "고친 화면 부품에 스토리가 없습니다: src/features/shop/AppShell.test.tsx",
+      "suggested_action": "그 부품의 상태를 스토리로 남기세요 — 없으면 다음 사람이 그 상태를 볼 방법이 없습니다. 차단하려면 하네스 규칙 `story-per-component`(pair 검사)를 채택하세요(/rules 제안 탭) — 축 C가 must로 막습니다"
+    },
+    {
+      "severity": "low",
+      "layer": "stories",
+      "finding": "고친 화면 부품에 스토리가 없습니다: src/features/shop/BottomTabBar.test.tsx",
+      "suggested_action": "그 부품의 상태를 스토리로 남기세요 — 없으면 다음 사람이 그 상태를 볼 방법이 없습니다. 차단하려면 하네스 규칙 `story-per-component`(pair 검사)를 채택하세요(/rules 제안 탭) — 축 C가 must로 막습니다"
+    },
+    {
+      "severity": "low",
+      "layer": "stories",
+      "finding": "고친 화면 부품에 스토리가 없습니다: src/features/shop/Gnb.test.tsx",
+      "suggested_action": "그 부품의 상태를 스토리로 남기세요 — 없으면 다음 사람이 그 상태를 볼 방법이 없습니다. 차단하려면 하네스 규칙 `story-per-component`(pair 검사)를 채택하세요(/rules 제안 탭) — 축 C가 must로 막습니다"
+    },
+    {
+      "severity": "low",
+      "layer": "stories",
+      "finding": "고친 화면 부품에 스토리가 없습니다: src/features/shop/GnbTabs.test.tsx",
+      "suggested_action": "그 부품의 상태를 스토리로 남기세요 — 없으면 다음 사람이 그 상태를 볼 방법이 없습니다. 차단하려면 하네스 규칙 `story-per-component`(pair 검사)를 채택하세요(/rules 제안 탭) — 축 C가 must로 막습니다"
+    },
+    {
+      "severity": "low",
+      "layer": "stories",
+      "finding": "고친 화면 부품에 스토리가 없습니다: src/features/shop/QuickBar.test.tsx",
+      "suggested_action": "그 부품의 상태를 스토리로 남기세요 — 없으면 다음 사람이 그 상태를 볼 방법이 없습니다. 차단하려면 하네스 규칙 `story-per-component`(pair 검사)를 채택하세요(/rules 제안 탭) — 축 C가 must로 막습니다"
+    },
+    {
+      "severity": "low",
+      "layer": "stories",
+      "finding": "고친 화면 부품에 스토리가 없습니다: src/features/shop/RightRail.test.tsx",
+      "suggested_action": "그 부품의 상태를 스토리로 남기세요 — 없으면 다음 사람이 그 상태를 볼 방법이 없습니다. 차단하려면 하네스 규칙 `story-per-component`(pair 검사)를 채택하세요(/rules 제안 탭) — 축 C가 must로 막습니다"
+    },
+    {
+      "severity": "low",
+      "layer": "conformance",
+      "finding": "focus 항목의 STORY '사람 확인 사항'이 round1→round4에 걸쳐 3차례 재해석됐다(검색 아이콘 클릭 시 포커스 주체) — 최종 round4 구현(navigate state → 도착화면이 autoFocusSearch로 소비)은 사람 지시 2 원문과 diff가 정확히 일치함을 확인(Gnb.tsx, ProductListPage.tsx, pages/SearchFocusHandoff.test.tsx)",
+      "suggested_action": "조치 불필요 — 사실 기록만(STEP 5.5 재동기화 시 UIS-CMN-003 본문에 이 최종 해석을 반영하도록 STORY에 이미 명시됨)",
+      "confidence": "high"
+    },
+    {
+      "severity": "low",
+      "layer": "conformance",
+      "finding": "축B은 SR-322.2가 소유 주장한 ProductListPage.tsx·ProductDetailPage.tsx의 diff도 대조 요청받아 확인함 — 두 파일 모두 AppShell 래핑만 있고(AC-1/AC-16 범위), SR-322(리스킨) 몫으로 보이는 인라인 스타일 변경은 없음. 두 항목 간 소유 경계가 깨끗함",
+      "suggested_action": "조치 불필요 — 기록만",
+      "confidence": "high"
+    }
+  ],
+  "rounds": [
+    {
+      "round": 1,
+      "gate": "CONCERNS",
+      "human": {
+        "decision": "rework",
+        "by": "사람",
+        "at": "2026-09-19T19:35:20",
+        "comment": "QA CONCERNS 7건 전부 재작업(사람 지시):\n1. 헤더 검색 아이콘을 Gnb에 추가 — 아이콘 버튼 클릭 시 #/shop/products로 이동 + 검색 입력에 포커스(검색 동작 자체는 SR-239 범위라 새로 구현하지 않음). 기존 Gnb 테스트는 그대로 통과해야 한다.\n2. 750px 이상 모든 폭에서 본문을 --layout-content-width(750px)로 가운데 고정(태블릿 750~1199px 대역 포함 — 폭이 단조롭게 유지, 1200px 진입 시 급락 금지).\n3. GNB 빨간 라벨을 오버레이가 아니라 각 탭 라벨 요소 안(위쪽 작은 줄)에 렌더 — 탭 수·굵기와 무관하게 위치가 맞도록. badge:true 탭을 가진 스토리 1개 + 테스트로 실제 행사할 것.\n4. RightRail은 최근 본 sku가 있을 때만 fetchProducts 호출(0개면 호출 자체를 하지 않음).\n5. 모바일 하단 여백을 셸 컨테이너(푸터 포함) 하단에 둬 하단탭바가 푸터를 가리지 않게.\n6. 현재 경로와 맞는 GNB 탭이 없으면 선택 탭 없음(aria-selected 전부 false, 임의로 홈을 선택 처리하지 않음).\n7. 로그인 리다이렉트에 pathname+search를 함께 실어 쿼리스트링 유실 방지(기존 redirectTarget 규약 그대로 확장).",
+        "targets": []
+      },
+      "layers": {
+        "spec": "concerns",
+        "security": "pass",
+        "regression": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "AC '헤더: 로고·검색 아이콘·장바구니 수량'의 검색 아이콘이 없다 — 구현 계획이 '파일' 절(Gnb 무변경 재사용)과 '실패 사례집 대조' 절(검색 아이콘을 입력 옆 시각 요소로 추가)로 자기모순이었고 dev가 전자로 해소해 Gnb.tsx가 무변경으로 남았다",
+          "suggested_action": "Gnb.tsx의 검색 입력 옆에 돋보기 span(aria-hidden)만 추가한다. aria-label='상품 검색' 입력 자체는 절대 축소하지 않는다(ShopHomePage/ProductListPage 테스트가 그 라벨로 타이핑·제출)"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "AppShell.tsx:58이 750~1199px 대역 본문에 폭 상한을 두지 않는데(maxWidth 100%), 기존 8개 페이지의 maxWidth 1040/920/720/640 래퍼는 제거됐다 — 1199px에서 본문이 ~1167px로 기존보다 넓어지고 1200px에서 750px로 급락해 폭이 뷰포트에 대해 비단조가 된다",
+          "suggested_action": "태블릿 대역에도 상한(--layout-content-width 또는 기존 1040)을 두고 margin:0 auto로 가운데 정렬한다"
+        },
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "GnbTabs.tsx의 '빨간 라벨' 오버레이가 모든 셀을 bold로 두는데 Tabs.css의 .cmn-tabs__tab은 활성 탭만 bold라, 노출 탭이 2개 이상이 되면 오버레이 셀이 실제 탭보다 넓어져 점이 오른쪽으로 누적 이동한다. 현재는 badge:true 탭이 없어 오버레이가 아예 렌더되지 않아 AC 기능이 스토리·테스트 어디서도 행사되지 않는다",
+          "suggested_action": "오버레이 셀 fontWeight를 활성 여부에 맞추거나, Tabs에 badgeKeys 같은 최소 계약을 열어 탭 버튼 안에서 점을 그린다. badge:true 탭 1개를 켠 스토리로 실물 검증을 남긴다"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "RightRail.tsx:48-55의 effect가 최근 본 상품 유무와 무관하게 fetchProducts()를 무조건 호출한다 — 0개면 레일이 null을 반환하는데 GET은 이미 나갔고, 이 SR로 셸이 붙은 LoginPage/PasswordResetPage는 원래 상품 API를 부르지 않던 화면이다",
+          "suggested_action": "effect 진입부에 if (loadRecentlyViewedSkus().length === 0) return 가드를 둔다"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "AppShell.tsx:59의 paddingBottom:56이 <main>에만 걸려 있고 ShopFooter는 main 바깥이라, 모바일에서 position:fixed 하단탭바가 푸터 마지막 줄을 덮는다",
+          "suggested_action": "paddingBottom을 최외곽 컨테이너로 옮긴다"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "GnbTabs.tsx:37의 '?? visibleTabs[0]' 때문에 #/shop/cart·#/login 등 홈이 아닌 화면에서도 '홈' 탭이 aria-selected=true로 강조된다",
+          "suggested_action": "매칭이 없으면 존재하지 않는 key를 넘겨 활성 탭 없음으로 둔다"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "QuickBar.tsx:36·BottomTabBar.tsx:32의 로그인 리다이렉트가 location.pathname만 실어 쿼리스트링을 버린다 — #/shop/products?keyword=가방에서 '마이'를 누르면 로그인 후 keyword가 사라진다",
+          "suggested_action": "location.pathname + location.search로 실어 보낸다"
+        }
+      ],
+      "cause": "plan_gap"
+    },
+    {
+      "round": 2,
+      "gate": "CONCERNS",
+      "human": {
+        "decision": "rework",
+        "by": "사람",
+        "at": "2026-09-19T19:50:39",
+        "comment": "QA CONCERNS round2 3건(+low 2건) 재작업(사람 지시, round1 지시(1)의 범위가 좁았던 것이 원인):\n1. 검색 아이콘: searchValue가 비어 있지 않으면 그 페이지의 기존 onSearchSubmit을 호출(Enter 제출과 같은 결과), 비어 있으면 #/shop/products로 이동+입력 포커스. 목록 화면 안에서도 URL keyword와 표시 상태가 일치해야 한다.\n2. 1200px 이상 레이아웃을 [퀵바 칸 | 750px 본문 | 레일 칸] 3열 고정 그리드로 바꾸고 레일 칸은 내용이 없어도 자리를 유지(빈 칸) — 레일 카드 유무·퀵바/레일 폭 차이와 무관하게 본문이 뷰포트 가운데에 고정.\n3. 단언 보강: 검색 아이콘(검색어 있음→onSearchSubmit 호출 스파이, 없음→이동), RightRail(sku 0개면 fetchProducts 미호출 스파이), 로그인 리다이렉트(pathname+search 보존 파라미터 단언), 레이아웃(레일 없음/있음에서 본문 left 동일 — 가능하면 스토리 기반). 각 가드를 지우면 해당 테스트가 실패하는지 확인.\n(low) AppShell.stories.tsx의 renders-nothing 태그 제거(셸은 항상 그린다). 시각 기준선은 STEP 5에서 capture --force로 재기록(이번 라운드에서 직접 하지 않음). 스와이프 기준 인덱스는 추적만(이번 라운드 수정 대상 아님).",
+        "targets": []
+      },
+      "layers": {
+        "spec": "concerns",
+        "security": "pass",
+        "regression": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "Gnb.tsx:36-39 검색 아이콘이 searchValue를 보지 않고 무조건 navigate('/shop/products')만 해, 헤더에 친 검색어가 버려지고(Enter는 ?keyword=로 보내는 것과 정반대) 목록 화면에서는 URL 쿼리만 지워져 appliedKeyword state와 어긋난다. 포커스도 navigate 직후 언마운트될 입력에 걸려 8개 화면 중 7개에서 동작하지 않는다(dev 주석 자인)",
+          "suggested_action": "handleSearchIconClick 진입부에 if (searchValue.trim()) { onSearchSubmit(); return } — 각 페이지에 이미 있는 제출 핸들러 재사용(SR-239 신규 구현 아님). 포커스는 목적지 화면이 받게 옮기거나 AC에서 '이동만'으로 범위를 낮춘다. Gnb.test.tsx를 새로 만들어 고정"
+        },
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "AppShell.tsx:53-65 — 재작업 지시 2의 '가운데 고정' 중 폭만 고정됐다. justifyContent:center + 퀵바 64px vs 레일 220px 비대칭 + 레일이 최근본상품 0개면 DOM에서 사라져(RightRail.tsx:70), 1280px에서 본문 중심이 레일 유무에 따라 78px 왼쪽 / 44px 오른쪽 = 122px 좌우로 점프한다",
+          "suggested_action": "레일이 숨어도 width:220 자리를 유지하거나 3열을 grid-template-columns: 64px 750px 220px; justify-content:center로 고정해 데이터 상태와 무관하게 격자를 고정"
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "재작업 7건 중 4건이 테스트 없이 들어갔다 — 1(검색 아이콘, Gnb.test.tsx 자체가 없음) · 4(RightRail.tsx:52 'sku 0개면 fetchProducts 미호출' 스파이 단언 없음) · 7(QuickBar.tsx:39/BottomTabBar.tsx:33 redirect 쿼리스트링 보존 단언 없음) · 2(AppShell.test.tsx:80-86이 부재만 보고 본문 폭은 안 봄). 가드를 지워도 36 suites가 그대로 통과한다(사례집 SR-302 #1 · SR-306 #2 거짓 보증 계열)",
+          "suggested_action": "최소 3건(fetch 미호출 스파이 · redirect 파라미터 문자열 · 검색 아이콘 클릭 결과)을 단언으로 고정하고, 각 단언은 가드를 임시로 걷어내 실제로 깨지는지 확인한 뒤 되돌린다"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "Tabs.css:15-28이 SR-310 공통 .cmn-tabs__tab에 flex-direction:column 등을 추가해 기존 '공통/Tabs' 스토리 픽셀이 달라진다(계약 확장 자체는 사람 확인 사항 3으로 승인). 신규 배지있는탭 + 쇼핑셸/* 9종도 기준선 신규 대상",
+          "suggested_action": ".speclinker/story_shots/baseline/를 'SR-311 재작업 3(사람 승인)' 사유와 함께 재기록"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "AppShell.stories.tsx:73-77 최근본상품_0개에 renders-nothing 태그가 붙었지만 셸은 헤더·GNB 탭·본문·푸터를 항상 그린다. 축E의 empty-ok 플래그(story_gate.py:53-54)라 실패를 만들지는 않으나 그 스토리가 통째로 빈 화면이 되는 회귀를 영구히 가린다(사례집 SR-310 #1의 반대 방향 오용, round1 산출물)",
+          "suggested_action": "해당 스토리에서 renders-nothing 태그를 제거(후속 TODO 가능)"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "GnbTabs.tsx:33이 불일치 시 activeKey=''를 넘기는데 Tabs.tsx:30의 Math.max(0, findIndex)가 기준 인덱스를 0으로 잡아, 탭이 2개 이상 열리면 '선택 탭 없음' 상태의 스와이프가 두 번째 탭으로 간다. 현재는 노출 탭이 '홈' 1개라 무해",
+          "suggested_action": "SR-237/SR-319로 탭이 열릴 때 Tabs가 activeKey 불일치를 '기준 없음'으로 다루게 한다(후속 TODO)"
+        }
+      ],
+      "cause": "impl_bug"
+    },
+    {
+      "round": 3,
+      "gate": "FAIL",
+      "human": {
+        "decision": "rework",
+        "by": "사람",
+        "at": "2026-09-19T20:13:35",
+        "comment": "QA FAIL round3 필수 수정 2건 재작업(사람 지시):\n1. AppShell grid-template-columns를 minmax(0,1fr) var(--layout-content-width) minmax(0,1fr)로(QA 수정안 그대로), 퀵바·레일은 각 가장자리 칸 안에 붙인다. 최근본상품 0개·3개 두 스토리 모두 storybook play assertMainCentered(허용오차 2px)를 통과해야 하고, STEP 5에서 test-storybook을 실제로 돌려 확인한다.\n2. 검색 아이콘 포커스는 '이동 뒤 도착 화면이' 받는다: 빈 검색어 클릭 시 navigate('/shop/products', { state: { focusSearch: true } })로 이동하고, ProductListPage(도착 화면)가 마운트 시 location.state.focusSearch면 자기 검색 입력에 포커스한 뒤 state를 소거한다(뒤로가기로 다시 포커스되지 않게). Gnb 쪽 focus 호출은 제거한다. 테스트는 App의 실제 <Routes>(MemoryRouter 초기 경로 #/shop)에서 아이콘 클릭 → 목록 화면의 검색 입력이 document.activeElement인지 단언 — Gnb를 라우트 밖에 두는 테스트는 이 요건의 근거로 쓰지 않는다. 가드(state 처리)를 지우면 실패하는지 확인.\n권고(low, 추적만): Gnb.tsx 목록 화면 내 빈 검색어 클릭 시 URL keyword stale 문제 — 이번 라운드 수정 대상 아님, 후속 TODO.",
+        "targets": []
+      },
+      "layers": {
+        "spec": "fail",
+        "security": "pass",
+        "regression": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "AppShell.tsx:64의 3열 그리드가 '1fr var(--layout-content-width) 1fr'이라 1fr=minmax(auto,1fr)의 min-content 하한(레일 칸 220px, 퀵바 칸 64px)에 눌려 1200~1310px 대역에서 좌우 칸이 비대칭이 된다. 레일이 최근 본 상품 0개로 null을 반환하면 다시 대칭이 되어, 사람 지시 2가 없애라고 한 '레일 데이터 상태에 따른 본문 이동'이 폭만 줄어든 채 남았다. 실측(Chromium, storybook padded 기준): 1200px 51px, 1240px 31px, 1280px 11px, 1366px 이상 0px. 게다가 AppShell.stories.tsx:58 assertMainCentered(허용오차 2px)는 test-storybook 기본 뷰포트 1280에서 최근본상품_3개만 실패해 STEP 5 축E가 깨진다(dev가 이번 라운드에 test-storybook을 실행하지 않았다).",
+          "suggested_action": "gridTemplateColumns를 'minmax(0, 1fr) var(--layout-content-width) minmax(0, 1fr)'로 바꾸고(또는 레일이 트랙을 밀지 않게 min-width:0 허용), 1200/1240/1280 세 폭에서 레일 있음/없음의 <main> 좌표가 동일한지 실브라우저로 확인한 뒤 AppShell.test.tsx의 인라인 스타일 문자열 단언을 갱신한다."
+        },
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "Gnb.tsx:58의 searchInputRef.focus()는 navigate 직후 곧 언마운트될 현재 화면의 입력에 걸린다 — App.tsx:98/101처럼 라우트마다 별도 페이지가 자기 AppShell→Gnb를 렌더하므로 전환 시 Gnb 인스턴스가 교체된다. QA가 운영과 동일한 Routes 구조로 임시 테스트를 돌린 결과 클릭 후 document.activeElement는 BODY였다(사람 지시 1의 '이동+입력 포커스'가 8개 화면 중 7개에서 미충족). 그런데 round3 신규 Gnb.test.tsx:20-28은 Gnb를 <Routes> 밖에 두어 navigate에도 인스턴스가 살아남기 때문에 :45의 toHaveFocus()가 통과한다 — 사람 지시 3이 겨냥한 거짓 보증 가드(사례집 SR-302 #1·SR-306 #2)가 같은 라운드에 새로 생겼다.",
+          "suggested_action": "포커스를 목적지 화면이 받게 옮기거나(navigate('/shop/products?focus=search') + ProductListPage가 Gnb에 autoFocusSearch prop 전달) 사람이 요건을 '이동만'으로 낮춰 AC/UIS-CMN-003 본문에 명시한다. 어느 쪽이든 Gnb.test.tsx를 라우트 2개 구조로 바꿔 도착 화면에서 단언한다."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "Gnb.tsx:50-51 — 이미 /shop/products면 navigate 대신 onSearchSubmit만 불러, ProductListPage(:98-101)가 표시를 전체 목록으로 되돌려도 URL의 ?keyword=는 그대로 남는다. 사람 지시 1의 'URL keyword와 표시 상태 일치'가 어긋나는 방향만 바뀌었다. SR-303의 기존 설계(마운트 1회만 URL을 읽음)라 round3 신규 결함은 아니다.",
+          "suggested_action": "그 분기에서 navigate('/shop/products', { replace: true })와 onSearchSubmit()를 함께 호출한다(같은 라우트라 재마운트가 없어 둘 다 필요). 후속 TODO로 묶어도 된다."
+        }
+      ],
+      "cause": "impl_bug"
+    },
+    {
+      "round": 4,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "AppShell.tsx:77 minmax(0,1fr)로 좌우 트랙 min-content 하한을 0으로 만든 대가로, 1200~1237px 대역에서 RightRail(width:220, flexShrink:0)이 칸 밖·뷰포트 밖으로 최대 19px 넘쳐 가로 스크롤이 생긴다(QA 실브라우저 실측: 1200px에서 scrollWidth 1219 > clientWidth 1200, 1240px 이상 0). 본문 좌표는 레일 유무·폭과 무관하게 전 구간 정확히 가운데(0px)로 round3 필수수정 1은 완전 해소됐고, 이 절충은 round3 QA 수정안·사람 지시 1이 이미 승인한 것이라 이번 라운드 결함으로 올리지 않는다.",
+          "suggested_action": "후속 TODO — 정리하려면 RightRail railStyle에 maxWidth:'100%'(또는 flexShrink:1)를 더해 좁은 데스크톱에서 레일이 칸에 맞춰 줄게 한다(카드 내용이 텍스트뿐이라 축소해도 깨지지 않는다)."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "본문 정렬을 실좌표로 재는 유일한 가드인 AppShell.stories.tsx:50-59 assertMainCentered(play)가 AIDD 축E에서 실행되지 않는다 — project.env에 STORYBOOK_TEST_CMD가 없어 story_gate.py:179가 내장 storybook_render.js로 폴백하고, 그 폴백은 스토리를 렌더해 콘솔 오류만 볼 뿐 play를 돌리지 않는다. 나머지 자동 가드인 AppShell.test.tsx:91-92는 gridTemplateColumns 문자열 동등성이라 구조상 레이아웃을 못 잡는다(round3에서 '1fr … 1fr'을 그대로 통과시킨 단언). round3 FAIL의 근인(test-storybook 미실행)도 이 구멍에서 나왔다.",
+          "suggested_action": "project.env에 STORYBOOK_TEST_CMD=npm run test-storybook -- --url {URL} --maxWorkers=1 을 추가해 축E가 play까지 돌게 한다(워커를 여럿 두고 단일 스레드 정적 서버에 붙이면 경합으로 22 suites가 타임아웃 오탐 — QA 실측)."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "ProductListPage.tsx:93-99의 'state 소거'(navigate(pathname+search,{replace:true}))를 QA가 무력화하고 스위트 전체를 돌렸더니 41 suites / 312 tests가 전부 그대로 통과했다 — 사람 지시 2의 후반부('뒤로가기로 다시 포커스되지 않게 state를 소거한다')에 가드가 없다. 동작 자체는 QA 임시 테스트로 정상 확인(소거 후 location.state.focusSearch=false)이라 결함이 아니라 커버리지 구멍이다.",
+          "suggested_action": "후속 TODO — SearchFocusHandoff.test.tsx에 useLocation 프로브 한 줄을 더해 도착 후 location.state.focusSearch가 소거됐는지 단언한다."
+        }
+      ],
+      "cause": "env"
+    },
+    {
+      "round": 5,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "concerns",
+        "baseline": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "AppShell.tsx:77 minmax(0,1fr)로 좌우 트랙 min-content 하한을 0으로 만든 대가로, 1200~1237px 대역에서 RightRail(width:220, flexShrink:0)이 칸 밖·뷰포트 밖으로 최대 19px 넘쳐 가로 스크롤이 생긴다(QA 실브라우저 실측: 1200px에서 scrollWidth 1219 > clientWidth 1200, 1240px 이상 0). 본문 좌표는 레일 유무·폭과 무관하게 전 구간 정확히 가운데(0px)로 round3 필수수정 1은 완전 해소됐고, 이 절충은 round3 QA 수정안·사람 지시 1이 이미 승인한 것이라 이번 라운드 결함으로 올리지 않는다.",
+          "suggested_action": "후속 TODO — 정리하려면 RightRail railStyle에 maxWidth:'100%'(또는 flexShrink:1)를 더해 좁은 데스크톱에서 레일이 칸에 맞춰 줄게 한다(카드 내용이 텍스트뿐이라 축소해도 깨지지 않는다)."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "본문 정렬을 실좌표로 재는 유일한 가드인 AppShell.stories.tsx:50-59 assertMainCentered(play)가 AIDD 축E에서 실행되지 않는다 — project.env에 STORYBOOK_TEST_CMD가 없어 story_gate.py:179가 내장 storybook_render.js로 폴백하고, 그 폴백은 스토리를 렌더해 콘솔 오류만 볼 뿐 play를 돌리지 않는다. 나머지 자동 가드인 AppShell.test.tsx:91-92는 gridTemplateColumns 문자열 동등성이라 구조상 레이아웃을 못 잡는다(round3에서 '1fr … 1fr'을 그대로 통과시킨 단언). round3 FAIL의 근인(test-storybook 미실행)도 이 구멍에서 나왔다.",
+          "suggested_action": "project.env에 STORYBOOK_TEST_CMD=npm run test-storybook -- --url {URL} --maxWorkers=1 을 추가해 축E가 play까지 돌게 한다(워커를 여럿 두고 단일 스레드 정적 서버에 붙이면 경합으로 22 suites가 타임아웃 오탐 — QA 실측)."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "ProductListPage.tsx:93-99의 'state 소거'(navigate(pathname+search,{replace:true}))를 QA가 무력화하고 스위트 전체를 돌렸더니 41 suites / 312 tests가 전부 그대로 통과했다 — 사람 지시 2의 후반부('뒤로가기로 다시 포커스되지 않게 state를 소거한다')에 가드가 없다. 동작 자체는 QA 임시 테스트로 정상 확인(소거 후 location.state.focusSearch=false)이라 결함이 아니라 커버리지 구멍이다.",
+          "suggested_action": "후속 TODO — SearchFocusHandoff.test.tsx에 useLocation 프로브 한 줄을 더해 도착 후 location.state.focusSearch가 소거됐는지 단언한다."
+        }
+      ],
+      "layer": "baseline"
+    },
+    {
+      "round": 6,
+      "gate": "FAIL",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "concerns",
+        "baseline": "pass",
+        "scope": "fail"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "AppShell.tsx:77 minmax(0,1fr)로 좌우 트랙 min-content 하한을 0으로 만든 대가로, 1200~1237px 대역에서 RightRail(width:220, flexShrink:0)이 칸 밖·뷰포트 밖으로 최대 19px 넘쳐 가로 스크롤이 생긴다(QA 실브라우저 실측: 1200px에서 scrollWidth 1219 > clientWidth 1200, 1240px 이상 0). 본문 좌표는 레일 유무·폭과 무관하게 전 구간 정확히 가운데(0px)로 round3 필수수정 1은 완전 해소됐고, 이 절충은 round3 QA 수정안·사람 지시 1이 이미 승인한 것이라 이번 라운드 결함으로 올리지 않는다.",
+          "suggested_action": "후속 TODO — 정리하려면 RightRail railStyle에 maxWidth:'100%'(또는 flexShrink:1)를 더해 좁은 데스크톱에서 레일이 칸에 맞춰 줄게 한다(카드 내용이 텍스트뿐이라 축소해도 깨지지 않는다)."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "본문 정렬을 실좌표로 재는 유일한 가드인 AppShell.stories.tsx:50-59 assertMainCentered(play)가 AIDD 축E에서 실행되지 않는다 — project.env에 STORYBOOK_TEST_CMD가 없어 story_gate.py:179가 내장 storybook_render.js로 폴백하고, 그 폴백은 스토리를 렌더해 콘솔 오류만 볼 뿐 play를 돌리지 않는다. 나머지 자동 가드인 AppShell.test.tsx:91-92는 gridTemplateColumns 문자열 동등성이라 구조상 레이아웃을 못 잡는다(round3에서 '1fr … 1fr'을 그대로 통과시킨 단언). round3 FAIL의 근인(test-storybook 미실행)도 이 구멍에서 나왔다.",
+          "suggested_action": "project.env에 STORYBOOK_TEST_CMD=npm run test-storybook -- --url {URL} --maxWorkers=1 을 추가해 축E가 play까지 돌게 한다(워커를 여럿 두고 단일 스레드 정적 서버에 붙이면 경합으로 22 suites가 타임아웃 오탐 — QA 실측)."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "ProductListPage.tsx:93-99의 'state 소거'(navigate(pathname+search,{replace:true}))를 QA가 무력화하고 스위트 전체를 돌렸더니 41 suites / 312 tests가 전부 그대로 통과했다 — 사람 지시 2의 후반부('뒤로가기로 다시 포커스되지 않게 state를 소거한다')에 가드가 없다. 동작 자체는 QA 임시 테스트로 정상 확인(소거 후 location.state.focusSearch=false)이라 결함이 아니라 커버리지 구멍이다.",
+          "suggested_action": "후속 TODO — SearchFocusHandoff.test.tsx에 useLocation 프로브 한 줄을 더해 도착 후 location.state.focusSearch가 소거됐는지 단언한다."
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: project.env (M)",
+          "suggested_action": "이 변경이 이 작업 항목에 필요한지 확인하고, 아니면 되돌리세요"
+        }
+      ],
+      "layer": "scope"
+    },
+    {
+      "round": 7,
+      "gate": "FAIL",
+      "human": {
+        "decision": "waiver",
+        "by": "sl-aidd(사람 조건부 사전 승인)",
+        "at": "2026-09-19T21:19:00",
+        "comment": "round4 QA CONCERNS 게이트 회신에서 사람이 project.env에 STORYBOOK_TEST_CMD 한 줄 추가를 직접·조건까지 명시해 지시함(자기완결 셸 명령 조건 등) — 축A가 '항목 모듈 밖' 변경으로 잡은 project.env 수정 1건은 이 사전 승인에 따른 것",
+        "targets": []
+      },
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "concerns",
+        "baseline": "pass",
+        "scope": "fail",
+        "rules": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "AppShell.tsx:77 minmax(0,1fr)로 좌우 트랙 min-content 하한을 0으로 만든 대가로, 1200~1237px 대역에서 RightRail(width:220, flexShrink:0)이 칸 밖·뷰포트 밖으로 최대 19px 넘쳐 가로 스크롤이 생긴다(QA 실브라우저 실측: 1200px에서 scrollWidth 1219 > clientWidth 1200, 1240px 이상 0). 본문 좌표는 레일 유무·폭과 무관하게 전 구간 정확히 가운데(0px)로 round3 필수수정 1은 완전 해소됐고, 이 절충은 round3 QA 수정안·사람 지시 1이 이미 승인한 것이라 이번 라운드 결함으로 올리지 않는다.",
+          "suggested_action": "후속 TODO — 정리하려면 RightRail railStyle에 maxWidth:'100%'(또는 flexShrink:1)를 더해 좁은 데스크톱에서 레일이 칸에 맞춰 줄게 한다(카드 내용이 텍스트뿐이라 축소해도 깨지지 않는다)."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "본문 정렬을 실좌표로 재는 유일한 가드인 AppShell.stories.tsx:50-59 assertMainCentered(play)가 AIDD 축E에서 실행되지 않는다 — project.env에 STORYBOOK_TEST_CMD가 없어 story_gate.py:179가 내장 storybook_render.js로 폴백하고, 그 폴백은 스토리를 렌더해 콘솔 오류만 볼 뿐 play를 돌리지 않는다. 나머지 자동 가드인 AppShell.test.tsx:91-92는 gridTemplateColumns 문자열 동등성이라 구조상 레이아웃을 못 잡는다(round3에서 '1fr … 1fr'을 그대로 통과시킨 단언). round3 FAIL의 근인(test-storybook 미실행)도 이 구멍에서 나왔다.",
+          "suggested_action": "project.env에 STORYBOOK_TEST_CMD=npm run test-storybook -- --url {URL} --maxWorkers=1 을 추가해 축E가 play까지 돌게 한다(워커를 여럿 두고 단일 스레드 정적 서버에 붙이면 경합으로 22 suites가 타임아웃 오탐 — QA 실측)."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "ProductListPage.tsx:93-99의 'state 소거'(navigate(pathname+search,{replace:true}))를 QA가 무력화하고 스위트 전체를 돌렸더니 41 suites / 312 tests가 전부 그대로 통과했다 — 사람 지시 2의 후반부('뒤로가기로 다시 포커스되지 않게 state를 소거한다')에 가드가 없다. 동작 자체는 QA 임시 테스트로 정상 확인(소거 후 location.state.focusSearch=false)이라 결함이 아니라 커버리지 구멍이다.",
+          "suggested_action": "후속 TODO — SearchFocusHandoff.test.tsx에 useLocation 프로브 한 줄을 더해 도착 후 location.state.focusSearch가 소거됐는지 단언한다."
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: project.env (M)",
+          "suggested_action": "이 변경이 이 작업 항목에 필요한지 확인하고, 아니면 되돌리세요"
+        }
+      ],
+      "layer": "rules"
+    },
+    {
+      "round": 8,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "concerns",
+        "baseline": "pass",
+        "scope": "fail",
+        "rules": "pass",
+        "stories": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "AppShell.tsx:77 minmax(0,1fr)로 좌우 트랙 min-content 하한을 0으로 만든 대가로, 1200~1237px 대역에서 RightRail(width:220, flexShrink:0)이 칸 밖·뷰포트 밖으로 최대 19px 넘쳐 가로 스크롤이 생긴다(QA 실브라우저 실측: 1200px에서 scrollWidth 1219 > clientWidth 1200, 1240px 이상 0). 본문 좌표는 레일 유무·폭과 무관하게 전 구간 정확히 가운데(0px)로 round3 필수수정 1은 완전 해소됐고, 이 절충은 round3 QA 수정안·사람 지시 1이 이미 승인한 것이라 이번 라운드 결함으로 올리지 않는다.",
+          "suggested_action": "후속 TODO — 정리하려면 RightRail railStyle에 maxWidth:'100%'(또는 flexShrink:1)를 더해 좁은 데스크톱에서 레일이 칸에 맞춰 줄게 한다(카드 내용이 텍스트뿐이라 축소해도 깨지지 않는다)."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "본문 정렬을 실좌표로 재는 유일한 가드인 AppShell.stories.tsx:50-59 assertMainCentered(play)가 AIDD 축E에서 실행되지 않는다 — project.env에 STORYBOOK_TEST_CMD가 없어 story_gate.py:179가 내장 storybook_render.js로 폴백하고, 그 폴백은 스토리를 렌더해 콘솔 오류만 볼 뿐 play를 돌리지 않는다. 나머지 자동 가드인 AppShell.test.tsx:91-92는 gridTemplateColumns 문자열 동등성이라 구조상 레이아웃을 못 잡는다(round3에서 '1fr … 1fr'을 그대로 통과시킨 단언). round3 FAIL의 근인(test-storybook 미실행)도 이 구멍에서 나왔다.",
+          "suggested_action": "project.env에 STORYBOOK_TEST_CMD=npm run test-storybook -- --url {URL} --maxWorkers=1 을 추가해 축E가 play까지 돌게 한다(워커를 여럿 두고 단일 스레드 정적 서버에 붙이면 경합으로 22 suites가 타임아웃 오탐 — QA 실측)."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "ProductListPage.tsx:93-99의 'state 소거'(navigate(pathname+search,{replace:true}))를 QA가 무력화하고 스위트 전체를 돌렸더니 41 suites / 312 tests가 전부 그대로 통과했다 — 사람 지시 2의 후반부('뒤로가기로 다시 포커스되지 않게 state를 소거한다')에 가드가 없다. 동작 자체는 QA 임시 테스트로 정상 확인(소거 후 location.state.focusSearch=false)이라 결함이 아니라 커버리지 구멍이다.",
+          "suggested_action": "후속 TODO — SearchFocusHandoff.test.tsx에 useLocation 프로브 한 줄을 더해 도착 후 location.state.focusSearch가 소거됐는지 단언한다."
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: project.env (M)",
+          "suggested_action": "이 변경이 이 작업 항목에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "low",
+          "layer": "stories",
+          "finding": "고친 화면 부품에 스토리가 없습니다: src/components/common/Tabs.test.tsx",
+          "suggested_action": "그 부품의 상태를 스토리로 남기세요 — 없으면 다음 사람이 그 상태를 볼 방법이 없습니다. 차단하려면 하네스 규칙 `story-per-component`(pair 검사)를 채택하세요(/rules 제안 탭) — 축 C가 must로 막습니다"
+        },
+        {
+          "severity": "low",
+          "layer": "stories",
+          "finding": "고친 화면 부품에 스토리가 없습니다: src/features/shop/AppShell.test.tsx",
+          "suggested_action": "그 부품의 상태를 스토리로 남기세요 — 없으면 다음 사람이 그 상태를 볼 방법이 없습니다. 차단하려면 하네스 규칙 `story-per-component`(pair 검사)를 채택하세요(/rules 제안 탭) — 축 C가 must로 막습니다"
+        },
+        {
+          "severity": "low",
+          "layer": "stories",
+          "finding": "고친 화면 부품에 스토리가 없습니다: src/features/shop/BottomTabBar.test.tsx",
+          "suggested_action": "그 부품의 상태를 스토리로 남기세요 — 없으면 다음 사람이 그 상태를 볼 방법이 없습니다. 차단하려면 하네스 규칙 `story-per-component`(pair 검사)를 채택하세요(/rules 제안 탭) — 축 C가 must로 막습니다"
+        },
+        {
+          "severity": "low",
+          "layer": "stories",
+          "finding": "고친 화면 부품에 스토리가 없습니다: src/features/shop/Gnb.test.tsx",
+          "suggested_action": "그 부품의 상태를 스토리로 남기세요 — 없으면 다음 사람이 그 상태를 볼 방법이 없습니다. 차단하려면 하네스 규칙 `story-per-component`(pair 검사)를 채택하세요(/rules 제안 탭) — 축 C가 must로 막습니다"
+        },
+        {
+          "severity": "low",
+          "layer": "stories",
+          "finding": "고친 화면 부품에 스토리가 없습니다: src/features/shop/GnbTabs.test.tsx",
+          "suggested_action": "그 부품의 상태를 스토리로 남기세요 — 없으면 다음 사람이 그 상태를 볼 방법이 없습니다. 차단하려면 하네스 규칙 `story-per-component`(pair 검사)를 채택하세요(/rules 제안 탭) — 축 C가 must로 막습니다"
+        },
+        {
+          "severity": "low",
+          "layer": "stories",
+          "finding": "고친 화면 부품에 스토리가 없습니다: src/features/shop/QuickBar.test.tsx",
+          "suggested_action": "그 부품의 상태를 스토리로 남기세요 — 없으면 다음 사람이 그 상태를 볼 방법이 없습니다. 차단하려면 하네스 규칙 `story-per-component`(pair 검사)를 채택하세요(/rules 제안 탭) — 축 C가 must로 막습니다"
+        },
+        {
+          "severity": "low",
+          "layer": "stories",
+          "finding": "고친 화면 부품에 스토리가 없습니다: src/features/shop/RightRail.test.tsx",
+          "suggested_action": "그 부품의 상태를 스토리로 남기세요 — 없으면 다음 사람이 그 상태를 볼 방법이 없습니다. 차단하려면 하네스 규칙 `story-per-component`(pair 검사)를 채택하세요(/rules 제안 탭) — 축 C가 must로 막습니다"
+        }
+      ],
+      "layer": "stories"
+    },
+    {
+      "round": 9,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "concerns",
+        "baseline": "pass",
+        "scope": "fail",
+        "rules": "pass",
+        "stories": "pass",
+        "conformance": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "AppShell.tsx:77 minmax(0,1fr)로 좌우 트랙 min-content 하한을 0으로 만든 대가로, 1200~1237px 대역에서 RightRail(width:220, flexShrink:0)이 칸 밖·뷰포트 밖으로 최대 19px 넘쳐 가로 스크롤이 생긴다(QA 실브라우저 실측: 1200px에서 scrollWidth 1219 > clientWidth 1200, 1240px 이상 0). 본문 좌표는 레일 유무·폭과 무관하게 전 구간 정확히 가운데(0px)로 round3 필수수정 1은 완전 해소됐고, 이 절충은 round3 QA 수정안·사람 지시 1이 이미 승인한 것이라 이번 라운드 결함으로 올리지 않는다.",
+          "suggested_action": "후속 TODO — 정리하려면 RightRail railStyle에 maxWidth:'100%'(또는 flexShrink:1)를 더해 좁은 데스크톱에서 레일이 칸에 맞춰 줄게 한다(카드 내용이 텍스트뿐이라 축소해도 깨지지 않는다)."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "본문 정렬을 실좌표로 재는 유일한 가드인 AppShell.stories.tsx:50-59 assertMainCentered(play)가 AIDD 축E에서 실행되지 않는다 — project.env에 STORYBOOK_TEST_CMD가 없어 story_gate.py:179가 내장 storybook_render.js로 폴백하고, 그 폴백은 스토리를 렌더해 콘솔 오류만 볼 뿐 play를 돌리지 않는다. 나머지 자동 가드인 AppShell.test.tsx:91-92는 gridTemplateColumns 문자열 동등성이라 구조상 레이아웃을 못 잡는다(round3에서 '1fr … 1fr'을 그대로 통과시킨 단언). round3 FAIL의 근인(test-storybook 미실행)도 이 구멍에서 나왔다.",
+          "suggested_action": "project.env에 STORYBOOK_TEST_CMD=npm run test-storybook -- --url {URL} --maxWorkers=1 을 추가해 축E가 play까지 돌게 한다(워커를 여럿 두고 단일 스레드 정적 서버에 붙이면 경합으로 22 suites가 타임아웃 오탐 — QA 실측)."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "ProductListPage.tsx:93-99의 'state 소거'(navigate(pathname+search,{replace:true}))를 QA가 무력화하고 스위트 전체를 돌렸더니 41 suites / 312 tests가 전부 그대로 통과했다 — 사람 지시 2의 후반부('뒤로가기로 다시 포커스되지 않게 state를 소거한다')에 가드가 없다. 동작 자체는 QA 임시 테스트로 정상 확인(소거 후 location.state.focusSearch=false)이라 결함이 아니라 커버리지 구멍이다.",
+          "suggested_action": "후속 TODO — SearchFocusHandoff.test.tsx에 useLocation 프로브 한 줄을 더해 도착 후 location.state.focusSearch가 소거됐는지 단언한다."
+        },
+        {
+          "severity": "high",
+          "layer": "scope",
+          "finding": "스코프 밖 변경: project.env (M)",
+          "suggested_action": "이 변경이 이 작업 항목에 필요한지 확인하고, 아니면 되돌리세요"
+        },
+        {
+          "severity": "low",
+          "layer": "stories",
+          "finding": "고친 화면 부품에 스토리가 없습니다: src/components/common/Tabs.test.tsx",
+          "suggested_action": "그 부품의 상태를 스토리로 남기세요 — 없으면 다음 사람이 그 상태를 볼 방법이 없습니다. 차단하려면 하네스 규칙 `story-per-component`(pair 검사)를 채택하세요(/rules 제안 탭) — 축 C가 must로 막습니다"
+        },
+        {
+          "severity": "low",
+          "layer": "stories",
+          "finding": "고친 화면 부품에 스토리가 없습니다: src/features/shop/AppShell.test.tsx",
+          "suggested_action": "그 부품의 상태를 스토리로 남기세요 — 없으면 다음 사람이 그 상태를 볼 방법이 없습니다. 차단하려면 하네스 규칙 `story-per-component`(pair 검사)를 채택하세요(/rules 제안 탭) — 축 C가 must로 막습니다"
+        },
+        {
+          "severity": "low",
+          "layer": "stories",
+          "finding": "고친 화면 부품에 스토리가 없습니다: src/features/shop/BottomTabBar.test.tsx",
+          "suggested_action": "그 부품의 상태를 스토리로 남기세요 — 없으면 다음 사람이 그 상태를 볼 방법이 없습니다. 차단하려면 하네스 규칙 `story-per-component`(pair 검사)를 채택하세요(/rules 제안 탭) — 축 C가 must로 막습니다"
+        },
+        {
+          "severity": "low",
+          "layer": "stories",
+          "finding": "고친 화면 부품에 스토리가 없습니다: src/features/shop/Gnb.test.tsx",
+          "suggested_action": "그 부품의 상태를 스토리로 남기세요 — 없으면 다음 사람이 그 상태를 볼 방법이 없습니다. 차단하려면 하네스 규칙 `story-per-component`(pair 검사)를 채택하세요(/rules 제안 탭) — 축 C가 must로 막습니다"
+        },
+        {
+          "severity": "low",
+          "layer": "stories",
+          "finding": "고친 화면 부품에 스토리가 없습니다: src/features/shop/GnbTabs.test.tsx",
+          "suggested_action": "그 부품의 상태를 스토리로 남기세요 — 없으면 다음 사람이 그 상태를 볼 방법이 없습니다. 차단하려면 하네스 규칙 `story-per-component`(pair 검사)를 채택하세요(/rules 제안 탭) — 축 C가 must로 막습니다"
+        },
+        {
+          "severity": "low",
+          "layer": "stories",
+          "finding": "고친 화면 부품에 스토리가 없습니다: src/features/shop/QuickBar.test.tsx",
+          "suggested_action": "그 부품의 상태를 스토리로 남기세요 — 없으면 다음 사람이 그 상태를 볼 방법이 없습니다. 차단하려면 하네스 규칙 `story-per-component`(pair 검사)를 채택하세요(/rules 제안 탭) — 축 C가 must로 막습니다"
+        },
+        {
+          "severity": "low",
+          "layer": "stories",
+          "finding": "고친 화면 부품에 스토리가 없습니다: src/features/shop/RightRail.test.tsx",
+          "suggested_action": "그 부품의 상태를 스토리로 남기세요 — 없으면 다음 사람이 그 상태를 볼 방법이 없습니다. 차단하려면 하네스 규칙 `story-per-component`(pair 검사)를 채택하세요(/rules 제안 탭) — 축 C가 must로 막습니다"
+        },
+        {
+          "severity": "low",
+          "layer": "conformance",
+          "finding": "focus 항목의 STORY '사람 확인 사항'이 round1→round4에 걸쳐 3차례 재해석됐다(검색 아이콘 클릭 시 포커스 주체) — 최종 round4 구현(navigate state → 도착화면이 autoFocusSearch로 소비)은 사람 지시 2 원문과 diff가 정확히 일치함을 확인(Gnb.tsx, ProductListPage.tsx, pages/SearchFocusHandoff.test.tsx)",
+          "suggested_action": "조치 불필요 — 사실 기록만(STEP 5.5 재동기화 시 UIS-CMN-003 본문에 이 최종 해석을 반영하도록 STORY에 이미 명시됨)",
+          "confidence": "high"
+        },
+        {
+          "severity": "low",
+          "layer": "conformance",
+          "finding": "축B은 SR-322.2가 소유 주장한 ProductListPage.tsx·ProductDetailPage.tsx의 diff도 대조 요청받아 확인함 — 두 파일 모두 AppShell 래핑만 있고(AC-1/AC-16 범위), SR-322(리스킨) 몫으로 보이는 인라인 스타일 변경은 없음. 두 항목 간 소유 경계가 깨끗함",
+          "suggested_action": "조치 불필요 — 기록만",
+          "confidence": "high"
+        }
+      ],
+      "layer": "conformance"
+    }
+  ],
+  "waiver": {
+    "active": true,
+    "by": "sl-aidd(사람 조건부 사전 승인)",
+    "reason": "round4 QA CONCERNS 게이트 회신에서 사람이 project.env에 STORYBOOK_TEST_CMD 한 줄 추가를 직접·조건까지 명시해 지시함(자기완결 셸 명령 조건 등) — 축A가 '항목 모듈 밖' 변경으로 잡은 project.env 수정 1건은 이 사전 승인에 따른 것",
+    "at": "2026-09-19T21:19:00",
+    "layer": "scope"
+  },
+  "story_transitions": [
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "SR 승인(SR-311)",
+      "at": "2026-09-19T16:30:04"
+    },
+    {
+      "from": "Approved",
+      "to": "InProgress",
+      "by": "sl-aidd",
+      "at": "2026-09-19T19:12:44"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "qa-agent",
+      "at": "2026-09-19T19:29:18"
+    },
+    {
+      "from": "Review",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-19T19:35:20"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "qa-agent",
+      "at": "2026-09-19T19:43:01"
+    },
+    {
+      "from": "Review",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-19T19:50:39"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "qa-agent",
+      "at": "2026-09-19T20:05:13"
+    },
+    {
+      "from": "Review",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-19T20:13:35"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "qa-agent",
+      "at": "2026-09-19T20:30:10"
+    },
+    {
+      "from": "Review",
+      "to": "Done",
+      "by": "사람",
+      "at": "2026-09-19T21:38:26"
+    }
+  ],
+  "cause": "env",
+  "escalate": false,
+  "fail_rounds": 1,
+  "max_rounds": 3,
+  "waivers": [
+    {
+      "active": true,
+      "by": "sl-aidd(사람 조건부 사전 승인)",
+      "reason": "round4 QA CONCERNS 게이트 회신에서 사람이 project.env에 STORYBOOK_TEST_CMD 한 줄 추가를 직접·조건까지 명시해 지시함(자기완결 셸 명령 조건 등) — 축A가 '항목 모듈 밖' 변경으로 잡은 project.env 수정 1건은 이 사전 승인에 따른 것",
+      "at": "2026-09-19T21:19:00",
+      "layer": "scope"
+    }
+  ]
+}

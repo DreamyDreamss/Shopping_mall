@@ -1,0 +1,133 @@
+{
+  "generated_at": "2026-09-12T01:33:20",
+  "generator": "build_clarify@1",
+  "types": [
+    "api",
+    "db",
+    "screen"
+  ],
+  "items": [
+    {
+      "id": "scope_freeze",
+      "type": "common",
+      "required": true,
+      "state": "미충족",
+      "question": "이번 SR에서 하는 것과 명시적으로 빼는 것은 무엇인가?",
+      "hint": "범위가 문장으로 고정돼야 승인 이후 scope 검증(대조 검증)이 기준을 갖는다",
+      "options": [],
+      "proposed": "포함: [유형: 화면+API] 최근 1/3/6개월·전체, 상태 필터, 주문별 카드(상품 썸네일·상태·금액), 상세에서 배송 추적·취소·반품·리뷰 작성 진입. UI/UX: 상태별 다음 행동 버튼(배송조회/취소/리뷰쓰기)만 노출 · 무한 스크롤. 수용 기준: 기존 주문 목록 화면(UIS-ORD-001)과 그리드 계약 유지 · 비회원 주문은 조회 인증 후 / 제외: 요구 본문에 적히지 않은 것 전부",
+      "evidence": "00_요구사항.md §요구 요지",
+      "proposed_by": "clarify_prefill@1"
+    },
+    {
+      "id": "regression_keep",
+      "type": "common",
+      "required": true,
+      "state": "미충족",
+      "question": "반드시 유지돼야 하는 기존 동작(회귀 범위)은 무엇인가?",
+      "hint": "회귀 TC의 근거 — \"기존과 동일\"이 구체적으로 무엇인지",
+      "options": [
+        "기존 조회 결과 전부",
+        "특정 화면/API만(명시)"
+      ],
+      "proposed": "기존 조회 결과 전부(데이터 계약 불변)",
+      "evidence": "도출 후보에 SCH 0건·테이블 0건, 본문에 삭제/형식 변경 단서 없음",
+      "proposed_by": "clarify_prefill@1"
+    },
+    {
+      "id": "api_compat",
+      "type": "api",
+      "required": true,
+      "state": "미충족",
+      "question": "기존 클라이언트와의 하위호환이 필요한가?",
+      "hint": "필드 추가만인지, 형식·의미 변경(호환 파괴)이 있는지",
+      "options": [
+        "필요 — 필드 추가만",
+        "호환 파괴 있음(마이그레이션 계획 필요)"
+      ],
+      "proposed": "필요 — 필드 추가만(기존 호출 그대로 동작)",
+      "evidence": "본문에 추가/필터/파라미터 단서, 삭제·형식 변경 단서 없음 · 대상 INF-ORD-001 회원 목록 조회, INF-ORD-002 회원 상세 조회, INF-ORD-003 주문 목록 조회, INF-ORD-004 주문 상세 조회, INF-ORD-006 주문 취소, INF-ORD-007 주문 배송 목록 조회",
+      "proposed_by": "clarify_prefill@1"
+    },
+    {
+      "id": "api_error",
+      "type": "api",
+      "required": true,
+      "state": "미충족",
+      "question": "오류 응답 계약(코드·메시지)은 무엇인가?",
+      "hint": "실패 케이스별 HTTP 상태·오류 코드 — TC가 이 계약을 검증한다",
+      "options": []
+    },
+    {
+      "id": "db_ripple",
+      "type": "db",
+      "required": true,
+      "state": "미충족",
+      "question": "타 도메인 테이블·집계(정산·통계류)에 파급이 있는가?",
+      "hint": "이 테이블을 참조하는 다른 도메인의 쿼리·배치 — CIA 관찰 조인 확인",
+      "options": [
+        "없음",
+        "있음 — 범위 명시"
+      ],
+      "proposed": "없음",
+      "evidence": "도출 후보에 SCH 0건·테이블 0건",
+      "proposed_by": "clarify_prefill@1"
+    },
+    {
+      "id": "db_migration",
+      "type": "db",
+      "required": true,
+      "state": "미충족",
+      "question": "기존 데이터 이관·백필이 필요한가?",
+      "hint": "새 컬럼의 기존 행 값, 제약 변경 시 위반 데이터 처리",
+      "options": [
+        "불필요(신규 데이터만)",
+        "필요 — 이관 스크립트"
+      ],
+      "proposed": "불필요(신규 데이터만)",
+      "evidence": "스키마 변경 후보 0건, 본문에 이관/백필 단서 없음",
+      "proposed_by": "clarify_prefill@1"
+    },
+    {
+      "id": "scr_scope",
+      "type": "screen",
+      "required": true,
+      "state": "미충족",
+      "question": "변경 대상 화면이 전부 나열됐는가? (누락 화면 없음 확인)",
+      "hint": "같은 데이터를 쓰는 다른 화면(목록/상세/팝업)이 함께 바뀌어야 하는지",
+      "options": [
+        "나열된 화면이 전부",
+        "추가 화면 있음(명시)"
+      ],
+      "proposed": "나열된 화면이 전부: UIS-ORD-001 주문 목록, UIS-ORD-002 주문 상세, UIS-ORD-003 상품 목록, UIS-ORD-004 상품 상세",
+      "evidence": "cia-derive 화면 후보(요구 본문 ↔ UIS 제목 매칭)",
+      "proposed_by": "clarify_prefill@1"
+    },
+    {
+      "id": "scr_empty_state",
+      "type": "screen",
+      "required": true,
+      "state": "미충족",
+      "question": "빈 값·오류 상태의 화면 표기는 무엇인가?",
+      "hint": "데이터 없음/권한 없음/로딩 실패 시 사용자에게 보일 것",
+      "options": []
+    },
+    {
+      "id": "scr_states",
+      "type": "screen",
+      "required": true,
+      "state": "미충족",
+      "question": "이 변경으로 생기거나 바뀌는 화면 상태 중 스토리(상태별 실물)로 남길 것은 무엇인가?",
+      "hint": "예: 목록 있음/0건/조회 실패/권한 없음. 대상에 스토리북이 없으면 \"해당없음\" — 화면설계서 §5 표시 조건이 정본",
+      "options": [
+        "모든 표시 조건(§5)을 스토리로",
+        "바뀌는 상태만",
+        "해당없음(스토리북 미사용)"
+      ]
+    }
+  ],
+  "prefill": {
+    "proposed": 6,
+    "by": "clarify_prefill@1"
+  }
+}

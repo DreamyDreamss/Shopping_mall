@@ -1,0 +1,45 @@
+{
+  "schema": 2,
+  "sr": "SR-301",
+  "title": "SR-301",
+  "clarification": "none",
+  "affected": {
+    "inf": [],
+    "sch": [],
+    "uis": [],
+    "bat": []
+  },
+  "new_specs": [
+    {
+      "kind": "INF",
+      "id": "INF-ORD-017",
+      "domain": "order",
+      "name": "쇼핑 SPA 정적 서빙(/shop)",
+      "module": "shop-api",
+      "module_path": "{{SRC_SHOP_API}}"
+    }
+  ],
+  "items": [
+    {
+      "n": 1,
+      "title": "쇼핑 SPA 정적 서빙(/shop)",
+      "specs": {
+        "uis": [],
+        "inf": [],
+        "sch": [],
+        "bat": []
+      },
+      "new_specs": [
+        "INF-ORD-017"
+      ],
+      "module": "shop-api",
+      "origin": "auto:new"
+    }
+  ],
+  "item_seq": 1,
+  "stories": [
+    "SR-301.1"
+  ],
+  "story_files": [],
+  "generated_at": "2026-09-16T23:56:56"
+}

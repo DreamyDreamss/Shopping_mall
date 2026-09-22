@@ -1,0 +1,86 @@
+{
+  "schema": 2,
+  "sr": "SR-312",
+  "title": "SR-312",
+  "clarification": "none",
+  "affected": {
+    "inf": [],
+    "sch": [],
+    "uis": [
+      "UIS-ORD-008",
+      "UIS-ORD-009",
+      "UIS-ORD-010"
+    ],
+    "bat": []
+  },
+  "new_specs": [
+    {
+      "kind": "UIS",
+      "id": "UIS-CMN-004",
+      "domain": "common",
+      "name": "상품 카드 규격",
+      "module": "shop-web",
+      "module_path": "{{SRC_SHOP_WEB}}"
+    }
+  ],
+  "items": [
+    {
+      "n": 1,
+      "title": "상품 카드 규격",
+      "specs": {
+        "uis": [],
+        "inf": [],
+        "sch": [],
+        "bat": []
+      },
+      "new_specs": [
+        "UIS-CMN-004"
+      ],
+      "module": "shop-web",
+      "origin": "auto:new"
+    },
+    {
+      "n": 2,
+      "title": "카드 v2 교체 — 홈·상품 목록·상세 관련 상품 레일",
+      "specs": {
+        "uis": [
+          "UIS-ORD-008",
+          "UIS-ORD-009",
+          "UIS-ORD-010"
+        ],
+        "inf": [],
+        "sch": [],
+        "bat": []
+      },
+      "new_specs": [],
+      "module": null,
+      "origin": "manual"
+    }
+  ],
+  "item_seq": 4,
+  "stories": [
+    "SR-312.1",
+    "SR-312.2"
+  ],
+  "story_files": [
+    "src/features/shop/CategoryShortcuts.stories.tsx",
+    "src/features/shop/Gnb.stories.tsx",
+    "src/features/shop/HeroBannerCarousel.stories.tsx",
+    "src/features/shop/ProductCard.stories.tsx",
+    "src/features/shop/ProductDetailSkeleton.stories.tsx",
+    "src/features/shop/ProductDetailTabs.stories.tsx",
+    "src/features/shop/ProductFilterBar.stories.tsx",
+    "src/features/shop/ProductGrid.stories.tsx",
+    "src/features/shop/ProductImageGallery.stories.tsx",
+    "src/features/shop/ProductInfoPanel.stories.tsx",
+    "src/features/shop/ProductListGrid.stories.tsx",
+    "src/features/shop/ProductNotFoundNotice.stories.tsx",
+    "src/features/shop/ProductNoticeTable.stories.tsx",
+    "src/features/shop/ProductPagination.stories.tsx",
+    "src/features/shop/RankingSection.stories.tsx",
+    "src/features/shop/RecentlyViewed.stories.tsx",
+    "src/features/shop/RelatedProducts.stories.tsx",
+    "src/features/shop/ShopFooter.stories.tsx"
+  ],
+  "generated_at": "2026-09-19T16:30:49"
+}

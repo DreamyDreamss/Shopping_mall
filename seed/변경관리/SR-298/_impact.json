@@ -1,0 +1,55 @@
+{
+  "schema": 2,
+  "sr": "SR-298",
+  "title": "SR-298",
+  "clarification": "none",
+  "affected": {
+    "inf": [
+      "INF-MBR-007",
+      "INF-MBR-002"
+    ],
+    "sch": [],
+    "uis": [],
+    "bat": []
+  },
+  "new_specs": [],
+  "items": [
+    {
+      "n": 1,
+      "title": "가입 요청(인증코드 검증 포함)",
+      "specs": {
+        "uis": [],
+        "inf": [
+          "INF-MBR-002"
+        ],
+        "sch": [],
+        "bat": []
+      },
+      "new_specs": [],
+      "module": null,
+      "origin": "auto:inf"
+    },
+    {
+      "n": 2,
+      "title": "비밀번호 재설정 확정",
+      "specs": {
+        "uis": [],
+        "inf": [
+          "INF-MBR-007"
+        ],
+        "sch": [],
+        "bat": []
+      },
+      "new_specs": [],
+      "module": null,
+      "origin": "auto:inf"
+    }
+  ],
+  "item_seq": 2,
+  "stories": [
+    "SR-298.1",
+    "SR-298.2"
+  ],
+  "story_files": [],
+  "generated_at": "2026-09-16T00:58:10"
+}

@@ -1,0 +1,21 @@
+{
+  "tables": [
+    "PRODUCTS"
+  ],
+  "tables_unknown": [],
+  "infs": [],
+  "infs_unmatched": [],
+  "paths": [
+    "/api/products"
+  ],
+  "paths_candidate": [
+    "/shop/products"
+  ],
+  "screens": [
+    "상품 목록",
+    "상품 상세"
+  ],
+  "uis_ids": [],
+  "terms": [],
+  "entities_arg": "PRODUCTS,/api/products,상품 목록,상품 상세"
+}

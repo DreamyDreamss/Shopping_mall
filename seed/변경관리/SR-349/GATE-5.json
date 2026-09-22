@@ -1,0 +1,22 @@
+{
+  "func": "SR-349.5",
+  "epic": null,
+  "story": "docs/변경관리/SR-349/STORY-5.md",
+  "gate": null,
+  "reviewer": "qa-agent",
+  "updated": null,
+  "layers": {},
+  "top_issues": [],
+  "rounds": [],
+  "waiver": {
+    "active": false
+  },
+  "story_transitions": [
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "SR 승인(SR-349)",
+      "at": "2026-09-20T22:13:35"
+    }
+  ]
+}

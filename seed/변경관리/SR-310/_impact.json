@@ -1,0 +1,45 @@
+{
+  "schema": 2,
+  "sr": "SR-310",
+  "title": "SR-310",
+  "clarification": "none",
+  "affected": {
+    "inf": [],
+    "sch": [],
+    "uis": [],
+    "bat": []
+  },
+  "new_specs": [
+    {
+      "kind": "UIS",
+      "id": "UIS-CMN-002",
+      "domain": "common",
+      "name": "공통 컴포넌트",
+      "module": "shop-web",
+      "module_path": "{{SRC_SHOP_WEB}}"
+    }
+  ],
+  "items": [
+    {
+      "n": 1,
+      "title": "공통 컴포넌트",
+      "specs": {
+        "uis": [],
+        "inf": [],
+        "sch": [],
+        "bat": []
+      },
+      "new_specs": [
+        "UIS-CMN-002"
+      ],
+      "module": "shop-web",
+      "origin": "auto:new"
+    }
+  ],
+  "item_seq": 1,
+  "stories": [
+    "SR-310.1"
+  ],
+  "story_files": [],
+  "generated_at": "2026-09-19T16:27:30"
+}

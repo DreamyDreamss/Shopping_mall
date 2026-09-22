@@ -1,0 +1,45 @@
+{
+  "schema": 2,
+  "sr": "SR-309",
+  "title": "SR-309",
+  "clarification": "none",
+  "affected": {
+    "inf": [],
+    "sch": [],
+    "uis": [],
+    "bat": []
+  },
+  "new_specs": [
+    {
+      "kind": "UIS",
+      "id": "UIS-CMN-001",
+      "domain": "common",
+      "name": "디자인 토큰",
+      "module": "shop-web",
+      "module_path": "{{SRC_SHOP_WEB}}"
+    }
+  ],
+  "items": [
+    {
+      "n": 1,
+      "title": "디자인 토큰",
+      "specs": {
+        "uis": [],
+        "inf": [],
+        "sch": [],
+        "bat": []
+      },
+      "new_specs": [
+        "UIS-CMN-001"
+      ],
+      "module": "shop-web",
+      "origin": "auto:new"
+    }
+  ],
+  "item_seq": 1,
+  "stories": [
+    "SR-309.1"
+  ],
+  "story_files": [],
+  "generated_at": "2026-09-19T16:05:05"
+}

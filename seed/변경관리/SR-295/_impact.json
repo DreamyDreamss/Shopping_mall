@@ -1,0 +1,40 @@
+{
+  "schema": 2,
+  "sr": "SR-295",
+  "title": "SR-295",
+  "clarification": "none",
+  "affected": {
+    "inf": [
+      "INF-MBR-001",
+      "INF-MBR-002"
+    ],
+    "sch": [],
+    "uis": [],
+    "bat": []
+  },
+  "new_specs": [],
+  "items": [
+    {
+      "n": 1,
+      "title": "재발송 시 인증코드 시도 횟수·소비 표시 초기화",
+      "specs": {
+        "uis": [],
+        "inf": [
+          "INF-MBR-001",
+          "INF-MBR-002"
+        ],
+        "sch": [],
+        "bat": []
+      },
+      "new_specs": [],
+      "module": null,
+      "origin": "manual"
+    }
+  ],
+  "item_seq": 2,
+  "stories": [
+    "SR-295.1"
+  ],
+  "story_files": [],
+  "generated_at": "2026-09-15T18:51:59"
+}

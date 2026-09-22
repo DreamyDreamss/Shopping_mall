@@ -1,0 +1,132 @@
+{
+  "generated_at": "2026-09-07T23:22:49",
+  "generator": "build_clarify@1",
+  "types": [
+    "api",
+    "db",
+    "screen"
+  ],
+  "items": [
+    {
+      "id": "scope_freeze",
+      "type": "common",
+      "required": true,
+      "state": "확정",
+      "question": "이번 SR에서 하는 것과 명시적으로 빼는 것은 무엇인가?",
+      "hint": "범위가 문장으로 고정돼야 승인 이후 scope 검증(대조 검증)이 기준을 갖는다",
+      "options": [],
+      "proposed": "포함: 회원 상세(마이페이지) 화면을 신규로 만들고, 그 회원의 최근 주문 5건(주문번호·일시·상태·금액)을 최신순으로 표시한다. 주문이 없으면 \"최근 주문 없음\"을 표시한다. 데이터는 기존 회원 상세 API(INF-ORD-002)의 recentOrders를 그대로 쓴다 — API 응답 계약은 바꾸지 않는다. 취소 주문도 포함(현행 규칙 유지). 주문번호 클릭 시 주문 상세(UIS-ORD-002)로 이동. 권한은 SR-204 전역 정책 그대로(관리 자원). / 제외: 요구 본문에 적히지 않은 것 전부",
+      "evidence": "00_요구사항.md §요구 요지",
+      "proposed_by": "clarify_prefill@1",
+      "answer": "포함: 회원 상세(마이페이지) 화면을 신규로 만들고, 그 회원의 최근 주문 5건(주문번호·일시·상태·금액)을 최신순으로 표시한다. 주문이 없으면 \"최근 주문 없음\"을 표시한다. 데이터는 기존 회원 상세 API(INF-ORD-002)의 recentOrders를 그대로 쓴다 — API 응답 계약은 바꾸지 않는다. 취소 주문도 포함(현행 규칙 유지). 주문번호 클릭 시 주문 상세(UIS-ORD-002)로 이동. 권한은 SR-204 전역 정책 그대로(관리 자원). / 제외: 요구 본문에 적히지 않은 것 전부",
+      "by": "viewer",
+      "at": "2026-09-07T23:23:25"
+    },
+    {
+      "id": "regression_keep",
+      "type": "common",
+      "required": true,
+      "state": "확정",
+      "question": "반드시 유지돼야 하는 기존 동작(회귀 범위)은 무엇인가?",
+      "hint": "회귀 TC의 근거 — \"기존과 동일\"이 구체적으로 무엇인지",
+      "options": [
+        "기존 조회 결과 전부",
+        "특정 화면/API만(명시)"
+      ],
+      "answer": "기존 조회 결과 전부",
+      "by": "viewer",
+      "at": "2026-09-07T23:23:29"
+    },
+    {
+      "id": "api_compat",
+      "type": "api",
+      "required": true,
+      "state": "확정",
+      "question": "기존 클라이언트와의 하위호환이 필요한가?",
+      "hint": "필드 추가만인지, 형식·의미 변경(호환 파괴)이 있는지",
+      "options": [
+        "필요 — 필드 추가만",
+        "호환 파괴 있음(마이그레이션 계획 필요)"
+      ],
+      "answer": "필요 — 필드 추가만",
+      "by": "viewer",
+      "at": "2026-09-07T23:23:29"
+    },
+    {
+      "id": "api_error",
+      "type": "api",
+      "required": true,
+      "state": "확정",
+      "question": "오류 응답 계약(코드·메시지)은 무엇인가?",
+      "hint": "실패 케이스별 HTTP 상태·오류 코드 — TC가 이 계약을 검증한다",
+      "options": [],
+      "answer": "기존 오류 계약 그대로 — 회원 없음 404(화면은 친화 안내), 미인증 401, 5xx 공통 오류 배너. 신규 오류 코드 없음",
+      "by": "viewer",
+      "at": "2026-09-07T23:23:55"
+    },
+    {
+      "id": "db_ripple",
+      "type": "db",
+      "required": true,
+      "state": "확정",
+      "question": "타 도메인 테이블·집계(정산·통계류)에 파급이 있는가?",
+      "hint": "이 테이블을 참조하는 다른 도메인의 쿼리·배치 — CIA 관찰 조인 확인",
+      "options": [
+        "없음",
+        "있음 — 범위 명시"
+      ],
+      "answer": "없음",
+      "by": "viewer",
+      "at": "2026-09-07T23:23:29"
+    },
+    {
+      "id": "db_migration",
+      "type": "db",
+      "required": true,
+      "state": "확정",
+      "question": "기존 데이터 이관·백필이 필요한가?",
+      "hint": "새 컬럼의 기존 행 값, 제약 변경 시 위반 데이터 처리",
+      "options": [
+        "불필요(신규 데이터만)",
+        "필요 — 이관 스크립트"
+      ],
+      "answer": "불필요(신규 데이터만)",
+      "by": "viewer",
+      "at": "2026-09-07T23:23:29"
+    },
+    {
+      "id": "scr_scope",
+      "type": "screen",
+      "required": true,
+      "state": "확정",
+      "question": "변경 대상 화면이 전부 나열됐는가? (누락 화면 없음 확인)",
+      "hint": "같은 데이터를 쓰는 다른 화면(목록/상세/팝업)이 함께 바뀌어야 하는지",
+      "options": [
+        "나열된 화면이 전부",
+        "추가 화면 있음(명시)"
+      ],
+      "proposed": "나열된 화면이 전부: UIS-ORD-002, UIS-ORD-003, UIS-ORD-004, UIS-ORD-005",
+      "evidence": "cia-derive 화면 후보(요구 본문 ↔ UIS 제목 매칭)",
+      "proposed_by": "clarify_prefill@1",
+      "answer": "추가 화면 있음 — 신규 회원 상세(마이페이지) 화면 1개(UIS 신규 채번). 기존 화면 중 바뀌는 것 없음. 주문번호 클릭 이동 대상은 UIS-ORD-002(변경 없음)",
+      "by": "viewer",
+      "at": "2026-09-07T23:24:15"
+    },
+    {
+      "id": "scr_empty_state",
+      "type": "screen",
+      "required": true,
+      "state": "확정",
+      "question": "빈 값·오류 상태의 화면 표기는 무엇인가?",
+      "hint": "데이터 없음/권한 없음/로딩 실패 시 사용자에게 보일 것",
+      "options": [],
+      "answer": "주문 없음: \"최근 주문 없음\" 문구 표시. 회원 없음: 404 친화 안내 화면. 로딩 실패/5xx: 기존 공통 오류 배너",
+      "by": "viewer",
+      "at": "2026-09-07T23:24:20"
+    }
+  ],
+  "prefill": {
+    "proposed": 2,
+    "by": "clarify_prefill@1"
+  }
+}

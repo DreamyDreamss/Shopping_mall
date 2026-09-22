@@ -1,0 +1,3032 @@
+{
+  "generated_by": "storybook_index.py",
+  "source": "shop-web",
+  "index_path": "{{SRC_SHOP_WEB}}\\storybook-static\\index.json",
+  "stories": [
+    {
+      "id": "주문-배송상태-배지--출고대기",
+      "name": "출고대기",
+      "title": "주문/배송상태 배지",
+      "import_path": "./src/components/DeliveryBadge.stories.tsx",
+      "component_path": "./src/components/DeliveryBadge.tsx",
+      "uis": [
+        "UIS-ORD-001"
+      ],
+      "func": [
+        "FUNC-order-001"
+      ],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "주문-배송상태-배지--출고",
+      "name": "출고",
+      "title": "주문/배송상태 배지",
+      "import_path": "./src/components/DeliveryBadge.stories.tsx",
+      "component_path": "./src/components/DeliveryBadge.tsx",
+      "uis": [
+        "UIS-ORD-001"
+      ],
+      "func": [
+        "FUNC-order-001"
+      ],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "주문-배송상태-배지--배송완료",
+      "name": "배송완료",
+      "title": "주문/배송상태 배지",
+      "import_path": "./src/components/DeliveryBadge.stories.tsx",
+      "component_path": "./src/components/DeliveryBadge.tsx",
+      "uis": [
+        "UIS-ORD-001"
+      ],
+      "func": [
+        "FUNC-order-001"
+      ],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "주문-배송상태-배지--이력없음",
+      "name": "이력없음",
+      "title": "주문/배송상태 배지",
+      "import_path": "./src/components/DeliveryBadge.stories.tsx",
+      "component_path": "./src/components/DeliveryBadge.tsx",
+      "uis": [
+        "UIS-ORD-001"
+      ],
+      "func": [
+        "FUNC-order-001"
+      ],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "회원-로그인--기본",
+      "name": "기본",
+      "title": "회원/로그인",
+      "import_path": "./src/components/LoginForm.stories.tsx",
+      "component_path": "./src/components/LoginForm.tsx",
+      "uis": [
+        "UIS-MBR-002"
+      ],
+      "func": [
+        "FUNC-member-004"
+      ],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "회원-로그인--입력됨",
+      "name": "입력됨",
+      "title": "회원/로그인",
+      "import_path": "./src/components/LoginForm.stories.tsx",
+      "component_path": "./src/components/LoginForm.tsx",
+      "uis": [
+        "UIS-MBR-002"
+      ],
+      "func": [
+        "FUNC-member-004"
+      ],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "회원-로그인--제출중",
+      "name": "제출중",
+      "title": "회원/로그인",
+      "import_path": "./src/components/LoginForm.stories.tsx",
+      "component_path": "./src/components/LoginForm.tsx",
+      "uis": [
+        "UIS-MBR-002"
+      ],
+      "func": [
+        "FUNC-member-004"
+      ],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "회원-로그인--실패401",
+      "name": "실패401",
+      "title": "회원/로그인",
+      "import_path": "./src/components/LoginForm.stories.tsx",
+      "component_path": "./src/components/LoginForm.tsx",
+      "uis": [
+        "UIS-MBR-002"
+      ],
+      "func": [
+        "FUNC-member-004"
+      ],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "회원-로그인--잠금429",
+      "name": "잠금429",
+      "title": "회원/로그인",
+      "import_path": "./src/components/LoginForm.stories.tsx",
+      "component_path": "./src/components/LoginForm.tsx",
+      "uis": [
+        "UIS-MBR-002"
+      ],
+      "func": [
+        "FUNC-member-004"
+      ],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "회원-로그인--비밀번호토글",
+      "name": "비밀번호토글",
+      "title": "회원/로그인",
+      "import_path": "./src/components/LoginForm.stories.tsx",
+      "component_path": "./src/components/LoginForm.tsx",
+      "uis": [
+        "UIS-MBR-002"
+      ],
+      "func": [
+        "FUNC-member-004"
+      ],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "주문-주문-상세--기본",
+      "name": "기본",
+      "title": "주문/주문 상세",
+      "import_path": "./src/components/OrderDetailCard.stories.tsx",
+      "component_path": "./src/components/OrderDetailCard.tsx",
+      "uis": [
+        "UIS-ORD-002"
+      ],
+      "func": [
+        "FUNC-order-002"
+      ],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "주문-주문-상세--미출고섞임",
+      "name": "미출고섞임",
+      "title": "주문/주문 상세",
+      "import_path": "./src/components/OrderDetailCard.stories.tsx",
+      "component_path": "./src/components/OrderDetailCard.tsx",
+      "uis": [
+        "UIS-ORD-002"
+      ],
+      "func": [
+        "FUNC-order-002"
+      ],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "주문-주문-상세--배송이력없음",
+      "name": "배송이력없음",
+      "title": "주문/주문 상세",
+      "import_path": "./src/components/OrderDetailCard.stories.tsx",
+      "component_path": "./src/components/OrderDetailCard.tsx",
+      "uis": [
+        "UIS-ORD-002"
+      ],
+      "func": [
+        "FUNC-order-002"
+      ],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "주문-주문-상세--품목없음",
+      "name": "품목없음",
+      "title": "주문/주문 상세",
+      "import_path": "./src/components/OrderDetailCard.stories.tsx",
+      "component_path": "./src/components/OrderDetailCard.tsx",
+      "uis": [
+        "UIS-ORD-002"
+      ],
+      "func": [
+        "FUNC-order-002"
+      ],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "주문-주문-상세--탈퇴회원",
+      "name": "탈퇴회원",
+      "title": "주문/주문 상세",
+      "import_path": "./src/components/OrderDetailCard.stories.tsx",
+      "component_path": "./src/components/OrderDetailCard.tsx",
+      "uis": [
+        "UIS-ORD-002"
+      ],
+      "func": [
+        "FUNC-order-002"
+      ],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "주문-주문-상세--로딩",
+      "name": "로딩",
+      "title": "주문/주문 상세",
+      "import_path": "./src/components/OrderDetailCard.stories.tsx",
+      "component_path": "./src/components/OrderDetailCard.tsx",
+      "uis": [
+        "UIS-ORD-002"
+      ],
+      "func": [
+        "FUNC-order-002"
+      ],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "주문-주문-상세--조회실패",
+      "name": "조회실패",
+      "title": "주문/주문 상세",
+      "import_path": "./src/components/OrderDetailCard.stories.tsx",
+      "component_path": "./src/components/OrderDetailCard.tsx",
+      "uis": [
+        "UIS-ORD-002"
+      ],
+      "func": [
+        "FUNC-order-002"
+      ],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "주문-주문-상세--주문없음",
+      "name": "주문없음",
+      "title": "주문/주문 상세",
+      "import_path": "./src/components/OrderDetailCard.stories.tsx",
+      "component_path": "./src/components/OrderDetailCard.tsx",
+      "uis": [
+        "UIS-ORD-002"
+      ],
+      "func": [
+        "FUNC-order-002"
+      ],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "주문-주문-상세--조회실패다시시도",
+      "name": "조회실패다시시도",
+      "title": "주문/주문 상세",
+      "import_path": "./src/components/OrderDetailCard.stories.tsx",
+      "component_path": "./src/components/OrderDetailCard.tsx",
+      "uis": [
+        "UIS-ORD-002"
+      ],
+      "func": [
+        "FUNC-order-002"
+      ],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "주문-검색-조건--빈조건",
+      "name": "빈조건",
+      "title": "주문/검색 조건",
+      "import_path": "./src/components/OrderFilters.stories.tsx",
+      "component_path": "./src/components/OrderFilters.tsx",
+      "uis": [
+        "UIS-ORD-001"
+      ],
+      "func": [
+        "FUNC-order-001"
+      ],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "주문-검색-조건--조건입력",
+      "name": "조건입력",
+      "title": "주문/검색 조건",
+      "import_path": "./src/components/OrderFilters.stories.tsx",
+      "component_path": "./src/components/OrderFilters.tsx",
+      "uis": [
+        "UIS-ORD-001"
+      ],
+      "func": [
+        "FUNC-order-001"
+      ],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "주문-검색-조건--기간역전",
+      "name": "기간역전",
+      "title": "주문/검색 조건",
+      "import_path": "./src/components/OrderFilters.stories.tsx",
+      "component_path": "./src/components/OrderFilters.tsx",
+      "uis": [
+        "UIS-ORD-001"
+      ],
+      "func": [
+        "FUNC-order-001"
+      ],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "주문-검색-조건--조회중",
+      "name": "조회중",
+      "title": "주문/검색 조건",
+      "import_path": "./src/components/OrderFilters.stories.tsx",
+      "component_path": "./src/components/OrderFilters.tsx",
+      "uis": [
+        "UIS-ORD-001"
+      ],
+      "func": [
+        "FUNC-order-001"
+      ],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "주문-주문-요약-카드--집계있음",
+      "name": "집계있음",
+      "title": "주문/주문 요약 카드",
+      "import_path": "./src/components/OrderSummaryCard.stories.tsx",
+      "component_path": "./src/components/OrderSummaryCard.tsx",
+      "uis": [
+        "UIS-ORD-001"
+      ],
+      "func": [
+        "FUNC-order-001"
+      ],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "주문-주문-요약-카드--결과없음",
+      "name": "결과없음",
+      "title": "주문/주문 요약 카드",
+      "import_path": "./src/components/OrderSummaryCard.stories.tsx",
+      "component_path": "./src/components/OrderSummaryCard.tsx",
+      "uis": [
+        "UIS-ORD-001"
+      ],
+      "func": [
+        "FUNC-order-001"
+      ],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "주문-주문-요약-카드--조회실패숨김",
+      "name": "조회실패숨김",
+      "title": "주문/주문 요약 카드",
+      "import_path": "./src/components/OrderSummaryCard.stories.tsx",
+      "component_path": "./src/components/OrderSummaryCard.tsx",
+      "uis": [
+        "UIS-ORD-001"
+      ],
+      "func": [
+        "FUNC-order-001"
+      ],
+      "linked_by": "tags",
+      "tags": [
+        "renders-nothing"
+      ]
+    },
+    {
+      "id": "주문-주문-목록-그리드--목록있음",
+      "name": "목록있음",
+      "title": "주문/주문 목록 그리드",
+      "import_path": "./src/components/OrderTable.stories.tsx",
+      "component_path": "./src/components/OrderTable.tsx",
+      "uis": [
+        "UIS-ORD-001"
+      ],
+      "func": [
+        "FUNC-order-001"
+      ],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "주문-주문-목록-그리드--결과없음",
+      "name": "결과없음",
+      "title": "주문/주문 목록 그리드",
+      "import_path": "./src/components/OrderTable.stories.tsx",
+      "component_path": "./src/components/OrderTable.tsx",
+      "uis": [
+        "UIS-ORD-001"
+      ],
+      "func": [
+        "FUNC-order-001"
+      ],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "주문-주문-목록-그리드--조회중",
+      "name": "조회중",
+      "title": "주문/주문 목록 그리드",
+      "import_path": "./src/components/OrderTable.stories.tsx",
+      "component_path": "./src/components/OrderTable.tsx",
+      "uis": [
+        "UIS-ORD-001"
+      ],
+      "func": [
+        "FUNC-order-001"
+      ],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "주문-주문-목록-그리드--조회실패",
+      "name": "조회실패",
+      "title": "주문/주문 목록 그리드",
+      "import_path": "./src/components/OrderTable.stories.tsx",
+      "component_path": "./src/components/OrderTable.tsx",
+      "uis": [
+        "UIS-ORD-001"
+      ],
+      "func": [
+        "FUNC-order-001"
+      ],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "주문-주문-목록-그리드--탈퇴회원포함",
+      "name": "탈퇴회원포함",
+      "title": "주문/주문 목록 그리드",
+      "import_path": "./src/components/OrderTable.stories.tsx",
+      "component_path": "./src/components/OrderTable.tsx",
+      "uis": [
+        "UIS-ORD-001"
+      ],
+      "func": [
+        "FUNC-order-001"
+      ],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "주문-주문-목록-그리드--미지의배송코드",
+      "name": "미지의배송코드",
+      "title": "주문/주문 목록 그리드",
+      "import_path": "./src/components/OrderTable.stories.tsx",
+      "component_path": "./src/components/OrderTable.tsx",
+      "uis": [
+        "UIS-ORD-001"
+      ],
+      "func": [
+        "FUNC-order-001"
+      ],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "주문-주문-목록-그리드--선택행강조",
+      "name": "선택행강조",
+      "title": "주문/주문 목록 그리드",
+      "import_path": "./src/components/OrderTable.stories.tsx",
+      "component_path": "./src/components/OrderTable.tsx",
+      "uis": [
+        "UIS-ORD-001"
+      ],
+      "func": [
+        "FUNC-order-001"
+      ],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-badge--tv상품",
+      "name": "TV상품",
+      "title": "공통/Badge",
+      "import_path": "./src/components/common/Badge.stories.tsx",
+      "component_path": "./src/components/common/Badge.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-badge--무료배송",
+      "name": "무료배송",
+      "title": "공통/Badge",
+      "import_path": "./src/components/common/Badge.stories.tsx",
+      "component_path": "./src/components/common/Badge.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-badge--무이자",
+      "name": "무이자",
+      "title": "공통/Badge",
+      "import_path": "./src/components/common/Badge.stories.tsx",
+      "component_path": "./src/components/common/Badge.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-badge--live",
+      "name": "LIVE",
+      "title": "공통/Badge",
+      "import_path": "./src/components/common/Badge.stories.tsx",
+      "component_path": "./src/components/common/Badge.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-badge--할인율",
+      "name": "할인율",
+      "title": "공통/Badge",
+      "import_path": "./src/components/common/Badge.stories.tsx",
+      "component_path": "./src/components/common/Badge.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-bottomsheet--열림",
+      "name": "열림",
+      "title": "공통/BottomSheet",
+      "import_path": "./src/components/common/BottomSheet.stories.tsx",
+      "component_path": "./src/components/common/BottomSheet.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-bottomsheet--닫힘",
+      "name": "닫힘",
+      "title": "공통/BottomSheet",
+      "import_path": "./src/components/common/BottomSheet.stories.tsx",
+      "component_path": "./src/components/common/BottomSheet.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": [
+        "renders-nothing"
+      ]
+    },
+    {
+      "id": "공통-button--주-기본",
+      "name": "주 기본",
+      "title": "공통/Button",
+      "import_path": "./src/components/common/Button.stories.tsx",
+      "component_path": "./src/components/common/Button.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-button--주-호버",
+      "name": "주 호버",
+      "title": "공통/Button",
+      "import_path": "./src/components/common/Button.stories.tsx",
+      "component_path": "./src/components/common/Button.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-button--주-포커스",
+      "name": "주 포커스",
+      "title": "공통/Button",
+      "import_path": "./src/components/common/Button.stories.tsx",
+      "component_path": "./src/components/common/Button.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-button--주-비활성",
+      "name": "주 비활성",
+      "title": "공통/Button",
+      "import_path": "./src/components/common/Button.stories.tsx",
+      "component_path": "./src/components/common/Button.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-button--주-로딩",
+      "name": "주 로딩",
+      "title": "공통/Button",
+      "import_path": "./src/components/common/Button.stories.tsx",
+      "component_path": "./src/components/common/Button.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-button--보조-기본",
+      "name": "보조 기본",
+      "title": "공통/Button",
+      "import_path": "./src/components/common/Button.stories.tsx",
+      "component_path": "./src/components/common/Button.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-button--보조-호버",
+      "name": "보조 호버",
+      "title": "공통/Button",
+      "import_path": "./src/components/common/Button.stories.tsx",
+      "component_path": "./src/components/common/Button.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-button--보조-포커스",
+      "name": "보조 포커스",
+      "title": "공통/Button",
+      "import_path": "./src/components/common/Button.stories.tsx",
+      "component_path": "./src/components/common/Button.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-button--보조-비활성",
+      "name": "보조 비활성",
+      "title": "공통/Button",
+      "import_path": "./src/components/common/Button.stories.tsx",
+      "component_path": "./src/components/common/Button.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-button--보조-로딩",
+      "name": "보조 로딩",
+      "title": "공통/Button",
+      "import_path": "./src/components/common/Button.stories.tsx",
+      "component_path": "./src/components/common/Button.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-button--구매-기본",
+      "name": "구매 기본",
+      "title": "공통/Button",
+      "import_path": "./src/components/common/Button.stories.tsx",
+      "component_path": "./src/components/common/Button.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-button--구매-호버",
+      "name": "구매 호버",
+      "title": "공통/Button",
+      "import_path": "./src/components/common/Button.stories.tsx",
+      "component_path": "./src/components/common/Button.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-button--구매-포커스",
+      "name": "구매 포커스",
+      "title": "공통/Button",
+      "import_path": "./src/components/common/Button.stories.tsx",
+      "component_path": "./src/components/common/Button.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-button--구매-비활성",
+      "name": "구매 비활성",
+      "title": "공통/Button",
+      "import_path": "./src/components/common/Button.stories.tsx",
+      "component_path": "./src/components/common/Button.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-button--구매-로딩",
+      "name": "구매 로딩",
+      "title": "공통/Button",
+      "import_path": "./src/components/common/Button.stories.tsx",
+      "component_path": "./src/components/common/Button.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-emptystate--기본",
+      "name": "기본",
+      "title": "공통/EmptyState",
+      "import_path": "./src/components/common/EmptyState.stories.tsx",
+      "component_path": "./src/components/common/EmptyState.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-emptystate--추천레일포함",
+      "name": "추천레일포함",
+      "title": "공통/EmptyState",
+      "import_path": "./src/components/common/EmptyState.stories.tsx",
+      "component_path": "./src/components/common/EmptyState.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-errorstate--기본",
+      "name": "기본",
+      "title": "공통/ErrorState",
+      "import_path": "./src/components/common/ErrorState.stories.tsx",
+      "component_path": "./src/components/common/ErrorState.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-popupcarousel--첫번째",
+      "name": "첫번째",
+      "title": "공통/PopupCarousel",
+      "import_path": "./src/components/common/PopupCarousel.stories.tsx",
+      "component_path": "./src/components/common/PopupCarousel.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-popupcarousel--마지막",
+      "name": "마지막",
+      "title": "공통/PopupCarousel",
+      "import_path": "./src/components/common/PopupCarousel.stories.tsx",
+      "component_path": "./src/components/common/PopupCarousel.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-popupcarousel--오늘은그만보기",
+      "name": "오늘은그만보기",
+      "title": "공통/PopupCarousel",
+      "import_path": "./src/components/common/PopupCarousel.stories.tsx",
+      "component_path": "./src/components/common/PopupCarousel.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-quantitystepper--중간값",
+      "name": "중간값",
+      "title": "공통/QuantityStepper",
+      "import_path": "./src/components/common/QuantityStepper.stories.tsx",
+      "component_path": "./src/components/common/QuantityStepper.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-quantitystepper--최솟값",
+      "name": "최솟값",
+      "title": "공통/QuantityStepper",
+      "import_path": "./src/components/common/QuantityStepper.stories.tsx",
+      "component_path": "./src/components/common/QuantityStepper.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-quantitystepper--최댓값",
+      "name": "최댓값",
+      "title": "공통/QuantityStepper",
+      "import_path": "./src/components/common/QuantityStepper.stories.tsx",
+      "component_path": "./src/components/common/QuantityStepper.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-quantitystepper--직접입력보정",
+      "name": "직접입력보정",
+      "title": "공통/QuantityStepper",
+      "import_path": "./src/components/common/QuantityStepper.stories.tsx",
+      "component_path": "./src/components/common/QuantityStepper.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-skeleton--카드",
+      "name": "카드",
+      "title": "공통/Skeleton",
+      "import_path": "./src/components/common/Skeleton.stories.tsx",
+      "component_path": "./src/components/common/Skeleton.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-skeleton--리스트",
+      "name": "리스트",
+      "title": "공통/Skeleton",
+      "import_path": "./src/components/common/Skeleton.stories.tsx",
+      "component_path": "./src/components/common/Skeleton.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-tabs--기본",
+      "name": "기본",
+      "title": "공통/Tabs",
+      "import_path": "./src/components/common/Tabs.stories.tsx",
+      "component_path": "./src/components/common/Tabs.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-tabs--스티키고정",
+      "name": "스티키고정",
+      "title": "공통/Tabs",
+      "import_path": "./src/components/common/Tabs.stories.tsx",
+      "component_path": "./src/components/common/Tabs.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-tabs--배지있는탭",
+      "name": "배지있는탭",
+      "title": "공통/Tabs",
+      "import_path": "./src/components/common/Tabs.stories.tsx",
+      "component_path": "./src/components/common/Tabs.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-textinput--기본",
+      "name": "기본",
+      "title": "공통/TextInput",
+      "import_path": "./src/components/common/TextInput.stories.tsx",
+      "component_path": "./src/components/common/TextInput.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-textinput--포커스",
+      "name": "포커스",
+      "title": "공통/TextInput",
+      "import_path": "./src/components/common/TextInput.stories.tsx",
+      "component_path": "./src/components/common/TextInput.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-textinput--오류",
+      "name": "오류",
+      "title": "공통/TextInput",
+      "import_path": "./src/components/common/TextInput.stories.tsx",
+      "component_path": "./src/components/common/TextInput.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-textinput--비활성",
+      "name": "비활성",
+      "title": "공통/TextInput",
+      "import_path": "./src/components/common/TextInput.stories.tsx",
+      "component_path": "./src/components/common/TextInput.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-toast--기본",
+      "name": "기본",
+      "title": "공통/Toast",
+      "import_path": "./src/components/common/Toast.stories.tsx",
+      "component_path": "./src/components/common/Toast.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-toast--성공",
+      "name": "성공",
+      "title": "공통/Toast",
+      "import_path": "./src/components/common/Toast.stories.tsx",
+      "component_path": "./src/components/common/Toast.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-toast--오류",
+      "name": "오류",
+      "title": "공통/Toast",
+      "import_path": "./src/components/common/Toast.stories.tsx",
+      "component_path": "./src/components/common/Toast.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-toaststack--한개",
+      "name": "한개",
+      "title": "공통/ToastStack",
+      "import_path": "./src/components/common/ToastStack.stories.tsx",
+      "component_path": "./src/components/common/ToastStack.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-toaststack--세개",
+      "name": "세개",
+      "title": "공통/ToastStack",
+      "import_path": "./src/components/common/ToastStack.stories.tsx",
+      "component_path": "./src/components/common/ToastStack.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "공통-toaststack--초과시제거",
+      "name": "초과시제거",
+      "title": "공통/ToastStack",
+      "import_path": "./src/components/common/ToastStack.stories.tsx",
+      "component_path": "./src/components/common/ToastStack.tsx",
+      "uis": [
+        "UIS-CMN-002"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "마이페이지-배송지-삭제-확인--일반삭제확인",
+      "name": "일반삭제확인",
+      "title": "마이페이지/배송지 삭제 확인",
+      "import_path": "./src/features/member/AddressDeleteConfirm.stories.tsx",
+      "component_path": "./src/features/member/AddressDeleteConfirm.tsx",
+      "uis": [
+        "UIS-MBR-004"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "마이페이지-배송지-삭제-확인--기본배송지삭제확인",
+      "name": "기본배송지삭제확인",
+      "title": "마이페이지/배송지 삭제 확인",
+      "import_path": "./src/features/member/AddressDeleteConfirm.stories.tsx",
+      "component_path": "./src/features/member/AddressDeleteConfirm.tsx",
+      "uis": [
+        "UIS-MBR-004"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "마이페이지-배송지-폼--신규",
+      "name": "신규",
+      "title": "마이페이지/배송지 폼",
+      "import_path": "./src/features/member/AddressForm.stories.tsx",
+      "component_path": "./src/features/member/AddressForm.tsx",
+      "uis": [
+        "UIS-MBR-004"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "마이페이지-배송지-폼--수정",
+      "name": "수정",
+      "title": "마이페이지/배송지 폼",
+      "import_path": "./src/features/member/AddressForm.stories.tsx",
+      "component_path": "./src/features/member/AddressForm.tsx",
+      "uis": [
+        "UIS-MBR-004"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "마이페이지-배송지-폼--검증오류",
+      "name": "검증오류",
+      "title": "마이페이지/배송지 폼",
+      "import_path": "./src/features/member/AddressForm.stories.tsx",
+      "component_path": "./src/features/member/AddressForm.tsx",
+      "uis": [
+        "UIS-MBR-004"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "마이페이지-배송지-목록--목록-0건",
+      "name": "목록 0건",
+      "title": "마이페이지/배송지 목록",
+      "import_path": "./src/features/member/AddressList.stories.tsx",
+      "component_path": "./src/features/member/AddressList.tsx",
+      "uis": [
+        "UIS-MBR-004"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "마이페이지-배송지-목록--목록-1건",
+      "name": "목록 1건",
+      "title": "마이페이지/배송지 목록",
+      "import_path": "./src/features/member/AddressList.stories.tsx",
+      "component_path": "./src/features/member/AddressList.tsx",
+      "uis": [
+        "UIS-MBR-004"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "마이페이지-배송지-목록--목록-10건상한",
+      "name": "목록 10건상한",
+      "title": "마이페이지/배송지 목록",
+      "import_path": "./src/features/member/AddressList.stories.tsx",
+      "component_path": "./src/features/member/AddressList.tsx",
+      "uis": [
+        "UIS-MBR-004"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "마이페이지-배송지-목록--기본배송지전환중",
+      "name": "기본배송지전환중",
+      "title": "마이페이지/배송지 목록",
+      "import_path": "./src/features/member/AddressList.stories.tsx",
+      "component_path": "./src/features/member/AddressList.tsx",
+      "uis": [
+        "UIS-MBR-004"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "회원-비밀번호-재설정-2단계-코드--기본",
+      "name": "기본",
+      "title": "회원/비밀번호 재설정/2단계 코드",
+      "import_path": "./src/features/member/PasswordResetCodeStep.stories.tsx",
+      "component_path": "./src/features/member/PasswordResetCodeStep.tsx",
+      "uis": [
+        "UIS-MBR-003"
+      ],
+      "func": [
+        "FUNC-member-007"
+      ],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "회원-비밀번호-재설정-2단계-코드--재전송쿨다운끝",
+      "name": "재전송쿨다운끝",
+      "title": "회원/비밀번호 재설정/2단계 코드",
+      "import_path": "./src/features/member/PasswordResetCodeStep.stories.tsx",
+      "component_path": "./src/features/member/PasswordResetCodeStep.tsx",
+      "uis": [
+        "UIS-MBR-003"
+      ],
+      "func": [
+        "FUNC-member-007"
+      ],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "회원-비밀번호-재설정-2단계-코드--코드오류",
+      "name": "코드오류",
+      "title": "회원/비밀번호 재설정/2단계 코드",
+      "import_path": "./src/features/member/PasswordResetCodeStep.stories.tsx",
+      "component_path": "./src/features/member/PasswordResetCodeStep.tsx",
+      "uis": [
+        "UIS-MBR-003"
+      ],
+      "func": [
+        "FUNC-member-007"
+      ],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "회원-비밀번호-재설정-2단계-코드--만료",
+      "name": "만료",
+      "title": "회원/비밀번호 재설정/2단계 코드",
+      "import_path": "./src/features/member/PasswordResetCodeStep.stories.tsx",
+      "component_path": "./src/features/member/PasswordResetCodeStep.tsx",
+      "uis": [
+        "UIS-MBR-003"
+      ],
+      "func": [
+        "FUNC-member-007"
+      ],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "회원-비밀번호-재설정-2단계-코드--시도초과",
+      "name": "시도초과",
+      "title": "회원/비밀번호 재설정/2단계 코드",
+      "import_path": "./src/features/member/PasswordResetCodeStep.stories.tsx",
+      "component_path": "./src/features/member/PasswordResetCodeStep.tsx",
+      "uis": [
+        "UIS-MBR-003"
+      ],
+      "func": [
+        "FUNC-member-007"
+      ],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "회원-비밀번호-재설정-4단계-완료--기본",
+      "name": "기본",
+      "title": "회원/비밀번호 재설정/4단계 완료",
+      "import_path": "./src/features/member/PasswordResetDoneStep.stories.tsx",
+      "component_path": "./src/features/member/PasswordResetDoneStep.tsx",
+      "uis": [
+        "UIS-MBR-003"
+      ],
+      "func": [
+        "FUNC-member-007"
+      ],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "회원-비밀번호-재설정-3단계-새-비밀번호--기본",
+      "name": "기본",
+      "title": "회원/비밀번호 재설정/3단계 새 비밀번호",
+      "import_path": "./src/features/member/PasswordResetPasswordStep.stories.tsx",
+      "component_path": "./src/features/member/PasswordResetPasswordStep.tsx",
+      "uis": [
+        "UIS-MBR-003"
+      ],
+      "func": [
+        "FUNC-member-007"
+      ],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "회원-비밀번호-재설정-3단계-새-비밀번호--제출중",
+      "name": "제출중",
+      "title": "회원/비밀번호 재설정/3단계 새 비밀번호",
+      "import_path": "./src/features/member/PasswordResetPasswordStep.stories.tsx",
+      "component_path": "./src/features/member/PasswordResetPasswordStep.tsx",
+      "uis": [
+        "UIS-MBR-003"
+      ],
+      "func": [
+        "FUNC-member-007"
+      ],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "회원-비밀번호-재설정-3단계-새-비밀번호--비밀번호규칙오류",
+      "name": "비밀번호규칙오류",
+      "title": "회원/비밀번호 재설정/3단계 새 비밀번호",
+      "import_path": "./src/features/member/PasswordResetPasswordStep.stories.tsx",
+      "component_path": "./src/features/member/PasswordResetPasswordStep.tsx",
+      "uis": [
+        "UIS-MBR-003"
+      ],
+      "func": [
+        "FUNC-member-007"
+      ],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "회원-비밀번호-재설정-1단계-요청--기본",
+      "name": "기본",
+      "title": "회원/비밀번호 재설정/1단계 요청",
+      "import_path": "./src/features/member/PasswordResetRequestStep.stories.tsx",
+      "component_path": "./src/features/member/PasswordResetRequestStep.tsx",
+      "uis": [
+        "UIS-MBR-003"
+      ],
+      "func": [
+        "FUNC-member-007"
+      ],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "회원-비밀번호-재설정-1단계-요청--입력됨",
+      "name": "입력됨",
+      "title": "회원/비밀번호 재설정/1단계 요청",
+      "import_path": "./src/features/member/PasswordResetRequestStep.stories.tsx",
+      "component_path": "./src/features/member/PasswordResetRequestStep.tsx",
+      "uis": [
+        "UIS-MBR-003"
+      ],
+      "func": [
+        "FUNC-member-007"
+      ],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "회원-비밀번호-재설정-1단계-요청--제출중",
+      "name": "제출중",
+      "title": "회원/비밀번호 재설정/1단계 요청",
+      "import_path": "./src/features/member/PasswordResetRequestStep.stories.tsx",
+      "component_path": "./src/features/member/PasswordResetRequestStep.tsx",
+      "uis": [
+        "UIS-MBR-003"
+      ],
+      "func": [
+        "FUNC-member-007"
+      ],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "회원-비밀번호-재설정-1단계-요청--형식오류",
+      "name": "형식오류",
+      "title": "회원/비밀번호 재설정/1단계 요청",
+      "import_path": "./src/features/member/PasswordResetRequestStep.stories.tsx",
+      "component_path": "./src/features/member/PasswordResetRequestStep.tsx",
+      "uis": [
+        "UIS-MBR-003"
+      ],
+      "func": [
+        "FUNC-member-007"
+      ],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑셸-appshell--pc-1280",
+      "name": "PC 1280",
+      "title": "쇼핑셸/AppShell",
+      "import_path": "./src/features/shop/AppShell.stories.tsx",
+      "component_path": "./src/features/shop/AppShell.tsx",
+      "uis": [
+        "UIS-CMN-003"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑셸-appshell--태블릿-1024",
+      "name": "태블릿 1024",
+      "title": "쇼핑셸/AppShell",
+      "import_path": "./src/features/shop/AppShell.stories.tsx",
+      "component_path": "./src/features/shop/AppShell.tsx",
+      "uis": [
+        "UIS-CMN-003"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑셸-appshell--모바일-390",
+      "name": "모바일 390",
+      "title": "쇼핑셸/AppShell",
+      "import_path": "./src/features/shop/AppShell.stories.tsx",
+      "component_path": "./src/features/shop/AppShell.tsx",
+      "uis": [
+        "UIS-CMN-003"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑셸-appshell--최근본상품-3개",
+      "name": "최근본상품 3개",
+      "title": "쇼핑셸/AppShell",
+      "import_path": "./src/features/shop/AppShell.stories.tsx",
+      "component_path": "./src/features/shop/AppShell.tsx",
+      "uis": [
+        "UIS-CMN-003"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑셸-appshell--최근본상품-0개",
+      "name": "최근본상품 0개",
+      "title": "쇼핑셸/AppShell",
+      "import_path": "./src/features/shop/AppShell.stories.tsx",
+      "component_path": "./src/features/shop/AppShell.tsx",
+      "uis": [
+        "UIS-CMN-003"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑셸-appshell--로그인-헤더",
+      "name": "로그인 헤더",
+      "title": "쇼핑셸/AppShell",
+      "import_path": "./src/features/shop/AppShell.stories.tsx",
+      "component_path": "./src/features/shop/AppShell.tsx",
+      "uis": [
+        "UIS-CMN-003"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑셸-appshell--비로그인-헤더",
+      "name": "비로그인 헤더",
+      "title": "쇼핑셸/AppShell",
+      "import_path": "./src/features/shop/AppShell.stories.tsx",
+      "component_path": "./src/features/shop/AppShell.tsx",
+      "uis": [
+        "UIS-CMN-003"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑셸-appshell--qr-팝업-열림",
+      "name": "QR 팝업 열림",
+      "title": "쇼핑셸/AppShell",
+      "import_path": "./src/features/shop/AppShell.stories.tsx",
+      "component_path": "./src/features/shop/AppShell.tsx",
+      "uis": [
+        "UIS-CMN-003"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑셸-bottomtabbar--비로그인",
+      "name": "비로그인",
+      "title": "쇼핑셸/BottomTabBar",
+      "import_path": "./src/features/shop/BottomTabBar.stories.tsx",
+      "component_path": "./src/features/shop/BottomTabBar.tsx",
+      "uis": [
+        "UIS-CMN-003"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑셸-bottomtabbar--로그인",
+      "name": "로그인",
+      "title": "쇼핑셸/BottomTabBar",
+      "import_path": "./src/features/shop/BottomTabBar.stories.tsx",
+      "component_path": "./src/features/shop/BottomTabBar.tsx",
+      "uis": [
+        "UIS-CMN-003"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "장바구니-빈-장바구니--빈장바구니",
+      "name": "빈장바구니",
+      "title": "장바구니/빈 장바구니",
+      "import_path": "./src/features/shop/CartEmptyState.stories.tsx",
+      "component_path": "./src/features/shop/CartEmptyState.tsx",
+      "uis": [
+        "UIS-ORD-012"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "장바구니-라인아이템--기본",
+      "name": "기본",
+      "title": "장바구니/라인아이템",
+      "import_path": "./src/features/shop/CartLineItem.stories.tsx",
+      "component_path": "./src/features/shop/CartLineItem.tsx",
+      "uis": [
+        "UIS-ORD-012"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "장바구니-라인아이템--선택해제",
+      "name": "선택해제",
+      "title": "장바구니/라인아이템",
+      "import_path": "./src/features/shop/CartLineItem.stories.tsx",
+      "component_path": "./src/features/shop/CartLineItem.tsx",
+      "uis": [
+        "UIS-ORD-012"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "장바구니-라인아이템--수량변경중",
+      "name": "수량변경중",
+      "title": "장바구니/라인아이템",
+      "import_path": "./src/features/shop/CartLineItem.stories.tsx",
+      "component_path": "./src/features/shop/CartLineItem.tsx",
+      "uis": [
+        "UIS-ORD-012"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "장바구니-라인아이템--재고초과안내",
+      "name": "재고초과안내",
+      "title": "장바구니/라인아이템",
+      "import_path": "./src/features/shop/CartLineItem.stories.tsx",
+      "component_path": "./src/features/shop/CartLineItem.tsx",
+      "uis": [
+        "UIS-ORD-012"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "장바구니-라인아이템--최소수량안내",
+      "name": "최소수량안내",
+      "title": "장바구니/라인아이템",
+      "import_path": "./src/features/shop/CartLineItem.stories.tsx",
+      "component_path": "./src/features/shop/CartLineItem.tsx",
+      "uis": [
+        "UIS-ORD-012"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "장바구니-라인아이템--수량변경실패",
+      "name": "수량변경실패",
+      "title": "장바구니/라인아이템",
+      "import_path": "./src/features/shop/CartLineItem.stories.tsx",
+      "component_path": "./src/features/shop/CartLineItem.tsx",
+      "uis": [
+        "UIS-ORD-012"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": [
+        "shows-error"
+      ]
+    },
+    {
+      "id": "장바구니-합계--전체선택",
+      "name": "전체선택",
+      "title": "장바구니/합계",
+      "import_path": "./src/features/shop/CartSummary.stories.tsx",
+      "component_path": "./src/features/shop/CartSummary.tsx",
+      "uis": [
+        "UIS-ORD-012"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "장바구니-합계--부분선택",
+      "name": "부분선택",
+      "title": "장바구니/합계",
+      "import_path": "./src/features/shop/CartSummary.stories.tsx",
+      "component_path": "./src/features/shop/CartSummary.tsx",
+      "uis": [
+        "UIS-ORD-012"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "장바구니-합계--선택없음",
+      "name": "선택없음",
+      "title": "장바구니/합계",
+      "import_path": "./src/features/shop/CartSummary.stories.tsx",
+      "component_path": "./src/features/shop/CartSummary.tsx",
+      "uis": [
+        "UIS-ORD-012"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑홈-카테고리-숏컷--기본",
+      "name": "기본",
+      "title": "쇼핑홈/카테고리 숏컷",
+      "import_path": "./src/features/shop/CategoryShortcuts.stories.tsx",
+      "component_path": "./src/features/shop/CategoryShortcuts.tsx",
+      "uis": [
+        "UIS-ORD-008"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "주문서-배송지-입력--기본",
+      "name": "기본",
+      "title": "주문서/배송지 입력",
+      "import_path": "./src/features/shop/DeliveryAddressForm.stories.tsx",
+      "component_path": "./src/features/shop/DeliveryAddressForm.tsx",
+      "uis": [
+        "UIS-ORD-011"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "주문서-배송지-입력--입력완료",
+      "name": "입력완료",
+      "title": "주문서/배송지 입력",
+      "import_path": "./src/features/shop/DeliveryAddressForm.stories.tsx",
+      "component_path": "./src/features/shop/DeliveryAddressForm.tsx",
+      "uis": [
+        "UIS-ORD-011"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "주문서-배송지-입력--배송지오류",
+      "name": "배송지오류",
+      "title": "주문서/배송지 입력",
+      "import_path": "./src/features/shop/DeliveryAddressForm.stories.tsx",
+      "component_path": "./src/features/shop/DeliveryAddressForm.tsx",
+      "uis": [
+        "UIS-ORD-011"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": [
+        "shows-error"
+      ]
+    },
+    {
+      "id": "쇼핑홈-gnb--비로그인",
+      "name": "비로그인",
+      "title": "쇼핑홈/GNB",
+      "import_path": "./src/features/shop/Gnb.stories.tsx",
+      "component_path": "./src/features/shop/Gnb.tsx",
+      "uis": [
+        "UIS-ORD-008"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑홈-gnb--로그인",
+      "name": "로그인",
+      "title": "쇼핑홈/GNB",
+      "import_path": "./src/features/shop/Gnb.stories.tsx",
+      "component_path": "./src/features/shop/Gnb.tsx",
+      "uis": [
+        "UIS-ORD-008"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑홈-gnb--장바구니담김",
+      "name": "장바구니담김",
+      "title": "쇼핑홈/GNB",
+      "import_path": "./src/features/shop/Gnb.stories.tsx",
+      "component_path": "./src/features/shop/Gnb.tsx",
+      "uis": [
+        "UIS-ORD-008"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑셸-gnbtabs--기본",
+      "name": "기본",
+      "title": "쇼핑셸/GnbTabs",
+      "import_path": "./src/features/shop/GnbTabs.stories.tsx",
+      "component_path": "./src/features/shop/GnbTabs.tsx",
+      "uis": [
+        "UIS-CMN-003"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑홈-히어로-배너--여러장",
+      "name": "여러장",
+      "title": "쇼핑홈/히어로 배너",
+      "import_path": "./src/features/shop/HeroBannerCarousel.stories.tsx",
+      "component_path": "./src/features/shop/HeroBannerCarousel.tsx",
+      "uis": [
+        "UIS-ORD-008"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑홈-히어로-배너--한장",
+      "name": "한장",
+      "title": "쇼핑홈/히어로 배너",
+      "import_path": "./src/features/shop/HeroBannerCarousel.stories.tsx",
+      "component_path": "./src/features/shop/HeroBannerCarousel.tsx",
+      "uis": [
+        "UIS-ORD-008"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "주문서-주문-완료--주문완료",
+      "name": "주문완료",
+      "title": "주문서/주문 완료",
+      "import_path": "./src/features/shop/OrderCompleteNotice.stories.tsx",
+      "component_path": "./src/features/shop/OrderCompleteNotice.tsx",
+      "uis": [
+        "UIS-ORD-011"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "주문서-결제-실패-안내--빈장바구니400",
+      "name": "빈장바구니400",
+      "title": "주문서/결제 실패 안내",
+      "import_path": "./src/features/shop/OrderFailureNotice.stories.tsx",
+      "component_path": "./src/features/shop/OrderFailureNotice.tsx",
+      "uis": [
+        "UIS-ORD-011"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": [
+        "shows-error"
+      ]
+    },
+    {
+      "id": "주문서-결제-실패-안내--회원없음404",
+      "name": "회원없음404",
+      "title": "주문서/결제 실패 안내",
+      "import_path": "./src/features/shop/OrderFailureNotice.stories.tsx",
+      "component_path": "./src/features/shop/OrderFailureNotice.tsx",
+      "uis": [
+        "UIS-ORD-011"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": [
+        "shows-error"
+      ]
+    },
+    {
+      "id": "주문서-결제-실패-안내--재고부족409",
+      "name": "재고부족409",
+      "title": "주문서/결제 실패 안내",
+      "import_path": "./src/features/shop/OrderFailureNotice.stories.tsx",
+      "component_path": "./src/features/shop/OrderFailureNotice.tsx",
+      "uis": [
+        "UIS-ORD-011"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": [
+        "shows-error"
+      ]
+    },
+    {
+      "id": "주문서-결제-실패-안내--일시적오류",
+      "name": "일시적오류",
+      "title": "주문서/결제 실패 안내",
+      "import_path": "./src/features/shop/OrderFailureNotice.stories.tsx",
+      "component_path": "./src/features/shop/OrderFailureNotice.tsx",
+      "uis": [
+        "UIS-ORD-011"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": [
+        "shows-error"
+      ]
+    },
+    {
+      "id": "주문서-상품-요약--주문서기본",
+      "name": "주문서기본",
+      "title": "주문서/상품 요약",
+      "import_path": "./src/features/shop/OrderItemsSummary.stories.tsx",
+      "component_path": "./src/features/shop/OrderItemsSummary.tsx",
+      "uis": [
+        "UIS-ORD-011"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "주문서-결제-수단--기본선택",
+      "name": "기본선택",
+      "title": "주문서/결제 수단",
+      "import_path": "./src/features/shop/PaymentMethodSelect.stories.tsx",
+      "component_path": "./src/features/shop/PaymentMethodSelect.tsx",
+      "uis": [
+        "UIS-ORD-011"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "주문서-결제-수단--계좌이체선택",
+      "name": "계좌이체선택",
+      "title": "주문서/결제 수단",
+      "import_path": "./src/features/shop/PaymentMethodSelect.stories.tsx",
+      "component_path": "./src/features/shop/PaymentMethodSelect.tsx",
+      "uis": [
+        "UIS-ORD-011"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑홈-상품-카드--기본",
+      "name": "기본",
+      "title": "쇼핑홈/상품 카드",
+      "import_path": "./src/features/shop/ProductCard.stories.tsx",
+      "component_path": "./src/features/shop/ProductCard.tsx",
+      "uis": [
+        "UIS-ORD-008"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑홈-상품-카드--할인",
+      "name": "할인",
+      "title": "쇼핑홈/상품 카드",
+      "import_path": "./src/features/shop/ProductCard.stories.tsx",
+      "component_path": "./src/features/shop/ProductCard.tsx",
+      "uis": [
+        "UIS-ORD-008"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑홈-상품-카드--품절",
+      "name": "품절",
+      "title": "쇼핑홈/상품 카드",
+      "import_path": "./src/features/shop/ProductCard.stories.tsx",
+      "component_path": "./src/features/shop/ProductCard.tsx",
+      "uis": [
+        "UIS-ORD-008"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑홈-상품-카드--이미지없음",
+      "name": "이미지없음",
+      "title": "쇼핑홈/상품 카드",
+      "import_path": "./src/features/shop/ProductCard.stories.tsx",
+      "component_path": "./src/features/shop/ProductCard.tsx",
+      "uis": [
+        "UIS-ORD-008"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑홈-상품-카드--정가없음",
+      "name": "정가없음",
+      "title": "쇼핑홈/상품 카드",
+      "import_path": "./src/features/shop/ProductCard.stories.tsx",
+      "component_path": "./src/features/shop/ProductCard.tsx",
+      "uis": [
+        "UIS-ORD-008"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑홈-상품-카드--이미지있음",
+      "name": "이미지있음",
+      "title": "쇼핑홈/상품 카드",
+      "import_path": "./src/features/shop/ProductCard.stories.tsx",
+      "component_path": "./src/features/shop/ProductCard.tsx",
+      "uis": [
+        "UIS-ORD-008"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑홈-상품-카드--할인0퍼센트",
+      "name": "할인0퍼센트",
+      "title": "쇼핑홈/상품 카드",
+      "import_path": "./src/features/shop/ProductCard.stories.tsx",
+      "component_path": "./src/features/shop/ProductCard.tsx",
+      "uis": [
+        "UIS-ORD-008"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑홈-상품-카드--이미지로드실패",
+      "name": "이미지로드실패",
+      "title": "쇼핑홈/상품 카드",
+      "import_path": "./src/features/shop/ProductCard.stories.tsx",
+      "component_path": "./src/features/shop/ProductCard.tsx",
+      "uis": [
+        "UIS-ORD-008"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑상세-로딩-스켈레톤--로딩",
+      "name": "로딩",
+      "title": "쇼핑상세/로딩 스켈레톤",
+      "import_path": "./src/features/shop/ProductDetailSkeleton.stories.tsx",
+      "component_path": "./src/features/shop/ProductDetailSkeleton.tsx",
+      "uis": [
+        "UIS-ORD-010"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑상세-상세-탭--기본",
+      "name": "기본",
+      "title": "쇼핑상세/상세 탭",
+      "import_path": "./src/features/shop/ProductDetailTabs.stories.tsx",
+      "component_path": "./src/features/shop/ProductDetailTabs.tsx",
+      "uis": [
+        "UIS-ORD-010"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑상세-상세-탭--상품평",
+      "name": "상품평",
+      "title": "쇼핑상세/상세 탭",
+      "import_path": "./src/features/shop/ProductDetailTabs.stories.tsx",
+      "component_path": "./src/features/shop/ProductDetailTabs.tsx",
+      "uis": [
+        "UIS-ORD-010"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑상세-상세-탭--상품문의",
+      "name": "상품문의",
+      "title": "쇼핑상세/상세 탭",
+      "import_path": "./src/features/shop/ProductDetailTabs.stories.tsx",
+      "component_path": "./src/features/shop/ProductDetailTabs.tsx",
+      "uis": [
+        "UIS-ORD-010"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑상세-상세-탭--탭전환",
+      "name": "탭전환",
+      "title": "쇼핑상세/상세 탭",
+      "import_path": "./src/features/shop/ProductDetailTabs.stories.tsx",
+      "component_path": "./src/features/shop/ProductDetailTabs.tsx",
+      "uis": [
+        "UIS-ORD-010"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑홈-상품-목록-필터바--기본",
+      "name": "기본",
+      "title": "쇼핑홈/상품 목록 필터바",
+      "import_path": "./src/features/shop/ProductFilterBar.stories.tsx",
+      "component_path": "./src/features/shop/ProductFilterBar.tsx",
+      "uis": [
+        "UIS-ORD-009"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑홈-상품-목록-필터바--정렬변경",
+      "name": "정렬변경",
+      "title": "쇼핑홈/상품 목록 필터바",
+      "import_path": "./src/features/shop/ProductFilterBar.stories.tsx",
+      "component_path": "./src/features/shop/ProductFilterBar.tsx",
+      "uis": [
+        "UIS-ORD-009"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑홈-상품-목록-필터바--재고필터켬",
+      "name": "재고필터켬",
+      "title": "쇼핑홈/상품 목록 필터바",
+      "import_path": "./src/features/shop/ProductFilterBar.stories.tsx",
+      "component_path": "./src/features/shop/ProductFilterBar.tsx",
+      "uis": [
+        "UIS-ORD-009"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑홈-추천-상품-그리드--목록있음",
+      "name": "목록있음",
+      "title": "쇼핑홈/추천 상품 그리드",
+      "import_path": "./src/features/shop/ProductGrid.stories.tsx",
+      "component_path": "./src/features/shop/ProductGrid.tsx",
+      "uis": [
+        "UIS-ORD-008"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑홈-추천-상품-그리드--빈목록",
+      "name": "빈목록",
+      "title": "쇼핑홈/추천 상품 그리드",
+      "import_path": "./src/features/shop/ProductGrid.stories.tsx",
+      "component_path": "./src/features/shop/ProductGrid.tsx",
+      "uis": [
+        "UIS-ORD-008"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑홈-추천-상품-그리드--로딩",
+      "name": "로딩",
+      "title": "쇼핑홈/추천 상품 그리드",
+      "import_path": "./src/features/shop/ProductGrid.stories.tsx",
+      "component_path": "./src/features/shop/ProductGrid.tsx",
+      "uis": [
+        "UIS-ORD-008"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑홈-추천-상품-그리드--조회실패",
+      "name": "조회실패",
+      "title": "쇼핑홈/추천 상품 그리드",
+      "import_path": "./src/features/shop/ProductGrid.stories.tsx",
+      "component_path": "./src/features/shop/ProductGrid.tsx",
+      "uis": [
+        "UIS-ORD-008"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑상세-이미지-갤러리--기본",
+      "name": "기본",
+      "title": "쇼핑상세/이미지 갤러리",
+      "import_path": "./src/features/shop/ProductImageGallery.stories.tsx",
+      "component_path": "./src/features/shop/ProductImageGallery.tsx",
+      "uis": [
+        "UIS-ORD-010"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑상세-이미지-갤러리--이미지없음",
+      "name": "이미지없음",
+      "title": "쇼핑상세/이미지 갤러리",
+      "import_path": "./src/features/shop/ProductImageGallery.stories.tsx",
+      "component_path": "./src/features/shop/ProductImageGallery.tsx",
+      "uis": [
+        "UIS-ORD-010"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑상세-이미지-갤러리--로드실패",
+      "name": "로드실패",
+      "title": "쇼핑상세/이미지 갤러리",
+      "import_path": "./src/features/shop/ProductImageGallery.stories.tsx",
+      "component_path": "./src/features/shop/ProductImageGallery.tsx",
+      "uis": [
+        "UIS-ORD-010"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": [
+        "shows-error"
+      ]
+    },
+    {
+      "id": "쇼핑상세-상품-정보-패널--기본",
+      "name": "기본",
+      "title": "쇼핑상세/상품 정보 패널",
+      "import_path": "./src/features/shop/ProductInfoPanel.stories.tsx",
+      "component_path": "./src/features/shop/ProductInfoPanel.tsx",
+      "uis": [
+        "UIS-ORD-010"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑상세-상품-정보-패널--할인있음",
+      "name": "할인있음",
+      "title": "쇼핑상세/상품 정보 패널",
+      "import_path": "./src/features/shop/ProductInfoPanel.stories.tsx",
+      "component_path": "./src/features/shop/ProductInfoPanel.tsx",
+      "uis": [
+        "UIS-ORD-010"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑상세-상품-정보-패널--품절",
+      "name": "품절",
+      "title": "쇼핑상세/상품 정보 패널",
+      "import_path": "./src/features/shop/ProductInfoPanel.stories.tsx",
+      "component_path": "./src/features/shop/ProductInfoPanel.tsx",
+      "uis": [
+        "UIS-ORD-010"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑상세-상품-정보-패널--담기실패",
+      "name": "담기실패",
+      "title": "쇼핑상세/상품 정보 패널",
+      "import_path": "./src/features/shop/ProductInfoPanel.stories.tsx",
+      "component_path": "./src/features/shop/ProductInfoPanel.tsx",
+      "uis": [
+        "UIS-ORD-010"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑상세-상품-정보-패널--담기중",
+      "name": "담기중",
+      "title": "쇼핑상세/상품 정보 패널",
+      "import_path": "./src/features/shop/ProductInfoPanel.stories.tsx",
+      "component_path": "./src/features/shop/ProductInfoPanel.tsx",
+      "uis": [
+        "UIS-ORD-010"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑상세-상품-정보-패널--담기성공",
+      "name": "담기성공",
+      "title": "쇼핑상세/상품 정보 패널",
+      "import_path": "./src/features/shop/ProductInfoPanel.stories.tsx",
+      "component_path": "./src/features/shop/ProductInfoPanel.tsx",
+      "uis": [
+        "UIS-ORD-010"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑상세-상품-정보-패널--바로구매성공",
+      "name": "바로구매성공",
+      "title": "쇼핑상세/상품 정보 패널",
+      "import_path": "./src/features/shop/ProductInfoPanel.stories.tsx",
+      "component_path": "./src/features/shop/ProductInfoPanel.tsx",
+      "uis": [
+        "UIS-ORD-010"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑상세-상품-정보-패널--로그인필요",
+      "name": "로그인필요",
+      "title": "쇼핑상세/상품 정보 패널",
+      "import_path": "./src/features/shop/ProductInfoPanel.stories.tsx",
+      "component_path": "./src/features/shop/ProductInfoPanel.tsx",
+      "uis": [
+        "UIS-ORD-010"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑홈-상품-목록-그리드--결과있음",
+      "name": "결과있음",
+      "title": "쇼핑홈/상품 목록 그리드",
+      "import_path": "./src/features/shop/ProductListGrid.stories.tsx",
+      "component_path": "./src/features/shop/ProductListGrid.tsx",
+      "uis": [
+        "UIS-ORD-009"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑홈-상품-목록-그리드--결과없음-검색어",
+      "name": "결과없음 검색어",
+      "title": "쇼핑홈/상품 목록 그리드",
+      "import_path": "./src/features/shop/ProductListGrid.stories.tsx",
+      "component_path": "./src/features/shop/ProductListGrid.tsx",
+      "uis": [
+        "UIS-ORD-009"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑홈-상품-목록-그리드--결과없음-필터",
+      "name": "결과없음 필터",
+      "title": "쇼핑홈/상품 목록 그리드",
+      "import_path": "./src/features/shop/ProductListGrid.stories.tsx",
+      "component_path": "./src/features/shop/ProductListGrid.tsx",
+      "uis": [
+        "UIS-ORD-009"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑홈-상품-목록-그리드--로딩",
+      "name": "로딩",
+      "title": "쇼핑홈/상품 목록 그리드",
+      "import_path": "./src/features/shop/ProductListGrid.stories.tsx",
+      "component_path": "./src/features/shop/ProductListGrid.tsx",
+      "uis": [
+        "UIS-ORD-009"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑홈-상품-목록-그리드--조회실패",
+      "name": "조회실패",
+      "title": "쇼핑홈/상품 목록 그리드",
+      "import_path": "./src/features/shop/ProductListGrid.stories.tsx",
+      "component_path": "./src/features/shop/ProductListGrid.tsx",
+      "uis": [
+        "UIS-ORD-009"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑상세-조회-실패-안내--상품없음",
+      "name": "상품없음",
+      "title": "쇼핑상세/조회 실패 안내",
+      "import_path": "./src/features/shop/ProductNotFoundNotice.stories.tsx",
+      "component_path": "./src/features/shop/ProductNotFoundNotice.tsx",
+      "uis": [
+        "UIS-ORD-010"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑상세-조회-실패-안내--조회실패",
+      "name": "조회실패",
+      "title": "쇼핑상세/조회 실패 안내",
+      "import_path": "./src/features/shop/ProductNotFoundNotice.stories.tsx",
+      "component_path": "./src/features/shop/ProductNotFoundNotice.tsx",
+      "uis": [
+        "UIS-ORD-010"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑상세-상품정보제공고시--기본",
+      "name": "기본",
+      "title": "쇼핑상세/상품정보제공고시",
+      "import_path": "./src/features/shop/ProductNoticeTable.stories.tsx",
+      "component_path": "./src/features/shop/ProductNoticeTable.tsx",
+      "uis": [
+        "UIS-ORD-010"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑홈-상품-목록-페이지네이션--기본",
+      "name": "기본",
+      "title": "쇼핑홈/상품 목록 페이지네이션",
+      "import_path": "./src/features/shop/ProductPagination.stories.tsx",
+      "component_path": "./src/features/shop/ProductPagination.tsx",
+      "uis": [
+        "UIS-ORD-009"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑홈-상품-목록-페이지네이션--마지막페이지",
+      "name": "마지막페이지",
+      "title": "쇼핑홈/상품 목록 페이지네이션",
+      "import_path": "./src/features/shop/ProductPagination.stories.tsx",
+      "component_path": "./src/features/shop/ProductPagination.tsx",
+      "uis": [
+        "UIS-ORD-009"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑홈-상품-목록-페이지네이션--첫페이지",
+      "name": "첫페이지",
+      "title": "쇼핑홈/상품 목록 페이지네이션",
+      "import_path": "./src/features/shop/ProductPagination.stories.tsx",
+      "component_path": "./src/features/shop/ProductPagination.tsx",
+      "uis": [
+        "UIS-ORD-009"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑셸-qrpopup--열림",
+      "name": "열림",
+      "title": "쇼핑셸/QrPopup",
+      "import_path": "./src/features/shop/QrPopup.stories.tsx",
+      "component_path": "./src/features/shop/QrPopup.tsx",
+      "uis": [
+        "UIS-CMN-003"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑셸-qrpopup--닫힘",
+      "name": "닫힘",
+      "title": "쇼핑셸/QrPopup",
+      "import_path": "./src/features/shop/QrPopup.stories.tsx",
+      "component_path": "./src/features/shop/QrPopup.tsx",
+      "uis": [
+        "UIS-CMN-003"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": [
+        "renders-nothing"
+      ]
+    },
+    {
+      "id": "쇼핑셸-quickbar--비로그인",
+      "name": "비로그인",
+      "title": "쇼핑셸/QuickBar",
+      "import_path": "./src/features/shop/QuickBar.stories.tsx",
+      "component_path": "./src/features/shop/QuickBar.tsx",
+      "uis": [
+        "UIS-CMN-003"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑셸-quickbar--로그인",
+      "name": "로그인",
+      "title": "쇼핑셸/QuickBar",
+      "import_path": "./src/features/shop/QuickBar.stories.tsx",
+      "component_path": "./src/features/shop/QuickBar.tsx",
+      "uis": [
+        "UIS-CMN-003"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑홈-랭킹--인기탭",
+      "name": "인기탭",
+      "title": "쇼핑홈/랭킹",
+      "import_path": "./src/features/shop/RankingSection.stories.tsx",
+      "component_path": "./src/features/shop/RankingSection.tsx",
+      "uis": [
+        "UIS-ORD-008"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑홈-랭킹--가격탭전환",
+      "name": "가격탭전환",
+      "title": "쇼핑홈/랭킹",
+      "import_path": "./src/features/shop/RankingSection.stories.tsx",
+      "component_path": "./src/features/shop/RankingSection.tsx",
+      "uis": [
+        "UIS-ORD-008"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑홈-최근-본-상품--있음",
+      "name": "있음",
+      "title": "쇼핑홈/최근 본 상품",
+      "import_path": "./src/features/shop/RecentlyViewed.stories.tsx",
+      "component_path": "./src/features/shop/RecentlyViewed.tsx",
+      "uis": [
+        "UIS-ORD-008"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑홈-최근-본-상품--없음",
+      "name": "없음",
+      "title": "쇼핑홈/최근 본 상품",
+      "import_path": "./src/features/shop/RecentlyViewed.stories.tsx",
+      "component_path": "./src/features/shop/RecentlyViewed.tsx",
+      "uis": [
+        "UIS-ORD-008"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑상세-함께-보면-좋은-상품--기본",
+      "name": "기본",
+      "title": "쇼핑상세/함께 보면 좋은 상품",
+      "import_path": "./src/features/shop/RelatedProducts.stories.tsx",
+      "component_path": "./src/features/shop/RelatedProducts.tsx",
+      "uis": [
+        "UIS-ORD-010"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑상세-함께-보면-좋은-상품--비어있음",
+      "name": "비어있음",
+      "title": "쇼핑상세/함께 보면 좋은 상품",
+      "import_path": "./src/features/shop/RelatedProducts.stories.tsx",
+      "component_path": "./src/features/shop/RelatedProducts.tsx",
+      "uis": [
+        "UIS-ORD-010"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": [
+        "renders-nothing"
+      ]
+    },
+    {
+      "id": "쇼핑셸-rightrail--최근본상품-3개",
+      "name": "최근본상품 3개",
+      "title": "쇼핑셸/RightRail",
+      "import_path": "./src/features/shop/RightRail.stories.tsx",
+      "component_path": "./src/features/shop/RightRail.tsx",
+      "uis": [
+        "UIS-CMN-003"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "쇼핑셸-rightrail--비어있음",
+      "name": "비어있음",
+      "title": "쇼핑셸/RightRail",
+      "import_path": "./src/features/shop/RightRail.stories.tsx",
+      "component_path": "./src/features/shop/RightRail.tsx",
+      "uis": [
+        "UIS-CMN-003"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": [
+        "renders-nothing"
+      ]
+    },
+    {
+      "id": "쇼핑홈-푸터--기본",
+      "name": "기본",
+      "title": "쇼핑홈/푸터",
+      "import_path": "./src/features/shop/ShopFooter.stories.tsx",
+      "component_path": "./src/features/shop/ShopFooter.tsx",
+      "uis": [
+        "UIS-ORD-008"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "주문서-우편번호-검색--검색전",
+      "name": "검색전",
+      "title": "주문서/우편번호 검색",
+      "import_path": "./src/features/shop/ZipcodeSearchModal.stories.tsx",
+      "component_path": "./src/features/shop/ZipcodeSearchModal.tsx",
+      "uis": [
+        "UIS-ORD-011"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "주문서-우편번호-검색--결과있음",
+      "name": "결과있음",
+      "title": "주문서/우편번호 검색",
+      "import_path": "./src/features/shop/ZipcodeSearchModal.stories.tsx",
+      "component_path": "./src/features/shop/ZipcodeSearchModal.tsx",
+      "uis": [
+        "UIS-ORD-011"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "주문서-우편번호-검색--결과없음",
+      "name": "결과없음",
+      "title": "주문서/우편번호 검색",
+      "import_path": "./src/features/shop/ZipcodeSearchModal.stories.tsx",
+      "component_path": "./src/features/shop/ZipcodeSearchModal.tsx",
+      "uis": [
+        "UIS-ORD-011"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "주문서-우편번호-검색--검색중",
+      "name": "검색중",
+      "title": "주문서/우편번호 검색",
+      "import_path": "./src/features/shop/ZipcodeSearchModal.stories.tsx",
+      "component_path": "./src/features/shop/ZipcodeSearchModal.tsx",
+      "uis": [
+        "UIS-ORD-011"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    },
+    {
+      "id": "주문서-우편번호-검색--조회실패",
+      "name": "조회실패",
+      "title": "주문서/우편번호 검색",
+      "import_path": "./src/features/shop/ZipcodeSearchModal.stories.tsx",
+      "component_path": "./src/features/shop/ZipcodeSearchModal.tsx",
+      "uis": [
+        "UIS-ORD-011"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": [
+        "shows-error"
+      ]
+    },
+    {
+      "id": "design-tokens--tokens",
+      "name": "Tokens",
+      "title": "Design Tokens",
+      "import_path": "./src/styles/DesignTokens.stories.tsx",
+      "component_path": null,
+      "uis": [
+        "UIS-CMN-001"
+      ],
+      "func": [],
+      "linked_by": "tags",
+      "tags": []
+    }
+  ],
+  "by_uis": {
+    "UIS-ORD-001": [
+      "주문-배송상태-배지--출고대기",
+      "주문-배송상태-배지--출고",
+      "주문-배송상태-배지--배송완료",
+      "주문-배송상태-배지--이력없음",
+      "주문-검색-조건--빈조건",
+      "주문-검색-조건--조건입력",
+      "주문-검색-조건--기간역전",
+      "주문-검색-조건--조회중",
+      "주문-주문-요약-카드--집계있음",
+      "주문-주문-요약-카드--결과없음",
+      "주문-주문-요약-카드--조회실패숨김",
+      "주문-주문-목록-그리드--목록있음",
+      "주문-주문-목록-그리드--결과없음",
+      "주문-주문-목록-그리드--조회중",
+      "주문-주문-목록-그리드--조회실패",
+      "주문-주문-목록-그리드--탈퇴회원포함",
+      "주문-주문-목록-그리드--미지의배송코드",
+      "주문-주문-목록-그리드--선택행강조"
+    ],
+    "UIS-MBR-002": [
+      "회원-로그인--기본",
+      "회원-로그인--입력됨",
+      "회원-로그인--제출중",
+      "회원-로그인--실패401",
+      "회원-로그인--잠금429",
+      "회원-로그인--비밀번호토글"
+    ],
+    "UIS-ORD-002": [
+      "주문-주문-상세--기본",
+      "주문-주문-상세--미출고섞임",
+      "주문-주문-상세--배송이력없음",
+      "주문-주문-상세--품목없음",
+      "주문-주문-상세--탈퇴회원",
+      "주문-주문-상세--로딩",
+      "주문-주문-상세--조회실패",
+      "주문-주문-상세--주문없음",
+      "주문-주문-상세--조회실패다시시도"
+    ],
+    "UIS-CMN-002": [
+      "공통-badge--tv상품",
+      "공통-badge--무료배송",
+      "공통-badge--무이자",
+      "공통-badge--live",
+      "공통-badge--할인율",
+      "공통-bottomsheet--열림",
+      "공통-bottomsheet--닫힘",
+      "공통-button--주-기본",
+      "공통-button--주-호버",
+      "공통-button--주-포커스",
+      "공통-button--주-비활성",
+      "공통-button--주-로딩",
+      "공통-button--보조-기본",
+      "공통-button--보조-호버",
+      "공통-button--보조-포커스",
+      "공통-button--보조-비활성",
+      "공통-button--보조-로딩",
+      "공통-button--구매-기본",
+      "공통-button--구매-호버",
+      "공통-button--구매-포커스",
+      "공통-button--구매-비활성",
+      "공통-button--구매-로딩",
+      "공통-emptystate--기본",
+      "공통-emptystate--추천레일포함",
+      "공통-errorstate--기본",
+      "공통-popupcarousel--첫번째",
+      "공통-popupcarousel--마지막",
+      "공통-popupcarousel--오늘은그만보기",
+      "공통-quantitystepper--중간값",
+      "공통-quantitystepper--최솟값",
+      "공통-quantitystepper--최댓값",
+      "공통-quantitystepper--직접입력보정",
+      "공통-skeleton--카드",
+      "공통-skeleton--리스트",
+      "공통-tabs--기본",
+      "공통-tabs--스티키고정",
+      "공통-tabs--배지있는탭",
+      "공통-textinput--기본",
+      "공통-textinput--포커스",
+      "공통-textinput--오류",
+      "공통-textinput--비활성",
+      "공통-toast--기본",
+      "공통-toast--성공",
+      "공통-toast--오류",
+      "공통-toaststack--한개",
+      "공통-toaststack--세개",
+      "공통-toaststack--초과시제거"
+    ],
+    "UIS-MBR-004": [
+      "마이페이지-배송지-삭제-확인--일반삭제확인",
+      "마이페이지-배송지-삭제-확인--기본배송지삭제확인",
+      "마이페이지-배송지-폼--신규",
+      "마이페이지-배송지-폼--수정",
+      "마이페이지-배송지-폼--검증오류",
+      "마이페이지-배송지-목록--목록-0건",
+      "마이페이지-배송지-목록--목록-1건",
+      "마이페이지-배송지-목록--목록-10건상한",
+      "마이페이지-배송지-목록--기본배송지전환중"
+    ],
+    "UIS-MBR-003": [
+      "회원-비밀번호-재설정-2단계-코드--기본",
+      "회원-비밀번호-재설정-2단계-코드--재전송쿨다운끝",
+      "회원-비밀번호-재설정-2단계-코드--코드오류",
+      "회원-비밀번호-재설정-2단계-코드--만료",
+      "회원-비밀번호-재설정-2단계-코드--시도초과",
+      "회원-비밀번호-재설정-4단계-완료--기본",
+      "회원-비밀번호-재설정-3단계-새-비밀번호--기본",
+      "회원-비밀번호-재설정-3단계-새-비밀번호--제출중",
+      "회원-비밀번호-재설정-3단계-새-비밀번호--비밀번호규칙오류",
+      "회원-비밀번호-재설정-1단계-요청--기본",
+      "회원-비밀번호-재설정-1단계-요청--입력됨",
+      "회원-비밀번호-재설정-1단계-요청--제출중",
+      "회원-비밀번호-재설정-1단계-요청--형식오류"
+    ],
+    "UIS-CMN-003": [
+      "쇼핑셸-appshell--pc-1280",
+      "쇼핑셸-appshell--태블릿-1024",
+      "쇼핑셸-appshell--모바일-390",
+      "쇼핑셸-appshell--최근본상품-3개",
+      "쇼핑셸-appshell--최근본상품-0개",
+      "쇼핑셸-appshell--로그인-헤더",
+      "쇼핑셸-appshell--비로그인-헤더",
+      "쇼핑셸-appshell--qr-팝업-열림",
+      "쇼핑셸-bottomtabbar--비로그인",
+      "쇼핑셸-bottomtabbar--로그인",
+      "쇼핑셸-gnbtabs--기본",
+      "쇼핑셸-qrpopup--열림",
+      "쇼핑셸-qrpopup--닫힘",
+      "쇼핑셸-quickbar--비로그인",
+      "쇼핑셸-quickbar--로그인",
+      "쇼핑셸-rightrail--최근본상품-3개",
+      "쇼핑셸-rightrail--비어있음"
+    ],
+    "UIS-ORD-012": [
+      "장바구니-빈-장바구니--빈장바구니",
+      "장바구니-라인아이템--기본",
+      "장바구니-라인아이템--선택해제",
+      "장바구니-라인아이템--수량변경중",
+      "장바구니-라인아이템--재고초과안내",
+      "장바구니-라인아이템--최소수량안내",
+      "장바구니-라인아이템--수량변경실패",
+      "장바구니-합계--전체선택",
+      "장바구니-합계--부분선택",
+      "장바구니-합계--선택없음"
+    ],
+    "UIS-ORD-008": [
+      "쇼핑홈-카테고리-숏컷--기본",
+      "쇼핑홈-gnb--비로그인",
+      "쇼핑홈-gnb--로그인",
+      "쇼핑홈-gnb--장바구니담김",
+      "쇼핑홈-히어로-배너--여러장",
+      "쇼핑홈-히어로-배너--한장",
+      "쇼핑홈-상품-카드--기본",
+      "쇼핑홈-상품-카드--할인",
+      "쇼핑홈-상품-카드--품절",
+      "쇼핑홈-상품-카드--이미지없음",
+      "쇼핑홈-상품-카드--정가없음",
+      "쇼핑홈-상품-카드--이미지있음",
+      "쇼핑홈-상품-카드--할인0퍼센트",
+      "쇼핑홈-상품-카드--이미지로드실패",
+      "쇼핑홈-추천-상품-그리드--목록있음",
+      "쇼핑홈-추천-상품-그리드--빈목록",
+      "쇼핑홈-추천-상품-그리드--로딩",
+      "쇼핑홈-추천-상품-그리드--조회실패",
+      "쇼핑홈-랭킹--인기탭",
+      "쇼핑홈-랭킹--가격탭전환",
+      "쇼핑홈-최근-본-상품--있음",
+      "쇼핑홈-최근-본-상품--없음",
+      "쇼핑홈-푸터--기본"
+    ],
+    "UIS-ORD-011": [
+      "주문서-배송지-입력--기본",
+      "주문서-배송지-입력--입력완료",
+      "주문서-배송지-입력--배송지오류",
+      "주문서-주문-완료--주문완료",
+      "주문서-결제-실패-안내--빈장바구니400",
+      "주문서-결제-실패-안내--회원없음404",
+      "주문서-결제-실패-안내--재고부족409",
+      "주문서-결제-실패-안내--일시적오류",
+      "주문서-상품-요약--주문서기본",
+      "주문서-결제-수단--기본선택",
+      "주문서-결제-수단--계좌이체선택",
+      "주문서-우편번호-검색--검색전",
+      "주문서-우편번호-검색--결과있음",
+      "주문서-우편번호-검색--결과없음",
+      "주문서-우편번호-검색--검색중",
+      "주문서-우편번호-검색--조회실패"
+    ],
+    "UIS-ORD-010": [
+      "쇼핑상세-로딩-스켈레톤--로딩",
+      "쇼핑상세-상세-탭--기본",
+      "쇼핑상세-상세-탭--상품평",
+      "쇼핑상세-상세-탭--상품문의",
+      "쇼핑상세-상세-탭--탭전환",
+      "쇼핑상세-이미지-갤러리--기본",
+      "쇼핑상세-이미지-갤러리--이미지없음",
+      "쇼핑상세-이미지-갤러리--로드실패",
+      "쇼핑상세-상품-정보-패널--기본",
+      "쇼핑상세-상품-정보-패널--할인있음",
+      "쇼핑상세-상품-정보-패널--품절",
+      "쇼핑상세-상품-정보-패널--담기실패",
+      "쇼핑상세-상품-정보-패널--담기중",
+      "쇼핑상세-상품-정보-패널--담기성공",
+      "쇼핑상세-상품-정보-패널--바로구매성공",
+      "쇼핑상세-상품-정보-패널--로그인필요",
+      "쇼핑상세-조회-실패-안내--상품없음",
+      "쇼핑상세-조회-실패-안내--조회실패",
+      "쇼핑상세-상품정보제공고시--기본",
+      "쇼핑상세-함께-보면-좋은-상품--기본",
+      "쇼핑상세-함께-보면-좋은-상품--비어있음"
+    ],
+    "UIS-ORD-009": [
+      "쇼핑홈-상품-목록-필터바--기본",
+      "쇼핑홈-상품-목록-필터바--정렬변경",
+      "쇼핑홈-상품-목록-필터바--재고필터켬",
+      "쇼핑홈-상품-목록-그리드--결과있음",
+      "쇼핑홈-상품-목록-그리드--결과없음-검색어",
+      "쇼핑홈-상품-목록-그리드--결과없음-필터",
+      "쇼핑홈-상품-목록-그리드--로딩",
+      "쇼핑홈-상품-목록-그리드--조회실패",
+      "쇼핑홈-상품-목록-페이지네이션--기본",
+      "쇼핑홈-상품-목록-페이지네이션--마지막페이지",
+      "쇼핑홈-상품-목록-페이지네이션--첫페이지"
+    ],
+    "UIS-CMN-001": [
+      "design-tokens--tokens"
+    ]
+  },
+  "by_func": {
+    "FUNC-order-001": [
+      "주문-배송상태-배지--출고대기",
+      "주문-배송상태-배지--출고",
+      "주문-배송상태-배지--배송완료",
+      "주문-배송상태-배지--이력없음",
+      "주문-검색-조건--빈조건",
+      "주문-검색-조건--조건입력",
+      "주문-검색-조건--기간역전",
+      "주문-검색-조건--조회중",
+      "주문-주문-요약-카드--집계있음",
+      "주문-주문-요약-카드--결과없음",
+      "주문-주문-요약-카드--조회실패숨김",
+      "주문-주문-목록-그리드--목록있음",
+      "주문-주문-목록-그리드--결과없음",
+      "주문-주문-목록-그리드--조회중",
+      "주문-주문-목록-그리드--조회실패",
+      "주문-주문-목록-그리드--탈퇴회원포함",
+      "주문-주문-목록-그리드--미지의배송코드",
+      "주문-주문-목록-그리드--선택행강조"
+    ],
+    "FUNC-member-004": [
+      "회원-로그인--기본",
+      "회원-로그인--입력됨",
+      "회원-로그인--제출중",
+      "회원-로그인--실패401",
+      "회원-로그인--잠금429",
+      "회원-로그인--비밀번호토글"
+    ],
+    "FUNC-order-002": [
+      "주문-주문-상세--기본",
+      "주문-주문-상세--미출고섞임",
+      "주문-주문-상세--배송이력없음",
+      "주문-주문-상세--품목없음",
+      "주문-주문-상세--탈퇴회원",
+      "주문-주문-상세--로딩",
+      "주문-주문-상세--조회실패",
+      "주문-주문-상세--주문없음",
+      "주문-주문-상세--조회실패다시시도"
+    ],
+    "FUNC-member-007": [
+      "회원-비밀번호-재설정-2단계-코드--기본",
+      "회원-비밀번호-재설정-2단계-코드--재전송쿨다운끝",
+      "회원-비밀번호-재설정-2단계-코드--코드오류",
+      "회원-비밀번호-재설정-2단계-코드--만료",
+      "회원-비밀번호-재설정-2단계-코드--시도초과",
+      "회원-비밀번호-재설정-4단계-완료--기본",
+      "회원-비밀번호-재설정-3단계-새-비밀번호--기본",
+      "회원-비밀번호-재설정-3단계-새-비밀번호--제출중",
+      "회원-비밀번호-재설정-3단계-새-비밀번호--비밀번호규칙오류",
+      "회원-비밀번호-재설정-1단계-요청--기본",
+      "회원-비밀번호-재설정-1단계-요청--입력됨",
+      "회원-비밀번호-재설정-1단계-요청--제출중",
+      "회원-비밀번호-재설정-1단계-요청--형식오류"
+    ]
+  },
+  "unlinked": [],
+  "_meta": {
+    "schema": 1,
+    "generated_at": "2026-09-19T21:03:35",
+    "generator": "storybook_index@1",
+    "sources": {
+      "{{SRC_SHOP_WEB}}/storybook-static/index.json": "1789819397027730600:75889|9ff97babbe611b7fe402cb3389518ed3243e5561"
+    }
+  }
+}

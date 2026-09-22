@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sm.lab.shop.dao.ZipcodeDao">
+  <!-- linked_func: FUNC-member-012
+       spec: docs/00_FUNC/stories/STORY-FUNC-member-012.md -->
+
+  <!-- linked_func: FUNC-member-012 — round2 재작업(QA FAIL 필수4): road_address 부분일치는
+       항상 보고, numeric=true면 zipcode 전방일치를 OR로 추가한다(사람 수정 (2) "전방일치로도
+       검색한다" = 추가이지 대체가 아님). 종전 <choose> 배타 구현은 numeric=true일 때
+       road_address를 아예 보지 않아, 시드 zipcode가 전부 "100xx"인 상황에서 q="16" 같은
+       숫자 검색어가 '테헤란로 16길'을 못 찾는 결함이 있었다(D04 재정정 대상).
+       컬럼 명시(no-select-star), road_address 오름차순, LIMIT 50(응답 크기 캡, SR에 없는
+       Dev 판단). -->
+  <select id="search" resultType="com.sm.lab.shop.domain.Zipcode">
+    SELECT zipcode, road_address, sido, sigungu
+      FROM ZIPCODES
+     WHERE (road_address LIKE CONCAT('%', #{q}, '%')
+    <if test="numeric">
+        OR zipcode LIKE CONCAT(#{q}, '%')
+    </if>
+     )
+     ORDER BY road_address ASC
+     LIMIT 50
+  </select>
+
+</mapper>

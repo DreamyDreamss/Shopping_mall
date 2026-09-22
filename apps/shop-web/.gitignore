@@ -1,0 +1,7 @@
+node_modules/
+dist/
+storybook-static/
+*.log
+
+# 타입스크립트 증분 빌드 캐시 — 산출물이라 추적하지 않는다(2026-09-17: 매 SR 축 A에 out_of_scope로 떴다)
+tsconfig.tsbuildinfo

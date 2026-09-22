@@ -1,0 +1,31 @@
+# ── /sl-init 시드 (제품 계약) ──
+.mcp.json
+.sr-worktrees/
+docs/viewer/spec_index.json
+docs/viewer/change_board.json
+docs/viewer/screen_flow.json
+docs/viewer/epics.json
+*.migrated.bak
+*.corrupt.bak
+# ── 실증 랩 추가 ──
+# 대상 소스는 자기 저장소(shop-api)를 갖는다
+modules/
+# 잡 로그·중간 산출물
+_tmp/
+_lab/
+node_modules/
+# 뷰어 번들(플러그인에서 동기화되는 파생물)
+docs/viewer2/
+docs/09_납품/
+.speclinker/model.sqlite
+.speclinker/agentchat.db
+.speclinker/backup/
+
+.speclinker/job_logs/
+.speclinker/app_process.json
+.speclinker/app_*.log
+# 화면 스냅샷 — baseline만 정본, 나머지는 대조 실행 기록(v4.98.1)
+.speclinker/story_shots/current/
+.speclinker/story_shots/diff/
+.speclinker/story_shots/last_compare.json
+out.log

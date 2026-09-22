@@ -1,0 +1,20 @@
+{
+  "title": "SR-229",
+  "stories": [
+    "FUNC-order-002"
+  ],
+  "clarification": "none",
+  "new_funcs": [],
+  "affected": {
+    "inf": [],
+    "sch": [],
+    "uis": [
+      "UIS-ORD-002"
+    ],
+    "bat": []
+  },
+  "story_files": [
+    "src/components/OrderDetailCard.stories.tsx"
+  ],
+  "generated_at": "2026-09-11T13:21:18"
+}

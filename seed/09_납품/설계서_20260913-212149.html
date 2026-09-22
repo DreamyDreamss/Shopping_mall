@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><title>설계서</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm 20mm; }
+  * { box-sizing: border-box; }
+  body { margin: 0; color: #10141c; background: #fff;
+         font-family: "Pretendard", "Malgun Gothic", "Segoe UI", system-ui, sans-serif;
+         font-size: 10.5pt; line-height: 1.65; }
+  .cover { height: 247mm; display: flex; flex-direction: column; page-break-after: always; }
+  .rule { height: 5px; width: 62px; background: #3b5bdb; border-radius: 2px; }
+  .org { margin-top: 40mm; font-size: 9.5pt; letter-spacing: .15em; color: #5c6773; }
+  .title { margin-top: 6mm; font-size: 30pt; font-weight: 800; line-height: 1.25;
+            letter-spacing: -.02em; }
+  .sub { margin-top: 4mm; font-size: 12pt; color: #4a5462; }
+  .chips { margin-top: 8mm; display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip { border: 1px solid #e3e6ea; border-radius: 4px; padding: 3px 8px;
+           font-size: 8.5pt; color: #4a5462; }
+  .facts { margin-top: auto; font-size: 9.5pt; color: #4a5462; }
+  .facts div { display: flex; } .facts span { width: 22mm; color: #5c6773; }
+  .foot { margin-top: 6mm; border-top: 1px solid #e3e6ea; padding-top: 3mm;
+           display: flex; align-items: center; font-size: 8.5pt; color: #5c6773; }
+  .conf { color: #c92a2a; font-weight: 700; letter-spacing: .12em; }
+  h1.part { page-break-before: always; font-size: 19pt; font-weight: 800;
+             border-bottom: 2px solid #3b5bdb; padding-bottom: 3mm; margin: 0 0 7mm; }
+  .toc { page-break-after: always; }
+  .toc h1 { font-size: 19pt; font-weight: 800; border-bottom: 2px solid #3b5bdb;
+             padding-bottom: 3mm; margin: 0 0 7mm; }
+  .toc ol { list-style: none; padding-left: 0; margin: 0; }
+  .toc ol ol { padding-left: 6mm; }
+  .toc-g { font-weight: 700; margin-top: 5mm; }
+  .toc-n { font-weight: 400; color: #5c6773; font-size: 9pt; }
+  .toc li li { font-weight: 400; font-size: 9.5pt; }
+  .toc a { color: #10141c; text-decoration: none; }
+  .doc { page-break-before: always; }
+  .doc h2 { font-size: 14pt; margin: 0 0 4mm; }
+  .doc-name { font-weight: 500; color: #4a5462; }
+  .note { border-left: 3px solid #d29922; background: #fdf6e3; padding: 3mm 4mm;
+           font-size: 9pt; color: #55452a; margin: 0 0 4mm; }
+  h3 { font-size: 11.5pt; margin: 6mm 0 2mm; }
+  h4 { font-size: 10.5pt; margin: 5mm 0 2mm; }
+  table { border-collapse: collapse; width: 100%; margin: 3mm 0; font-size: 9pt; }
+  th, td { border: 1px solid #dfe3e8; padding: 2mm 2.5mm; text-align: left;
+            vertical-align: top; word-break: break-word; }
+  th { background: #f4f6f8; font-weight: 700; }
+  .rev td, .rev th { font-size: 9.5pt; }
+  pre { background: #f6f8fa; border: 1px solid #e3e6ea; border-radius: 4px;
+         padding: 3mm; overflow-wrap: anywhere; white-space: pre-wrap; font-size: 8.5pt; }
+  code { font-family: Consolas, "JetBrains Mono", monospace; }
+  img { max-width: 100%; }
+</style></head><body>
+<div class="cover">
+  <div class="rule"></div>
+  <div class="org">ktds </div>
+  <div class="title">설계서</div>
+  <div class="sub">testshoppingMall</div>
+  <div class="chips"><span class="chip">API 설계서 2</span></div>
+  <div class="facts">
+    <div><span>버전</span>v1.0</div>
+    <div><span>작성일</span>2026-09-13</div>
+    <div><span>작성자</span>이주형</div>
+  </div>
+  <div class="foot"><span class="conf">대외비</span></div>
+</div>
+<div class="toc"><h1>목차</h1><ol><li class="toc-g">API 설계서 <span class="toc-n">2건</span><ol><li><a href="#doc-1">INF-ORD-011 장바구니 조회</a></li><li><a href="#doc-2">INF-ORD-012 장바구니 수량 변경</a></li></ol></li></ol></div>
+<h1 class="part">개정 이력</h1><table class="rev"><tr><th>버전</th><th>일자</th><th>내용</th><th>작성자</th></tr><tr><td>v1.0</td><td>2026-09-13</td><td>최초 작성</td><td></td></tr></table>
+<h1 class="part" id="part-INF">API 설계서</h1><section class="doc" id="doc-1"><h2>INF-ORD-011 <span class="doc-name">장바구니 조회</span></h2><h1 id="inf-ord-011-get-apicart">INF-ORD-011: GET /api/cart/ — 장바구니 조회</h1>
+<blockquote>
+<p><strong>개요:</strong> 회원의 장바구니 품목 전체와 총액을 조회한다.</p>
+<p><strong>근거 소스:</strong> <code>src/main/java/com/sm/lab/shop/controller/CartController.java:28-32</code></p>
+</blockquote>
+<h2 id="_1">요청</h2>
+<ul>
+<li>Method: GET</li>
+<li>Path: /api/cart/</li>
+<li>Content-Type: application/json</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>파라미터</th>
+<th>위치</th>
+<th>타입</th>
+<th>필수</th>
+<th>설명</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>memberId</td>
+<td>Query</td>
+<td>string</td>
+<td>Y</td>
+<td>회원 ID</td>
+</tr>
+</tbody>
+</table>
+<h2 id="200-ok">응답 (200 OK)</h2>
+<pre><code class="language-json">{
+  &quot;items&quot;: [
+    {
+      &quot;memberId&quot;: &quot;string&quot;,
+      &quot;sku&quot;: &quot;string&quot;,
+      &quot;productName&quot;: &quot;string&quot;,
+      &quot;price&quot;: 0,
+      &quot;qty&quot;: 0,
+      &quot;addedAt&quot;: &quot;2026-08-23T10:00:00&quot;,
+      &quot;lineTotal&quot;: 0
+    }
+  ],
+  &quot;totalAmount&quot;: 0
+}
+</code></pre>
+<h2 id="_2">비즈니스 규칙</h2>
+<ul>
+<li>품목은 담은 순(<code>added_at, sku</code>)으로 정렬된다</li>
+<li><code>totalAmount</code>는 각 품목의 <code>price × qty</code>(lineTotal) 합계로, 조회 시점에 애플리케이션에서 계산한다(저장 컬럼 아님)</li>
+</ul>
+<h2 id="_3">오류 응답</h2>
+<table>
+<thead>
+<tr>
+<th>코드</th>
+<th>사유</th>
+<th>발생 조건</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>404</td>
+<td>회원 없음</td>
+<td>memberId로 조회된 회원 없음</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_4">참조 테이블</h2>
+<table>
+<thead>
+<tr>
+<th>테이블</th>
+<th>SCH</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CART_ITEMS</td>
+<td>[[SCH-ORD-006]]</td>
+</tr>
+<tr>
+<td>PRODUCTS</td>
+<td>[[SCH-ORD-005]]</td>
+</tr>
+<tr>
+<td>MEMBERS</td>
+<td>[[SCH-ORD-001]]</td>
+</tr>
+</tbody>
+</table>
+<h2 id="curl">curl 예시</h2>
+<pre><code class="language-bash">curl -X GET &quot;/api/cart/?memberId=M001&quot; \
+  -H &quot;Content-Type: application/json&quot;
+</code></pre></section><section class="doc" id="doc-2"><h2>INF-ORD-012 <span class="doc-name">장바구니 수량 변경</span></h2><h1 id="inf-ord-012-patch-apicartitemssku">INF-ORD-012: PATCH /api/cart/items/{sku} — 장바구니 수량 변경</h1>
+<blockquote>
+<p><strong>개요:</strong> 장바구니에 담긴 품목의 수량을 변경한다.</p>
+<p><strong>근거 소스:</strong> <code>src/main/java/com/sm/lab/shop/controller/CartController.java:34-39</code></p>
+</blockquote>
+<h2 id="_1">요청</h2>
+<ul>
+<li>Method: PATCH</li>
+<li>Path: /api/cart/items/{sku}</li>
+<li>Content-Type: application/json</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>파라미터</th>
+<th>위치</th>
+<th>타입</th>
+<th>필수</th>
+<th>설명</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>sku</td>
+<td>PathVariable</td>
+<td>string</td>
+<td>Y</td>
+<td>상품 SKU</td>
+</tr>
+<tr>
+<td>memberId</td>
+<td>Query</td>
+<td>string</td>
+<td>Y</td>
+<td>회원 ID</td>
+</tr>
+<tr>
+<td>qty</td>
+<td>Body</td>
+<td>int</td>
+<td>Y</td>
+<td>변경할 수량 (1 이상)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="200-ok">응답 (200 OK)</h2>
+<pre><code class="language-json">{
+  &quot;memberId&quot;: &quot;string&quot;,
+  &quot;sku&quot;: &quot;string&quot;,
+  &quot;productName&quot;: &quot;string&quot;,
+  &quot;price&quot;: 0,
+  &quot;qty&quot;: 0,
+  &quot;addedAt&quot;: &quot;2026-08-23T10:00:00&quot;,
+  &quot;lineTotal&quot;: 0
+}
+</code></pre>
+<h2 id="_2">비즈니스 규칙</h2>
+<ul>
+<li>qty &lt; 1은 400으로 거부한다 — 삭제는 명시적 DELETE로만 수행(실수 삭제 방지)</li>
+<li>요청 qty가 상품 재고를 초과하거나 상품이 품절(stock_qty=0)이면 409</li>
+</ul>
+<h2 id="_3">트랜잭션 순서</h2>
+<ol>
+<li>CART_ITEMS UPDATE(qty 변경)</li>
+<li>CART_ITEMS SELECT(변경 결과 반환용, 상품명·현재 단가 조인)</li>
+</ol>
+<h2 id="_4">오류 응답</h2>
+<table>
+<thead>
+<tr>
+<th>코드</th>
+<th>사유</th>
+<th>발생 조건</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>400</td>
+<td>유효성 실패</td>
+<td>qty &lt; 1</td>
+</tr>
+<tr>
+<td>404</td>
+<td>장바구니 품목 없음</td>
+<td>memberId+sku 조합의 품목 없음</td>
+</tr>
+<tr>
+<td>404</td>
+<td>상품 없음</td>
+<td>sku로 조회된 상품 없음</td>
+</tr>
+<tr>
+<td>409</td>
+<td>재고 초과/품절</td>
+<td>요청 qty가 가용 재고 초과 또는 상품 품절</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_5">참조 테이블</h2>
+<table>
+<thead>
+<tr>
+<th>테이블</th>
+<th>SCH</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CART_ITEMS</td>
+<td>[[SCH-ORD-006]]</td>
+</tr>
+<tr>
+<td>PRODUCTS</td>
+<td>[[SCH-ORD-005]]</td>
+</tr>
+</tbody>
+</table>
+<h2 id="curl">curl 예시</h2>
+<pre><code class="language-bash">curl -X PATCH &quot;/api/cart/items/SKU001?memberId=M001&quot; \
+  -H &quot;Content-Type: application/json&quot; \
+  -d '{&quot;qty&quot;:3}'
+</code></pre></section>
+</body></html>

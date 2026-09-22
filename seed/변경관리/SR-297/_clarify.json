@@ -1,0 +1,171 @@
+{
+  "generated_at": "2026-09-16T03:55:37",
+  "generator": "build_clarify@1",
+  "types": [
+    "api",
+    "batch",
+    "db"
+  ],
+  "items": [
+    {
+      "id": "scope_freeze",
+      "type": "common",
+      "required": true,
+      "state": "확정",
+      "question": "이번 SR에서 하는 것과 명시적으로 빼는 것은 무엇인가?",
+      "hint": "범위가 문장으로 고정돼야 승인 이후 scope 검증(대조 검증)이 기준을 갖는다",
+      "options": [],
+      "proposed": "포함: SR-234 FUNC-member-008 QA medium 이월. 무인증 경로 /api/members/password-resets/codes에 target별 60초 쿨다운만 있다 — 일일 상한(가입 API MEMBER_SIGNUP_RATE_LIMITS와 같은 모양)과 만료 행 정리 배치(일 1회)를 추가한다. 회귀: 항상 202·존재 오라클 없음 유지. / 제외: 요구 본문에 적히지 않은 것 전부",
+      "evidence": "00_요구사항.md §요구 요지",
+      "proposed_by": "clarify_prefill@1",
+      "answer": "포함: ① POST /api/members/password-resets/codes에 target별 일일 요청 상한 5회 — 전용 카운터 테이블(target, day_key PK) 단일 UPSERT 원자 판정, 가입 MEMBER_SIGNUP_RATE_LIMITS와 같은 모양 ② 만료 행 정리 배치(일 1회 @Scheduled) — 만료된 재설정 코드 행·지난 날짜 카운터 행. 제외: 쿨다운 60초 값, 재설정 확정 API, 가입 API·가입 정리 배치, 화면.",
+      "by": "viewer",
+      "at": "2026-09-16T02:23:06"
+    },
+    {
+      "id": "regression_keep",
+      "type": "common",
+      "required": true,
+      "state": "확정",
+      "question": "반드시 유지돼야 하는 기존 동작(회귀 범위)은 무엇인가?",
+      "hint": "회귀 TC의 근거 — \"기존과 동일\"이 구체적으로 무엇인지",
+      "options": [
+        "기존 조회 결과 전부",
+        "특정 화면/API만(명시)"
+      ],
+      "answer": "코드 요청은 상한 초과·쿨다운·미가입 대상 모두 항상 202(존재 오라클 없음, 응답 본문 동일) · 상한 이내 발급·확정 흐름 불변 · 가입 레이트리밋·가입 정리 배치 불변.",
+      "by": "viewer",
+      "at": "2026-09-16T02:23:10"
+    },
+    {
+      "id": "api_compat",
+      "type": "api",
+      "required": true,
+      "state": "확정",
+      "question": "기존 클라이언트와의 하위호환이 필요한가?",
+      "hint": "필드 추가만인지, 형식·의미 변경(호환 파괴)이 있는지",
+      "options": [
+        "필요 — 필드 추가만",
+        "호환 파괴 있음(마이그레이션 계획 필요)"
+      ],
+      "proposed": "필요 — 필드 추가만(기존 호출 그대로 동작)",
+      "evidence": "본문에 추가/필터/파라미터 단서, 삭제·형식 변경 단서 없음 · 대상 INF-MBR-001, INF-MBR-002, INF-MBR-003, INF-MBR-004, INF-MBR-005, INF-MBR-006, INF-MBR-007, INF-MBR-008, INF-MBR-010, INF-ORD-001, INF-ORD-002, INF-ORD-003, INF-ORD-004, INF-ORD-005, INF-ORD-006, INF-ORD-007, INF-ORD-014, INF-ORD-015, INF-ORD-010, INF-ORD-011",
+      "proposed_by": "clarify_prefill@1",
+      "answer": "필요 — 요청·응답 형식 변경 없음. 상한 초과도 202(발송만 생략).",
+      "by": "viewer",
+      "at": "2026-09-16T02:23:14"
+    },
+    {
+      "id": "api_error",
+      "type": "api",
+      "required": true,
+      "state": "확정",
+      "question": "오류 응답 계약(코드·메시지)은 무엇인가?",
+      "hint": "실패 케이스별 HTTP 상태·오류 코드 — TC가 이 계약을 검증한다",
+      "options": [],
+      "answer": "변경 없음 — 새 오류 응답을 만들지 않는다(상한 초과는 202로 흡수, 서버 로그만 남김).",
+      "by": "viewer",
+      "at": "2026-09-16T02:23:18"
+    },
+    {
+      "id": "bat_idempotent",
+      "type": "batch",
+      "required": true,
+      "state": "확정",
+      "question": "배치 실행 주기와 재실행(중복 실행) 멱등성은?",
+      "hint": "실패 후 재실행 시 이중 처리 방지 방법",
+      "options": [],
+      "answer": "일 1회(새벽, 주기는 설정값). 조건부 DELETE(만료 시각 < 지금, day_key < 오늘)라 재실행·중복 실행해도 결과 동일(멱등). 요청 경로 트랜잭션과 분리.",
+      "by": "viewer",
+      "at": "2026-09-16T02:23:22"
+    },
+    {
+      "id": "db_ripple",
+      "type": "db",
+      "required": true,
+      "state": "확정",
+      "question": "타 도메인 테이블·집계(정산·통계류)에 파급이 있는가?",
+      "hint": "이 테이블을 참조하는 다른 도메인의 쿼리·배치 — CIA 관찰 조인 확인",
+      "options": [
+        "없음",
+        "있음 — 범위 명시"
+      ],
+      "answer": "신규 전용 카운터 테이블 1개 추가(가입 MEMBER_SIGNUP_RATE_LIMITS와 같은 모양) — 기존 MEMBER_PASSWORD_RESETS는 정리 배치의 조건부 DELETE 대상일 뿐 스키마·다른 도메인 참조 변경 없음.",
+      "by": "viewer",
+      "at": "2026-09-16T03:23:34"
+    },
+    {
+      "id": "db_migration",
+      "type": "db",
+      "required": true,
+      "state": "확정",
+      "question": "기존 데이터 이관·백필이 필요한가?",
+      "hint": "새 컬럼의 기존 행 값, 제약 변경 시 위반 데이터 처리",
+      "options": [
+        "불필요(신규 데이터만)",
+        "필요 — 이관 스크립트"
+      ],
+      "answer": "이관·백필 불필요 — 신규 테이블은 빈 상태로 시작(오늘 카운트 0부터). 기존 행은 배치가 만료분만 정리.",
+      "by": "viewer",
+      "at": "2026-09-16T03:23:38"
+    },
+    {
+      "id": "scr_scope",
+      "type": "screen",
+      "required": true,
+      "state": "해당없음",
+      "question": "변경 대상 화면이 전부 나열됐는가? (누락 화면 없음 확인)",
+      "hint": "같은 데이터를 쓰는 다른 화면(목록/상세/팝업)이 함께 바뀌어야 하는지",
+      "options": [
+        "나열된 화면이 전부",
+        "추가 화면 있음(명시)"
+      ],
+      "answer": "해당 없음 — 서버 전용 SR — 화면 변경 없음(범위 확정 문답의 '제외: 화면'이 유형 신호로 오감지된 문답, RUN13 수리)",
+      "by": "viewer",
+      "at": "2026-09-16T03:23:25"
+    },
+    {
+      "id": "scr_empty_state",
+      "type": "screen",
+      "required": true,
+      "state": "해당없음",
+      "question": "빈 값·오류 상태의 화면 표기는 무엇인가?",
+      "hint": "데이터 없음/권한 없음/로딩 실패 시 사용자에게 보일 것",
+      "options": [],
+      "answer": "해당 없음 — 서버 전용 SR — 화면 변경 없음(범위 확정 문답의 '제외: 화면'이 유형 신호로 오감지된 문답, RUN13 수리)",
+      "by": "viewer",
+      "at": "2026-09-16T03:23:28"
+    },
+    {
+      "id": "scr_states",
+      "type": "screen",
+      "required": true,
+      "state": "해당없음",
+      "question": "이 변경으로 생기거나 바뀌는 화면 상태 중 스토리(상태별 실물)로 남길 것은 무엇인가?",
+      "hint": "예: 목록 있음/0건/조회 실패/권한 없음. 대상에 스토리북이 없으면 \"해당없음\" — 화면설계서 §5 표시 조건이 정본",
+      "options": [
+        "모든 표시 조건(§5)을 스토리로",
+        "바뀌는 상태만",
+        "해당없음(스토리북 미사용)"
+      ],
+      "answer": "해당 없음 — 서버 전용 SR — 화면 변경 없음(범위 확정 문답의 '제외: 화면'이 유형 신호로 오감지된 문답, RUN13 수리)",
+      "by": "viewer",
+      "at": "2026-09-16T03:23:30"
+    },
+    {
+      "id": "db_readers",
+      "type": "db",
+      "required": true,
+      "state": "확정",
+      "question": "이 SR이 바꾸는 테이블을 읽는 다른 API(INF-MBR-007)의 결과·오류 판정이 달라지는가?",
+      "hint": "행 삭제·값 갱신이 그 API의 존재·만료·상태 판정(오류 코드)을 바꾸는지 — SCH `inf:` 역참조",
+      "options": [
+        "달라지지 않음(근거 명시)",
+        "달라짐 — 계약·범위 명시"
+      ],
+      "answer": "달라짐 — 확정 API(INF-MBR-007)는 행이 남아 있으면 만료 410(MBR-4101), 없으면 오답 409(MBR-4102)로 판정한다. 정리 배치는 만료 후 7일(설정값) 지난 행만 지워 7일 이내 만료 코드 확정은 기존 410 유지, 7일 초과 뒤 409는 알려진 동작으로 INF-MBR-007·BAT-MBR-001에 명시(SR-297 #1 QA 회신과 같은 결정).",
+      "by": "viewer",
+      "at": "2026-09-16T03:55:06"
+    }
+  ]
+}

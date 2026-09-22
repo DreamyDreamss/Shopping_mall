@@ -1,0 +1,38 @@
+{
+  "schema": 2,
+  "sr": "SR-300",
+  "title": "SR-300",
+  "clarification": "none",
+  "affected": {
+    "inf": [
+      "INF-ORD-003"
+    ],
+    "sch": [],
+    "uis": [],
+    "bat": []
+  },
+  "new_specs": [],
+  "items": [
+    {
+      "n": 1,
+      "title": "GET /api/orders — 주문 목록 조회",
+      "specs": {
+        "uis": [],
+        "inf": [
+          "INF-ORD-003"
+        ],
+        "sch": [],
+        "bat": []
+      },
+      "new_specs": [],
+      "module": null,
+      "origin": "auto:inf"
+    }
+  ],
+  "item_seq": 1,
+  "stories": [
+    "SR-300.1"
+  ],
+  "story_files": [],
+  "generated_at": "2026-09-19T14:42:38"
+}

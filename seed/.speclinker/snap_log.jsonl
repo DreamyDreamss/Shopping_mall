@@ -1,0 +1,6 @@
+{"op": "capture", "name": "api", "base": "http://localhost:8087", "urls": 9, "bad": 0, "force": true, "ts": "2026-09-12T12:55:49"}
+{"op": "compare", "name": "api", "base": "http://localhost:8087", "urls": 9, "same": 5, "diff_total": 9, "verdict": "fail", "ts": "2026-09-16T06:31:43"}
+{"op": "compare", "name": "api", "base": "http://localhost:8087", "urls": 9, "same": 5, "diff_total": 9, "verdict": "fail", "ts": "2026-09-16T06:31:51"}
+{"op": "capture", "name": "api", "base": "http://localhost:8087", "urls": 9, "bad": 0, "force": true, "ts": "2026-09-16T06:32:54"}
+{"op": "compare", "name": "api", "base": "http://localhost:8087", "urls": 9, "same": 9, "diff_total": 0, "verdict": "pass", "ts": "2026-09-16T06:32:54"}
+{"op": "compare", "name": "api", "base": "http://localhost:8087", "urls": 9, "same": 7, "diff_total": 12, "verdict": "fail", "ts": "2026-09-20T22:09:27"}

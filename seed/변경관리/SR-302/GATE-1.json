@@ -1,0 +1,790 @@
+{
+  "func": "SR-302.1",
+  "epic": "SR-302",
+  "story": "docs/변경관리/SR-302/STORY-1.md",
+  "gate": "CONCERNS",
+  "reviewer": "qa-agent",
+  "updated": "2026-09-17T02:16:35",
+  "layers": {
+    "spec": "pass",
+    "security": "pass",
+    "regression": "pass",
+    "baseline": "pass",
+    "scope": "pass",
+    "rules": "concerns",
+    "stories": "pass",
+    "conformance": "pass"
+  },
+  "top_issues": [
+    {
+      "severity": "low",
+      "layer": "regression",
+      "finding": "npm run test-storybook 미실행 — 신규 스토리 10건(특히 RankingSection.stories.tsx:가격탭전환의 play)이 한 번도 렌더 검증되지 않음(사람이 범위 밖으로 명시, 추적만)",
+      "suggested_action": "화면 상태 기준선 재측정 전에 test-storybook 1회 실행"
+    },
+    {
+      "severity": "low",
+      "layer": "spec",
+      "finding": "Gnb.tsx:39 장바구니 span(role=generic)의 aria-label·aria-hidden 배지로 수량 정보가 보조기술에 안 나오고, Gnb.tsx:27 aria-haspopup은 열 팝업이 없음(재작업 지시 3 — 사람 코멘트 미포함으로 미반영)",
+      "suggested_action": "role=\"img\" 부여 또는 시각적 숨김 텍스트로 수량 노출 · aria-haspopup 제거"
+    },
+    {
+      "severity": "low",
+      "layer": "regression",
+      "finding": "applyShopBootRedirect()가 window.location.hash 대입이라 히스토리 항목이 하나 쌓임 — /shop 최초 진입 후 뒤로가기 1회는 사이트를 벗어나지 않고 주문 목록으로 간다(사람 지시 원문 '세팅한다'를 그대로 따른 결과, 규칙 위반 아님)",
+      "suggested_action": "항목을 남기지 않으려면 location.replace('#/shop') 또는 history.replaceState로 교체 검토"
+    },
+    {
+      "severity": "low",
+      "layer": "regression",
+      "finding": "main.tsx가 render 이전에 applyShopBootRedirect()를 호출한다는 배선 자체를 검증하는 테스트가 없다(테스트는 함수를 직접 호출해 부팅을 재현) · 뒤로가기 실물 동작도 jsdom 한계로 '해시가 이미 있는 상태' 재현으로 대체",
+      "suggested_action": "후속 TODO — main.tsx 배선은 육안 유지, E2E/수동 확인 시 뒤로가기 경로 1회 점검"
+    },
+    {
+      "severity": "low",
+      "layer": "regression",
+      "finding": "서버 마운트 번들(shop-api/target/classes/static/shop/index.html·shop-web/dist 둘 다 00:33)이 SR-302 구현 이전 산출물이라 이번 진입 규칙은 재빌드·배치 뒤에야 실환경에서 확인된다(현 배포본엔 round1 회귀도 없어 라이브 피해 없음)",
+      "suggested_action": "릴리스 단계에서 npm run build + shop-api static 재배치 후 /shop 진입 1회 확인"
+    },
+    {
+      "severity": "low",
+      "layer": "security",
+      "finding": "/api/products가 ApiKeyAuthFilter.isOpenRoute에 없어 shop-api가 서빙하는 /shop 환경에서는 비로그인 상품 조회가 401(사람이 별도 SR로 분리한 항목, 이번에도 미접촉 확인)",
+      "suggested_action": "후속 SR에서 공개 화이트리스트 등록 여부 결정"
+    },
+    {
+      "severity": "low",
+      "layer": "scope",
+      "finding": "소속 불명(막지 않음): modules/shop-api/pom.xml — 완료 항목 SR-301.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+      "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+    },
+    {
+      "severity": "low",
+      "layer": "scope",
+      "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java — 완료 항목 QUICK-20260915-1.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+      "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+    },
+    {
+      "severity": "low",
+      "layer": "scope",
+      "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/controller/ShopIndexController.java — 완료 항목 SR-301.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+      "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+    },
+    {
+      "severity": "low",
+      "layer": "scope",
+      "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/web/ShopStaticResourceConfig.java — 완료 항목 SR-301.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+      "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+    },
+    {
+      "severity": "low",
+      "layer": "scope",
+      "finding": "소속 불명(막지 않음): modules/shop-web/vite.config.ts — 완료 항목 SR-301.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+      "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+    },
+    {
+      "severity": "medium",
+      "layer": "rules",
+      "finding": "규칙 위반 [lab/file-size-cap/java-file-cap] modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java:0 — 자바 파일 450줄 초과 — 책임을 나눈다(필터·핸들러·서비스가 한 파일에 자라면 QA가 스코프를 못 가른다)",
+      "suggested_action": "규칙을 지키도록 고치거나, 규칙이 틀렸으면 SpecLens /rules에서 규칙을 고치세요"
+    },
+    {
+      "severity": "low",
+      "layer": "stories",
+      "finding": "고친 화면 부품에 스토리가 없습니다: src/App.test.tsx",
+      "suggested_action": "그 부품의 상태를 스토리로 남기세요 — 없으면 다음 사람이 그 상태를 볼 방법이 없습니다. 차단하려면 하네스 규칙 `story-per-component`(pair 검사)를 채택하세요(/rules 제안 탭) — 축 C가 must로 막습니다"
+    },
+    {
+      "severity": "low",
+      "layer": "stories",
+      "finding": "고친 화면 부품에 스토리가 없습니다: src/App.tsx",
+      "suggested_action": "그 부품의 상태를 스토리로 남기세요 — 없으면 다음 사람이 그 상태를 볼 방법이 없습니다. 차단하려면 하네스 규칙 `story-per-component`(pair 검사)를 채택하세요(/rules 제안 탭) — 축 C가 must로 막습니다"
+    },
+    {
+      "severity": "low",
+      "layer": "stories",
+      "finding": "고친 화면 부품에 스토리가 없습니다: src/main.tsx",
+      "suggested_action": "그 부품의 상태를 스토리로 남기세요 — 없으면 다음 사람이 그 상태를 볼 방법이 없습니다. 차단하려면 하네스 규칙 `story-per-component`(pair 검사)를 채택하세요(/rules 제안 탭) — 축 C가 must로 막습니다"
+    },
+    {
+      "severity": "low",
+      "layer": "conformance",
+      "finding": "디스패치 입력이 'SR-302.1로 분류된 파일 32개'라 했으나, shop-web 자체 git(별도 저장소)의 git status --porcelain -uall로 직접 센 SR-302 관련 변경 파일은 26개(수정 4: App.tsx·api.ts·main.tsx·types.ts + 신규 22: App.test.tsx·ShopHomePage.tsx/test.tsx·features/shop 하위 19개)다. vite.config.ts·tsconfig.tsbuildinfo도 shop-web에서 M 상태지만 diff 내용(vite base:'/shop/' 설정)이 주석상 SR-301(INF-ORD-017) 귀속으로 명시돼 있어 SR-302분에서 제외했다. scope_verify.py의 실제 32개 파일 목록(JSON)이 디스패치에 원문으로 포함되지 않아 1:1 대조는 못했다 — 분류 자체(축 A)는 재판정 대상이 아니므로 게이트에 반영하지 않는다.",
+      "suggested_action": "필요시 scope_verify.py 실행 로그의 classified 파일 목록을 보존해 다음 검증에서 직접 대조 가능하게 한다.",
+      "confidence": "low"
+    },
+    {
+      "severity": "low",
+      "layer": "conformance",
+      "finding": "QA round1~3이 이미 기록·추적 중인 low 항목(Gnb.tsx:27 aria-haspopup 불일치, Gnb.tsx:39/43 장바구니 span의 aria-label 노출 불확실성, test-storybook 미실행, /api/products 401 비프록시 환경)을 diff에서도 그대로 재확인했다 — round3 PASS 결정에 이미 반영된 '범위 밖/후속 추적' 항목이라 새 finding이 아니라 참고용으로만 남긴다.",
+      "suggested_action": "STEP 5.5 재동기화 또는 후속 SR에서 기존 추적 그대로 처리.",
+      "confidence": "high"
+    }
+  ],
+  "rounds": [
+    {
+      "round": 1,
+      "gate": "CONCERNS",
+      "human": {
+        "decision": "rework",
+        "by": "사람",
+        "at": "2026-09-17T01:37:29",
+        "comment": "QA CONCERNS 권고 중 아래 항목만 이번 라운드에서 함께 고친다(사람 결정):\n\n[고칠 것]\n1) /shop 진입점 — 현재 실제 URL은 /shop#/shop이라 #/shop으로 가는 링크가 없어 아무도 쇼핑 홈에 못 들어간다. SPA가 /shop 경로 아래에 마운트됐고 해시가 비어 있으면 최초 진입 시 #/shop(쇼핑 홈)으로 리다이렉트한다. 주문 목록(# 없는 루트, 기존 사용자 경로)은 바뀌지 않는다.\n2) 로그아웃이 서버 세션을 폐기하지 않음(ShopHomePage.tsx:66) — clearSession() 전에 기존 POST /api/members/sessions/logout을 호출해 서버 토큰을 폐기한다. 그 호출이 실패해도 로컬 세션은 정리한다(네트워크 실패로 로그아웃 자체가 막히면 안 됨).\n3) GNB 장바구니 죽은 링크(Gnb.tsx:36, href=\"#/cart\") — 라우트를 만들지 말고 링크를 비활성(회색 처리 + title=\"준비 중\")으로 바꾼다. 장바구니 화면은 SR-305에서 만든다.\n5) low: 재시도 버튼 연타 시 중복 요청 방지(in-flight 가드).\n6) low: 랭킹 순위 숫자에 aria-hidden 제거(스크린리더 접근성).\n\n[이번에 안 고치는 것 — 별도 SR]\n4) shop-api 서빙 환경(:8087/shop)에서 GET /api/products 401(ApiKeyAuthFilter.isOpenRoute 미등록) — 서버 인증 정책 변경이라 범위 밖. 사람이 별도 SR로 접수한다(공개 조회 엔드포인트).\nlow: test-storybook 미실행 신규 스토리 10건 검증, aria-haspopup 불일치 — 이번 라운드에 포함하지 않음(추적만).\n\n[테스트 추가]\n- /shop 마운트 시 해시 없이 들어오면 쇼핑 홈(ShopHomePage)이 렌더되는지.\n- 로그아웃 클릭 시 logout API가 호출되고, 그 API가 실패해도 로컬 세션이 지워지는지.\n- 재시도 버튼 연타 시 요청이 한 번만 나가는지.\n- 기존 shop-web 47건 전부 통과 유지가 완료 조건.",
+        "targets": []
+      },
+      "layers": {
+        "spec": "concerns",
+        "security": "concerns",
+        "regression": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "spec",
+          "finding": "확정문답의 '경로 /shop'로 들어가면 쇼핑 홈이 아니라 주문 목록(HashRouter 기본 '#/')이 뜬다. 실제 URL은 '/shop#/shop'이고, '#/shop'로 가는 진입 링크가 앱 어디에도 없어 손으로 URL을 치지 않으면 새 화면에 도달할 수 없다(SR-301이 만든 서버 진입점과 이번 클라이언트 라우트의 합성 결과 — 계획이 따지지 않은 지점).",
+          "suggested_action": "'#/'를 쇼핑 홈으로 둘지·'/shop' 진입 시 '#/shop'으로 리다이렉트할지·진입 링크를 어디에 둘지 이번 라운드에 결정한다(다음 화면 SR들이 같은 판단을 반복하지 않도록). 서버 진입점 확인에는 shop-web 재빌드+배치가 선행된다."
+        },
+        {
+          "severity": "medium",
+          "layer": "security",
+          "finding": "GNB 로그아웃(ShopHomePage.tsx:66)이 clearSession()만 호출하고 기존 POST /api/members/sessions/logout(INF-MBR-004, apiKey+refreshToken 전량 폐기)을 부르지 않아, 로그아웃 후에도 해당 세션 토큰이 만료까지 서버에서 유효하다. 이 버튼이 SPA 최초의 사용자용 로그아웃이다(PasswordResetPage의 clearSession은 서버가 이미 폐기한 뒤의 로컬 정리라 성격이 다르다).",
+          "suggested_action": "로그아웃 시 기존 logout API를 호출한다(신규 API가 아니라 /api/cart 재사용과 동일한 성격). 필터 화이트리스트 밖이라 세션의 apiKey를 X-Api-Key로 실어 보내는 배선 결정이 필요하다."
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "Gnb.tsx:36의 장바구니 아이콘이 href=\"#/cart\"로 링크하는데 App.tsx에 /cart 라우트가 없어, 클릭하면 <Routes>가 아무것도 렌더하지 않아 빈 화면이 되고 뒤로가기 외에 복귀 경로가 없다. 상품 카드 클릭은 같은 이유(장바구니·상세 화면 범위 밖)로 이동하지 않게 해 놓고 장바구니 아이콘만 링크로 남았다.",
+          "suggested_action": "장바구니 SR 전까지 링크를 걷어내 표시 전용으로 두거나 미구현 안내를 띄운다."
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "ApiKeyAuthFilter.isOpenRoute에 /api/products가 없어(실측), shop-api가 서빙하는 진짜 진입점(:8087/shop)에서는 브라우저가 X-Api-Key 없이 호출해 401이 나고 화면이 '불러오지 못했습니다'만 보인다. 지금 동작하는 것은 vite dev 프록시(:5273)가 admin 키를 폴백 주입하기 때문이다. 이 SR이 만든 결함은 아니나(/api/orders도 동일) '로그인 없이 접근 가능한 공개 커머스 홈'이라는 이번 AC가 그 환경에서 충족되지 않는다.",
+          "suggested_action": "/product/** 화면 경로가 이미 무인증인 것과 일관되게 /api/products를 공개 화이트리스트로 올릴지, SPA가 세션 apiKey를 실어 보내게 할지 결정한다(서버 변경이라 이 항목 범위 밖 — 후속 SR 후보로 명시)."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "랭킹 순위 숫자가 aria-hidden=\"true\"(RankingSection.tsx:54)라 스크린리더에 순위 정보가 전달되지 않는다 — 확정문답의 '순위 숫자'가 시각 사용자에게만 존재한다.",
+          "suggested_action": "aria-hidden을 걷어내거나 '1위' 형태의 텍스트 대안을 제공한다(후속 TODO)."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "ShopHomePage.load()에 in-flight 가드가 없어 [다시 시도] 연타 시 늦게 도착한 응답이 이긴다(last-write-wins). 읽기 전용이라 피해는 표시 지연뿐.",
+          "suggested_action": "후속 TODO — 요청 세대 카운터나 AbortController로 늦은 응답을 버린다."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "npm run test-storybook이 실행되지 않아(npm test = 타입체크+jest만) 신규 스토리 10개, 특히 play 상호작용이 있는 RankingSection.stories.tsx:가격탭전환이 한 번도 렌더 검증되지 않았다.",
+          "suggested_action": "화면 상태 기준선 재측정 전에 test-storybook을 1회 실행해 콘솔 오류 없이 렌더되는지 확인한다."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "Gnb.tsx:27의 '카테고리' 버튼이 aria-haspopup=\"true\"인데 열 팝업이 없다(메뉴는 범위 밖) — 보조기술에 없는 기능을 약속한다.",
+          "suggested_action": "속성을 제거하거나 비활성 표시로 둔다."
+        }
+      ],
+      "cause": "plan_gap"
+    },
+    {
+      "round": 2,
+      "gate": "FAIL",
+      "human": {
+        "decision": "rework",
+        "by": "사람",
+        "at": "2026-09-17T01:51:57",
+        "comment": "QA FAIL round 2 재작업 지시(사람 결정):\n\n[1. 라우트 되돌림 — 회귀 위반 수정]\nApp.tsx의 \"/\" 라우트 element를 <Navigate to=\"/shop\"/>로 치환한 방식을 되돌린다. \"/\" 라우트는 다시 <OrderListPage/> 그대로(회귀 원상복구).\n대신 앱 부팅 시(라우터 렌더 이전) 1회만: location.pathname이 /shop 이거나 /shop/로 시작하고, location.hash가 비어 있을 때만 location.hash를 \"#/shop\"으로 세팅한다. 컴포넌트/라우트 레벨의 상시 리다이렉트가 아니라 부팅 시 1회성 사이드이펙트로 구현할 것 — 그 뒤 사용자가 #/ 로 이동하면 반드시 주문 목록이 떠야 한다(뒤로가기·링크 클릭 등 모든 경로 포함).\n\n[2. in-flight 가드 테스트 보강]\n현재 테스트는 재시도 버튼이 클릭 직후 DOM에서 사라지는 구조 때문에 2·3번째 fireEvent가 빈 노드에 발사돼 가드를 검증하지 못한다(가드를 지워도 통과). 실패 응답을 지연(pending promise)시켜 버튼이 화면에 남아있는 상태에서 연속 클릭하거나, 핸들러를 직접 여러 번 호출해 fetch 호출 수가 1회인지 단언하도록 고친다. 가드 코드를 임시로 제거했을 때 이 테스트가 실제로 실패하는지 직접 확인하고, 그 확인 결과를 Dev 기록에 남길 것.\n\n[회귀 테스트 추가 — 완료 조건]\n- #/ 로 이동하면 주문 목록(OrderListPage)이 렌더된다(쇼핑 홈으로 튕기지 않음).\n- 주문 상세 화면에서 \"← 주문 목록\" 클릭 시 정상 이동한다.\n- /shop 서버 경로 + 빈 해시로 최초 진입할 때만 쇼핑 홈(#/shop)으로 간다.\n- 기존 shop-web 테스트 스위트 전부(신규 포함) 통과.",
+        "targets": []
+      },
+      "layers": {
+        "spec": "concerns",
+        "security": "pass",
+        "regression": "fail"
+      },
+      "top_issues": [
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "App.tsx:67이 '/' 라우트 element 자체를 <Navigate to=\"/shop\" replace/>로 영구 치환해, /shop 마운트에서 주문 목록(#/)이 세션 내내 도달 불가가 된다. OrderDetailPage.tsx:26의 '← 주문 목록'(<Link to=\"/\">) 클릭이 쇼핑 홈으로 튀고 replace라 뒤로가기도 주문 상세로 되돌아간다. LoginPage.tsx:29의 로그인 성공 후 기본 이동(resolveRedirectTarget(null)==='/')도 동일. 사람 지시는 '최초 진입 시' 리다이렉트였고, 확정문답 회귀 범위('기존 주문 목록·상세 화면과 그 동작 불변')에 걸린다. /shop 마운트는 이미 라이브(target/classes/static/shop/index.html 실재).",
+          "suggested_action": "리다이렉트를 진입 1회로 좁힌다 — 라우터 마운트 전(모듈 스코프/main.tsx)에서 isShopServerRoot() && !window.location.hash 일 때만 window.location.hash='#/shop'을 1회 수행하고, '/' 라우트는 <OrderListPage/>로 되돌린다. '/shop 마운트에서 주문 상세 → 주문 목록 복귀' 테스트 1건 추가."
+        },
+        {
+          "severity": "medium",
+          "layer": "regression",
+          "finding": "ShopHomePage.test.tsx:201-226의 in-flight 가드 테스트가 가드를 실제로 검증하지 못한다(inFlightRef를 지워도 통과). ProductGrid.tsx:22는 error가 최우선 분기라 첫 클릭에서 setError(null)+setLoading(true)가 반영되는 순간 [다시 시도] 버튼이 DOM에서 제거되고, RTL fireEvent는 act로 매 클릭마다 렌더를 flush하므로 2·3번째 클릭은 분리된 노드에 디스패치돼 React 루트 위임 리스너에 닿지 않는다. 사람이 완료 조건으로 명시한 '연타 시 요청 1회' 보증이 거짓이 된다(가드 코드 자체는 올바름).",
+          "suggested_action": "세 클릭을 한 act() 안에서 flush 없이 연달아 발사(act(() => { btn.click(); btn.click(); btn.click() }))해 버튼이 살아있는 동안 가드가 막는지 검증하거나, 재조회 경로를 직접 두 번 호출해 검증한다."
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "Gnb.tsx:39 장바구니를 <a>(role=link) → <span>(role=generic)으로 바꾸면서 aria-label='장바구니 N개'가 보조기술에 노출되지 않을 수 있고, 배지 숫자는 aria-hidden(43행)이라 수량 정보가 통째로 사라진다. 같은 라운드에 RankingSection의 aria-hidden을 접근성 이유로 걷어낸 것과 방향이 어긋난다. 테스트의 getByLabelText는 role 제약을 보지 않아 통과한다(거짓 보증).",
+          "suggested_action": "role=\"img\"를 부여하거나 시각적 숨김 텍스트로 장바구니 수량을 노출한다."
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "RankingSection.tsx·Gnb.tsx가 이번 라운드에 변경됐으나 짝 스토리(01:24~01:26)는 그대로이고 npm run test-storybook은 여전히 미실행이다(사람이 이번 범위 밖으로 명시 — 추적만). 신규 스토리 10건, 특히 RankingSection.stories.tsx:가격탭전환의 play 상호작용이 한 번도 렌더 검증되지 않았다.",
+          "suggested_action": "화면 상태 기준선 재측정 전에 test-storybook을 1회 실행해 콘솔 오류 없이 렌더되는지 확인한다."
+        }
+      ],
+      "cause": "impl_bug"
+    },
+    {
+      "round": 3,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "npm run test-storybook 미실행 — 신규 스토리 10건(특히 RankingSection.stories.tsx:가격탭전환의 play)이 한 번도 렌더 검증되지 않음(사람이 범위 밖으로 명시, 추적만)",
+          "suggested_action": "화면 상태 기준선 재측정 전에 test-storybook 1회 실행"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "Gnb.tsx:39 장바구니 span(role=generic)의 aria-label·aria-hidden 배지로 수량 정보가 보조기술에 안 나오고, Gnb.tsx:27 aria-haspopup은 열 팝업이 없음(재작업 지시 3 — 사람 코멘트 미포함으로 미반영)",
+          "suggested_action": "role=\"img\" 부여 또는 시각적 숨김 텍스트로 수량 노출 · aria-haspopup 제거"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "applyShopBootRedirect()가 window.location.hash 대입이라 히스토리 항목이 하나 쌓임 — /shop 최초 진입 후 뒤로가기 1회는 사이트를 벗어나지 않고 주문 목록으로 간다(사람 지시 원문 '세팅한다'를 그대로 따른 결과, 규칙 위반 아님)",
+          "suggested_action": "항목을 남기지 않으려면 location.replace('#/shop') 또는 history.replaceState로 교체 검토"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "main.tsx가 render 이전에 applyShopBootRedirect()를 호출한다는 배선 자체를 검증하는 테스트가 없다(테스트는 함수를 직접 호출해 부팅을 재현) · 뒤로가기 실물 동작도 jsdom 한계로 '해시가 이미 있는 상태' 재현으로 대체",
+          "suggested_action": "후속 TODO — main.tsx 배선은 육안 유지, E2E/수동 확인 시 뒤로가기 경로 1회 점검"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "서버 마운트 번들(shop-api/target/classes/static/shop/index.html·shop-web/dist 둘 다 00:33)이 SR-302 구현 이전 산출물이라 이번 진입 규칙은 재빌드·배치 뒤에야 실환경에서 확인된다(현 배포본엔 round1 회귀도 없어 라이브 피해 없음)",
+          "suggested_action": "릴리스 단계에서 npm run build + shop-api static 재배치 후 /shop 진입 1회 확인"
+        },
+        {
+          "severity": "low",
+          "layer": "security",
+          "finding": "/api/products가 ApiKeyAuthFilter.isOpenRoute에 없어 shop-api가 서빙하는 /shop 환경에서는 비로그인 상품 조회가 401(사람이 별도 SR로 분리한 항목, 이번에도 미접촉 확인)",
+          "suggested_action": "후속 SR에서 공개 화이트리스트 등록 여부 결정"
+        }
+      ],
+      "cause": "none"
+    },
+    {
+      "round": 4,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "npm run test-storybook 미실행 — 신규 스토리 10건(특히 RankingSection.stories.tsx:가격탭전환의 play)이 한 번도 렌더 검증되지 않음(사람이 범위 밖으로 명시, 추적만)",
+          "suggested_action": "화면 상태 기준선 재측정 전에 test-storybook 1회 실행"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "Gnb.tsx:39 장바구니 span(role=generic)의 aria-label·aria-hidden 배지로 수량 정보가 보조기술에 안 나오고, Gnb.tsx:27 aria-haspopup은 열 팝업이 없음(재작업 지시 3 — 사람 코멘트 미포함으로 미반영)",
+          "suggested_action": "role=\"img\" 부여 또는 시각적 숨김 텍스트로 수량 노출 · aria-haspopup 제거"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "applyShopBootRedirect()가 window.location.hash 대입이라 히스토리 항목이 하나 쌓임 — /shop 최초 진입 후 뒤로가기 1회는 사이트를 벗어나지 않고 주문 목록으로 간다(사람 지시 원문 '세팅한다'를 그대로 따른 결과, 규칙 위반 아님)",
+          "suggested_action": "항목을 남기지 않으려면 location.replace('#/shop') 또는 history.replaceState로 교체 검토"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "main.tsx가 render 이전에 applyShopBootRedirect()를 호출한다는 배선 자체를 검증하는 테스트가 없다(테스트는 함수를 직접 호출해 부팅을 재현) · 뒤로가기 실물 동작도 jsdom 한계로 '해시가 이미 있는 상태' 재현으로 대체",
+          "suggested_action": "후속 TODO — main.tsx 배선은 육안 유지, E2E/수동 확인 시 뒤로가기 경로 1회 점검"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "서버 마운트 번들(shop-api/target/classes/static/shop/index.html·shop-web/dist 둘 다 00:33)이 SR-302 구현 이전 산출물이라 이번 진입 규칙은 재빌드·배치 뒤에야 실환경에서 확인된다(현 배포본엔 round1 회귀도 없어 라이브 피해 없음)",
+          "suggested_action": "릴리스 단계에서 npm run build + shop-api static 재배치 후 /shop 진입 1회 확인"
+        },
+        {
+          "severity": "low",
+          "layer": "security",
+          "finding": "/api/products가 ApiKeyAuthFilter.isOpenRoute에 없어 shop-api가 서빙하는 /shop 환경에서는 비로그인 상품 조회가 401(사람이 별도 SR로 분리한 항목, 이번에도 미접촉 확인)",
+          "suggested_action": "후속 SR에서 공개 화이트리스트 등록 여부 결정"
+        }
+      ],
+      "layer": "baseline"
+    },
+    {
+      "round": 5,
+      "gate": "PASS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "pass",
+        "scope": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "npm run test-storybook 미실행 — 신규 스토리 10건(특히 RankingSection.stories.tsx:가격탭전환의 play)이 한 번도 렌더 검증되지 않음(사람이 범위 밖으로 명시, 추적만)",
+          "suggested_action": "화면 상태 기준선 재측정 전에 test-storybook 1회 실행"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "Gnb.tsx:39 장바구니 span(role=generic)의 aria-label·aria-hidden 배지로 수량 정보가 보조기술에 안 나오고, Gnb.tsx:27 aria-haspopup은 열 팝업이 없음(재작업 지시 3 — 사람 코멘트 미포함으로 미반영)",
+          "suggested_action": "role=\"img\" 부여 또는 시각적 숨김 텍스트로 수량 노출 · aria-haspopup 제거"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "applyShopBootRedirect()가 window.location.hash 대입이라 히스토리 항목이 하나 쌓임 — /shop 최초 진입 후 뒤로가기 1회는 사이트를 벗어나지 않고 주문 목록으로 간다(사람 지시 원문 '세팅한다'를 그대로 따른 결과, 규칙 위반 아님)",
+          "suggested_action": "항목을 남기지 않으려면 location.replace('#/shop') 또는 history.replaceState로 교체 검토"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "main.tsx가 render 이전에 applyShopBootRedirect()를 호출한다는 배선 자체를 검증하는 테스트가 없다(테스트는 함수를 직접 호출해 부팅을 재현) · 뒤로가기 실물 동작도 jsdom 한계로 '해시가 이미 있는 상태' 재현으로 대체",
+          "suggested_action": "후속 TODO — main.tsx 배선은 육안 유지, E2E/수동 확인 시 뒤로가기 경로 1회 점검"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "서버 마운트 번들(shop-api/target/classes/static/shop/index.html·shop-web/dist 둘 다 00:33)이 SR-302 구현 이전 산출물이라 이번 진입 규칙은 재빌드·배치 뒤에야 실환경에서 확인된다(현 배포본엔 round1 회귀도 없어 라이브 피해 없음)",
+          "suggested_action": "릴리스 단계에서 npm run build + shop-api static 재배치 후 /shop 진입 1회 확인"
+        },
+        {
+          "severity": "low",
+          "layer": "security",
+          "finding": "/api/products가 ApiKeyAuthFilter.isOpenRoute에 없어 shop-api가 서빙하는 /shop 환경에서는 비로그인 상품 조회가 401(사람이 별도 SR로 분리한 항목, 이번에도 미접촉 확인)",
+          "suggested_action": "후속 SR에서 공개 화이트리스트 등록 여부 결정"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/pom.xml — 완료 항목 SR-301.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java — 완료 항목 QUICK-20260915-1.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/controller/ShopIndexController.java — 완료 항목 SR-301.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/web/ShopStaticResourceConfig.java — 완료 항목 SR-301.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-web/vite.config.ts — 완료 항목 SR-301.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        }
+      ],
+      "layer": "scope"
+    },
+    {
+      "round": 6,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "pass",
+        "scope": "pass",
+        "rules": "concerns"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "npm run test-storybook 미실행 — 신규 스토리 10건(특히 RankingSection.stories.tsx:가격탭전환의 play)이 한 번도 렌더 검증되지 않음(사람이 범위 밖으로 명시, 추적만)",
+          "suggested_action": "화면 상태 기준선 재측정 전에 test-storybook 1회 실행"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "Gnb.tsx:39 장바구니 span(role=generic)의 aria-label·aria-hidden 배지로 수량 정보가 보조기술에 안 나오고, Gnb.tsx:27 aria-haspopup은 열 팝업이 없음(재작업 지시 3 — 사람 코멘트 미포함으로 미반영)",
+          "suggested_action": "role=\"img\" 부여 또는 시각적 숨김 텍스트로 수량 노출 · aria-haspopup 제거"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "applyShopBootRedirect()가 window.location.hash 대입이라 히스토리 항목이 하나 쌓임 — /shop 최초 진입 후 뒤로가기 1회는 사이트를 벗어나지 않고 주문 목록으로 간다(사람 지시 원문 '세팅한다'를 그대로 따른 결과, 규칙 위반 아님)",
+          "suggested_action": "항목을 남기지 않으려면 location.replace('#/shop') 또는 history.replaceState로 교체 검토"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "main.tsx가 render 이전에 applyShopBootRedirect()를 호출한다는 배선 자체를 검증하는 테스트가 없다(테스트는 함수를 직접 호출해 부팅을 재현) · 뒤로가기 실물 동작도 jsdom 한계로 '해시가 이미 있는 상태' 재현으로 대체",
+          "suggested_action": "후속 TODO — main.tsx 배선은 육안 유지, E2E/수동 확인 시 뒤로가기 경로 1회 점검"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "서버 마운트 번들(shop-api/target/classes/static/shop/index.html·shop-web/dist 둘 다 00:33)이 SR-302 구현 이전 산출물이라 이번 진입 규칙은 재빌드·배치 뒤에야 실환경에서 확인된다(현 배포본엔 round1 회귀도 없어 라이브 피해 없음)",
+          "suggested_action": "릴리스 단계에서 npm run build + shop-api static 재배치 후 /shop 진입 1회 확인"
+        },
+        {
+          "severity": "low",
+          "layer": "security",
+          "finding": "/api/products가 ApiKeyAuthFilter.isOpenRoute에 없어 shop-api가 서빙하는 /shop 환경에서는 비로그인 상품 조회가 401(사람이 별도 SR로 분리한 항목, 이번에도 미접촉 확인)",
+          "suggested_action": "후속 SR에서 공개 화이트리스트 등록 여부 결정"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/pom.xml — 완료 항목 SR-301.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java — 완료 항목 QUICK-20260915-1.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/controller/ShopIndexController.java — 완료 항목 SR-301.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/web/ShopStaticResourceConfig.java — 완료 항목 SR-301.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-web/vite.config.ts — 완료 항목 SR-301.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "medium",
+          "layer": "rules",
+          "finding": "규칙 위반 [lab/file-size-cap/java-file-cap] modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java:0 — 자바 파일 450줄 초과 — 책임을 나눈다(필터·핸들러·서비스가 한 파일에 자라면 QA가 스코프를 못 가른다)",
+          "suggested_action": "규칙을 지키도록 고치거나, 규칙이 틀렸으면 SpecLens /rules에서 규칙을 고치세요"
+        }
+      ],
+      "layer": "rules"
+    },
+    {
+      "round": 7,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "pass",
+        "scope": "pass",
+        "rules": "concerns",
+        "stories": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "npm run test-storybook 미실행 — 신규 스토리 10건(특히 RankingSection.stories.tsx:가격탭전환의 play)이 한 번도 렌더 검증되지 않음(사람이 범위 밖으로 명시, 추적만)",
+          "suggested_action": "화면 상태 기준선 재측정 전에 test-storybook 1회 실행"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "Gnb.tsx:39 장바구니 span(role=generic)의 aria-label·aria-hidden 배지로 수량 정보가 보조기술에 안 나오고, Gnb.tsx:27 aria-haspopup은 열 팝업이 없음(재작업 지시 3 — 사람 코멘트 미포함으로 미반영)",
+          "suggested_action": "role=\"img\" 부여 또는 시각적 숨김 텍스트로 수량 노출 · aria-haspopup 제거"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "applyShopBootRedirect()가 window.location.hash 대입이라 히스토리 항목이 하나 쌓임 — /shop 최초 진입 후 뒤로가기 1회는 사이트를 벗어나지 않고 주문 목록으로 간다(사람 지시 원문 '세팅한다'를 그대로 따른 결과, 규칙 위반 아님)",
+          "suggested_action": "항목을 남기지 않으려면 location.replace('#/shop') 또는 history.replaceState로 교체 검토"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "main.tsx가 render 이전에 applyShopBootRedirect()를 호출한다는 배선 자체를 검증하는 테스트가 없다(테스트는 함수를 직접 호출해 부팅을 재현) · 뒤로가기 실물 동작도 jsdom 한계로 '해시가 이미 있는 상태' 재현으로 대체",
+          "suggested_action": "후속 TODO — main.tsx 배선은 육안 유지, E2E/수동 확인 시 뒤로가기 경로 1회 점검"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "서버 마운트 번들(shop-api/target/classes/static/shop/index.html·shop-web/dist 둘 다 00:33)이 SR-302 구현 이전 산출물이라 이번 진입 규칙은 재빌드·배치 뒤에야 실환경에서 확인된다(현 배포본엔 round1 회귀도 없어 라이브 피해 없음)",
+          "suggested_action": "릴리스 단계에서 npm run build + shop-api static 재배치 후 /shop 진입 1회 확인"
+        },
+        {
+          "severity": "low",
+          "layer": "security",
+          "finding": "/api/products가 ApiKeyAuthFilter.isOpenRoute에 없어 shop-api가 서빙하는 /shop 환경에서는 비로그인 상품 조회가 401(사람이 별도 SR로 분리한 항목, 이번에도 미접촉 확인)",
+          "suggested_action": "후속 SR에서 공개 화이트리스트 등록 여부 결정"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/pom.xml — 완료 항목 SR-301.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java — 완료 항목 QUICK-20260915-1.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/controller/ShopIndexController.java — 완료 항목 SR-301.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/web/ShopStaticResourceConfig.java — 완료 항목 SR-301.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-web/vite.config.ts — 완료 항목 SR-301.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "medium",
+          "layer": "rules",
+          "finding": "규칙 위반 [lab/file-size-cap/java-file-cap] modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java:0 — 자바 파일 450줄 초과 — 책임을 나눈다(필터·핸들러·서비스가 한 파일에 자라면 QA가 스코프를 못 가른다)",
+          "suggested_action": "규칙을 지키도록 고치거나, 규칙이 틀렸으면 SpecLens /rules에서 규칙을 고치세요"
+        },
+        {
+          "severity": "low",
+          "layer": "stories",
+          "finding": "고친 화면 부품에 스토리가 없습니다: src/App.test.tsx",
+          "suggested_action": "그 부품의 상태를 스토리로 남기세요 — 없으면 다음 사람이 그 상태를 볼 방법이 없습니다. 차단하려면 하네스 규칙 `story-per-component`(pair 검사)를 채택하세요(/rules 제안 탭) — 축 C가 must로 막습니다"
+        },
+        {
+          "severity": "low",
+          "layer": "stories",
+          "finding": "고친 화면 부품에 스토리가 없습니다: src/App.tsx",
+          "suggested_action": "그 부품의 상태를 스토리로 남기세요 — 없으면 다음 사람이 그 상태를 볼 방법이 없습니다. 차단하려면 하네스 규칙 `story-per-component`(pair 검사)를 채택하세요(/rules 제안 탭) — 축 C가 must로 막습니다"
+        },
+        {
+          "severity": "low",
+          "layer": "stories",
+          "finding": "고친 화면 부품에 스토리가 없습니다: src/main.tsx",
+          "suggested_action": "그 부품의 상태를 스토리로 남기세요 — 없으면 다음 사람이 그 상태를 볼 방법이 없습니다. 차단하려면 하네스 규칙 `story-per-component`(pair 검사)를 채택하세요(/rules 제안 탭) — 축 C가 must로 막습니다"
+        }
+      ],
+      "layer": "stories"
+    },
+    {
+      "round": 8,
+      "gate": "CONCERNS",
+      "human": null,
+      "layers": {
+        "spec": "pass",
+        "security": "pass",
+        "regression": "pass",
+        "baseline": "pass",
+        "scope": "pass",
+        "rules": "concerns",
+        "stories": "pass",
+        "conformance": "pass"
+      },
+      "top_issues": [
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "npm run test-storybook 미실행 — 신규 스토리 10건(특히 RankingSection.stories.tsx:가격탭전환의 play)이 한 번도 렌더 검증되지 않음(사람이 범위 밖으로 명시, 추적만)",
+          "suggested_action": "화면 상태 기준선 재측정 전에 test-storybook 1회 실행"
+        },
+        {
+          "severity": "low",
+          "layer": "spec",
+          "finding": "Gnb.tsx:39 장바구니 span(role=generic)의 aria-label·aria-hidden 배지로 수량 정보가 보조기술에 안 나오고, Gnb.tsx:27 aria-haspopup은 열 팝업이 없음(재작업 지시 3 — 사람 코멘트 미포함으로 미반영)",
+          "suggested_action": "role=\"img\" 부여 또는 시각적 숨김 텍스트로 수량 노출 · aria-haspopup 제거"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "applyShopBootRedirect()가 window.location.hash 대입이라 히스토리 항목이 하나 쌓임 — /shop 최초 진입 후 뒤로가기 1회는 사이트를 벗어나지 않고 주문 목록으로 간다(사람 지시 원문 '세팅한다'를 그대로 따른 결과, 규칙 위반 아님)",
+          "suggested_action": "항목을 남기지 않으려면 location.replace('#/shop') 또는 history.replaceState로 교체 검토"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "main.tsx가 render 이전에 applyShopBootRedirect()를 호출한다는 배선 자체를 검증하는 테스트가 없다(테스트는 함수를 직접 호출해 부팅을 재현) · 뒤로가기 실물 동작도 jsdom 한계로 '해시가 이미 있는 상태' 재현으로 대체",
+          "suggested_action": "후속 TODO — main.tsx 배선은 육안 유지, E2E/수동 확인 시 뒤로가기 경로 1회 점검"
+        },
+        {
+          "severity": "low",
+          "layer": "regression",
+          "finding": "서버 마운트 번들(shop-api/target/classes/static/shop/index.html·shop-web/dist 둘 다 00:33)이 SR-302 구현 이전 산출물이라 이번 진입 규칙은 재빌드·배치 뒤에야 실환경에서 확인된다(현 배포본엔 round1 회귀도 없어 라이브 피해 없음)",
+          "suggested_action": "릴리스 단계에서 npm run build + shop-api static 재배치 후 /shop 진입 1회 확인"
+        },
+        {
+          "severity": "low",
+          "layer": "security",
+          "finding": "/api/products가 ApiKeyAuthFilter.isOpenRoute에 없어 shop-api가 서빙하는 /shop 환경에서는 비로그인 상품 조회가 401(사람이 별도 SR로 분리한 항목, 이번에도 미접촉 확인)",
+          "suggested_action": "후속 SR에서 공개 화이트리스트 등록 여부 결정"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/pom.xml — 완료 항목 SR-301.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java — 완료 항목 QUICK-20260915-1.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/controller/ShopIndexController.java — 완료 항목 SR-301.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-api/src/main/java/com/sm/lab/shop/web/ShopStaticResourceConfig.java — 완료 항목 SR-301.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "low",
+          "layer": "scope",
+          "finding": "소속 불명(막지 않음): modules/shop-web/vite.config.ts — 완료 항목 SR-301.1의 계획·앵커 파일 — 반영 전 잔여 작업인지 이 항목 수정인지 확인",
+          "suggested_action": "같은 SR의 다른 진행 중 항목 변경이면 그 항목에서 판정됩니다. 아니면 이 항목 몫인지 확인하세요"
+        },
+        {
+          "severity": "medium",
+          "layer": "rules",
+          "finding": "규칙 위반 [lab/file-size-cap/java-file-cap] modules/shop-api/src/main/java/com/sm/lab/shop/web/ApiKeyAuthFilter.java:0 — 자바 파일 450줄 초과 — 책임을 나눈다(필터·핸들러·서비스가 한 파일에 자라면 QA가 스코프를 못 가른다)",
+          "suggested_action": "규칙을 지키도록 고치거나, 규칙이 틀렸으면 SpecLens /rules에서 규칙을 고치세요"
+        },
+        {
+          "severity": "low",
+          "layer": "stories",
+          "finding": "고친 화면 부품에 스토리가 없습니다: src/App.test.tsx",
+          "suggested_action": "그 부품의 상태를 스토리로 남기세요 — 없으면 다음 사람이 그 상태를 볼 방법이 없습니다. 차단하려면 하네스 규칙 `story-per-component`(pair 검사)를 채택하세요(/rules 제안 탭) — 축 C가 must로 막습니다"
+        },
+        {
+          "severity": "low",
+          "layer": "stories",
+          "finding": "고친 화면 부품에 스토리가 없습니다: src/App.tsx",
+          "suggested_action": "그 부품의 상태를 스토리로 남기세요 — 없으면 다음 사람이 그 상태를 볼 방법이 없습니다. 차단하려면 하네스 규칙 `story-per-component`(pair 검사)를 채택하세요(/rules 제안 탭) — 축 C가 must로 막습니다"
+        },
+        {
+          "severity": "low",
+          "layer": "stories",
+          "finding": "고친 화면 부품에 스토리가 없습니다: src/main.tsx",
+          "suggested_action": "그 부품의 상태를 스토리로 남기세요 — 없으면 다음 사람이 그 상태를 볼 방법이 없습니다. 차단하려면 하네스 규칙 `story-per-component`(pair 검사)를 채택하세요(/rules 제안 탭) — 축 C가 must로 막습니다"
+        },
+        {
+          "severity": "low",
+          "layer": "conformance",
+          "finding": "디스패치 입력이 'SR-302.1로 분류된 파일 32개'라 했으나, shop-web 자체 git(별도 저장소)의 git status --porcelain -uall로 직접 센 SR-302 관련 변경 파일은 26개(수정 4: App.tsx·api.ts·main.tsx·types.ts + 신규 22: App.test.tsx·ShopHomePage.tsx/test.tsx·features/shop 하위 19개)다. vite.config.ts·tsconfig.tsbuildinfo도 shop-web에서 M 상태지만 diff 내용(vite base:'/shop/' 설정)이 주석상 SR-301(INF-ORD-017) 귀속으로 명시돼 있어 SR-302분에서 제외했다. scope_verify.py의 실제 32개 파일 목록(JSON)이 디스패치에 원문으로 포함되지 않아 1:1 대조는 못했다 — 분류 자체(축 A)는 재판정 대상이 아니므로 게이트에 반영하지 않는다.",
+          "suggested_action": "필요시 scope_verify.py 실행 로그의 classified 파일 목록을 보존해 다음 검증에서 직접 대조 가능하게 한다.",
+          "confidence": "low"
+        },
+        {
+          "severity": "low",
+          "layer": "conformance",
+          "finding": "QA round1~3이 이미 기록·추적 중인 low 항목(Gnb.tsx:27 aria-haspopup 불일치, Gnb.tsx:39/43 장바구니 span의 aria-label 노출 불확실성, test-storybook 미실행, /api/products 401 비프록시 환경)을 diff에서도 그대로 재확인했다 — round3 PASS 결정에 이미 반영된 '범위 밖/후속 추적' 항목이라 새 finding이 아니라 참고용으로만 남긴다.",
+          "suggested_action": "STEP 5.5 재동기화 또는 후속 SR에서 기존 추적 그대로 처리.",
+          "confidence": "high"
+        }
+      ],
+      "layer": "conformance"
+    }
+  ],
+  "waiver": {
+    "active": false
+  },
+  "story_transitions": [
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "SR 승인(SR-302)",
+      "at": "2026-09-17T00:24:05"
+    },
+    {
+      "from": "Approved",
+      "to": "InProgress",
+      "by": "sl-aidd",
+      "at": "2026-09-17T01:17:11"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "qa-agent",
+      "at": "2026-09-17T01:29:21"
+    },
+    {
+      "from": "Review",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-17T01:37:29"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "qa-agent",
+      "at": "2026-09-17T01:43:52"
+    },
+    {
+      "from": "Review",
+      "to": "InProgress",
+      "by": "사람",
+      "at": "2026-09-17T01:51:57"
+    },
+    {
+      "from": "InProgress",
+      "to": "Review",
+      "by": "qa-agent",
+      "at": "2026-09-17T02:00:59"
+    },
+    {
+      "from": "Review",
+      "to": "Done",
+      "by": "사람",
+      "at": "2026-09-17T02:20:49"
+    }
+  ],
+  "cause": "none",
+  "escalate": false,
+  "fail_rounds": 1,
+  "max_rounds": 3
+}

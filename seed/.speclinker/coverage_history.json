@@ -1,0 +1,245 @@
+[
+ {
+  "date": "2026-08-22",
+  "totals": {
+   "inf": 9,
+   "uis": 4,
+   "sch": 5,
+   "bat": 0
+  },
+  "expected": 18,
+  "generated": 18,
+  "pct": 100.0
+ },
+ {
+  "date": "2026-08-23",
+  "totals": {
+   "inf": 15,
+   "uis": 5,
+   "sch": 6,
+   "bat": 0
+  },
+  "expected": 30,
+  "generated": 27,
+  "pct": 90.0
+ },
+ {
+  "date": "2026-08-24",
+  "totals": {
+   "inf": 15,
+   "uis": 5,
+   "sch": 6,
+   "bat": 0
+  },
+  "expected": 30,
+  "generated": 27,
+  "pct": 90.0
+ },
+ {
+  "date": "2026-08-31",
+  "totals": {
+   "inf": 15,
+   "uis": 5,
+   "sch": 6,
+   "bat": 0
+  },
+  "expected": 30,
+  "generated": 27,
+  "pct": 90.0
+ },
+ {
+  "date": "2026-09-06",
+  "totals": {
+   "inf": 15,
+   "uis": 5,
+   "sch": 6,
+   "bat": 0,
+   "sch_tables": 6
+  },
+  "expected": 30,
+  "generated": 27,
+  "pct": 90.0
+ },
+ {
+  "date": "2026-09-07",
+  "totals": {
+   "inf": 15,
+   "uis": 5,
+   "sch": 6,
+   "bat": 0,
+   "sch_tables": 6
+  },
+  "expected": 30,
+  "generated": 27,
+  "pct": 90.0
+ },
+ {
+  "date": "2026-09-08",
+  "totals": {
+   "inf": 15,
+   "uis": 5,
+   "sch": 6,
+   "bat": 0,
+   "sch_tables": 6
+  },
+  "expected": 30,
+  "generated": 27,
+  "pct": 90.0
+ },
+ {
+  "date": "2026-09-09",
+  "totals": {
+   "inf": 15,
+   "uis": 5,
+   "sch": 6,
+   "bat": 1,
+   "sch_tables": 6
+  },
+  "expected": 30,
+  "generated": 27,
+  "pct": 90.0
+ },
+ {
+  "date": "2026-09-10",
+  "totals": {
+   "inf": 15,
+   "uis": 5,
+   "sch": 6,
+   "bat": 1,
+   "sch_tables": 6
+  },
+  "expected": 30,
+  "generated": 27,
+  "pct": 90.0
+ },
+ {
+  "date": "2026-09-11",
+  "totals": {
+   "inf": 15,
+   "uis": 5,
+   "sch": 6,
+   "bat": 1,
+   "sch_tables": 6
+  },
+  "expected": 30,
+  "generated": 27,
+  "pct": 90.0
+ },
+ {
+  "date": "2026-09-12",
+  "totals": {
+   "inf": 20,
+   "uis": 5,
+   "sch": 6,
+   "bat": 1,
+   "sch_tables": 6
+  },
+  "expected": 37,
+  "generated": 27,
+  "pct": 73.0
+ },
+ {
+  "date": "2026-09-13",
+  "totals": {
+   "inf": 25,
+   "uis": 11,
+   "sch": 15,
+   "bat": 0,
+   "sch_tables": 15
+  },
+  "expected": 40,
+  "generated": 36,
+  "pct": 90.0
+ },
+ {
+  "date": "2026-09-15",
+  "totals": {
+   "inf": 25,
+   "uis": 11,
+   "sch": 15,
+   "bat": 0,
+   "sch_tables": 15
+  },
+  "expected": 40,
+  "generated": 36,
+  "pct": 90.0
+ },
+ {
+  "date": "2026-09-16",
+  "totals": {
+   "inf": 25,
+   "uis": 11,
+   "sch": 16,
+   "bat": 1,
+   "sch_tables": 16
+  },
+  "expected": 41,
+  "generated": 37,
+  "pct": 90.2
+ },
+ {
+  "date": "2026-09-17",
+  "totals": {
+   "inf": 26,
+   "uis": 16,
+   "sch": 16,
+   "bat": 1,
+   "sch_tables": 16
+  },
+  "expected": 41,
+  "generated": 37,
+  "pct": 90.2
+ },
+ {
+  "date": "2026-09-19",
+  "totals": {
+   "inf": 26,
+   "uis": 20,
+   "sch": 16,
+   "bat": 2,
+   "sch_tables": 16
+  },
+  "expected": 41,
+  "generated": 37,
+  "pct": 90.2
+ },
+ {
+  "date": "2026-09-20",
+  "totals": {
+   "inf": 26,
+   "uis": 20,
+   "sch": 16,
+   "bat": 2,
+   "sch_tables": 16
+  },
+  "expected": 41,
+  "generated": 37,
+  "pct": 90.2
+ },
+ {
+  "date": "2026-09-21",
+  "totals": {
+   "inf": 26,
+   "uis": 20,
+   "sch": 16,
+   "bat": 2,
+   "sch_tables": 16
+  },
+  "expected": 41,
+  "generated": 37,
+  "pct": 90.2
+ },
+ {
+  "date": "2026-09-22",
+  "totals": {
+   "inf": 26,
+   "uis": 20,
+   "sch": 16,
+   "bat": 2,
+   "sch_tables": 16
+  },
+  "expected": 41,
+  "generated": 37,
+  "pct": 90.2
+ }
+]

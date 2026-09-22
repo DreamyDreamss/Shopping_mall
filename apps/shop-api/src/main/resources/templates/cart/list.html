@@ -1,0 +1,99 @@
+<!--/*
+linked_func: FUNC-order-011, FUNC-order-012
+spec: docs/00_FUNC/stories/STORY-FUNC-order-011.md, docs/00_FUNC/stories/STORY-FUNC-order-012.md
+*/-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>장바구니</title>
+  <style>
+    body { font-family: "Malgun Gothic", sans-serif; margin: 24px; color: #1c2128; }
+    h1 { font-size: 20px; }
+    form.searchForm { margin: 12px 0; }
+    input, button, select { padding: 6px 10px; font-size: 13px; }
+    table { border-collapse: collapse; width: 100%; font-size: 13px; }
+    th, td { border: 1px solid #d7dbe0; padding: 8px 10px; text-align: left; }
+    th { background: #f1f3f6; }
+    .total { font-weight: 700; margin-top: 12px; }
+    a { color: #3b5bdb; text-decoration: none; }
+    .rowForm { display: inline-flex; gap: 6px; align-items: center; }
+    .qtyInput { width: 60px; }
+  </style>
+</head>
+<body>
+<h1>장바구니</h1>
+
+<!--/* linked_func: FUNC-order-012 — 체크아웃 실패 사유(SR-203 D6, PRG 플래시로 전달됨) */-->
+<div th:if="${checkoutError != null}">
+  <p th:text="'체크아웃 실패: ' + ${checkoutError}">체크아웃 실패</p>
+</div>
+
+<!--/* linked_func: FUNC-order-011 — 회원 선택 셀렉트(로그인 없음, 회원별 장바구니 구분) */-->
+<form class="searchForm" method="get" action="/cart" id="memberForm">
+  <label>회원
+    <select name="memberId" id="selMember" onchange="this.form.submit()">
+      <option th:each="m : ${members}" th:value="${m.memberId}"
+              th:text="${m.memberName} + ' (' + ${m.memberId} + ')'"
+              th:selected="${m.memberId == selectedMemberId}">김실증 (M-0001)</option>
+    </select>
+  </label>
+  <button type="submit" id="btnSelect">조회</button>
+</form>
+
+<table th:if="${!#lists.isEmpty(cart['items'])}">
+  <thead>
+  <tr><th>상품명</th><th>단가</th><th>수량</th><th>품목합계</th><th>관리</th></tr>
+  </thead>
+  <tbody>
+  <tr th:each="it : ${cart['items']}">
+    <td th:text="${it.productName}">마우스</td>
+    <td th:text="${#numbers.formatInteger(it.price, 3, 'COMMA')} + '원'">25,000원</td>
+    <td>
+      <!--/* linked_func: FUNC-order-011 — 수량변경 폼(서버렌더 POST → 서비스 → redirect) */-->
+      <form class="rowForm" method="post" th:action="@{'/cart/items/' + ${it.sku} + '/update'}">
+        <input type="hidden" name="memberId" th:value="${selectedMemberId}">
+        <input class="qtyInput" type="number" name="qty" min="1" th:value="${it.qty}">
+        <button type="submit">변경</button>
+      </form>
+    </td>
+    <td th:text="${#numbers.formatInteger(it.lineTotal, 3, 'COMMA')} + '원'">50,000원</td>
+    <td>
+      <!--/* linked_func: FUNC-order-011 — 삭제는 명시적 버튼으로만(D4, 수량 0 유도 금지) */-->
+      <form class="rowForm" method="post" th:action="@{'/cart/items/' + ${it.sku} + '/delete'}">
+        <input type="hidden" name="memberId" th:value="${selectedMemberId}">
+        <button type="submit">삭제</button>
+      </form>
+    </td>
+  </tr>
+  </tbody>
+</table>
+<p class="total" th:if="${!#lists.isEmpty(cart['items'])}">
+  총 합계 <span th:text="${#numbers.formatInteger(cart['totalAmount'], 3, 'COMMA')} + '원'">50,000원</span>
+</p>
+
+<!--/* linked_func: FUNC-order-012 — 체크아웃(장바구니 전체→주문 전환, SR-203 D6).
+     품목이 있을 때만 노출(빈 장바구니는 동작하지 않는다는 요구사항). */-->
+<form method="post" action="/cart/checkout" th:if="${!#lists.isEmpty(cart['items'])}">
+  <input type="hidden" name="memberId" th:value="${selectedMemberId}">
+  <button type="submit" id="btnCheckout">주문하기</button>
+</form>
+
+<!--/* linked_func: FUNC-order-011 — 빈 장바구니(SR-202 확정 문답 scr_empty_state,
+     SR-224 scr_empty_state: 검색조건 없는 목록의 0건 문구를 "조회 결과가 없습니다"로 통일 —
+     회원 셀렉트는 조회 대상 식별용이지 검색조건이 아니므로 "조건에 맞는" 변형은 쓰지 않는다.
+     오류로 인한 빈 상태(체크아웃 실패 등)는 이 문구를 쓰지 않고 별도 오류 배너로 알린다 — 위 checkoutError 참조.
+     round7 재작업: checkoutError == null 가드 추가 — order/list.html의 검색 실패 배너 가드(SR-208,
+     안내 문구 하나에만 적용하는 패턴)와 동일 취지. 이미 빈 장바구니에서 주문하기를 재제출(중복
+     submit·뒤로가기·동시 체크아웃 패자)하면 400이 흡수돼 "체크아웃 실패: ..." 배너와 이 안내가
+     한 화면에 동시 노출되던 것을 방지.
+     round8 재작업(QA r8 CONCERNS 권고1): 가드를 안내 문구 <p> 한 줄에만 걸고 "상품 목록으로" 링크는
+     이 div 밖으로 뺐다 — checkoutError 유무와 무관하게, 장바구니가 비어 있는 한 항상 노출된다(빈
+     상태에서 UIS-ORD-005/spec.md의 "문구 + 이동 링크" 규정을 충족). 라인 번호 앵커는 편집마다
+     밀리므로 이후에는 라인 번호 대신 이 설명으로 위치를 특정한다(같은 유형의 앵커 드리프트 재발 방지). */-->
+<p th:if="${checkoutError == null and #lists.isEmpty(cart['items'])}">조회 결과가 없습니다</p>
+<p th:if="${#lists.isEmpty(cart['items'])}"><a href="/product/list">상품 목록으로</a></p>
+
+<p th:if="${!#lists.isEmpty(cart['items'])}"><a href="/product/list">상품 목록으로</a></p>
+</body>
+</html>

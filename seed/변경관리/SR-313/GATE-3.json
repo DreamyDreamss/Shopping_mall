@@ -1,0 +1,22 @@
+{
+  "func": "SR-313.3",
+  "epic": null,
+  "story": "docs/변경관리/SR-313/STORY-3.md",
+  "gate": null,
+  "reviewer": "qa-agent",
+  "updated": null,
+  "layers": {},
+  "top_issues": [],
+  "rounds": [],
+  "waiver": {
+    "active": false
+  },
+  "story_transitions": [
+    {
+      "from": "Draft",
+      "to": "Approved",
+      "by": "SR 승인(SR-313)",
+      "at": "2026-09-19T16:09:54"
+    }
+  ]
+}

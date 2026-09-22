@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sm.lab.shop.dao.ProductDao">
+
+  <!-- 판매중 상품만 — sale_yn 상시필터. keyword 지정 시 product_name 부분일치(LIKE)와 AND (SR-201).
+       inStock=true 지정 시 stock_qty >= 1 조건 추가 AND(품절 제외, SR-220). 목록 쿼리 자체에 조건을 걸어
+       총 건수(=반환 행 수)가 항상 필터를 반영한다 — 별도 count 쿼리 없음. -->
+  <!-- linked_func: FUNC-order-007 -->
+  <!-- SR-306(#2) — list_price/image_url 컬럼을 명시 추가(표시 전용, map-underscore-to-camel-case로
+       Product.listPrice/imageUrl에 자동 매핑). 기존 5컬럼 순서·이름은 불변. -->
+  <select id="selectProducts" resultType="com.sm.lab.shop.domain.Product">
+    SELECT p.sku, p.product_name, p.price, p.stock_qty, p.sale_yn, p.list_price, p.image_url
+      FROM PRODUCTS p
+     WHERE p.sale_yn = 'Y'
+    <if test="keyword != null and keyword != ''">
+       AND p.product_name LIKE CONCAT('%', #{keyword}, '%')
+    </if>
+    <if test="inStock != null and inStock == true">
+       AND p.stock_qty >= 1
+    </if>
+     ORDER BY p.sku
+  </select>
+
+  <!-- SR-306(#2) — list_price/image_url 컬럼을 명시 추가. 목록 조회와 달리 sale_yn 필터가 없으므로
+       판매종료 상품(SKU-1004)도 정가·이미지(NULL이면 null)를 그대로 반환한다(기존 회귀 불변). -->
+  <select id="selectBySku" resultType="com.sm.lab.shop.domain.Product">
+    SELECT p.sku, p.product_name, p.price, p.stock_qty, p.sale_yn, p.list_price, p.image_url
+      FROM PRODUCTS p
+     WHERE p.sku = #{sku}
+  </select>
+
+  <update id="decreaseStock">
+    UPDATE PRODUCTS
+       SET stock_qty = stock_qty - #{qty}
+     WHERE sku = #{sku}
+       AND stock_qty >= #{qty}
+  </update>
+
+  <!-- linked_func: FUNC-order-002 — 주문 취소 시 재고 원복 (LAB-102) -->
+  <update id="increaseStock">
+    UPDATE PRODUCTS
+       SET stock_qty = stock_qty + #{qty}
+     WHERE sku = #{sku}
+  </update>
+
+  <!-- 상품 목록 화면 정렬(SR-214) — sale_yn 상시필터 + keyword 부분일치는 selectProducts와 동일 규칙.
+       sort는 서비스가 화이트리스트 검증을 마친 "priceAsc"/"priceDesc"만 전달한다("latest"는 selectProducts 재사용). -->
+  <!-- linked_func: FUNC-order-009 -->
+  <!-- SR-306(#2) 스코프 밖 — 이 쿼리는 Thymeleaf 정렬 화면(FUNC-order-009) 전용이라 이 항목이
+       건드리지 않는다. list_price/image_url 미포함 — map-underscore-to-camel-case가 있어도 SELECT
+       목록에 없는 컬럼은 자동으로 채워지지 않으므로, 이 결과의 Product.listPrice/imageUrl은
+       항상 null이다(다음 사람이 "컬럼을 테이블에 추가하면 저절로 채워질 것"으로 오인하지 않게 명시). -->
+  <select id="selectProductsForList" resultType="com.sm.lab.shop.domain.Product">
+    SELECT p.sku, p.product_name, p.price, p.stock_qty, p.sale_yn
+      FROM PRODUCTS p
+     WHERE p.sale_yn = 'Y'
+    <if test="keyword != null and keyword != ''">
+       AND p.product_name LIKE CONCAT('%', #{keyword}, '%')
+    </if>
+    <choose>
+      <when test="sort == 'priceAsc'">ORDER BY p.price ASC, p.sku ASC</when>
+      <when test="sort == 'priceDesc'">ORDER BY p.price DESC, p.sku ASC</when>
+      <otherwise>ORDER BY p.sku</otherwise>
+    </choose>
+  </select>
+
+</mapper>

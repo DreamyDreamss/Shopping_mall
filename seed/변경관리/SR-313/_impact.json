@@ -1,0 +1,84 @@
+{
+  "schema": 2,
+  "sr": "SR-313",
+  "title": "SR-313",
+  "clarification": "none",
+  "affected": {
+    "inf": [
+      "INF-ORD-008",
+      "INF-ORD-009"
+    ],
+    "sch": [
+      "SCH-ORD-005"
+    ],
+    "uis": [],
+    "bat": []
+  },
+  "new_specs": [
+    {
+      "kind": "INF",
+      "id": "INF-PRD-001",
+      "domain": "product",
+      "name": "카테고리 트리 조회",
+      "module": "shop-api",
+      "module_path": "{{SRC_SHOP_API}}"
+    }
+  ],
+  "items": [
+    {
+      "n": 1,
+      "title": "카테고리 트리 조회",
+      "specs": {
+        "uis": [],
+        "inf": [],
+        "sch": [],
+        "bat": []
+      },
+      "new_specs": [
+        "INF-PRD-001"
+      ],
+      "module": "shop-api",
+      "origin": "auto:new"
+    },
+    {
+      "n": 2,
+      "title": "GET /api/products — 판매중 상품 목록 조회",
+      "specs": {
+        "uis": [],
+        "inf": [
+          "INF-ORD-008"
+        ],
+        "sch": [
+          "SCH-ORD-005"
+        ],
+        "bat": []
+      },
+      "new_specs": [],
+      "module": null,
+      "origin": "auto:inf"
+    },
+    {
+      "n": 3,
+      "title": "GET /api/products/{sku} — 상품 단건 조회",
+      "specs": {
+        "uis": [],
+        "inf": [
+          "INF-ORD-009"
+        ],
+        "sch": [],
+        "bat": []
+      },
+      "new_specs": [],
+      "module": null,
+      "origin": "auto:inf"
+    }
+  ],
+  "item_seq": 3,
+  "stories": [
+    "SR-313.1",
+    "SR-313.2",
+    "SR-313.3"
+  ],
+  "story_files": [],
+  "generated_at": "2026-09-19T16:07:12"
+}

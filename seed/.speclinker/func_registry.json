@@ -1,0 +1,56 @@
+{
+  "assigned": {
+    "inf:INF-MBR-001": "FUNC-member-002",
+    "inf:INF-MBR-002": "FUNC-member-003",
+    "inf:INF-MBR-003": "FUNC-member-005",
+    "inf:INF-MBR-004": "FUNC-member-006",
+    "inf:INF-MBR-006": "FUNC-member-008",
+    "inf:INF-MBR-007": "FUNC-member-009",
+    "inf:INF-MBR-008": "FUNC-member-011",
+    "inf:INF-MBR-009": "FUNC-member-012",
+    "inf:INF-ORD-001": "FUNC-order-003",
+    "inf:INF-ORD-002": "FUNC-order-004",
+    "inf:INF-ORD-005": "FUNC-order-005",
+    "inf:INF-ORD-007": "FUNC-order-006",
+    "inf:INF-ORD-008": "FUNC-order-007",
+    "inf:INF-ORD-014": "FUNC-order-012",
+    "inf:INF-ORD-015": "FUNC-order-013",
+    "uis:UIS-MBR-002": "FUNC-member-004",
+    "uis:UIS-MBR-003": "FUNC-member-007",
+    "uis:UIS-MBR-004": "FUNC-member-010",
+    "uis:UIS-ORD-001": "FUNC-order-001",
+    "uis:UIS-ORD-002": "FUNC-order-002",
+    "uis:UIS-ORD-003": "FUNC-order-009",
+    "uis:UIS-ORD-004": "FUNC-order-010",
+    "uis:UIS-ORD-005": "FUNC-order-011"
+  },
+  "labels": {
+    "inf:INF-MBR-003": "로그인 API",
+    "inf:INF-MBR-004": "로그아웃·자동 로그인 토큰 API",
+    "inf:INF-MBR-006": "비밀번호 재설정 코드 요청 API",
+    "inf:INF-MBR-007": "비밀번호 재설정 확정 API",
+    "inf:INF-MBR-008": "배송지 CRUD API",
+    "inf:INF-MBR-009": "우편번호(도로명) 검색 API",
+    "uis:UIS-MBR-002": "로그인 화면",
+    "uis:UIS-MBR-003": "비밀번호 재설정 화면",
+    "uis:UIS-MBR-004": "배송지 관리 화면"
+  },
+  "next": {
+    "member": 13,
+    "order": 18
+  },
+  "reserved": {
+    "inf:INF-MBR-008": "SR-235",
+    "inf:INF-MBR-009": "SR-235",
+    "uis:UIS-MBR-004": "SR-235"
+  },
+  "tombstones": [
+    "FUNC-order-008",
+    "FUNC-member-001",
+    "FUNC-order-014",
+    "FUNC-order-015",
+    "FUNC-order-016",
+    "FUNC-order-017"
+  ],
+  "version": 1
+}

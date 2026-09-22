@@ -1,0 +1,23 @@
+{
+  "title": "장바구니 도입",
+  "stories": [
+    "FUNC-order-010",
+    "FUNC-order-011"
+  ],
+  "clarification": "resolved",
+  "new_funcs": [
+    {
+      "func_id": "FUNC-order-011",
+      "kind": "uis",
+      "spec_id": "UIS-ORD-005"
+    }
+  ],
+  "affected": {
+    "inf": [],
+    "sch": [],
+    "uis": [
+      "UIS-ORD-004"
+    ]
+  },
+  "generated_at": "2026-08-22T20:41:13"
+}
