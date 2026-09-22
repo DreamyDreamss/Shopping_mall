@@ -141,6 +141,12 @@ done
 ok "seed 전개: SR $(ls -d "$WS"/docs/변경관리/SR-* 2>/dev/null | wc -l)건 · 설계서 $(find "$WS/docs/05_설계서" -name spec.md 2>/dev/null | wc -l)건 · 카탈로그 $(find "$WS/_lab/catalog" -type f 2>/dev/null | wc -l)건 · 납품 $(find "$WS/docs/09_납품" -type f 2>/dev/null | wc -l)건"
 
 # seed는 절대 경로를 토큰으로 담는다 — 여기서 이 환경의 실제 경로로 되돌린다.
+step "4-a 파생 색인 생성"
+# 화면 목록(설계서·화면·API)은 **파생 색인**(docs/viewer/spec_index.json)을 읽는다. 이것을 안 만들면
+# 워크스페이스에 설계서가 다 있어도 SpecLens가 **빈 목록**으로 뜬다(2026-09-22 서버 실측 — 설계서 20건이
+# 들어갔는데 화면이 0건이었다). 뷰어 자산 동기화도 이 스크립트가 함께 한다.
+( cd "$WS" && "$PY" "$PLUGIN/scripts/gen_spec_index.py" . ) >/dev/null 2>&1   && ok "spec_index 생성"   || warn "색인 생성 실패 — cd $WS && $PY $PLUGIN/scripts/gen_spec_index.py . 로 확인하세요(화면 목록이 빕니다)"
+
 step "4-b 경로 토큰 치환"
 SUBST=$(find "$WS" -type f \( -name '*.md' -o -name '*.json' -o -name '*.jsonl' -o -name '*.txt' \
         -o -name '*.html' -o -name '*.yaml' -o -name '*.yml' -o -name '*.csv' -o -name '*.xml' \) \

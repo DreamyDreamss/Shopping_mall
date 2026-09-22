@@ -119,6 +119,13 @@ $srCount = (Get-ChildItem "$Ws\docs\변경관리" -Directory -Filter 'SR-*' -Err
 Write-Host "  OK seed 전개: SR $srCount건"
 
 # seed는 절대 경로를 토큰으로 담는다 — 여기서 이 환경의 실제 경로로 되돌린다.
+Write-Host '== 3-a 파생 색인 생성'
+# 화면 목록은 파생 색인(docsiewer\spec_index.json)을 읽는다 — 안 만들면 설계서가 다 있어도 빈 목록으로 뜬다.
+Push-Location $Ws
+& python (Join-Path $Plugin 'scripts\gen_spec_index.py') .
+if ($LASTEXITCODE -ne 0) { Write-Warning "색인 생성 실패 — 화면 목록이 빕니다" } else { Write-Host '  OK spec_index' }
+Pop-Location
+
 Write-Host '== 3-b 경로 토큰 치환'
 $fwd = @{
     '{{SRC_SHOP_API}}' = $SrcApi.Replace('\', '/')

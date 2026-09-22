@@ -145,3 +145,16 @@ def test_setup_expands_seed_by_rule_not_by_a_name_list():
     assert 'for src in' in sh and 'basename' in sh, 'setup-linux.sh 가 규칙으로 돌지 않는다'
     ps = _read('setup.ps1')
     assert 'Get-ChildItem' in ps and 'switch ($src.Name)' in ps, 'setup.ps1 이 규칙으로 돌지 않는다'
+
+
+def test_setup_generates_the_derived_index():
+    """화면 목록은 파생 색인(`docs/viewer/spec_index.json`)을 읽는다 — 안 만들면 설계서가
+    워크스페이스에 다 있어도 SpecLens가 **빈 목록**으로 뜬다(2026-09-22 서버 실측).
+
+    전개(seed)만 하고 색인을 안 만드는 것이 바로 그 증상이었다."""
+    for name in ('setup-linux.sh', 'setup.ps1'):
+        s = _read(name)
+        assert 'gen_spec_index.py' in s, f'{name}: 파생 색인을 만들지 않는다 — 화면 목록이 빈다'
+    sh = _read('setup-linux.sh')
+    i, j = sh.index('4-a 파생 색인'), sh.index('5/5 빌드')
+    assert i < j, '색인 생성이 빌드 뒤에 있으면 seed 전개 직후 상태가 반영되지 않는다'
