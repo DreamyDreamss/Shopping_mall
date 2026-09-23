@@ -30,7 +30,7 @@ export const 결과있음: Story = {
 }
 
 /** 결과없음 — 검색했지만 0건. */
-export const 결과없음: Story = { args: { query: '존재하지않는주소xyz' } }
+export const 결과없음: Story = { tags: ['state:빈'], args: { query: '존재하지않는주소xyz' } }
 
 /** 검색중 — 로딩 표시. */
 export const 검색중: Story = { args: { query: '테헤란로', loading: true } }
@@ -38,5 +38,5 @@ export const 검색중: Story = { args: { query: '테헤란로', loading: true }
 /** 조회실패 — 검색어 형식 오류 등 서버 사유 그대로 노출. */
 export const 조회실패: Story = {
   args: { query: 'a', error: '검색어를 2자 이상 입력해 주세요' },
-  tags: ['shows-error'],
+  tags: ['shows-error', 'state:오류'],
 }

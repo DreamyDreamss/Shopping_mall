@@ -39,7 +39,7 @@ export const 수정: Story = {
 }
 
 /** 검증오류 — 수령인/연락처/우편번호/상세주소 전부 오류. */
-export const 검증오류: Story = {
+export const 검증오류: Story = { tags: ['state:오류'],
   args: {
     mode: 'add',
     value: {

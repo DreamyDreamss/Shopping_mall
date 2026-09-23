@@ -24,10 +24,10 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 /** 0건 — 안내 문구 + [추가] 버튼. */
-export const 목록_0건: Story = { args: { addresses: [] } }
+export const 목록_0건: Story = { tags: ['state:빈'], args: { addresses: [] } }
 
 /** 1건 — 기본 배지 표시. */
-export const 목록_1건: Story = { args: { addresses: [address(1, { isDefault: 'Y' })] } }
+export const 목록_1건: Story = { tags: ['state:기본'], args: { addresses: [address(1, { isDefault: 'Y' })] } }
 
 /** 10건 도달 — [추가] 버튼 비활성 + "최대 10개" 안내. */
 export const 목록_10건상한: Story = {
@@ -35,7 +35,7 @@ export const 목록_10건상한: Story = {
 }
 
 /** 기본 배송지 전환 중 — 어느 한 행이 pendingAddressId로 잠긴 상태(버튼 disabled 시각 확인). */
-export const 기본배송지전환중: Story = {
+export const 기본배송지전환중: Story = { tags: ['state:로딩'],
   args: {
     addresses: [address(1, { isDefault: 'Y' }), address(2)],
     pendingAddressId: 2,

@@ -11,5 +11,5 @@ export default meta
 
 type Story = StoryObj<typeof meta>
 
-export const 카드: Story = { args: { variant: 'card' } }
+export const 카드: Story = { tags: ['state:로딩'], args: { variant: 'card' } }
 export const 리스트: Story = { args: { variant: 'list' } }

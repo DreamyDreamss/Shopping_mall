@@ -16,4 +16,4 @@ type Story = StoryObj<typeof meta>
 export const 상품없음: Story = { args: { reason: 'notFound' } }
 
 /** 조회실패 — 네트워크/5xx. [다시 시도]. */
-export const 조회실패: Story = { args: { reason: 'fetchError' } }
+export const 조회실패: Story = { tags: ['state:오류'], args: { reason: 'fetchError' } }

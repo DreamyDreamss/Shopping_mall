@@ -32,7 +32,7 @@ export const 결과없음_검색어: Story = { args: { rows: [], emptyReason: 'k
 export const 결과없음_필터: Story = { args: { rows: [], emptyReason: 'filter' } }
 
 /** 로딩 — 그리드 자리에 골격(스켈레톤) 카드. */
-export const 로딩: Story = { args: { rows: [], loading: true } }
+export const 로딩: Story = { tags: ['state:로딩'], args: { rows: [], loading: true } }
 
 /** 조회실패 — 문구 + [다시 시도]만 보인다(서버 계약은 그대로, 확정 답변 api_error). */
-export const 조회실패: Story = { args: { rows: [], error: '500 Internal Server Error' } }
+export const 조회실패: Story = { tags: ['state:오류'], args: { rows: [], error: '500 Internal Server Error' } }

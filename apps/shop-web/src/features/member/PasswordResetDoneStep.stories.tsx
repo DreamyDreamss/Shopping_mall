@@ -13,4 +13,4 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 /** 기본 — 완료 문구 + 로그인 이동 링크. */
-export const 기본: Story = {}
+export const 기본: Story = { tags: ['state:기본'],}

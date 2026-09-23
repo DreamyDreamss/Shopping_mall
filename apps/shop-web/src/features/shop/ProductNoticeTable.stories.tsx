@@ -12,4 +12,4 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 /** 기본 — 값 소스가 없어 전 항목이 '-'로 표시된다. */
-export const 기본: Story = {}
+export const 기본: Story = { tags: ['state:기본'],}

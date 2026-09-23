@@ -13,7 +13,7 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 /** 기본 — 중간 페이지, 이전/다음 둘 다 활성. */
-export const 기본: Story = { args: { page: 3, totalPages: 5 } }
+export const 기본: Story = { tags: ['state:기본'], args: { page: 3, totalPages: 5 } }
 
 /** 마지막페이지 — 다음 버튼 비활성. */
 export const 마지막페이지: Story = { args: { page: 5, totalPages: 5 } }

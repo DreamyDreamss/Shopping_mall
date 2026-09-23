@@ -22,7 +22,7 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 /** 기본 — 정가 없음, 담기/구매 가능. */
-export const 기본: Story = {}
+export const 기본: Story = { tags: ['state:기본'],}
 
 /** 할인있음 — 실 SKU-1001(스탠딩 데스크), price 390,000 / listPrice 450,000(13% 할인, DB 실측). */
 export const 할인있음: Story = {

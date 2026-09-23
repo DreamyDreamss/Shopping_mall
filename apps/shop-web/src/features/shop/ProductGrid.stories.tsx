@@ -37,7 +37,7 @@ export const 목록있음: Story = { args: { rows } }
 export const 빈목록: Story = { args: { rows: [] } }
 
 /** 로딩 — 그리드 대신 진행 표시. */
-export const 로딩: Story = { args: { rows: [], loading: true } }
+export const 로딩: Story = { tags: ['state:로딩'], args: { rows: [], loading: true } }
 
 /** 조회실패 — 문구 + [다시 시도]만 보인다(서버 계약은 그대로, 확정 답변 api_error). */
-export const 조회실패: Story = { args: { rows: [], error: '500 Internal Server Error' } }
+export const 조회실패: Story = { tags: ['state:오류'], args: { rows: [], error: '500 Internal Server Error' } }

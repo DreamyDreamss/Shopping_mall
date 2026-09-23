@@ -21,7 +21,7 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 /** 기본 — 정가·이미지 없이 판매가만(합성 데이터, 실 SKU 4건 중 이 조합 없음). */
-export const 기본: Story = { args: { product } }
+export const 기본: Story = { tags: ['state:기본'], args: { product } }
 
 /**
  * 할인 — 실 SKU-1001(스탠딩 데스크), price 390,000 / listPrice 450,000 / image

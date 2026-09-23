@@ -15,13 +15,13 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 /** 기본 — 빈 입력. */
-export const 기본: Story = { args: { value: { email: '', password: '' } } }
+export const 기본: Story = { tags: ['state:기본'], args: { value: { email: '', password: '' } } }
 
 /** 입력됨 — 이메일·비밀번호를 채운 상태. */
 export const 입력됨: Story = { args: { value: { email: 'user@example.com', password: 'abcd1234' } } }
 
 /** 제출 중 — 버튼이 잠긴다(중복 제출 방지). */
-export const 제출중: Story = {
+export const 제출중: Story = { tags: ['state:로딩'],
   args: { value: { email: 'user@example.com', password: 'abcd1234' }, busy: true },
 }
 

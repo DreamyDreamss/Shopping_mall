@@ -15,4 +15,4 @@ export default meta
 
 type Story = StoryObj<typeof meta>
 
-export const 기본: Story = { args: { categories: CATEGORY_SHORTCUTS } }
+export const 기본: Story = { tags: ['state:기본'], args: { categories: CATEGORY_SHORTCUTS } }

@@ -26,7 +26,7 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 /** 기본 — 품목 2건 + 배송 이력 2건(출고일시 DESC). */
-export const 기본: Story = { args: { order: base } }
+export const 기본: Story = { tags: ['state:기본'], args: { order: base } }
 
 /**
  * 미출고 섞임 — `shippedAt`이 null인 건은 **맨 뒤**로 간다.
@@ -45,22 +45,22 @@ export const 미출고섞임: Story = {
 }
 
 /** 배송 이력 없음 — "배송 이력이 없습니다"(빈 목록을 그리지 않는다). */
-export const 배송이력없음: Story = { args: { order: { ...base, deliveries: [], deliveryState: null } } }
+export const 배송이력없음: Story = { tags: ['state:빈'], args: { order: { ...base, deliveries: [], deliveryState: null } } }
 
 /** 품목 없음 — 데이터 이상이지만 화면이 죽지 않아야 한다. */
-export const 품목없음: Story = { args: { order: { ...base, items: [] } } }
+export const 품목없음: Story = { tags: ['state:빈'], args: { order: { ...base, items: [] } } }
 
 /** 탈퇴 회원 — 회원명이 비어도 주문은 보인다(SR-221). */
 export const 탈퇴회원: Story = { args: { order: { ...base, memberName: null } } }
 
 /** 불러오는 중. */
-export const 로딩: Story = { args: { order: null, loading: true } }
+export const 로딩: Story = { tags: ['state:로딩'], args: { order: null, loading: true } }
 
 /** 조회 실패 — 사유를 그대로 싣는다. */
-export const 조회실패: Story = { args: { order: null, error: '404 Not Found' } }
+export const 조회실패: Story = { tags: ['state:오류'], args: { order: null, error: '404 Not Found' } }
 
 /** 주문 없음 — 오류가 아니라 "찾을 수 없습니다". */
-export const 주문없음: Story = { args: { order: null } }
+export const 주문없음: Story = { tags: ['state:빈'], args: { order: null } }
 
 /** 조회 실패 + 다시 시도 — 버튼이 보이고 onRetry를 부른다(SR-229) */
 export const 조회실패다시시도: Story = { args: { order: null, error: '503 Service Unavailable', onRetry: () => {} } }

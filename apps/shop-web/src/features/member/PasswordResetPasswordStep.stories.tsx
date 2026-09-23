@@ -14,10 +14,10 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 /** 기본 — 빈 입력. */
-export const 기본: Story = { args: { value: '' } }
+export const 기본: Story = { tags: ['state:기본'], args: { value: '' } }
 
 /** 제출 중 — 버튼이 잠긴다(중복 제출 방지). */
-export const 제출중: Story = { args: { value: 'newPass123', busy: true } }
+export const 제출중: Story = { tags: ['state:로딩'], args: { value: 'newPass123', busy: true } }
 
 /** 비밀번호규칙오류 — 400 MBR-4001(8~64자, 영문+숫자 포함 규칙 위반). */
 export const 비밀번호규칙오류: Story = {

@@ -13,6 +13,6 @@ export default meta
 
 type Story = StoryObj<typeof meta>
 
-export const 기본: Story = {}
+export const 기본: Story = { tags: ['state:기본'],}
 export const 성공: Story = { args: { variant: 'success', message: '주문이 완료되었습니다' } }
-export const 오류: Story = { args: { variant: 'error', message: '처리 중 오류가 발생했습니다' } }
+export const 오류: Story = { tags: ['state:오류'], args: { variant: 'error', message: '처리 중 오류가 발생했습니다' } }

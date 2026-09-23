@@ -22,7 +22,7 @@ const rows: OrderRow[] = [
 export const 집계있음: Story = { args: { rows } }
 
 /** 0건 — 0원·0건을 늘어놓지 않고 "집계할 주문이 없습니다" */
-export const 결과없음: Story = { args: { rows: [] } }
+export const 결과없음: Story = { tags: ['state:빈'], args: { rows: [] } }
 
 /** 조회 실패 — 카드도 숨긴다(그리드와 같은 규칙) */
 export const 조회실패숨김: Story = {

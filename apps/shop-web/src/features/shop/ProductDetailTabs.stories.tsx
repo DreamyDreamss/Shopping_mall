@@ -13,7 +13,7 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 /** 기본 — 상세정보 탭이 먼저 보인다("등록된 상세 설명이 없습니다"). */
-export const 기본: Story = { args: { initialTab: 'detail' } }
+export const 기본: Story = { tags: ['state:기본'], args: { initialTab: 'detail' } }
 
 /** 상품평 — 데이터가 없어 "준비 중"만 보인다. */
 export const 상품평: Story = { args: { initialTab: 'review' } }

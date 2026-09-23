@@ -14,4 +14,4 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 /** 기본 — 도착 화면이 있는 '홈'만 탭으로 보인다(나머지 8개는 AC대로 숨김). */
-export const 기본: Story = {}
+export const 기본: Story = { tags: ['state:기본'],}

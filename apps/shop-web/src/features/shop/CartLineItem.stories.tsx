@@ -17,7 +17,7 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 /** 기본 — 선택됨, 조작 가능. */
-export const 기본: Story = {}
+export const 기본: Story = { tags: ['state:기본'],}
 
 /** 선택 해제 — 체크박스만 꺼진 상태. */
 export const 선택해제: Story = { args: { selected: false } }

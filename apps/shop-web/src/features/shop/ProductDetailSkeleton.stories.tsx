@@ -12,4 +12,4 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 /** 로딩 — 이미지·정보 영역 골격만 보인다. */
-export const 로딩: Story = {}
+export const 로딩: Story = { tags: ['state:로딩'],}

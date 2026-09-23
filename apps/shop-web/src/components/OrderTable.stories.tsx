@@ -26,19 +26,19 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 /** 기본 — 3건. 배송 이력이 없는 건은 배송상태가 "-"다. */
-export const 목록있음: Story = { args: { rows } }
+export const 목록있음: Story = { tags: ['state:기본'], args: { rows } }
 
 /** 0건 — "조회 결과 없음". 오류와 **다른 사실**이다. */
-export const 결과없음: Story = { args: { rows: [] } }
+export const 결과없음: Story = { tags: ['state:빈'], args: { rows: [] } }
 
 /** 조회 중 — 그리드 대신 진행 표시. */
-export const 조회중: Story = { args: { rows: [], loading: true } }
+export const 조회중: Story = { tags: ['state:로딩'], args: { rows: [], loading: true } }
 
 /**
  * 조회 실패(SR-208) — 그리드·"조회 결과 없음"·"전체 N건"을 **모두 숨긴다**.
  * 오류인데 "0건"이라고 말하면 사람은 "조건에 맞는 게 없구나"로 읽는다.
  */
-export const 조회실패: Story = { args: { rows: [], error: '500 Internal Server Error' } }
+export const 조회실패: Story = { tags: ['state:오류'], args: { rows: [], error: '500 Internal Server Error' } }
 
 /** 탈퇴 회원(SR-221) — 회원명이 비어도 주문이 사라지지 않고 "(탈퇴)"로 표시된다. */
 export const 탈퇴회원포함: Story = { args: { rows: [rows[2]] } }

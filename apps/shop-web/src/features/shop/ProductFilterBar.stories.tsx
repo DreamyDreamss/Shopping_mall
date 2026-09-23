@@ -15,7 +15,7 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 /** 기본 — 재고 필터 꺼짐, 가격대 미입력, 추천순. */
-export const 기본: Story = {
+export const 기본: Story = { tags: ['state:기본'],
   args: { inStockOnly: false, priceMin: '', priceMax: '', sortKey: 'recommend', resultCount: 24 },
 }
 

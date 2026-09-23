@@ -17,7 +17,7 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 /** 기본 — 전부 미입력. */
-export const 기본: Story = {}
+export const 기본: Story = { tags: ['state:기본'],}
 
 /** 입력완료 — 우편번호 찾기까지 마친 상태. */
 export const 입력완료: Story = {

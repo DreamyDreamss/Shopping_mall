@@ -16,7 +16,7 @@ type Story = StoryObj<typeof meta>
 const base = { target: 'user@example.com', channel: 'EMAIL' as const, code: '' }
 
 /** 기본 — 카운트다운 진행중, 재전송은 쿨다운 중. */
-export const 기본: Story = {
+export const 기본: Story = { tags: ['state:기본'],
   args: { ...base, remainingSeconds: 540, resendRemainingSeconds: 42 },
 }
 

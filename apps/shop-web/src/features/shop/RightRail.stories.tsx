@@ -40,5 +40,5 @@ export const 최근본상품_3개: Story = {
 /** 최근 본 상품 0개(+쿠폰/주문 카드도 없음) — 아무것도 그리지 않는 것이 정답인 상태. */
 export const 비어있음: Story = {
   decorators: [withFixture([])],
-  tags: ['renders-nothing'],
+  tags: ['renders-nothing', 'state:빈'],
 }

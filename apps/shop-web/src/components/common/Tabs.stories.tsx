@@ -25,7 +25,7 @@ function Demo({ sticky }: { sticky?: boolean }) {
 
 const demoArgs = { tabs: sampleTabs, activeKey: 'all', onChange: () => {} } // render가 상태를 관리해 무시된다(타입 요건 충족용)
 
-export const 기본: Story = { args: demoArgs, render: () => <Demo /> }
+export const 기본: Story = { tags: ['state:기본'], args: demoArgs, render: () => <Demo /> }
 export const 스티키고정: Story = { args: demoArgs, render: () => <Demo sticky /> }
 
 // SR-311 round2 재작업 지시 3 — 탭 라벨 위 점(빨간 라벨) 마커를 badge:true 탭으로 실물 검증한다.

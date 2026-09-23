@@ -16,4 +16,4 @@ export const 출고: Story = { args: { state: 'SHIPPED' } }
 export const 배송완료: Story = { args: { state: 'DELIVERED' } }
 
 /** 이력 없음 — "-"다. 빈 문자열도 "없음"도 아니다(UIS-ORD-001 §5). */
-export const 이력없음: Story = { args: { state: null } }
+export const 이력없음: Story = { tags: ['state:빈'], args: { state: null } }

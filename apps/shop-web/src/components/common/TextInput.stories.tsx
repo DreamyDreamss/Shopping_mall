@@ -13,7 +13,7 @@ export default meta
 
 type Story = StoryObj<typeof meta>
 
-export const 기본: Story = {}
+export const 기본: Story = { tags: ['state:기본'],}
 
 export const 포커스: Story = {
   play: ({ canvasElement }) => {
@@ -22,6 +22,6 @@ export const 포커스: Story = {
   },
 }
 
-export const 오류: Story = { args: { error: '이름을 입력해 주세요' } }
+export const 오류: Story = { tags: ['state:오류'], args: { error: '이름을 입력해 주세요' } }
 
 export const 비활성: Story = { args: { disabled: true } }

@@ -30,4 +30,4 @@ export const 기간역전: Story = {
 }
 
 /** 조회 중 — 버튼이 잠긴다(중복 조회 방지). */
-export const 조회중: Story = { args: { value: EMPTY_QUERY, busy: true } }
+export const 조회중: Story = { tags: ['state:로딩'], args: { value: EMPTY_QUERY, busy: true } }

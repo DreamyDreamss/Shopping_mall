@@ -12,7 +12,7 @@ export default meta
 
 type Story = StoryObj<typeof meta>
 
-export const 기본: Story = {}
+export const 기본: Story = { tags: ['state:기본', 'state:빈'],}
 
 /** bench/screenshot-10 구성 그대로 — 하단 추천 레일 슬롯까지 채운 상태. */
 export const 추천레일포함: Story = {

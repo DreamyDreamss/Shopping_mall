@@ -20,10 +20,10 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 /** 기본 — 후보 N개가 가로 스크롤 레일로 보인다. */
-export const 기본: Story = { args: { products: rows } }
+export const 기본: Story = { tags: ['state:기본'], args: { products: rows } }
 
 /** 비어있음 — 후보가 없으면 섹션 자체를 렌더하지 않는다(빈 렌더가 정답인 상태). */
 export const 비어있음: Story = {
   args: { products: [] },
-  tags: ['renders-nothing'], // 이 상태는 아무것도 그리지 않는 것이 정답이다 — 빈 렌더를 고장으로 보지 않게
+  tags: ['renders-nothing', 'state:빈'], // 이 상태는 아무것도 그리지 않는 것이 정답이다 — 빈 렌더를 고장으로 보지 않게
 }

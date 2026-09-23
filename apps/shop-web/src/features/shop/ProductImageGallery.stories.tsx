@@ -14,7 +14,7 @@ type Story = StoryObj<typeof meta>
 
 /** 기본 — 대표 이미지+썸네일 정확히 1개(같은 이미지 재사용, 실 SKU-1001 이미지 — 재작업 round 2:
  * 이전엔 THUMBNAIL_COUNT=3으로 같은 이미지를 3번 반복해 "여러 장"처럼 보였다, QA 권고 1 대응). */
-export const 기본: Story = { args: { imageUrl: '/images/products/sku-1001.svg' } }
+export const 기본: Story = { tags: ['state:기본'], args: { imageUrl: '/images/products/sku-1001.svg' } }
 
 /** 이미지없음 — 이니셜 대체 영역만 보이고 썸네일 자체를 렌더하지 않는다. */
 export const 이미지없음: Story = { args: { imageUrl: null } }
