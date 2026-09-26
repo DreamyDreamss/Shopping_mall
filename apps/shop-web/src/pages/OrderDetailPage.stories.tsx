@@ -24,6 +24,12 @@ const base: OrderDetail = {
     { deliveryNo: 'D-002', state: 'DELIVERED', shippedAt: '2026-08-17 09:10' },
     { deliveryNo: 'D-001', state: 'SHIPPED', shippedAt: '2026-08-16 18:40' },
   ],
+  // round2 재작업 지시 2와 동일 사유(OrderDetailCard.stories.tsx 참고) — deliveries(둘 다 출고 완료)와
+  // 정합하는 shipments. shipments가 필수 필드가 된 이후 이 픽스처도 채워야 타입체크를 통과한다.
+  shipments: [
+    { deliveryNo: 'D-002', carrierCode: 'CJ', carrierName: 'CJ대한통운', invoiceNo: 'INV-70002', shippedAt: '2026-08-17 09:10' },
+    { deliveryNo: 'D-001', carrierCode: 'CJ', carrierName: 'CJ대한통운', invoiceNo: 'INV-70001', shippedAt: '2026-08-16 18:40' },
+  ],
 }
 
 /** `/api/orders/{no}`만 가로챈다 — 모르는 요청을 삼키면 화면이 왜 비었는지 알 수 없어진다. */
@@ -70,7 +76,9 @@ export const 기본: Story = {
 /** 품목 없음 — 데이터 이상이지만 화면이 죽지 않아야 한다. 빈 목록을 그리지 않고 사유를 적는다. */
 export const 품목없음: Story = {
   tags: ['state:빈'],
-  beforeEach: () => stubOrder({ ...base, items: [], deliveries: [], deliveryState: null }),
+  // deliveries가 0건이라 shipments도 []로 정합한다(round2 재작업 지시 2와 동일 사유 — "배송 완료"와
+  // "출고 준비 중"이 동시에 표시되는 모순을 만들지 않는다).
+  beforeEach: () => stubOrder({ ...base, items: [], deliveries: [], deliveryState: null, shipments: [] }),
 }
 
 /** 불러오는 중. */

@@ -3,6 +3,8 @@
 package com.sm.lab.shop.controller;
 
 import com.sm.lab.shop.domain.Order;
+import com.sm.lab.shop.domain.OrderDelivery;
+import com.sm.lab.shop.domain.OrderShipment;
 import com.sm.lab.shop.service.ExportRowLimitExceededException;
 import com.sm.lab.shop.service.OrderService;
 import com.sm.lab.shop.support.AdminApiKeyTestConfig;
@@ -20,6 +22,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -219,5 +223,84 @@ class OrderControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.items[0].orderNo").value("20260817-0001"))
                 .andExpect(jsonPath("$.items[0].deliveryState").doesNotExist());
+    }
+
+    // LAB-105.1 — GET /api/orders/{orderNo} 신설(이 파일에 detail() 테스트가 아직 없었다).
+    private static Order orderWithoutOptionalLists(String orderNo) {
+        Order o = new Order();
+        o.setOrderNo(orderNo);
+        o.setMemberId("M-0001");
+        o.setMemberName("김실증");
+        o.setOrderState("SHIPPED");
+        o.setTotalAmount(55000L);
+        o.setOrderedAt(LocalDateTime.of(2026, 8, 17, 9, 0));
+        o.setItems(List.of());
+        o.setDeliveries(List.of());
+        return o;
+    }
+
+    private static OrderShipment shipment(String deliveryNo, String carrierCode, String carrierName, String invoiceNo) {
+        OrderShipment s = new OrderShipment();
+        s.setDeliveryNo(deliveryNo);
+        s.setCarrierCode(carrierCode);
+        s.setCarrierName(carrierName);
+        s.setInvoiceNo(invoiceNo);
+        return s;
+    }
+
+    // linked_tc: LAB-105.1
+    @Test
+    void detail_returnsShipmentsArrayWithCarrierFields() throws Exception {
+        Order o = orderWithoutOptionalLists("20260815-0001");
+        o.setShipments(List.of(shipment("D-0815-1", "CJ", "CJ대한통운", "INV-88010")));
+        when(orderService.detail("20260815-0001")).thenReturn(o);
+
+        mockMvc.perform(get("/api/orders/20260815-0001"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.shipments[0].deliveryNo").value("D-0815-1"))
+                .andExpect(jsonPath("$.shipments[0].carrierCode").value("CJ"))
+                .andExpect(jsonPath("$.shipments[0].carrierName").value("CJ대한통운"))
+                .andExpect(jsonPath("$.shipments[0].invoiceNo").value("INV-88010"));
+    }
+
+    // linked_tc: LAB-105.1 — 출고 전은 오류가 아니라 빈 배열(AC 확정)
+    @Test
+    void detail_noDeliveries_returnsEmptyShipmentsArray() throws Exception {
+        Order o = orderWithoutOptionalLists("20260817-0001");
+        o.setShipments(List.of());
+        when(orderService.detail("20260817-0001")).thenReturn(o);
+
+        mockMvc.perform(get("/api/orders/20260817-0001"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.shipments").isArray())
+                .andExpect(jsonPath("$.shipments").isEmpty());
+    }
+
+    // linked_tc: LAB-105.1 — 회귀 가드(SR-210 list_responseNeverIncludesDeliveryStateField와 동일 기법):
+    // OrderDelivery에는 carrierCode getter 자체가 없어 이 단언은 "필드 부재" 검증이다(값이 null인
+    // 경우를 놓치는 거짓보증이 아니다 — SR-306#2 doesNotExist() 오탐과 다른 조건, STORY "실패 사례집" 참조).
+    @Test
+    void detail_deliveriesArrayNeverGainsCarrierFields() throws Exception {
+        Order o = orderWithoutOptionalLists("20260816-0002");
+        OrderDelivery delivery = new OrderDelivery();
+        delivery.setDeliveryNo("D-0816-1");
+        delivery.setDeliveryState("SHIPPED");
+        delivery.setInvoiceNo("INV-88031");
+        o.setDeliveries(List.of(delivery));
+        o.setShipments(List.of(shipment("D-0816-1", "CJ", "CJ대한통운", "INV-88031")));
+        when(orderService.detail("20260816-0002")).thenReturn(o);
+
+        mockMvc.perform(get("/api/orders/20260816-0002"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.deliveries[0].carrierCode").doesNotExist());
+    }
+
+    // linked_tc: LAB-105.1 — 회귀 확인용: 이 엔드포인트 자체가 이번에 신설이라 기존 404 계약도 같이 고정.
+    @Test
+    void detail_notFound_returns404() throws Exception {
+        when(orderService.detail("NO-SUCH")).thenThrow(new ResponseStatusException(NOT_FOUND, "주문 없음: NO-SUCH"));
+
+        mockMvc.perform(get("/api/orders/NO-SUCH"))
+                .andExpect(status().isNotFound());
     }
 }

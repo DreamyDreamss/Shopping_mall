@@ -53,9 +53,21 @@ spring:
       # 신설) 추가. 기존 8개 항목 순서는 건드리지 않고 목록 맨 끝에 이어붙였다.
       # SR-306(#2) — V10__product_list_price_image.sql(PRODUCTS.list_price/image_url 컬럼 추가 +
       # 시드 UPDATE 4문) 추가. 기존 9개 항목 순서는 건드리지 않고 목록 맨 끝에 이어붙였다.
+      # SR-351(#1) — V11__product_reviews.sql(PRODUCT_REVIEWS 신설, 상품평 작성/삭제 API) 추가.
+      # 기존 10개 항목 순서는 건드리지 않고 목록 맨 끝에 이어붙였다.
+      # LAB-105.1 — V12__order_delivery_carrier.sql(ORDER_DELIVERY.carrier_code/carrier_name 컬럼
+      # 추가 + 시드 UPDATE 2문) 추가. 계획서는 이 파일을 V11로 적었으나(CLAUDE.md의 "현재 최신
+      # V9" 서술이 stale — 실제로는 SR-351이 이미 V11__product_reviews.sql을 점유해 있었다),
+      # 이 목록이 명시적 나열 방식(glob 아님)이라 새 파일이 여기 없으면 조용히 실행되지 않는다는
+      # 것을 실측(테스트 재현)으로 확인해 V12로 정정하고 이 자리에 추가했다. 기존 11개 항목 순서는
+      # 건드리지 않았다.
+      # SR-351(#2) — V13__product_reviews_list_indexes.sql(PRODUCT_REVIEWS 목록·집계 전용 인덱스
+      # 2건) 추가. V12와 동일한 이유로 이 목록에 직접 추가해야 실제로 실행된다(명시적 나열 방식,
+      # glob 아님 — V12 추가 시 실측 확인된 것과 동일 함정, 이 SR 착수 시 다시 실측 재현해 확인함).
+      # 기존 12개 항목 순서는 건드리지 않고 목록 맨 끝에 이어붙였다.
       encoding: UTF-8
       mode: always
-      schema-locations: classpath:db/member_signup_verifications.sql,classpath:db/member_signup_rate_limits.sql,classpath:db/V3__members_signup.sql,classpath:db/V4__members_login.sql,classpath:db/V5__member_password_resets.sql,classpath:db/V6__member_password_reset_confirmation.sql,classpath:db/V7__member_addresses.sql,classpath:db/V8__zipcodes.sql,classpath:db/V9__member_password_reset_rate_limits.sql,classpath:db/V10__product_list_price_image.sql
+      schema-locations: classpath:db/member_signup_verifications.sql,classpath:db/member_signup_rate_limits.sql,classpath:db/V3__members_signup.sql,classpath:db/V4__members_login.sql,classpath:db/V5__member_password_resets.sql,classpath:db/V6__member_password_reset_confirmation.sql,classpath:db/V7__member_addresses.sql,classpath:db/V8__zipcodes.sql,classpath:db/V9__member_password_reset_rate_limits.sql,classpath:db/V10__product_list_price_image.sql,classpath:db/V11__product_reviews.sql,classpath:db/V12__order_delivery_carrier.sql,classpath:db/V13__product_reviews_list_indexes.sql
 
 mybatis:
   mapper-locations: classpath:mapper/*.xml

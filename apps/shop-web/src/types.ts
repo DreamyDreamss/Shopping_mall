@@ -22,9 +22,25 @@ export interface OrderItem {
   unitPrice: number
 }
 
+// LAB-105.1 — 주문 상세(INF-ORD-004) 배송 정보(택배사·송장). `deliveries[]`(배송 이력)와는 별도
+// 파생 배열이다 — 값이 없으면(미배정) null(빈 문자열 아님, 서버 `OrderShipment` 관례 그대로).
+export interface OrderShipment {
+  deliveryNo: string
+  carrierCode: string | null
+  carrierName: string | null
+  invoiceNo: string | null
+  shippedAt: string | null
+}
+
 export interface OrderDetail extends OrderRow {
   items: OrderItem[]
   deliveries: { deliveryNo: string; state: Exclude<DeliveryState, null>; shippedAt: string | null }[]
+  // 필수 필드(LAB-105.1 round2 — round1 QA FAIL 필수수정 1). 계약상 항상 채워진다. 다만 `fetchOrder`가
+  // 서버 JSON을 검증 없이 `as OrderDetail`로 캐스팅할 뿐이라, 실제 응답에 이 키가 없으면(구버전 응답
+  // 등) 자바스크립트 런타임 값은 여전히 `undefined`일 수 있다 — 그 계약 위반을 `OrderShipmentInfo`가
+  // 방어적으로 감지해 "배송 정보를 불러오지 못했습니다"로 표시한다(AC 68). `[]`(정상 응답, 출고 전 —
+  // "출고 준비 중")와는 의미가 다르므로 `??`로 뭉개지 않는다(`OrderDetailCard`도 그대로 넘긴다).
+  shipments: OrderShipment[]
 }
 
 export interface OrderQuery {
@@ -85,6 +101,22 @@ export interface Product {
   saleYn: string
   listPrice: number | null
   imageUrl: string | null
+}
+
+// SR-353 — 상품 상세(`/shop/products/:sku`) 전용 응답 타입. `GET /api/products/{sku}`(INF-ORD-009)에
+// `soldOut`(boolean) 필드가 추가되고, `stockQty`는 "읽지 못하는 경우"에 한해 `null`을 허용하도록 타입이
+// 열렸다(값 자체는 재고 있는 상품과 동일한 number, 확정 답변 api_error). 기존 `Product`(목록·카드·장바구니
+// 등 다수 소비처 공유)는 건드리지 않고 상세 화면 전용으로 별도 선언한다(`MemberAddress`/`CartRow`와 같은
+// "이름 겹침 방지, 별도 타입" 관례) — 기존 7필드는 이름·타입·순서 불변, `soldOut`은 끝에 추가.
+export interface ProductDetail {
+  sku: string
+  productName: string
+  price: number
+  stockQty: number | null
+  saleYn: string
+  listPrice: number | null
+  imageUrl: string | null
+  soldOut: boolean
 }
 
 // SR-304 — 상품 상세(`/shop/products/:sku`). `POST /api/cart/items` 응답(`CartController.addItem` →

@@ -1,7 +1,15 @@
 // linked_func: FUNC-order-002 — 주문 상세의 상태들
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { OrderDetailCard } from './OrderDetailCard'
-import type { OrderDetail } from '../types'
+import type { OrderDetail, OrderShipment } from '../types'
+
+// round2 재작업 지시 2(round1 QA FAIL 필수수정 2) — `base.deliveries`(D-002/D-001, 둘 다 출고 완료)와
+// **정합하는** `shipments`. round1은 `shipments`가 선택 필드라 `base`에 안 채워도 됐지만, 그 결과
+// "배송 완료(DELIVERED/SHIPPED) + 출고 준비 중"이 동시에 표시되는 사실 모순 화면이 됐다.
+const baseShipments: OrderShipment[] = [
+  { deliveryNo: 'D-002', carrierCode: 'CJ', carrierName: 'CJ대한통운', invoiceNo: 'INV-70002', shippedAt: '2026-08-17 09:10' },
+  { deliveryNo: 'D-001', carrierCode: 'CJ', carrierName: 'CJ대한통운', invoiceNo: 'INV-70001', shippedAt: '2026-08-16 18:40' },
+]
 
 const base: OrderDetail = {
   orderNo: '20260816-0001', memberId: 'm001', memberName: '김주문', orderState: 'DONE',
@@ -14,6 +22,7 @@ const base: OrderDetail = {
     { deliveryNo: 'D-002', state: 'DELIVERED', shippedAt: '2026-08-17 09:10' },
     { deliveryNo: 'D-001', state: 'SHIPPED', shippedAt: '2026-08-16 18:40' },
   ],
+  shipments: baseShipments,
 }
 
 const meta = {
@@ -40,12 +49,25 @@ export const 미출고섞임: Story = {
         { deliveryNo: 'D-003', state: 'READY', shippedAt: null },
         ...base.deliveries,
       ],
+      // D-003은 아직 미배정(READY) — carrier·invoice 전부 null("송장 등록 대기"), baseShipments의
+      // D-002/D-001은 그대로(정합).
+      shipments: [
+        { deliveryNo: 'D-003', carrierCode: null, carrierName: null, invoiceNo: null, shippedAt: null },
+        ...baseShipments,
+      ],
     },
   },
 }
 
-/** 배송 이력 없음 — "배송 이력이 없습니다"(빈 목록을 그리지 않는다). */
-export const 배송이력없음: Story = { tags: ['state:빈'], args: { order: { ...base, deliveries: [], deliveryState: null } } }
+/**
+ * 배송 이력 없음 — "배송 이력이 없습니다"(빈 목록을 그리지 않는다). `ORDER_DELIVERY` 행이 0건인
+ * 상태라 `shipments`도 `[]`(출고 전 — "출고 준비 중")로 정합한다(round2 재작업 지시 2 — 출고 전을
+ * 보여줄 상태는 이 스토리로 분리, `기본`·`미출고섞임`·`품목없음`·`탈퇴회원`과 겹치지 않는다).
+ */
+export const 배송이력없음: Story = {
+  tags: ['state:빈'],
+  args: { order: { ...base, deliveries: [], deliveryState: null, shipments: [] } },
+}
 
 /** 품목 없음 — 데이터 이상이지만 화면이 죽지 않아야 한다. */
 export const 품목없음: Story = { tags: ['state:빈'], args: { order: { ...base, items: [] } } }

@@ -7,6 +7,7 @@ import com.sm.lab.shop.dao.ProductDao;
 import com.sm.lab.shop.domain.Order;
 import com.sm.lab.shop.domain.OrderDelivery;
 import com.sm.lab.shop.domain.OrderItem;
+import com.sm.lab.shop.domain.OrderShipment;
 import com.sm.lab.shop.support.TestClocks;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -506,6 +507,27 @@ class OrderServiceTest {
                 .isInstanceOf(ResponseStatusException.class)
                 .satisfies(e -> assertThat(((ResponseStatusException) e).getStatusCode()).isEqualTo(HttpStatus.CONFLICT));
         verify(productDao, never()).increaseStock(any(), anyInt());
+    }
+
+    // LAB-105.1 — INF-ORD-004: orderDao.selectShipments 결과가 Order.getShipments()에 그대로 실린다.
+    @Test
+    void detail_populatesShipmentsFromDao() {
+        Order o = order("20260907-0109", "M-0001", "SHIPPED", 10000L, LocalDateTime.now());
+        OrderShipment shipment = new OrderShipment();
+        shipment.setDeliveryNo("D-0907-1");
+        shipment.setCarrierCode("CJ");
+        shipment.setCarrierName("CJ대한통운");
+        shipment.setInvoiceNo("INV-99999");
+        List<OrderShipment> shipments = List.of(shipment);
+        when(orderDao.selectByOrderNo("20260907-0109")).thenReturn(o);
+        when(orderDao.selectItems("20260907-0109")).thenReturn(List.of());
+        when(orderDao.selectDeliveries("20260907-0109")).thenReturn(List.of());
+        when(orderDao.selectShipments("20260907-0109")).thenReturn(shipments);
+
+        Order result = newService().detail("20260907-0109");
+
+        assertThat(result.getShipments()).isEqualTo(shipments);
+        verify(orderDao).selectShipments("20260907-0109");
     }
 
     // INF-ORD-006: 상태 전이가 성공한 뒤에만 라인별 재고를 원복한다 — 호출 순서까지 검증

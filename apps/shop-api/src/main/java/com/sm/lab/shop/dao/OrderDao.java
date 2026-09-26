@@ -5,6 +5,7 @@ package com.sm.lab.shop.dao;
 import com.sm.lab.shop.domain.Order;
 import com.sm.lab.shop.domain.OrderDelivery;
 import com.sm.lab.shop.domain.OrderItem;
+import com.sm.lab.shop.domain.OrderShipment;
 import com.sm.lab.shop.domain.OrderSummary;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -47,6 +48,9 @@ public interface OrderDao {
     // 배송 이력이 없는 주문번호는 결과 목록에 아예 나타나지 않는다(서비스 계층이 "-"로 보완).
     // orderNos가 비어 있으면 호출하지 않는다(호출측 책임 — IN () SQL 오류 방지).
     List<OrderDelivery> selectLatestDeliveryStates(@Param("orderNos") List<String> orderNos);
+    // LAB-105.1 — 주문 상세(INF-ORD-004) 배송 정보(택배사·송장): selectDeliveries와 동일 조건·정렬로
+    // ORDER_DELIVERY를 별도 조회(1:1, 같은 행에서 파생). 출고 이력이 없으면 빈 리스트(오류 아님).
+    List<OrderShipment> selectShipments(@Param("orderNo") String orderNo);
     int insertOrder(Order order);
     int insertItem(OrderItem item);
     int updateState(@Param("orderNo") String orderNo, @Param("state") String state);

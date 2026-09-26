@@ -3,6 +3,7 @@
 package com.sm.lab.shop.dao;
 
 import com.sm.lab.shop.domain.OrderDelivery;
+import com.sm.lab.shop.domain.OrderShipment;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -60,5 +61,41 @@ class OrderDaoTest {
         assertThat(byOrderNo).doesNotContainKey("20260817-0001");
         // 주문번호당 정확히 1건(최신)만 — 2건 이력이 있는 20260816-0002도 결과에 1행뿐이어야 한다
         assertThat(latest).filteredOn(d -> "20260816-0002".equals(d.getOrderNo())).hasSize(1);
+    }
+
+    // LAB-105.1 — 주문 상세(INF-ORD-004) 배송 정보. 실측(db-main describe): D-0815-1
+    // (order_no=20260815-0001, carrier_code=CJ, carrier_name=CJ대한통운, invoice_no=INV-88010).
+    @Test
+    void selectShipments_returnsCarrierAndInvoiceForShippedRow() {
+        List<OrderShipment> shipments = orderDao.selectShipments("20260815-0001");
+
+        assertThat(shipments).hasSize(1);
+        OrderShipment s = shipments.get(0);
+        assertThat(s.getDeliveryNo()).isEqualTo("D-0815-1");
+        assertThat(s.getCarrierCode()).isEqualTo("CJ");
+        assertThat(s.getCarrierName()).isEqualTo("CJ대한통운");
+        assertThat(s.getInvoiceNo()).isEqualTo("INV-88010");
+    }
+
+    // 부분 출고 2건 — D-0816-1(carrier·invoice 있음) + D-0816-2(READY, "송장 등록 대기" = invoice_no NULL).
+    @Test
+    void selectShipments_partialShipment_returnsBothRowsWithOneAwaitingInvoice() {
+        List<OrderShipment> shipments = orderDao.selectShipments("20260816-0002");
+
+        Map<String, OrderShipment> byDeliveryNo = shipments.stream()
+                .collect(Collectors.toMap(OrderShipment::getDeliveryNo, s -> s));
+        assertThat(byDeliveryNo).hasSize(2);
+        assertThat(byDeliveryNo.get("D-0816-1").getCarrierCode()).isEqualTo("CJ");
+        assertThat(byDeliveryNo.get("D-0816-1").getInvoiceNo()).isNotNull();
+        assertThat(byDeliveryNo.get("D-0816-2").getCarrierCode()).isNull();
+        assertThat(byDeliveryNo.get("D-0816-2").getInvoiceNo()).isNull();
+    }
+
+    // 출고 전(ORDER_DELIVERY 행 0건) — 오류가 아니라 빈 리스트.
+    @Test
+    void selectShipments_noDeliveryRows_returnsEmptyList() {
+        List<OrderShipment> shipments = orderDao.selectShipments("20260817-0001");
+
+        assertThat(shipments).isEmpty();
     }
 }

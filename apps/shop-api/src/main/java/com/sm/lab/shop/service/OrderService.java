@@ -181,6 +181,7 @@ public class OrderService {
         }
         order.setItems(orderDao.selectItems(orderNo));
         order.setDeliveries(orderDao.selectDeliveries(orderNo));
+        order.setShipments(orderDao.selectShipments(orderNo));   // LAB-105.1 — 소유권 판정(위 selectByOrderNo) 뒤 부가 조회
         return order;
     }
 

@@ -1,6 +1,7 @@
 // linked_func: FUNC-order-002 — 주문 상세
 import type { OrderDetail } from '../types'
 import { DeliveryBadge } from './DeliveryBadge'
+import { OrderShipmentInfo } from './OrderShipmentInfo'
 
 const won = (n: number) => n.toLocaleString('ko-KR') + '원'
 
@@ -89,6 +90,16 @@ export function OrderDetailCard({ order, loading, error, onRetry }: OrderDetailC
                 </li>
               ))}
             </ul>}
+      </section>
+
+      <section>
+        {/* LAB-105.1 — "배송 이력"(위)과는 별도 파생 배열(shipments)이라 그 섹션 뒤에 추가만 한다
+            (대체 아님) — 위 섹션의 "배송 이력이 없습니다" 문구·회귀 스토리를 건드리지 않는다.
+            round2 재작업 지시 1: `order.shipments`를 `?? []`로 뭉개지 않고 그대로 넘긴다 — 응답에
+            키가 없는 경우(undefined, 정보 부재)와 빈 배열(출고 전)은 다른 화면 문구다(AC 68).
+            `OrderShipmentInfo`가 그 구분을 담당한다. */}
+        <h3 style={{ fontSize: 14, margin: '0 0 6px' }}>배송 정보</h3>
+        <OrderShipmentInfo shipments={order.shipments} />
       </section>
     </div>
   )

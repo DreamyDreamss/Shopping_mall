@@ -13,6 +13,7 @@ public class Order {
     private LocalDateTime orderedAt;
     private List<OrderItem> items;
     private List<OrderDelivery> deliveries;
+    private List<OrderShipment> shipments;   // LAB-105.1 — 택배사·송장 정보(추가만, 기존 필드 불변)
 
     public String getOrderNo() { return orderNo; }
     public void setOrderNo(String orderNo) { this.orderNo = orderNo; }
@@ -30,4 +31,6 @@ public class Order {
     public void setItems(List<OrderItem> items) { this.items = items; }
     public List<OrderDelivery> getDeliveries() { return deliveries; }
     public void setDeliveries(List<OrderDelivery> deliveries) { this.deliveries = deliveries; }
+    public List<OrderShipment> getShipments() { return shipments; }
+    public void setShipments(List<OrderShipment> shipments) { this.shipments = shipments; }
 }
