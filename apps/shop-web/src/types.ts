@@ -190,3 +190,49 @@ export interface MemberAddressInput {
   deliveryMemo?: string
   isDefault?: boolean
 }
+
+// SR-351 — 상품평(리뷰·별점, `/shop/products/:sku` 상품평 탭). `GET/POST/DELETE
+// /api/products/{sku}/reviews*`(INF-ORD-037/038/039, SR-351 #1·#2에서 이미 구현·Done)의 응답 계약을
+// 그대로 옮긴 타입(이 항목이 계약을 정의하지 않음, STORY "계약" 절 그대로).
+
+/** 정렬 — 최신순/별점높은순/별점낮은순. */
+export type ReviewSort = 'latest' | 'ratingDesc' | 'ratingAsc'
+
+/** 목록 응답 items[] 1건 — authorName은 서버가 이미 마스킹한 값(원본 이름은 API로 나가지 않는다). */
+export interface ReviewItem {
+  reviewId: number
+  rating: number
+  content: string
+  authorName: string
+  createdAt: string
+}
+
+/** GET /api/products/{sku}/reviews 응답. avgRating은 리뷰 0건이면 null(화면은 이때 '-'로 표시,
+ * 0.0 표기 금지). */
+export interface ReviewListResult {
+  totalCount: number
+  page: number
+  size: number
+  avgRating: number | null
+  reviewCount: number
+  distribution: Record<'1' | '2' | '3' | '4' | '5', number>
+  items: ReviewItem[]
+}
+
+/** POST /api/products/{sku}/reviews 요청 바디. memberId는 싣지 않는다(`ApiKeyAuthFilter`의
+ * SCOPE_TO_SELF가 회원 X-Api-Key에서 강제한다). */
+export interface ReviewInput {
+  rating: number
+  content: string
+  orderNo: string
+}
+
+/** POST /api/products/{sku}/reviews 성공(201) 응답. */
+export interface ReviewCreateResult {
+  reviewId: number
+  sku: string
+  orderNo: string
+  rating: number
+  content: string
+  createdAt: string
+}

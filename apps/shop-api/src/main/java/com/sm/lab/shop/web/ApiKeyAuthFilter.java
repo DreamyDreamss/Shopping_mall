@@ -124,6 +124,14 @@ import java.util.regex.Pattern;
  * {@code /member/{id}} 경로 패턴을 추가해 {@code /api/members/{id}}(b-1)와 동일한 의미로 판정한다:
  * admin 키는 통과, member 키는 경로변수가 자기 자신일 때만 허용한다.
  *
+ * <p><b>SR-351(#1) — 상품평 작성/삭제 API도 memberId 없는 쓰기 자원</b>: {@code
+ * /api/products/{sku}/reviews}(및 하위 {@code /{reviewId}})는 {@code /api/members/me/addresses}
+ * (SR-235)와 동일한 모양의 자원이다 — URL에 memberId 토큰이 없다. 같은 SCOPE_TO_SELF 메커니즘을
+ * 재사용하되, 메서드가 POST 또는 DELETE일 때만 적용한다(GET 목록 조회는 SR-351 #2가 자기 SR에서
+ * 공개 GET 예외를 처리할 자리라 여기서 미리 막지 않는다). 화이트리스트({@link #isOpenRoute})에는
+ * 넣지 않는다 — SR-307 #1/SR-232 r3와 동일한 함정(필터 스킵 → 소유권 판정 우회)을 피하기 위해
+ * {@link #evaluateMemberScope}에만 분기를 추가한다.
+ *
  * <p><b>스트림 재소비 문제</b>: 서블릿 {@code InputStream}은 1회용이라, 필터가 JSON 본문을 먼저
  * 읽어 memberId를 검사하면 이후 컨트롤러의 {@code @RequestBody} 파싱은 빈 스트림을 보게 된다.
  * 이를 피하기 위해 본문이 있는 요청만 {@link CachedBodyRequest}로 감싸 전체를 한 번만 읽어
@@ -203,6 +211,11 @@ public class ApiKeyAuthFilter extends OncePerRequestFilter {
     // 애초에 매치되지 않는다 — /api/members/me/addresses는 세그먼트가 3개 이상이다.
     private static final Pattern MEMBER_ME_ADDRESSES_PATH =
             Pattern.compile("^/api/members/me/addresses(?:/.*)?$");
+    // SR-351(#1) — /api/products/{sku}/reviews(및 하위 /{reviewId})도 URL에 memberId가 없는
+    // 쓰기 자원이다. MEMBER_ME_ADDRESSES_PATH와 동일한 이유의 SCOPE_TO_SELF 대상이나, 메서드를
+    // POST/DELETE로 한정한다(GET은 SR-351 #2 몫 — 클래스 상단 "SR-351(#1)" 노트 참고).
+    private static final Pattern PRODUCT_REVIEWS_PATH =
+            Pattern.compile("^/api/products/[^/]+/reviews(?:/[^/]+)?$");
     // SR-307(SR-307.1) — 상품 조회 GET만 공개(isOpenRoute 화이트리스트가 아니라 doFilterInternal의
     // "무키 예외" 판정에서만 쓰인다 — 클래스 상단 "round 2 재작업" 노트 참고). 목록은 정확 일치 —
     // "/api/members/"·"/member/"·"/api/orders/" 계열과 접두사가 겹치지 않아 다른 화이트리스트·
@@ -213,6 +226,14 @@ public class ApiKeyAuthFilter extends OncePerRequestFilter {
     // SKU-TEST 등)으로 좁혔다 — "export"·"inventory"처럼 이 접두사가 없는 미래 서브리소스 세그먼트는
     // 매치되지 않아 default-deny(401)로 남는다. 클래스 상단 "가상 서브리소스 자동 공개 방지" 노트 참고.
     private static final Pattern PRODUCT_ITEM_PATH = Pattern.compile("^/api/products/(SKU-[A-Za-z0-9-]+)$");
+    // SR-351(#2) — 상품평 목록 조회(GET /api/products/{sku}/reviews)도 공개 GET이다(확정 문답
+    // "비로그인 포함 누구나 조회"). PRODUCT_REVIEWS_PATH(POST/DELETE, 하위 /{reviewId} 포함)를
+    // 재사용하지 않고 "/reviews"로 정확히 끝나는 패턴만 새로 만든다 — 그 정규식은 선택적 하위
+    // 세그먼트(/{reviewId})까지 매치해, 재사용하면 정의되지 않은 GET /api/products/{sku}/reviews/
+    // {reviewId}(향후 개별 리뷰 상세가 생길 수 있는 자리)까지 의도치 않게 무인증 공개된다(STORY
+    // "폴백·우회 경로의 자격 판정" 절 — "가상 서브리소스 자동 공개 방지" 원칙과 동일 조건).
+    private static final Pattern PRODUCT_REVIEWS_LIST_PATH =
+            Pattern.compile("^/api/products/(SKU-[A-Za-z0-9-]+)/reviews$");
 
     private enum Decision { ALLOW, DENY, SCOPE_TO_SELF }
 
@@ -295,7 +316,8 @@ public class ApiKeyAuthFilter extends OncePerRequestFilter {
      * 않는다 — 호출부가 메서드(GET)와 "키 자체가 없음"을 함께 확인해야만 이 결과를 쓴다.
      */
     private static boolean isPublicProductReadPath(String path) {
-        return PRODUCTS_LIST_PATH.equals(path) || PRODUCT_ITEM_PATH.matcher(path).matches();
+        return PRODUCTS_LIST_PATH.equals(path) || PRODUCT_ITEM_PATH.matcher(path).matches()
+                || PRODUCT_REVIEWS_LIST_PATH.matcher(path).matches();
     }
 
     /**
@@ -379,6 +401,14 @@ public class ApiKeyAuthFilter extends OncePerRequestFilter {
         // 무관 — CRUD 전 경로가 동일 정책). MEMBERS_ITEM_PATH보다 먼저 검사하지만 두 정규식은
         // 세그먼트 수가 달라 애초에 겹치지 않는다(클래스 상단 주석 참고).
         if (MEMBER_ME_ADDRESSES_PATH.matcher(path).matches()) {
+            return Decision.SCOPE_TO_SELF;
+        }
+
+        // (b-0') /api/products/{sku}/reviews 및 하위(SR-351 #1) — memberId 토큰이 없는 쓰기
+        // 자원이라 POST/DELETE일 때만 자기 자신으로 강제 축소한다. GET(목록, SR-351 #2 몫)은 이
+        // 분기를 타지 않고 아래 일반 규칙으로 떨어진다(클래스 상단 "SR-351(#1)" 노트 참고).
+        if (PRODUCT_REVIEWS_PATH.matcher(path).matches()
+                && ("POST".equalsIgnoreCase(request.getMethod()) || "DELETE".equalsIgnoreCase(request.getMethod()))) {
             return Decision.SCOPE_TO_SELF;
         }
 

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sm.lab.shop.dao.ProductReviewDao">
+
+  <!-- SR-351(#1) — 주문 존재(논리 삭제 제외). ORDERS를 이 매퍼에서 직접 조회한다(OrderDao 재사용 안 함). -->
+  <select id="existsOrder" resultType="int">
+    SELECT COUNT(*)
+      FROM ORDERS
+     WHERE order_no = #{orderNo}
+       AND del_yn = 'N'
+  </select>
+
+  <!-- SR-351(#1) — 구매 자격 단일 판정: 이 주문이 이 회원 소유 + CANCELED 아님 + 이 SKU 라인 포함. -->
+  <select id="countEligiblePurchase" resultType="int">
+    SELECT COUNT(*)
+      FROM ORDERS o
+      JOIN ORDER_ITEMS i ON o.order_no = i.order_no
+     WHERE o.order_no = #{orderNo}
+       AND o.member_id = #{memberId}
+       AND o.del_yn = 'N'
+       AND o.order_state != 'CANCELED'
+       AND i.sku = #{sku}
+  </select>
+
+  <!-- SR-351(#1) — review_id는 이 SR 전용 신규 AUTO_INCREMENT PK. 유일성은 active_key UNIQUE
+       인덱스가 원자적으로 보장한다(DuplicateKeyException은 호출부 캐치). -->
+  <insert id="insertReview" useGeneratedKeys="true" keyProperty="reviewId">
+    INSERT INTO PRODUCT_REVIEWS (order_no, sku, member_id, rating, content, created_at, updated_at)
+    VALUES (#{orderNo}, #{sku}, #{memberId}, #{rating}, #{content}, #{createdAt}, #{updatedAt})
+  </insert>
+
+  <!-- SR-351(#1) — 단일 조건부 UPDATE(사례집 SR-298 #1·#2 — 선조회 후 UPDATE 금지). -->
+  <update id="softDelete">
+    UPDATE PRODUCT_REVIEWS
+       SET del_yn = 'Y', updated_at = #{updatedAt}
+     WHERE review_id = #{reviewId}
+       AND sku = #{sku}
+       AND member_id = #{memberId}
+       AND del_yn = 'N'
+  </update>
+
+  <!-- SR-351(#1) — softDelete 0행일 때만 호출하는 원인 재조회(del_yn 상시필터 없음, no-select-star). -->
+  <select id="selectById" resultType="com.sm.lab.shop.domain.ProductReview">
+    SELECT review_id, order_no, sku, member_id, rating, content, del_yn, created_at, updated_at
+      FROM PRODUCT_REVIEWS
+     WHERE review_id = #{reviewId}
+  </select>
+
+  <!-- SR-351(#2) — 공개 목록(INF-ORD-038). MEMBERS 조인으로 이름을 한 번에 가져온다(N+1 없음) —
+       마스킹은 서비스(Java)가 한다. del_yn='N' 상시필터로 삭제 리뷰 제외. sort는 서비스가
+       화이트리스트 검증을 마친 값만 넘긴다(latest/ratingDesc/ratingAsc). -->
+  <select id="selectReviews" resultType="com.sm.lab.shop.domain.ProductReviewView">
+    SELECT r.review_id AS reviewId, r.rating, r.content, m.member_name AS memberName, r.created_at AS createdAt
+      FROM PRODUCT_REVIEWS r
+      JOIN MEMBERS m ON m.member_id = r.member_id
+     WHERE r.sku = #{sku}
+       AND r.del_yn = 'N'
+     ORDER BY
+    <choose>
+      <when test="sort == 'ratingDesc'">r.rating DESC, r.created_at DESC, r.review_id DESC</when>
+      <when test="sort == 'ratingAsc'">r.rating ASC, r.created_at DESC, r.review_id DESC</when>
+      <otherwise>r.created_at DESC, r.review_id DESC</otherwise>
+    </choose>
+     LIMIT #{limit} OFFSET #{offset}
+  </select>
+
+  <!-- SR-351(#2) — 평균 별점·리뷰 수·별점 분포 단일 쿼리(GROUP BY 없이 항상 1행). COALESCE
+       필수 — SUM(CASE...)는 매칭 0건이면 SQL 표준상 NULL을 반환해, COALESCE 없이 int 프리미티브
+       필드에 그대로 매핑하면 리뷰 0건 상품마다 MyBatis 매핑에서 NPE가 난다(STORY "데이터" 절). -->
+  <select id="selectRatingSummary" resultType="com.sm.lab.shop.domain.ProductReviewSummary">
+    SELECT
+      ROUND(AVG(rating), 1)                             AS avgRating,
+      COUNT(*)                                           AS reviewCount,
+      COALESCE(SUM(CASE WHEN rating = 1 THEN 1 END), 0)  AS rating1Count,
+      COALESCE(SUM(CASE WHEN rating = 2 THEN 1 END), 0)  AS rating2Count,
+      COALESCE(SUM(CASE WHEN rating = 3 THEN 1 END), 0)  AS rating3Count,
+      COALESCE(SUM(CASE WHEN rating = 4 THEN 1 END), 0)  AS rating4Count,
+      COALESCE(SUM(CASE WHEN rating = 5 THEN 1 END), 0)  AS rating5Count
+      FROM PRODUCT_REVIEWS
+     WHERE sku = #{sku}
+       AND del_yn = 'N'
+  </select>
+
+</mapper>

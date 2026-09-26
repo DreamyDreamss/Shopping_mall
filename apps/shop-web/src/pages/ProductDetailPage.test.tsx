@@ -47,7 +47,9 @@ describe('ProductDetailPage', () => {
   })
 
   /** URL로 분기하는 fetch 라우터 — 상품 상세(`/api/products/:sku`)를 목록(`/api/products`)보다 먼저
-   * 검사한다(두 경로 접두가 같다). */
+   * 검사한다(두 경로 접두가 같다). SR-351 상품평 관련 라우팅(목록/작성/삭제·주문 자격 조회)은
+   * `ProductDetailPage.reviews.test.tsx`가 자체 routeFetch로 따로 갖는다(file-size-cap 분리,
+   * STORY-3 재작업 round2 사람 지시 2). */
   function routeFetch(handlers: {
     detail?: (sku: string) => Response | Promise<Response>
     list?: () => Response | Promise<Response>
@@ -55,20 +57,22 @@ describe('ProductDetailPage', () => {
   }) {
     fetchMock.mockImplementation(async (input: unknown, init?: RequestInit) => {
       const url = String(input)
-      if (url.startsWith('/api/products/')) {
-        const sku = decodeURIComponent(url.slice('/api/products/'.length))
+      const [path] = url.split('?')
+
+      if (path.startsWith('/api/products/')) {
+        const sku = decodeURIComponent(path.slice('/api/products/'.length))
         if (!handlers.detail) throw new Error('unexpected detail call ' + url)
         return handlers.detail(sku)
       }
-      if (url.startsWith('/api/products')) {
+      if (path.startsWith('/api/products')) {
         return handlers.list ? handlers.list() : jsonResponse(200, [])
       }
-      if (url.startsWith('/api/cart/items')) {
+      if (path.startsWith('/api/cart/items')) {
         const body = init?.body ? (JSON.parse(String(init.body)) as { memberId: string; sku: string; qty: number }) : { memberId: '', sku: '', qty: 0 }
         addItemCalls.push(body)
         return handlers.addItem ? handlers.addItem(body) : jsonResponse(200, { sku: body.sku, qty: body.qty, lineTotal: 0 })
       }
-      if (url.startsWith('/api/cart')) return jsonResponse(200, { items: [] })
+      if (path.startsWith('/api/cart')) return jsonResponse(200, { items: [] })
       throw new Error('unexpected url ' + url)
     })
   }

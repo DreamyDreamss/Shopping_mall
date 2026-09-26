@@ -11,12 +11,14 @@ import { ProductDetailSkeleton } from '../features/shop/ProductDetailSkeleton'
 import { ProductNotFoundNotice } from '../features/shop/ProductNotFoundNotice'
 import { ProductImageGallery } from '../features/shop/ProductImageGallery'
 import { ProductInfoPanel, type AddAction, type AddStatus, type NotifyStatus } from '../features/shop/ProductInfoPanel'
-import { ProductDetailTabs } from '../features/shop/ProductDetailTabs'
+import { ProductDetailTabs, type ProductDetailTabKey } from '../features/shop/ProductDetailTabs'
 import { ProductNoticeTable } from '../features/shop/ProductNoticeTable'
+import { ProductReviewsSection } from '../features/shop/ProductReviewsSection'
 import { RelatedProducts } from '../features/shop/RelatedProducts'
 import { pickRelatedProducts } from '../features/shop/relatedProductsPicker'
 import { ToastStack } from '../components/common/ToastStack'
 import { pushToast, type ToastItem } from '../components/common/toastQueue'
+import { useProductReviews } from './useProductReviews'
 
 type ErrorKind = 'notFound' | 'fetchError' | null
 
@@ -68,6 +70,11 @@ export default function ProductDetailPage() {
   const notifyInFlightRef = useRef(false)
   const [toasts, setToasts] = useState<ToastItem[]>([])
   const toastIdRef = useRef(0)
+
+  // SR-351 — 상품평 탭. 훅은 항상 호출한다(조건부 아님, hooks-rule) — 목록 GET은 훅 내부에서
+  // `enabled: activeTab === 'review'`일 때만 나간다(AC "탭 진입 시에만").
+  const [activeTab, setActiveTab] = useState<ProductDetailTabKey>('detail')
+  const reviews = useProductReviews({ sku, session, enabled: activeTab === 'review' })
 
   const load = async (targetSku: string) => {
     const id = ++requestIdRef.current
@@ -209,7 +216,41 @@ export default function ProductDetailPage() {
               </div>
             </div>
             <div style={{ marginTop: 32 }}>
-              <ProductDetailTabs />
+              <ProductDetailTabs
+                onTabChange={setActiveTab}
+                reviewContent={
+                  <ProductReviewsSection
+                    loggedIn={!!session}
+                    listStatus={reviews.listStatus}
+                    listResult={reviews.listResult}
+                    onRetryList={reviews.onRetryList}
+                    isOwn={reviews.isOwn}
+                    sort={reviews.sort}
+                    onSortChange={reviews.onSortChange}
+                    page={reviews.page}
+                    onPageChange={reviews.onPageChange}
+                    eligibleOrders={reviews.eligibleOrders}
+                    orderLookupStatus={reviews.orderLookupStatus}
+                    onRetryOrderLookup={reviews.onRetryOrderLookup}
+                    orderNo={reviews.orderNo}
+                    onOrderNoChange={reviews.onOrderNoChange}
+                    rating={reviews.rating}
+                    onRatingChange={reviews.onRatingChange}
+                    content={reviews.content}
+                    onContentChange={reviews.onContentChange}
+                    fieldErrors={reviews.fieldErrors}
+                    writeStatus={reviews.writeStatus}
+                    bannerMessage={reviews.bannerMessage}
+                    onSubmit={reviews.onSubmit}
+                    deleteTarget={reviews.deleteTarget}
+                    deleteStatus={reviews.deleteStatus}
+                    deleteErrorMessage={reviews.deleteErrorMessage}
+                    onDeleteRequest={reviews.onDeleteRequest}
+                    onDeleteCancel={reviews.onDeleteCancel}
+                    onDeleteConfirm={reviews.onDeleteConfirm}
+                  />
+                }
+              />
             </div>
             <div style={{ marginTop: 32 }}>
               <ProductNoticeTable />

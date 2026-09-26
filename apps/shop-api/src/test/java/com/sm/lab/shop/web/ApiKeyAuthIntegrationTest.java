@@ -18,7 +18,10 @@ import com.sm.lab.shop.dao.MemberApiKeyDao;
 import com.sm.lab.shop.dao.MemberDao;
 import com.sm.lab.shop.dao.MemberSignupRateLimitDao;
 import com.sm.lab.shop.dao.MemberSignupVerificationDao;
+import com.sm.lab.shop.dao.OrderDao;
 import com.sm.lab.shop.domain.MemberAddress;
+import com.sm.lab.shop.domain.Order;
+import com.sm.lab.shop.domain.OrderItem;
 import com.sm.lab.shop.support.TestClocks;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -207,6 +210,11 @@ class ApiKeyAuthIntegrationTest {
             builder = builder.method("PATCH", HttpRequest.BodyPublishers.noBody());
         } else if ("HEAD".equals(method)) {
             builder = builder.method("HEAD", HttpRequest.BodyPublishers.noBody());
+        } else if ("DELETE".equals(method)) {
+            // SR-351(#1) — 무키 DELETE 401 회귀(아래 productReviewsRoute_deleteWithoutApiKey_returns401)
+            // 전용 추가. PATCH/HEAD와 동일한 이유(JDK HttpURLConnection 한계 회피, 클래스 상단
+            // "PATCH가 필요한 경우도..." 노트 참고)로 JDK HttpClient의 명시적 메서드 지정을 쓴다.
+            builder = builder.method("DELETE", HttpRequest.BodyPublishers.noBody());
         } else {
             builder = builder.GET();
         }
@@ -997,6 +1005,153 @@ class ApiKeyAuthIntegrationTest {
 
         assertThat(res.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
         assertThat(res.getBody()).contains("\"error\"").contains("unauthorized");
+    }
+
+    // ===== SR-351(#1) — 상품평 작성/삭제 API(/api/products/{sku}/reviews)도 URL에 memberId가
+    // 없는 쓰기 자원이다. evaluateMemberScope의 PRODUCT_REVIEWS_PATH 분기(POST/DELETE만
+    // SCOPE_TO_SELF)가 무인증을 막고, 강제된 memberId로 실제 서비스까지 도달하는지, 그리고
+    // 소유권 판정(403)이 실 DB 라운드트립까지 가는지 확인한다(STORY "테스트" 절).
+    private static final String REVIEW_SKU = "SKU-1001";
+    private static final String REVIEW_ORDER_NO = "20260903-RVWAUTHTST";
+
+    @Autowired
+    private OrderDao orderDao;
+
+    @AfterEach
+    void cleanUpProductReviewFixture() {
+        jdbcTemplate.update("DELETE FROM PRODUCT_REVIEWS WHERE order_no IN (?, ?)",
+                REVIEW_ORDER_NO, FOREIGN_ORDER_NO);
+        jdbcTemplate.update("DELETE FROM ORDER_ITEMS WHERE order_no = ?", REVIEW_ORDER_NO);
+        jdbcTemplate.update("DELETE FROM ORDERS WHERE order_no = ?", REVIEW_ORDER_NO);
+    }
+
+    private void insertOwnEligibleOrder() {
+        Order order = new Order();
+        order.setOrderNo(REVIEW_ORDER_NO);
+        order.setMemberId(OWN_MEMBER_ID);
+        order.setOrderState("DONE");
+        order.setTotalAmount(10000);
+        orderDao.insertOrder(order);
+
+        OrderItem item = new OrderItem();
+        item.setOrderNo(REVIEW_ORDER_NO);
+        item.setLineNo(1);
+        item.setSku(REVIEW_SKU);
+        item.setQty(1);
+        item.setUnitPrice(10000);
+        orderDao.insertItem(item);
+    }
+
+    @Test
+    void productReviewsRoute_postWithoutApiKey_returns401() throws Exception {
+        HttpResponse<String> res = rawPostJson("/api/products/" + REVIEW_SKU + "/reviews", null,
+                "{\"rating\":5,\"content\":\"인증 없이 시도하는 상품평 본문입니다\",\"orderNo\":\"" + REVIEW_ORDER_NO + "\"}");
+
+        assertThat(res.statusCode()).isEqualTo(401);
+        assertThat(res.body()).contains("\"error\"").contains("unauthorized");
+    }
+
+    @Test
+    void productReviewsRoute_deleteWithoutApiKey_returns401() throws Exception {
+        HttpResponse<String> res = rawRequest("DELETE", "/api/products/" + REVIEW_SKU + "/reviews/1");
+
+        assertThat(res.statusCode()).isEqualTo(401);
+        assertThat(res.body()).contains("\"error\"").contains("unauthorized");
+    }
+
+    // member 키는 URL에 memberId가 없어도 SCOPE_TO_SELF가 자기 자신으로 강제한다 — 자기 소유
+    // 주문·SKU로 작성하면 필터가 요청을 삼키지 않고 컨트롤러/서비스까지 도달해 실제로 201이 난다.
+    @Test
+    void productReviewsRoute_memberApiKey_ownOrder_reachesServiceReturns201() throws Exception {
+        insertOwnEligibleOrder();
+
+        HttpResponse<String> res = rawPostJson("/api/products/" + REVIEW_SKU + "/reviews", MEMBER_0001_KEY,
+                "{\"rating\":5,\"content\":\"자기 소유 주문으로 작성하는 상품평 본문입니다\",\"orderNo\":\""
+                        + REVIEW_ORDER_NO + "\"}");
+
+        assertThat(res.statusCode()).isEqualTo(201);
+        assertThat(res.body()).contains("\"orderNo\":\"" + REVIEW_ORDER_NO + "\"");
+    }
+
+    // admin 키는 evaluateMemberScope를 타지 않아 memberId가 강제되지 않는다 — 이 컨트롤러가
+    // 명시적으로 400 RVW-4001로 막는다(MemberAddressController.requireMemberId와 동일 원칙).
+    @Test
+    void productReviewsRoute_adminApiKeyWithoutMemberIdParam_returns400() throws Exception {
+        HttpResponse<String> res = rawPostJson("/api/products/" + REVIEW_SKU + "/reviews", ADMIN_KEY,
+                "{\"rating\":5,\"content\":\"admin 키로 memberId 없이 시도하는 본문입니다\",\"orderNo\":\""
+                        + REVIEW_ORDER_NO + "\"}");
+
+        assertThat(res.statusCode()).isEqualTo(400);
+        assertThat(res.body()).contains("RVW-4001");
+    }
+
+    // member 키로 남의 reviewId 삭제 시도 → 403(IDOR, 실 DB 라운드트립). FOREIGN_ORDER_NO(M-0002
+    // 소유, CANCELED)에 직접 심은 리뷰 행을 M-0001 키로 삭제 시도한다 — 작성 API를 거치지 않고
+    // jdbcTemplate으로 직접 적재해 "이미 존재하는 남의 리뷰"만 재현한다(작성 자격과는 무관한 검증).
+    @Test
+    void productReviewsRoute_memberApiKey_deleteForeignReviewId_returns403Forbidden() {
+        LocalDateTime now = LocalDateTime.now();
+        jdbcTemplate.update(
+                "INSERT INTO PRODUCT_REVIEWS (order_no, sku, member_id, rating, content, created_at, updated_at) "
+                        + "VALUES (?, ?, ?, ?, ?, ?, ?)",
+                FOREIGN_ORDER_NO, "SKU-1003", OTHER_MEMBER_ID, 5, "타인 소유 상품평 본문(삭제 시도 대상)", now, now);
+        Long reviewId = jdbcTemplate.queryForObject(
+                "SELECT review_id FROM PRODUCT_REVIEWS WHERE order_no = ? AND sku = ? AND member_id = ?",
+                Long.class, FOREIGN_ORDER_NO, "SKU-1003", OTHER_MEMBER_ID);
+
+        ResponseEntity<String> res = delete("/api/products/SKU-1003/reviews/" + reviewId, MEMBER_0001_KEY);
+
+        assertThat(res.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+        assertThat(res.getBody()).contains("RVW-4031");
+    }
+
+    // ===== SR-351(#2) — 상품평 목록 조회(GET /api/products/{sku}/reviews)는 무인증 공개다.
+    // #1(POST/DELETE)과 달리 PRODUCT_REVIEWS_LIST_PATH("/reviews"로 정확히 끝나는 패턴)로만 열린다
+    // (STORY "폴백·우회 경로의 자격 판정" 절) — 순수 GET이라 DB 변경이 없어 별도 정리 불필요
+    // (위 SEED_SKU 관례와 동일).
+
+    @Test
+    void productReviewsListRoute_getWithoutApiKey_returns200() {
+        ResponseEntity<String> res = get("/api/products/" + REVIEW_SKU + "/reviews", null);
+
+        assertThat(res.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(res.getBody()).contains("\"totalCount\"").contains("\"avgRating\"")
+                .contains("\"reviewCount\"").contains("\"distribution\"").contains("\"items\"");
+    }
+
+    // 회귀 — GET에는 SCOPE_TO_SELF가 강제되지 않는다(#1의 PRODUCT_REVIEWS_PATH 분기는 POST/DELETE
+    // 전용, evaluateMemberScope 참고) — member 키로도 그대로 200.
+    @Test
+    void productReviewsListRoute_getWithMemberApiKey_returns200() {
+        ResponseEntity<String> res = get("/api/products/" + REVIEW_SKU + "/reviews", MEMBER_0001_KEY);
+
+        assertThat(res.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @Test
+    void productReviewsListRoute_getWithoutApiKey_unknownSku_returns404() {
+        ResponseEntity<String> res = get("/api/products/" + UNKNOWN_SKU + "/reviews", null);
+
+        assertThat(res.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void productReviewsListRoute_getWithoutApiKey_invalidSort_returns400() {
+        ResponseEntity<String> res = get("/api/products/" + REVIEW_SKU + "/reviews?sort=bogus", null);
+
+        assertThat(res.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(res.getBody()).contains("RVW-4001");
+    }
+
+    // round 2(SR-351 #1) "가상 서브리소스 자동 공개 방지" 원칙과 동일 조건 — PRODUCT_REVIEWS_LIST_PATH는
+    // "/reviews"로 정확히 끝나는 패턴만 매치한다. 오늘 정의되지 않은 GET .../reviews/{reviewId}(개별
+    // 리뷰 상세, 향후 생길 수 있는 자리)까지 이 화이트리스트가 넓게 삼키면 안 된다 — 무키는 여전히 401.
+    @Test
+    void productReviewsItemRoute_getWithoutApiKey_stillReturns401() throws Exception {
+        HttpResponse<String> res = rawRequest("GET", "/api/products/" + REVIEW_SKU + "/reviews/1");
+
+        assertThat(res.statusCode()).isEqualTo(401);
+        assertThat(res.body()).contains("\"error\"").contains("unauthorized");
     }
 
     private Long insertOtherMemberAddress() {

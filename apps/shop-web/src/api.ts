@@ -15,6 +15,10 @@ import type {
   OrderRow,
   Product,
   ProductDetail,
+  ReviewCreateResult,
+  ReviewInput,
+  ReviewListResult,
+  ReviewSort,
   SessionResult,
   VerificationCodeResult,
   ZipcodeResult,
@@ -341,4 +345,41 @@ export function deleteAddress(apiKey: string, addressId: number): Promise<void> 
 /** PUT /api/members/me/addresses/{addressId}/default — 기본 설정, 200 + 배송지(이미 기본이면 no-op). */
 export function setDefaultAddress(apiKey: string, addressId: number): Promise<MemberAddress> {
   return sendAuth<MemberAddress>('PUT', `/api/members/me/addresses/${addressId}/default`, apiKey)
+}
+
+// SR-351 — 상품평(리뷰·별점, `/shop/products/:sku` 상품평 탭). POST/GET/DELETE 세 엔드포인트 모두
+// SR-351 #1·#2에서 이미 구현·Done이라 이 항목은 계약을 그대로 소비만 한다(STORY "파일" 절). memberId는
+// 어느 함수에도 싣지 않는다 — `ApiKeyAuthFilter`의 SCOPE_TO_SELF가 회원 X-Api-Key에서 강제한다
+// (`registerAddress`/`deleteAddress`와 동일 원칙).
+
+/** 오류 시 `ApiError`({code,message})를 던지는 GET — 기존 `get`은 plain `Error`를 던져 code를 옮기지
+ * 못한다(`post`가 이미 `ApiError`를 던지는 것과 대칭되는 GET 버전, 리뷰 목록 400/404 코드 판별에 필요). */
+async function getWithApiError<T>(url: string): Promise<T> {
+  const r = await fetch(url, { headers: { Accept: 'application/json' } })
+  if (!r.ok) throw new ApiError(r.status, await parseErrorBody(r))
+  return (await r.json()) as T
+}
+
+/** GET /api/products/{sku}/reviews?sort=&page= — 무인증 공개 조회(vite 프록시가 admin 키를 붙여도
+ * 이 경로는 어떤 키로도 200, 실측). 400 `RVW-4001`(sort·page)/404 `RVW-4041`(상품 없음). */
+export function fetchReviews(sku: string, sort: ReviewSort, page: number): Promise<ReviewListResult> {
+  const p = new URLSearchParams({ sort, page: String(page) })
+  return getWithApiError<ReviewListResult>(`/api/products/${encodeURIComponent(sku)}/reviews?${p.toString()}`)
+}
+
+/** POST /api/products/{sku}/reviews(헤더 X-Api-Key: 회원 키) — 201. 400 `RVW-4001`/403 `RVW-4031`/
+ * 404 `RVW-4041`/409 `RVW-4091`. */
+export function createReview(apiKey: string, sku: string, input: ReviewInput): Promise<ReviewCreateResult> {
+  return sendAuth<ReviewCreateResult>('POST', `/api/products/${encodeURIComponent(sku)}/reviews`, apiKey, input)
+}
+
+/** DELETE /api/products/{sku}/reviews/{reviewId}(헤더 X-Api-Key: 회원 키) — 204. `deleteAddress`와
+ * 동일한 인라인 fetch 패턴. 403 `RVW-4031`/404 `RVW-4041`. */
+export function deleteReview(apiKey: string, sku: string, reviewId: number): Promise<void> {
+  return fetch(`/api/products/${encodeURIComponent(sku)}/reviews/${reviewId}`, {
+    method: 'DELETE',
+    headers: { 'X-Api-Key': apiKey, Accept: 'application/json' },
+  }).then(async r => {
+    if (!r.ok) throw new ApiError(r.status, await parseErrorBody(r))
+  })
 }
