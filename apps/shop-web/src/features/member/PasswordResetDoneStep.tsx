@@ -13,7 +13,10 @@ export function PasswordResetDoneStep() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 320 }}>
       <p style={{ fontSize: 14 }}>비밀번호가 변경되었습니다 — 모든 기기에서 로그아웃되었습니다.</p>
-      <a href="#/login" style={{ fontSize: 13, color: '#0b4ea2' }}>로그인으로 이동</a>
+      <a href="#/login"
+         style={{ display: 'inline-block', textAlign: 'center', textDecoration: 'none',
+                  border: 0, borderRadius: 5, padding: '10px 16px', fontSize: 14, fontWeight: 600,
+                  background: '#0b4ea2', color: '#fff' }}>로그인하러 가기</a>
     </div>
   )
 }
