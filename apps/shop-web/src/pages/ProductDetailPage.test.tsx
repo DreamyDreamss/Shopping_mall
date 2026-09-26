@@ -8,17 +8,21 @@ import { afterEach, beforeEach, describe, expect, jest, test } from '@jest/globa
 import ProductDetailPage from './ProductDetailPage'
 import { calcDiscountRate } from '../features/shop/discountRate'
 import { saveSession } from '../session'
-import type { Product } from '../types'
+import type { ProductDetail } from '../types'
 
 function jsonResponse(status: number, body: unknown, ok = status >= 200 && status < 300) {
   return { ok, status, statusText: '', json: async () => body } as Response
 }
 
 // 테스트마다 인덱스로 유일화한다(STORY "테스트 격리" 절) — sku·상품명 문자열 충돌을 막는다.
-function product(i: number, overrides: Partial<Product> = {}): Product {
+// SR-353 — Product → ProductDetail. soldOut은 (overrides.stockQty ?? 5) <= 0으로 파생시켜, 기존
+// 10여 개 호출부의 {stockQty:0} 오버라이드가 각 호출부를 고치지 않아도 자동으로 soldOut:true가 되게 한다.
+function product(i: number, overrides: Partial<ProductDetail> = {}): ProductDetail {
+  const stockQty = overrides.stockQty ?? 5
   return {
-    sku: `sku-detail-${i}`, productName: `상세테스트상품${i}`, price: 10000 + i * 1000, stockQty: 5,
-    saleYn: 'Y', listPrice: null, imageUrl: null, ...overrides,
+    sku: `sku-detail-${i}`, productName: `상세테스트상품${i}`, price: 10000 + i * 1000, stockQty,
+    saleYn: 'Y', listPrice: null, imageUrl: null, soldOut: stockQty !== null && stockQty <= 0,
+    ...overrides,
   }
 }
 
@@ -73,9 +77,15 @@ describe('ProductDetailPage', () => {
   // 고정하려면 실제 경로 변화 여부를 확인할 수단이 필요하다. `/shop/cart` 라우트에 감시용 문구를
   // 두고(존재해도 실제로 렌더되지 않아야 함), 현재 pathname을 항상 노출하는 프로브를 Routes 밖에
   // 둔다("location 해시 불변"의 테스트 환경 등가물 — 실제 앱은 HashRouter, 테스트는 MemoryRouter).
+  // SR-353 — 재입고 알림 신청(비로그인) 리다이렉트 검증용으로 location.search도 노출한다.
   function LocationProbe() {
     const location = useLocation()
-    return <div data-testid="location-pathname">{location.pathname}</div>
+    return (
+      <>
+        <div data-testid="location-pathname">{location.pathname}</div>
+        <div data-testid="location-search">{location.search}</div>
+      </>
+    )
   }
 
   function renderPage(sku: string) {
@@ -86,6 +96,7 @@ describe('ProductDetailPage', () => {
           <Route path="/shop/products/:sku" element={<ProductDetailPage />} />
           <Route path="/shop/products" element={<div>목록(placeholder)</div>} />
           <Route path="/shop/cart" element={<div>장바구니(placeholder)</div>} />
+          <Route path="/login" element={<div>로그인(placeholder)</div>} />
         </Routes>
       </MemoryRouter>,
     )
@@ -108,13 +119,45 @@ describe('ProductDetailPage', () => {
     // screen 레벨에서 로드 완료를 기다린 뒤에 scoped 쿼리(infoSection())로 넘어간다.
     await screen.findByText(p1.productName)
     expect(within(infoSection()).getByText('11,000원')).toBeInTheDocument()
-    expect(within(infoSection()).getByLabelText('재고 상태')).toHaveTextContent('재고 5개')
+    // SR-353 — 재고 5개(10개 이하)는 "남은 수량 N개" 문구로 바뀐다(구 "재고 N개" 아님).
+    expect(within(infoSection()).getByLabelText('재고 상태')).toHaveTextContent('남은 수량 5개')
     expect(screen.getByRole('tablist', { name: '상품 상세 탭 목록' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: '상품정보제공고시' })).toBeInTheDocument()
 
     // 관련상품 레일 — 현재 sku(p1)는 제외되고 나머지(p2)만 보인다.
     await within(relatedSection()).findByText(p2.productName)
     expect(within(relatedSection()).queryByText(p1.productName)).not.toBeInTheDocument()
+  })
+
+  // SR-353 — 재고 12(>10)는 "재고 상태" 라벨 자체가 렌더되지 않는다(값이 아니라 엘리먼트를 숨김,
+  // 확정 답변 scr_empty_state를 문자 그대로).
+  test('재고 12개(10개 초과) — "재고 상태" 라벨이 렌더되지 않는다', async () => {
+    const p = product(12, { stockQty: 12 })
+    routeFetch({ detail: sku => jsonResponse(200, { ...p, sku }), list: () => jsonResponse(200, [p]) })
+    renderPage(p.sku)
+
+    await screen.findByText(p.productName)
+    expect(within(infoSection()).queryByLabelText('재고 상태')).not.toBeInTheDocument()
+  })
+
+  // SR-353 재작업(round 2, 사람 코멘트 ③/QA CONCERNS #3) — stockQty=null && soldOut=false(현재
+  // 백엔드가 만들지 않는 방어 조합)에서 [수량 증가] 버튼이 죽은 버튼이면 안 된다. 이전에는
+  // `handleQtyChange`의 클램프 상한(`stockQty ?? 1`)과 `ProductInfoPanel`의 버튼 disabled 조건
+  // (`stockQty ?? Infinity`)이 어긋나 버튼은 영원히 활성인데 눌러도 qty가 1에 묶여 아무 일도
+  // 일어나지 않았다. 두 기본값을 1로 맞춰 qty=1에서 버튼이 처음부터 비활성이어야 한다.
+  test('재고 null(soldOut=false 방어 조합) — 수량 증가 버튼이 처음부터 비활성이다', async () => {
+    // round 3(QA CONCERNS carry-back) — 비로그인 렌더면 disabledReason(로그인 필요)이 이미
+    // actionsDisabled를 true로 만들어 버튼을 비활성화시키므로, `?? 1` 방어 자체는 전혀 검증되지
+    // 않는 거짓 보증이었다(ProductInfoPanel.tsx: `actionsDisabled || qty >= (product.stockQty ?? 1)`).
+    // 로그인 상태로 렌더해 `?? 1` 단독으로 검증한다.
+    saveSession(session)
+    const p = product(16, { stockQty: null, soldOut: false })
+    routeFetch({ detail: sku => jsonResponse(200, { ...p, sku }), list: () => jsonResponse(200, [p]) })
+    renderPage(p.sku)
+
+    await screen.findByText(p.productName)
+    expect(within(infoSection()).getByLabelText('수량')).toHaveValue(1)
+    expect(within(infoSection()).getByRole('button', { name: '수량 증가' })).toBeDisabled()
   })
 
   // linked_tc: TC-FUNC-shop-010-02
@@ -130,17 +173,21 @@ describe('ProductDetailPage', () => {
   })
 
   // linked_tc: TC-FUNC-shop-010-03
-  test('품절 — 담기/구매 버튼이 비활성이고 사유 텍스트가 보인다', async () => {
-    saveSession(session) // 세션은 있어도(로그인 사유와 섞이지 않게) 재고 0이면 품절 사유가 뜨는지만 본다.
+  // SR-353 재작성 — 품절이면 장바구니 담기/바로 구매 버튼이 아예 사라지고(비활성이 아니라 부재),
+  // [재입고 알림 신청] 버튼이 대신 보인다. 기존 role="note" "품절된 상품입니다"는 더 이상 렌더되지
+  // 않는다(품절이 disabledReason 경로에서 빠졌다, STORY "계약" 절).
+  test('품절 — 담기/구매 버튼이 사라지고 재입고 알림 신청 버튼이 보인다', async () => {
+    saveSession(session) // 세션은 있어도(로그인 사유와 섞이지 않게) 재고 0이면 품절 표시가 뜨는지만 본다.
     const p = product(3, { stockQty: 0 })
     routeFetch({ detail: sku => jsonResponse(200, { ...p, sku }), list: () => jsonResponse(200, [p]) })
     renderPage(p.sku)
 
     await screen.findByText(p.productName)
     expect(within(infoSection()).getByLabelText('재고 상태')).toHaveTextContent('품절')
-    expect(within(infoSection()).getByRole('button', { name: '장바구니 담기' })).toBeDisabled()
-    expect(within(infoSection()).getByRole('button', { name: '바로 구매' })).toBeDisabled()
-    expect(within(infoSection()).getByRole('note')).toHaveTextContent('품절된 상품입니다')
+    expect(within(infoSection()).queryByRole('button', { name: '장바구니 담기' })).not.toBeInTheDocument()
+    expect(within(infoSection()).queryByRole('button', { name: '바로 구매' })).not.toBeInTheDocument()
+    expect(within(infoSection()).getByRole('button', { name: '재입고 알림 신청' })).toBeInTheDocument()
+    expect(within(infoSection()).queryByRole('note')).not.toBeInTheDocument()
   })
 
   // linked_tc: TC-FUNC-shop-010-04
@@ -293,5 +340,78 @@ describe('ProductDetailPage', () => {
 
     fireEvent.click(addBtn)
     expect(addItemCalls).toHaveLength(0)
+  })
+
+  // SR-353 — 재입고 알림 신청(로그인 상태) — 버튼이 "신청됨"으로 바뀌고 완료 토스트가 뜬다.
+  test('재입고 알림 신청(로그인) — 버튼이 신청됨으로 바뀌고 토스트가 뜬다', async () => {
+    saveSession(session)
+    const p = product(13, { stockQty: 0 })
+    routeFetch({ detail: sku => jsonResponse(200, { ...p, sku }), list: () => jsonResponse(200, [p]) })
+    renderPage(p.sku)
+
+    await screen.findByText(p.productName)
+    fireEvent.click(within(infoSection()).getByRole('button', { name: '재입고 알림 신청' }))
+
+    expect(within(infoSection()).getByRole('button', { name: '신청됨' })).toBeDisabled()
+    expect(await screen.findByRole('status')).toHaveTextContent('재입고 알림 신청이 완료되었습니다')
+  })
+
+  // SR-353 — 재입고 알림 신청(비로그인) — 로그인 판정이 먼저다(부수효과보다 앞선 순서, STORY
+  // "순서·보안" 절). 즉시 로그인 화면으로 이동하고 redirect 쿼리가 정확히 붙으며, 네트워크 호출은
+  // 새로 나가지 않는다(신청됨으로 낙관 전환 금지).
+  test('재입고 알림 신청(비로그인) — 로그인 화면으로 이동하고 redirect 쿼리가 붙는다', async () => {
+    const p = product(14, { stockQty: 0 })
+    routeFetch({ detail: sku => jsonResponse(200, { ...p, sku }), list: () => jsonResponse(200, [p]) })
+    renderPage(p.sku)
+
+    await screen.findByText(p.productName)
+    const callsBefore = fetchMock.mock.calls.length
+    fireEvent.click(within(infoSection()).getByRole('button', { name: '재입고 알림 신청' }))
+
+    expect(screen.getByTestId('location-pathname')).toHaveTextContent('/login')
+    expect(screen.getByTestId('location-search')).toHaveTextContent(
+      '?redirect=' + encodeURIComponent('/shop/products/' + p.sku),
+    )
+    expect(fetchMock.mock.calls.length).toBe(callsBefore)
+  })
+
+  // 실패 사례집 대조(SR-302 #1) — 연타 검증은 act() 한 스코프 안에서 flush 없이 묶어 발사한다. 가드
+  // (`ProductDetailPage.tsx`의 `notifyInFlightRef`)를 임시로 제거해 이 테스트가 실제로 토스트 2개로
+  // 깨지는지 먼저 확인한 뒤 가드를 복원했다(Dev 기록 참조).
+  test('재입고 알림 신청 연타 방지 — 토스트가 1개만 뜬다', async () => {
+    saveSession(session)
+    const p = product(15, { stockQty: 0 })
+    routeFetch({ detail: sku => jsonResponse(200, { ...p, sku }), list: () => jsonResponse(200, [p]) })
+    renderPage(p.sku)
+
+    await screen.findByText(p.productName)
+    const notifyBtn = within(infoSection()).getByRole('button', { name: '재입고 알림 신청' })
+    act(() => {
+      notifyBtn.click()
+      notifyBtn.click()
+    })
+
+    const toasts = await screen.findAllByRole('status')
+    expect(toasts).toHaveLength(1)
+  })
+
+  // linked_tc: TC-FUNC-shop-010-17
+  // SR-353 — AC-5: stockQty=null(재고 정보 미상)이면 "수량 표기"(= aria-label="재고 상태" 라벨,
+  // 예: "남은 수량 5개"/"품절") 자체가 렌더되지 않는다는 것을 직접 검증한다(AC-5 "표기 자체를
+  // 숨긴다" 문자 그대로, `ProductInfoPanel.tsx`의 `stockLabel !== null &&` 게이트).
+  // 구매 수량 선택기(aria-label="수량", 수량 감소/증가 버튼)는 stockQty 유무와 무관하게 계속
+  // 렌더되는 것이 구현 계획·QA round3 PASS의 전제라 그 부재를 단언하지 않는다(round 4 재작업 —
+  // 이전 버전은 이 둘을 혼동해 잘못된 단언을 했었다).
+  test('재고 정보 미상(stockQty=null && soldOut=false) — "재고 상태" 라벨이 렌더되지 않는다', async () => {
+    saveSession(session)
+    const p = product(17, { stockQty: null, soldOut: false })
+    routeFetch({ detail: sku => jsonResponse(200, { ...p, sku }), list: () => jsonResponse(200, [p]) })
+    renderPage(p.sku)
+
+    await screen.findByText(p.productName)
+    // "재고 상태" 라벨 자체가 렌더되지 않음 (값이 아니라 엘리먼트를 숨김)
+    expect(within(infoSection()).queryByLabelText('재고 상태')).not.toBeInTheDocument()
+    // 수량 선택기는 stockQty=null 여부와 무관하게 계속 렌더된다(삭제 대상 아님)
+    expect(within(infoSection()).getByLabelText('수량')).toBeInTheDocument()
   })
 })

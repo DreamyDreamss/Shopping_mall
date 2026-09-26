@@ -2,19 +2,21 @@
 // 위임한다(파일 크기 상한 300줄 고려). 컨테이너라 스토리 대상이 아니다(규칙 `story-per-component`
 // 제외 — `src/pages/`).
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { addCartItem, fetchCartItemCount, fetchProduct, fetchProducts, logout, OrderHttpError } from '../api'
 import { clearSession, loadSession } from '../session'
-import type { Product, SessionResult } from '../types'
+import type { Product, ProductDetail, SessionResult } from '../types'
 import { AppShell } from '../features/shop/AppShell'
 import { ProductDetailSkeleton } from '../features/shop/ProductDetailSkeleton'
 import { ProductNotFoundNotice } from '../features/shop/ProductNotFoundNotice'
 import { ProductImageGallery } from '../features/shop/ProductImageGallery'
-import { ProductInfoPanel, type AddAction, type AddStatus } from '../features/shop/ProductInfoPanel'
+import { ProductInfoPanel, type AddAction, type AddStatus, type NotifyStatus } from '../features/shop/ProductInfoPanel'
 import { ProductDetailTabs } from '../features/shop/ProductDetailTabs'
 import { ProductNoticeTable } from '../features/shop/ProductNoticeTable'
 import { RelatedProducts } from '../features/shop/RelatedProducts'
 import { pickRelatedProducts } from '../features/shop/relatedProductsPicker'
+import { ToastStack } from '../components/common/ToastStack'
+import { pushToast, type ToastItem } from '../components/common/toastQueue'
 
 type ErrorKind = 'notFound' | 'fetchError' | null
 
@@ -35,12 +37,13 @@ function mapAddErrorMessage(e: unknown): string {
 export default function ProductDetailPage() {
   const { sku = '' } = useParams<{ sku: string }>()
   const navigate = useNavigate()
+  const location = useLocation()
 
   const [session, setSession] = useState<SessionResult | null>(() => loadSession())
   const [cartItemCount, setCartItemCount] = useState(0)
   const [searchValue, setSearchValue] = useState('')
 
-  const [product, setProduct] = useState<Product | null>(null)
+  const [product, setProduct] = useState<ProductDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [errorKind, setErrorKind] = useState<ErrorKind>(null)
   // `ProductListPage`와 동일한 세대 카운터 — sku 변경 시 이전 응답이 더 최신 요청 결과를 덮어쓰지
@@ -57,6 +60,15 @@ export default function ProductDetailPage() {
   // 지연에 의존하지 않음, 사용자 더블클릭이 실제로 두 번의 POST를 만드는 것을 막는다).
   const inFlightRef = useRef(false)
 
+  // SR-353 — 재입고 알림 신청(프론트 상태만, 서버 저장 없음, 확정 답변). `notifyStatus`는 표시용,
+  // `notifyInFlightRef`는 동기 잠금(addCartItem의 `inFlightRef`와 동일 원리 — state 검사만으로는 같은
+  // 이벤트 루프 안의 연속 클릭을 못 막는다, STORY "프레임워크 실행 모델 함정" 절). 한 번 신청되면 이
+  // 상품 조회 중에는 계속 true — 새 상품 로드(load) 시에만 리셋한다.
+  const [notifyStatus, setNotifyStatus] = useState<NotifyStatus>('idle')
+  const notifyInFlightRef = useRef(false)
+  const [toasts, setToasts] = useState<ToastItem[]>([])
+  const toastIdRef = useRef(0)
+
   const load = async (targetSku: string) => {
     const id = ++requestIdRef.current
     setLoading(true)
@@ -69,6 +81,9 @@ export default function ProductDetailPage() {
       setAddStatus('idle')
       setAddErrorMessage(null)
       setLastAction(null)
+      setNotifyStatus('idle')
+      notifyInFlightRef.current = false
+      setToasts([])
     } catch (e) {
       if (id !== requestIdRef.current) return
       setProduct(null)
@@ -113,17 +128,18 @@ export default function ProductDetailPage() {
   }
 
   // 수량 클램프(1~재고) — `ProductInfoPanel`이 아니라 여기서 한다(STORY "상태관리 방식" 절, 클램프
-  // 로직을 컴포넌트에 복제하지 않는다).
+  // 로직을 컴포넌트에 복제하지 않는다). stockQty가 null인데 soldOut=false인 조합은 현재 백엔드 로직상
+  // 발생하지 않지만 타입상 가능해 방어값(1)만 둔다([미상], QA 확인 권장).
   const handleQtyChange = (next: number) => {
     if (!product) return
-    const max = Math.max(1, product.stockQty)
+    const max = Math.max(1, product.stockQty ?? 1)
     const safe = Number.isFinite(next) ? Math.trunc(next) : 1
     setQty(Math.min(Math.max(1, safe), max))
   }
 
   const handleAdd = (action: AddAction) => {
     if (inFlightRef.current) return // 연타 방지 — 동기 잠금(위 inFlightRef 주석)
-    if (!session?.memberId || !product || product.stockQty <= 0) return
+    if (!session?.memberId || !product || product.soldOut) return
     inFlightRef.current = true
     setAddStatus('pending')
     setLastAction(action)
@@ -142,11 +158,29 @@ export default function ProductDetailPage() {
       .finally(() => { inFlightRef.current = false })
   }
 
-  const disabledReason = !session
-    ? '로그인이 필요합니다'
-    : product && product.stockQty <= 0
-      ? '품절된 상품입니다'
-      : null
+  // SR-353 — 품절은 더 이상 "비활성" 사유가 아니다(버튼 자체가 재입고 알림 신청으로 바뀐다,
+  // `ProductInfoPanel`이 `product.soldOut` 분기로 렌더). 로그인 필요만 남는다(회귀 없음).
+  const disabledReason = !session ? '로그인이 필요합니다' : null
+
+  // 재입고 알림 신청 — 로그인 판정이 부수효과(토스트)보다 먼저다(STORY "순서·보안" 3·4, RUN8/SR-234
+  // FUNC-member-008 r1 사례 대조). 비로그인 클릭은 어떤 프론트 상태도 바꾸지 않고 즉시 로그인 화면으로
+  // 보낸다(신청됨으로 낙관 전환 금지) — `QuickBar`/`MyAddressesPage`와 동일한
+  // `/login?redirect=<encodeURIComponent(pathname+search)>` 규약을 그대로 쓴다(신규 리다이렉트 규약을
+  // 만들지 않는다).
+  const handleNotifyRequest = () => {
+    if (notifyInFlightRef.current) return // 연타 방지 — 동기 잠금(addCartItem의 inFlightRef와 동일 원리)
+    if (!session?.memberId) {
+      navigate('/login?redirect=' + encodeURIComponent(location.pathname + location.search))
+      return
+    }
+    notifyInFlightRef.current = true
+    setNotifyStatus('requested')
+    setToasts(prev => pushToast(prev, {
+      id: String(++toastIdRef.current),
+      message: '재입고 알림 신청이 완료되었습니다',
+      variant: 'success',
+    }))
+  }
 
   const relatedProducts = pickRelatedProducts(allProducts, sku, 8)
 
@@ -170,7 +204,8 @@ export default function ProductDetailPage() {
                 <ProductInfoPanel product={product} qty={qty} onQtyChange={handleQtyChange}
                                    onAddToCart={() => handleAdd('cart')} onBuyNow={() => handleAdd('buyNow')}
                                    addStatus={addStatus} addErrorMessage={addErrorMessage} lastAction={lastAction}
-                                   disabledReason={disabledReason} />
+                                   disabledReason={disabledReason}
+                                   notifyStatus={notifyStatus} onNotifyRequest={handleNotifyRequest} />
               </div>
             </div>
             <div style={{ marginTop: 32 }}>
@@ -186,6 +221,7 @@ export default function ProductDetailPage() {
           </>
         ) : null}
       </div>
+      <ToastStack toasts={toasts} onDismiss={id => setToasts(prev => prev.filter(t => t.id !== id))} />
     </AppShell>
   )
 }

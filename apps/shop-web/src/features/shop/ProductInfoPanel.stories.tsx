@@ -1,11 +1,14 @@
 // SR-304 — 상품 상세 정보 영역 상태(기본·할인있음·품절·담기실패·담기중·담기성공·로그인필요).
+// SR-353 — product를 ProductDetail로(soldOut 필드 추가), notifyStatus/onNotifyRequest 추가.
+// "재고 충분/재고 임박/품절(신청 전)/품절(신청됨)" 4상태(확정 답변)는 기본=재고 충분, 재고임박(신규),
+// 품절=품절(신청 전), 품절신청됨(신규)로 대응한다.
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { ProductInfoPanel } from './ProductInfoPanel'
-import type { Product } from '../../types'
+import type { ProductDetail } from '../../types'
 
-const product: Product = {
+const product: ProductDetail = {
   sku: 'SKU-1002', productName: '기계식 키보드', price: 129000, stockQty: 20, saleYn: 'Y',
-  listPrice: null, imageUrl: null,
+  listPrice: null, imageUrl: null, soldOut: false,
 }
 
 const meta = {
@@ -14,6 +17,7 @@ const meta = {
   args: {
     product, qty: 1, onQtyChange: () => {}, onAddToCart: () => {}, onBuyNow: () => {},
     addStatus: 'idle', addErrorMessage: null, lastAction: null, disabledReason: null,
+    notifyStatus: 'idle', onNotifyRequest: () => {},
   },
   tags: ['UIS-ORD-010'],
 } satisfies Meta<typeof ProductInfoPanel>
@@ -21,21 +25,36 @@ export default meta
 
 type Story = StoryObj<typeof meta>
 
-/** 기본 — 정가 없음, 담기/구매 가능. */
+/** 기본 — 재고 충분(20개, 10개 초과라 재고 상태 라벨 자체가 없음), 정가 없음, 담기/구매 가능. */
 export const 기본: Story = { tags: ['state:기본'],}
 
 /** 할인있음 — 실 SKU-1001(스탠딩 데스크), price 390,000 / listPrice 450,000(13% 할인, DB 실측). */
 export const 할인있음: Story = {
   args: {
-    product: { sku: 'SKU-1001', productName: '스탠딩 데스크', price: 390000, stockQty: 12, saleYn: 'Y', listPrice: 450000, imageUrl: null },
+    product: { sku: 'SKU-1001', productName: '스탠딩 데스크', price: 390000, stockQty: 12, saleYn: 'Y', listPrice: 450000, imageUrl: null, soldOut: false },
   },
 }
 
-/** 품절 — 재고 0. 수량 선택 자체가 사라지고 담기/구매 버튼이 비활성 + 사유가 보인다. */
+/** 재고임박 — 재고 3개(10개 이하). "남은 수량 3개" 라벨이 보인다(확정 답변 scope_freeze). */
+export const 재고임박: Story = {
+  args: {
+    product: { ...product, stockQty: 3, soldOut: false },
+  },
+}
+
+/** 품절(신청 전) — 재고 0. 수량 선택·담기/구매 버튼이 사라지고 [재입고 알림 신청] 버튼만 보인다. */
 export const 품절: Story = {
   args: {
-    product: { ...product, stockQty: 0 },
-    disabledReason: '품절된 상품입니다',
+    product: { ...product, stockQty: 0, soldOut: true },
+    notifyStatus: 'idle',
+  },
+}
+
+/** 품절(신청됨) — 재입고 알림 신청 완료 후. 버튼 라벨이 "신청됨"으로 바뀌고 비활성화된다. */
+export const 품절신청됨: Story = {
+  args: {
+    product: { ...product, stockQty: 0, soldOut: true },
+    notifyStatus: 'requested',
   },
 }
 

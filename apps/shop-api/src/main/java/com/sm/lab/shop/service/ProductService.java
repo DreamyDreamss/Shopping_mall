@@ -3,11 +3,14 @@
 package com.sm.lab.shop.service;
 
 import com.sm.lab.shop.dao.ProductDao;
+import com.sm.lab.shop.dao.ProductReviewDao;
 import com.sm.lab.shop.domain.Product;
+import com.sm.lab.shop.domain.ProductReviewSummary;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -18,9 +21,14 @@ public class ProductService {
     private static final List<String> VALID_SORTS = List.of(SORT_LATEST, "priceAsc", "priceDesc");
 
     private final ProductDao productDao;
+    // SR-351(#2) — INF-ORD-009 응답에 avgRating/reviewCount를 얹기 위한 집계 조회 전용 의존성.
+    // ProductReviewDao#selectRatingSummary(sku)를 목록 API(INF-ORD-038)와 공유 호출한다(STORY
+    // "데이터" 절 — 집계 쿼리 중복 금지).
+    private final ProductReviewDao productReviewDao;
 
-    public ProductService(ProductDao productDao) {
+    public ProductService(ProductDao productDao, ProductReviewDao productReviewDao) {
         this.productDao = productDao;
+        this.productReviewDao = productReviewDao;
     }
 
     /**
@@ -73,4 +81,39 @@ public class ProductService {
         }
         return p;
     }
+
+    /**
+     * 상품 상세(SR-353) — 단건 조회에 {@code soldOut}을 얹어 반환한다. 인증·존재 판정({@link #get})은
+     * 그대로 재사용하고 매핑만 얇게 더한다. {@code Product.stockQty}(int) 자체는 바꾸지 않는다 —
+     * 목록(FUNC-order-007)·{@link CartService}(stockQty==0 비교, 언박싱 위험)처럼 이 SR과 무관한
+     * 전역 소비처가 있어(SR-231 r4 "전역 계약 변경 금지" 사례) 컨트롤러 경계에서만 새 record로 감싼다.
+     * "재고 수량을 읽지 못하는 경우"(stockQty를 null로 돌려야 하는 조건)는 현재 스키마·경로 어디에도
+     * 트리거가 없어(요구사항 근거 없음, STORY "계약" 절) 이 메서드는 항상 실제 값을 채워 넣는다 —
+     * 존재하지 않는 실패를 흉내 내는 분기를 만들지 않는다(SR-297 #2 사례 대조).
+     */
+    public ProductDetailResponse getDetail(String sku) {
+        Product p = get(sku);
+        // SR-351(#2) — avgRating/reviewCount는 이 단건 조회 뒤(존재 판정 통과 후)에만 집계한다.
+        // distribution(별점 분포 원시값)은 이 응답에 넣지 않는다 — INF-ORD-009 "추가만" 계약
+        // 범위 밖(목록 API INF-ORD-038 전용, STORY "계약" 절).
+        ProductReviewSummary summary = productReviewDao.selectRatingSummary(sku);
+        return new ProductDetailResponse(
+                p.getSku(), p.getProductName(), p.getPrice(), p.getStockQty(),
+                p.getSaleYn(), p.getListPrice(), p.getImageUrl(), p.getStockQty() <= 0,
+                /* avgRating */ summary.getAvgRating(), /* reviewCount */ summary.getReviewCount()
+        );
+    }
+
+    /**
+     * INF-ORD-009 응답 전용(SR-353 + SR-351(#2)). 기존 7필드(이름·타입·순서 불변, 확정 답변
+     * api_compat) + {@code soldOut}(SR-353) 뒤에 {@code avgRating}(BigDecimal, nullable — 리뷰
+     * 0건이면 null, 소수 1자리)·{@code reviewCount}(int, 0 이상)를 끝에 추가만 한다(SR-351(#2)).
+     * stockQty는 nullable로 열어 두지만(계약상 가능성), 이 메서드가 실제로 null을 채우는 경로는
+     * 없다(위 {@link #getDetail} 문서 참조).
+     */
+    public record ProductDetailResponse(
+            String sku, String productName, long price, Integer stockQty,
+            String saleYn, Long listPrice, String imageUrl, boolean soldOut,
+            BigDecimal avgRating, int reviewCount
+    ) {}
 }

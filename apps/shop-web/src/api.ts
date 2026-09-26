@@ -14,6 +14,7 @@ import type {
   OrderQuery,
   OrderRow,
   Product,
+  ProductDetail,
   SessionResult,
   VerificationCodeResult,
   ZipcodeResult,
@@ -201,12 +202,16 @@ async function parseOrderErrorMessage(r: Response): Promise<string> {
   }
 }
 
-/** INF-ORD-008 — `GET /api/products/{sku}`. 404를 포함해 실패는 전부 `OrderHttpError`로 던진다. */
-export function fetchProduct(sku: string): Promise<Product> {
+/**
+ * INF-ORD-009 — `GET /api/products/{sku}`. 404를 포함해 실패는 전부 `OrderHttpError`로 던진다.
+ * SR-353 — 응답에 `soldOut`이 추가되고 `stockQty`가 nullable로 열려 반환 타입을 `ProductDetail`로
+ * 좁힌다(목록 `fetchProducts`가 쓰는 `Product`와는 별도 타입, STORY "파일" 절).
+ */
+export function fetchProduct(sku: string): Promise<ProductDetail> {
   return fetch('/api/products/' + encodeURIComponent(sku), { headers: { Accept: 'application/json' } })
     .then(async r => {
       if (!r.ok) throw new OrderHttpError(r.status, await parseOrderErrorMessage(r))
-      return (await r.json()) as Product
+      return (await r.json()) as ProductDetail
     })
 }
 

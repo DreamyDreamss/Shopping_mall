@@ -32,9 +32,9 @@ public class ProductController {
         return productService.list(keyword, inStock);
     }
 
-    /** 상품 단건 조회. */
+    /** 상품 단건 조회(INF-ORD-009). SR-353 — 응답에 soldOut을 얹은 {@link ProductService.ProductDetailResponse}. */
     @GetMapping("/{sku}")
-    public Product get(@PathVariable String sku) {
-        return productService.get(sku);
+    public ProductService.ProductDetailResponse get(@PathVariable String sku) {
+        return productService.getDetail(sku);
     }
 }

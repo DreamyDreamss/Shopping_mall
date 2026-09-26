@@ -10,8 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static org.hamcrest.Matchers.nullValue;
@@ -118,21 +121,69 @@ class ProductControllerTest {
     }
 
     // linked_tc: TC-FUNC-order-007-05
+    // SR-353 — 컨트롤러가 이제 getDetail을 호출한다(get은 더 이상 호출되지 않음). soldOut/stockQty 단언 추가.
+    // SR-351(#2) — avgRating/reviewCount 필드 단언 추가(jsonPath 필드명 기준, 위치 인덱스 비교 금지).
     @Test
     void get_existingSku_returns200WithProduct() throws Exception {
         // 단건 조회 정상 케이스
-        Product p = new Product();
-        p.setSku("SKU-1001");
-        p.setProductName("마우스");
-        p.setPrice(25000L);
-        p.setStockQty(100);
-        p.setSaleYn("Y");
-        when(productService.get("SKU-1001")).thenReturn(p);
+        ProductService.ProductDetailResponse resp = new ProductService.ProductDetailResponse(
+                "SKU-1001", "마우스", 25000L, 100, "Y", null, null, false,
+                /* avgRating */ new BigDecimal("4.5"), /* reviewCount */ 3);
+        when(productService.getDetail("SKU-1001")).thenReturn(resp);
 
         mockMvc.perform(get("/api/products/SKU-1001"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.sku").value("SKU-1001"))
-                .andExpect(jsonPath("$.productName").value("마우스"));
+                .andExpect(jsonPath("$.productName").value("마우스"))
+                .andExpect(jsonPath("$.stockQty").value(100))
+                .andExpect(jsonPath("$.soldOut").value(false))
+                .andExpect(jsonPath("$.avgRating").value(4.5))
+                .andExpect(jsonPath("$.reviewCount").value(3));
+    }
+
+    // SR-353 — 품절 상품 단건 조회는 soldOut=true를 그대로 직렬화한다.
+    @Test
+    void get_soldOutProduct_returnsSoldOutTrueInBody() throws Exception {
+        ProductService.ProductDetailResponse resp = new ProductService.ProductDetailResponse(
+                "SKU-2002", "품절 상품", 15000L, 0, "Y", null, null, true,
+                /* avgRating */ null, /* reviewCount */ 0);
+        when(productService.getDetail("SKU-2002")).thenReturn(resp);
+
+        mockMvc.perform(get("/api/products/SKU-2002"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.soldOut").value(true))
+                .andExpect(jsonPath("$.stockQty").value(0));
+    }
+
+    // SR-353 — stockQty가 null인 계약(서비스가 "읽지 못하는 경우"를 재현했다고 가정)도 컨트롤러가 그대로
+    // 직렬화하는지만 확인한다 — 이 null을 실제로 만드는 서비스 조건은 재현하지 않는다(SR-297 #2 사례 대조,
+    // STORY "테스트" 절).
+    // SR-351(#2) — 리뷰 0건(avgRating null)도 이 계약대로 nullValue()로 단언한다(doesNotExist() 금지,
+    // 사례집 SR-306 #2 판별력 0 가드).
+    @Test
+    void get_nullStockQty_returnsNullField() throws Exception {
+        ProductService.ProductDetailResponse resp = new ProductService.ProductDetailResponse(
+                "SKU-2003", "재고미상품", 20000L, null, "Y", null, null, false,
+                /* avgRating */ null, /* reviewCount */ 0);
+        when(productService.getDetail("SKU-2003")).thenReturn(resp);
+
+        mockMvc.perform(get("/api/products/SKU-2003"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.stockQty").value(nullValue()))
+                .andExpect(jsonPath("$.avgRating").value(nullValue()))
+                .andExpect(jsonPath("$.reviewCount").value(0));
+    }
+
+    // SR-353 재작업(round 2, QA CONCERNS #2) — AC "오류 응답 코드·사유(401/404) 변경 없음"을 컨트롤러가
+    // get() → getDetail() 호출로 바꾼 뒤에도 404 경로가 그대로 전파되는지 고정한다(이전 라운드까지
+    // isNotFound() 단언이 하나도 없었다).
+    @Test
+    void get_missingSku_returns404() throws Exception {
+        when(productService.getDetail("SKU-9999"))
+                .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "상품 없음"));
+
+        mockMvc.perform(get("/api/products/SKU-9999"))
+                .andExpect(status().isNotFound());
     }
 
     // SR-306(#2) — 목록 응답에 listPrice/imageUrl 필드가 추가되고 기존 필드는 불변인지 확인.
@@ -179,16 +230,13 @@ class ProductControllerTest {
 
     // SR-306(#2) — 단건 조회 응답에도 listPrice/imageUrl이 추가된다(판매종료 상품, SKU-1004 상태
     // — sale_yn 필터가 없는 이 엔드포인트는 이미지가 없는 상품도 그대로 반환한다).
+    // SR-353 — getDetail 스텁으로 교체(컨트롤러가 더 이상 get을 호출하지 않음).
     @Test
     void get_returnsListPriceAndImageUrl_withImageUrlNullWhenMissing() throws Exception {
-        Product p = new Product();
-        p.setSku("SKU-1004");
-        p.setProductName("단종 마우스");
-        p.setPrice(35000L);
-        p.setSaleYn("N");
-        p.setListPrice(42000L);
-        p.setImageUrl(null);
-        when(productService.get("SKU-1004")).thenReturn(p);
+        ProductService.ProductDetailResponse resp = new ProductService.ProductDetailResponse(
+                "SKU-1004", "단종 마우스", 35000L, 0, "N", 42000L, null, true,
+                /* avgRating */ null, /* reviewCount */ 0);
+        when(productService.getDetail("SKU-1004")).thenReturn(resp);
 
         mockMvc.perform(get("/api/products/SKU-1004"))
                 .andExpect(status().isOk())
@@ -196,6 +244,23 @@ class ProductControllerTest {
                 .andExpect(jsonPath("$.listPrice").value(42000))
                 // doesNotExist() 대신 nullValue() — 위 list_withNullListPrice_returnsNullField와 동일 근거.
                 .andExpect(jsonPath("$.imageUrl").value(nullValue()));
+    }
+
+    // SR-353 회귀(AC-7) — GET /api/products/{sku}은 목록 조회(GET /api/products)와 달리 sale_yn 필터가
+    // 없다 — 판매종료 상품(sale_yn='N')도 SKU를 알면 조회 가능해야 한다. 이는 사용자가 상품 외부 링크나
+    // 이전 주문 히스토리에서 판매종료 상품을 다시 보고 싶어 하는 시나리오를 고려한 것이다(회귀 범위).
+    @Test
+    void get_discontinuedProduct_returns200WithSaleYnN() throws Exception {
+        ProductService.ProductDetailResponse resp = new ProductService.ProductDetailResponse(
+                "SKU-9001", "단종된 마우스", 28000L, 0, "N", null, null, true,
+                /* avgRating */ null, /* reviewCount */ 0);
+        when(productService.getDetail("SKU-9001")).thenReturn(resp);
+
+        mockMvc.perform(get("/api/products/SKU-9001"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.sku").value("SKU-9001"))
+                .andExpect(jsonPath("$.saleYn").value("N"))
+                .andExpect(jsonPath("$.soldOut").value(true));
     }
 
 }

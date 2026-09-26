@@ -5,16 +5,23 @@
 // 이 부품은 fetch/자격 판정을 하지 않는다(규칙 `web-fetch-only-in-api`, STORY "폴백·우회 경로의
 // 자격 판정" 절) — 담기/구매 가능 여부(`disabledReason`)와 진행 상태(`addStatus`)는 전부 부모
 // (`ProductDetailPage`)가 세션·재고·서버 응답을 보고 판정해 내려준 값을 그대로 표시만 한다.
-// 연타 방지(동기 ref 잠금)도 부모(`inFlightRef`) 몫이다 — 이 부품은 `addStatus==='pending'`이면
-// 버튼을 비활성화하는 표시만 담당한다(프레임워크 실행 모델 함정 절 — 사용자 더블클릭 대응).
+// 연타 방지(동기 ref 잠금)도 부모(`inFlightRef`/`notifyInFlightRef`) 몫이다 — 이 부품은
+// `addStatus==='pending'`/`notifyStatus==='requested'`면 버튼을 비활성화하는 표시만 담당한다
+// (프레임워크 실행 모델 함정 절 — 사용자 더블클릭 대응).
+//
+// SR-353 — `product.soldOut`(서버 계산값, INF-ORD-009)이 품절 판정의 유일한 근거다(더 이상
+// `stockQty<=0`을 이 부품에서 계산하지 않는다). 품절이면 장바구니/바로구매 버튼 대신 재입고 알림 신청
+// 버튼 1개만 보인다(`notifyStatus`·`onNotifyRequest`는 부모가 로그인 판정 뒤에만 전환한다, STORY
+// "순서·보안" 절).
 import { hasListPriceDiscount, calcDiscountRate } from './discountRate'
-import type { Product } from '../../types'
+import type { ProductDetail } from '../../types'
 
 export type AddStatus = 'idle' | 'pending' | 'success' | 'error'
 export type AddAction = 'cart' | 'buyNow'
+export type NotifyStatus = 'idle' | 'requested'
 
 export interface ProductInfoPanelProps {
-  product: Product
+  product: ProductDetail
   qty: number
   /** 수량 변경 요청 — 클램프(1~재고)는 호출자(`ProductDetailPage`)가 한다(상태관리 방식 절). */
   onQtyChange: (qty: number) => void
@@ -24,8 +31,12 @@ export interface ProductInfoPanelProps {
   addErrorMessage?: string | null
   /** 마지막으로 눌린 버튼 — 성공 알림 문구를 가르는 데만 쓴다. */
   lastAction?: AddAction | null
-  /** 담기/구매를 막아야 하는 사유(품절·로그인 필요). null/undefined면 막지 않는다. */
+  /** 담기/구매를 막아야 하는 사유(로그인 필요). 품절은 더 이상 이 사유로 표시하지 않는다(버튼 자체가
+   * 재입고 알림 신청으로 바뀐다) — null/undefined면 막지 않는다. */
   disabledReason?: string | null
+  /** 재입고 알림 신청 상태 — 'requested'면 버튼이 "신청됨"으로 비활성화된다. */
+  notifyStatus: NotifyStatus
+  onNotifyRequest: () => void
 }
 
 const won = (n: number) => n.toLocaleString('ko-KR') + '원'
@@ -46,12 +57,21 @@ const disabledButtonStyle: React.CSSProperties = {
 
 export function ProductInfoPanel({
   product, qty, onQtyChange, onAddToCart, onBuyNow, addStatus, addErrorMessage, lastAction, disabledReason,
+  notifyStatus, onNotifyRequest,
 }: ProductInfoPanelProps) {
-  const soldOut = product.stockQty <= 0
+  const soldOut = product.soldOut
   const hasDiscount = hasListPriceDiscount(product.price, product.listPrice)
   const discountRate = calcDiscountRate(product.price, product.listPrice)
   const pending = addStatus === 'pending'
   const actionsDisabled = !!disabledReason || pending
+  const notifyRequested = notifyStatus === 'requested'
+  // 계약(STORY "계약" 절): soldOut이면 "품절"(문구 불변), 아니면 stockQty!=null && <=10일 때만
+  // "남은 수량 N개" — 조건 미충족 시 값이 아니라 엘리먼트 자체를 숨긴다(null이면 라벨 렌더 안 함).
+  const stockLabel = soldOut
+    ? '품절'
+    : product.stockQty != null && product.stockQty <= 10
+      ? `남은 수량 ${product.stockQty}개`
+      : null
 
   return (
     <section aria-label="상품 정보">
@@ -67,9 +87,11 @@ export function ProductInfoPanel({
         </div>
       )}
 
-      <div aria-label="재고 상태" style={{ marginTop: 12, fontSize: 13, color: soldOut ? '#912d2b' : '#333' }}>
-        {soldOut ? '품절' : `재고 ${product.stockQty}개`}
-      </div>
+      {stockLabel !== null && (
+        <div aria-label="재고 상태" style={{ marginTop: 12, fontSize: 13, color: soldOut ? '#912d2b' : '#333' }}>
+          {stockLabel}
+        </div>
+      )}
 
       {!soldOut && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 14 }}>
@@ -79,32 +101,45 @@ export function ProductInfoPanel({
                   style={{ border: '1px solid #d5d8dd', borderRadius: 4, background: '#fff', width: 28, height: 28, cursor: 'pointer' }}>
             −
           </button>
-          <input id="product-detail-qty" aria-label="수량" type="number" value={qty} min={1} max={product.stockQty}
+          <input id="product-detail-qty" aria-label="수량" type="number" value={qty} min={1} max={product.stockQty ?? undefined}
                  disabled={actionsDisabled}
                  onChange={e => onQtyChange(Number(e.target.value))}
                  style={{ width: 56, textAlign: 'center', border: '1px solid #d5d8dd', borderRadius: 4, padding: '4px 6px' }} />
+          {/* SR-353 재작업(권고 3) — stockQty=null인데 soldOut=false인 방어 조합에서 이 버튼의
+              비활성 기준이 `ProductDetailPage.handleQtyChange`의 클램프 상한(`stockQty ?? 1`)과
+              일치해야 한다. 이전에는 `?? Infinity`라 클램프가 qty를 1에 묶어 둬도 버튼은 영원히
+              활성으로 남아 눌러도 아무 일도 안 일어나는 죽은 버튼이 됐다(QA CONCERNS #3). */}
           <button type="button" aria-label="수량 증가" onClick={() => onQtyChange(qty + 1)}
-                  disabled={actionsDisabled || qty >= product.stockQty}
+                  disabled={actionsDisabled || qty >= (product.stockQty ?? 1)}
                   style={{ border: '1px solid #d5d8dd', borderRadius: 4, background: '#fff', width: 28, height: 28, cursor: 'pointer' }}>
             +
           </button>
         </div>
       )}
 
-      {disabledReason && (
+      {!soldOut && disabledReason && (
         <div role="note" style={{ marginTop: 10, fontSize: 12.5, color: '#912d2b' }}>{disabledReason}</div>
       )}
 
-      <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
-        <button type="button" onClick={onAddToCart} disabled={actionsDisabled}
-                style={actionsDisabled ? { ...secondaryButtonStyle, ...disabledButtonStyle } : secondaryButtonStyle}>
-          {pending ? '담는 중…' : '장바구니 담기'}
-        </button>
-        <button type="button" onClick={onBuyNow} disabled={actionsDisabled}
-                style={actionsDisabled ? { ...primaryButtonStyle, ...disabledButtonStyle } : primaryButtonStyle}>
-          {pending ? '담는 중…' : '바로 구매'}
-        </button>
-      </div>
+      {soldOut ? (
+        <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
+          <button type="button" onClick={onNotifyRequest} disabled={notifyRequested}
+                  style={notifyRequested ? { ...primaryButtonStyle, ...disabledButtonStyle } : primaryButtonStyle}>
+            {notifyRequested ? '신청됨' : '재입고 알림 신청'}
+          </button>
+        </div>
+      ) : (
+        <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
+          <button type="button" onClick={onAddToCart} disabled={actionsDisabled}
+                  style={actionsDisabled ? { ...secondaryButtonStyle, ...disabledButtonStyle } : secondaryButtonStyle}>
+            {pending ? '담는 중…' : '장바구니 담기'}
+          </button>
+          <button type="button" onClick={onBuyNow} disabled={actionsDisabled}
+                  style={actionsDisabled ? { ...primaryButtonStyle, ...disabledButtonStyle } : primaryButtonStyle}>
+            {pending ? '담는 중…' : '바로 구매'}
+          </button>
+        </div>
+      )}
 
       {addStatus === 'error' && addErrorMessage && (
         <div role="alert" style={{ marginTop: 12, fontSize: 12.5, color: '#912d2b' }}>{addErrorMessage}</div>
