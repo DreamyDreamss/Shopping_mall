@@ -21,6 +21,7 @@ import type {
   ReviewSort,
   SessionResult,
   VerificationCodeResult,
+  WishItem,
   ZipcodeResult,
 } from './types'
 
@@ -377,6 +378,42 @@ export function createReview(apiKey: string, sku: string, input: ReviewInput): P
  * 동일한 인라인 fetch 패턴. 403 `RVW-4031`/404 `RVW-4041`. */
 export function deleteReview(apiKey: string, sku: string, reviewId: number): Promise<void> {
   return fetch(`/api/products/${encodeURIComponent(sku)}/reviews/${reviewId}`, {
+    method: 'DELETE',
+    headers: { 'X-Api-Key': apiKey, Accept: 'application/json' },
+  }).then(async r => {
+    if (!r.ok) throw new ApiError(r.status, await parseErrorBody(r))
+  })
+}
+
+// SR-356 — 상품 찜하기(위시리스트). `MemberWishController`류(INF-ORD-040/041/042, SR-356 #2 구현)는
+// `ApiError`({code,message}) 계열이다 — `registerAddress`/`createReview`와 동일 원칙으로 memberId는
+// 어느 함수에도 싣지 않는다(`SCOPE_TO_SELF`가 회원 X-Api-Key에서 강제한다).
+
+/** GET /api/members/me/wishes 응답 page 크기 — 서버 고정값(요청으로 안 바뀐다, INF-ORD-042). */
+export const WISH_PAGE_SIZE = 20
+
+/** GET /api/members/me/wishes?page= — `{items}` 봉투(계약대로 단일 형태만 받는다, 신규 API라 레거시
+ * raw-array 호환 불필요). 응답의 page/size 필드는 호출자가 쓰지 않는다(다음 페이지 존재 여부는
+ * `items.length < WISH_PAGE_SIZE`로만 판정, STORY "파일" 절). */
+export function fetchWishes(apiKey: string, page = 1): Promise<WishItem[]> {
+  return getAuth<{ items: WishItem[] }>(`/api/members/me/wishes?page=${page}`, apiKey).then(r => r.items)
+}
+
+/** POST /api/members/me/wishes — 찜 등록(INF-ORD-040). 이미 찜한 상품 재등록은 멱등 200. 응답 바디
+ * 형태가 계약에 없어 파싱하지 않는다(`deleteAddress`/`deleteReview`와 동일하게 상태코드만 본다). */
+export function addWish(apiKey: string, sku: string): Promise<void> {
+  return fetch('/api/members/me/wishes', {
+    method: 'POST',
+    headers: { 'X-Api-Key': apiKey, 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify({ sku }),
+  }).then(async r => {
+    if (!r.ok) throw new ApiError(r.status, await parseErrorBody(r))
+  })
+}
+
+/** DELETE /api/members/me/wishes/{sku} — 찜 해제(INF-ORD-041). 찜 안 한 상품 해제는 멱등 204. */
+export function removeWish(apiKey: string, sku: string): Promise<void> {
+  return fetch(`/api/members/me/wishes/${encodeURIComponent(sku)}`, {
     method: 'DELETE',
     headers: { 'X-Api-Key': apiKey, Accept: 'application/json' },
   }).then(async r => {

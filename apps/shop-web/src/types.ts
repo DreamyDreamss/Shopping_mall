@@ -117,6 +117,20 @@ export interface ProductDetail {
   listPrice: number | null
   imageUrl: string | null
   soldOut: boolean
+  // SR-356 — 상품 찜하기(위시리스트). `GET /api/products/{sku}`(INF-ORD-009)에 끝에 추가(하위호환,
+  // 위 8필드 이름·순서·타입 불변, SR-356 #6 구현).
+  wishCount: number
+}
+
+// SR-356 — 내 찜 목록(`/shop/mypage/wishes`). `GET /api/members/me/wishes`(INF-ORD-042, SR-356 #2 구현)
+// 응답 items[] 1건. wishedAt은 타입엔 있으나 화면에 렌더하지 않는다(STORY "범위 밖" 절).
+export interface WishItem {
+  sku: string
+  productName: string
+  price: number
+  imageUrl: string | null
+  soldOut: boolean
+  wishedAt: string
 }
 
 // SR-304 — 상품 상세(`/shop/products/:sku`). `POST /api/cart/items` 응답(`CartController.addItem` →

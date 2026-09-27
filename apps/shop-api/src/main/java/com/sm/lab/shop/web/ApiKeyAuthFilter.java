@@ -211,6 +211,13 @@ public class ApiKeyAuthFilter extends OncePerRequestFilter {
     // 애초에 매치되지 않는다 — /api/members/me/addresses는 세그먼트가 3개 이상이다.
     private static final Pattern MEMBER_ME_ADDRESSES_PATH =
             Pattern.compile("^/api/members/me/addresses(?:/.*)?$");
+    // SR-356(#2) — /api/members/me/wishes(및 하위 /{sku})도 URL에 memberId가 없는 "me" 자원이다.
+    // MEMBER_ME_ADDRESSES_PATH(SR-235)와 완전히 동일한 이유·모양의 SCOPE_TO_SELF 대상 — 새 클래스·
+    // 새 우회 경로를 만들지 않는다(STORY "폴백·우회 경로의 자격 판정" 절). isOpenRoute(화이트리스트)
+    // 에는 절대 넣지 않는다 — 넣으면 필터 자체가 스킵되어 이 소유권 강제까지 함께 우회된다(SR-307
+    // #1/SR-232 r3와 동일한 함정, 사례집에 두 번 기록된 재발 항목).
+    private static final Pattern MEMBER_ME_WISHES_PATH =
+            Pattern.compile("^/api/members/me/wishes(?:/.*)?$");
     // SR-351(#1) — /api/products/{sku}/reviews(및 하위 /{reviewId})도 URL에 memberId가 없는
     // 쓰기 자원이다. MEMBER_ME_ADDRESSES_PATH와 동일한 이유의 SCOPE_TO_SELF 대상이나, 메서드를
     // POST/DELETE로 한정한다(GET은 SR-351 #2 몫 — 클래스 상단 "SR-351(#1)" 노트 참고).
@@ -401,6 +408,13 @@ public class ApiKeyAuthFilter extends OncePerRequestFilter {
         // 무관 — CRUD 전 경로가 동일 정책). MEMBERS_ITEM_PATH보다 먼저 검사하지만 두 정규식은
         // 세그먼트 수가 달라 애초에 겹치지 않는다(클래스 상단 주석 참고).
         if (MEMBER_ME_ADDRESSES_PATH.matcher(path).matches()) {
+            return Decision.SCOPE_TO_SELF;
+        }
+
+        // (b-0'') /api/members/me/wishes 및 하위(SR-356 #2) — memberId 토큰이 없는 "me" 자원이라
+        // GET/POST/DELETE 전 경로가 동일 정책으로 자기 자신으로 강제 축소한다(MEMBER_ME_ADDRESSES_PATH
+        // 와 동일 이유, 메서드 무관 — STORY "순서·보안" 절).
+        if (MEMBER_ME_WISHES_PATH.matcher(path).matches()) {
             return Decision.SCOPE_TO_SELF;
         }
 

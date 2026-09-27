@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sm.lab.shop.dao.ProductWishDao">
+
+  <!-- SR-356(#2) — 등록: INSERT IGNORE 단일 원자문. PK(member_id, sku) 충돌은 DB가 조용히 흡수
+       (0행) — 존재 여부와 무관하게 예외 없이 항상 성공한다(사례집 SR-231 r2/SR-298 #1·#2와 동일
+       계열, 선조회 후 INSERT 금지). -->
+  <insert id="insertWish">
+    INSERT IGNORE INTO PRODUCT_WISHES (member_id, sku, created_at)
+    VALUES (#{memberId}, #{sku}, #{createdAt})
+  </insert>
+
+  <!-- SR-356(#2) — 해제: 단일 DML, 존재 여부를 먼저 조회하지 않는다(영향행수 0/1 무관 — 호출부가
+       항상 204로 응답). sku가 실재 상품인지도 확인하지 않는다(이 회원의 찜 행만 다루는 연산). -->
+  <delete id="deleteWish">
+    DELETE FROM PRODUCT_WISHES
+     WHERE member_id = #{memberId}
+       AND sku = #{sku}
+  </delete>
+
+  <!-- SR-356(#2) — 목록: 최신 찜 순, 상품 조인(soldOut은 stock_qty<=0으로 SQL에서 계산 —
+       ProductService.getDetail과 동일 정의). no-select-star.
+       round2(QA CONCERNS 권고 2, 사람 확정) — created_at은 DATETIME(초 정밀도)이라 같은 초에 찜한
+       행들의 상대 순서가 미정이면 LIMIT/OFFSET 두 호출 사이에 페이지 경계가 흔들린다. w.sku ASC를
+       tie-breaker로 추가해 정렬을 결정적으로 만든다(productReview.xml의 r.created_at DESC,
+       r.review_id DESC와 동일 원리 — 여기서는 PK 두 번째 열인 sku를 tie-breaker로 쓴다). -->
+  <select id="selectWishList" resultType="com.sm.lab.shop.domain.ProductWishView">
+    SELECT w.sku, p.product_name AS productName, p.price, p.image_url AS imageUrl,
+           (p.stock_qty &lt;= 0) AS soldOut, w.created_at AS wishedAt
+      FROM PRODUCT_WISHES w
+      JOIN PRODUCTS p ON w.sku = p.sku
+     WHERE w.member_id = #{memberId}
+     ORDER BY w.created_at DESC, w.sku ASC
+     LIMIT #{limit} OFFSET #{offset}
+  </select>
+
+  <!-- SR-356(#6) — 상품 단건 조회(INF-ORD-009) 응답의 wishCount 집계. 스칼라 COUNT(*)라
+       규칙 no-select-star 취지(컬럼 전체 노출로 축 D 스냅샷이 깨지는 것) 밖 — productReview.xml의
+       selectRatingSummary(COUNT(*) AS reviewCount)와 동일 패턴(전례 재사용). ix_product_wishes_sku
+       (V14, sku 단독 보조 인덱스)로 커버된다. -->
+  <select id="countWishesBySku" resultType="int">
+    SELECT COUNT(*)
+      FROM PRODUCT_WISHES
+     WHERE sku = #{sku}
+  </select>
+
+</mapper>

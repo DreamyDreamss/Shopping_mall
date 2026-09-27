@@ -19,6 +19,7 @@ import { pickRelatedProducts } from '../features/shop/relatedProductsPicker'
 import { ToastStack } from '../components/common/ToastStack'
 import { pushToast, type ToastItem } from '../components/common/toastQueue'
 import { useProductReviews } from './useProductReviews'
+import { useProductWish } from './useProductWish'
 
 type ErrorKind = 'notFound' | 'fetchError' | null
 
@@ -76,6 +77,18 @@ export default function ProductDetailPage() {
   const [activeTab, setActiveTab] = useState<ProductDetailTabKey>('detail')
   const reviews = useProductReviews({ sku, session, enabled: activeTab === 'review' })
 
+  // SR-356 — 찜하기(위시리스트). 찜 상태·찜 여부 확인 루프·토글 핸들러는 전부 `useProductWish`로
+  // 옮겼다(재작업 round2, QA FAIL 권고1 — 파일 크기 상한 + 필수1의 소유권 분리를 그 훅 한 곳에서
+  // 끝낸다). `load()`가 아래에서 `wish.resetForProduct`를 직접 호출하므로(동기 리셋, 렌더 지연 없음)
+  // 훅 호출을 `load` 정의보다 먼저 둔다. 로그인 필요 시 이동은 `handleNotifyRequest`와 동일한
+  // 리다이렉트 규약을 그대로 쓴다.
+  const wish = useProductWish({
+    sku,
+    session,
+    product,
+    onRequireLogin: () => navigate('/login?redirect=' + encodeURIComponent(location.pathname + location.search)),
+  })
+
   const load = async (targetSku: string) => {
     const id = ++requestIdRef.current
     setLoading(true)
@@ -91,6 +104,9 @@ export default function ProductDetailPage() {
       setNotifyStatus('idle')
       notifyInFlightRef.current = false
       setToasts([])
+      // SR-356 — 찜 카운트·토글 상태 리셋은 `setProduct`와 같은 동기 블록에서(렌더 지연 없이) 한다.
+      // wished 판정은 `useProductWish`의 별도 effect가 sku/세션 변경을 보고 스스로 재조회한다.
+      wish.resetForProduct(data.wishCount)
     } catch (e) {
       if (id !== requestIdRef.current) return
       setProduct(null)
@@ -212,7 +228,9 @@ export default function ProductDetailPage() {
                                    onAddToCart={() => handleAdd('cart')} onBuyNow={() => handleAdd('buyNow')}
                                    addStatus={addStatus} addErrorMessage={addErrorMessage} lastAction={lastAction}
                                    disabledReason={disabledReason}
-                                   notifyStatus={notifyStatus} onNotifyRequest={handleNotifyRequest} />
+                                   notifyStatus={notifyStatus} onNotifyRequest={handleNotifyRequest}
+                                   wishCount={wish.wishCount} wished={wish.wished} wishToggleStatus={wish.wishToggleStatus}
+                                   wishErrorMessage={wish.wishErrorMessage} onToggleWish={wish.onToggleWish} />
               </div>
             </div>
             <div style={{ marginTop: 32 }}>

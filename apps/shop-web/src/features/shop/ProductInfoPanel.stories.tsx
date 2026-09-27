@@ -8,7 +8,7 @@ import type { ProductDetail } from '../../types'
 
 const product: ProductDetail = {
   sku: 'SKU-1002', productName: '기계식 키보드', price: 129000, stockQty: 20, saleYn: 'Y',
-  listPrice: null, imageUrl: null, soldOut: false,
+  listPrice: null, imageUrl: null, soldOut: false, wishCount: 0,
 }
 
 const meta = {
@@ -18,6 +18,8 @@ const meta = {
     product, qty: 1, onQtyChange: () => {}, onAddToCart: () => {}, onBuyNow: () => {},
     addStatus: 'idle', addErrorMessage: null, lastAction: null, disabledReason: null,
     notifyStatus: 'idle', onNotifyRequest: () => {},
+    // SR-356 — 찜 수 0(0도 '0'으로 표시), 찜 안 한 상태, 토글 idle.
+    wishCount: 0, wished: false, wishToggleStatus: 'idle', wishErrorMessage: null, onToggleWish: () => {},
   },
   tags: ['UIS-ORD-010'],
 } satisfies Meta<typeof ProductInfoPanel>
@@ -31,7 +33,7 @@ export const 기본: Story = { tags: ['state:기본'],}
 /** 할인있음 — 실 SKU-1001(스탠딩 데스크), price 390,000 / listPrice 450,000(13% 할인, DB 실측). */
 export const 할인있음: Story = {
   args: {
-    product: { sku: 'SKU-1001', productName: '스탠딩 데스크', price: 390000, stockQty: 12, saleYn: 'Y', listPrice: 450000, imageUrl: null, soldOut: false },
+    product: { sku: 'SKU-1001', productName: '스탠딩 데스크', price: 390000, stockQty: 12, saleYn: 'Y', listPrice: 450000, imageUrl: null, soldOut: false, wishCount: 0 },
   },
 }
 
@@ -85,4 +87,26 @@ export const 바로구매성공: Story = {
 /** 로그인필요 — 세션 없음. 재고는 있어도 담기/구매 자체를 막는다(신규 신원 확인 경로를 만들지 않음). */
 export const 로그인필요: Story = {
   args: { disabledReason: '로그인이 필요합니다' },
+}
+
+// SR-356 — 찜 수·찜/해제 토글 상태(기본=찜0은 위 `기본` 스토리 기본값으로 이미 커버).
+
+/** 찜N — 찜 수 12건, 아직 찜 안 한 상태. */
+export const 찜N: Story = {
+  args: { wishCount: 12, wished: false },
+}
+
+/** 찜됨 — 찜한 상태(버튼 라벨이 "♥ 찜됨"으로 바뀐다). */
+export const 찜됨: Story = {
+  args: { wishCount: 13, wished: true },
+}
+
+/** 찜토글중 — pending, 라벨은 낙관 반영값(wished) 그대로 두고 버튼만 비활성(연타 방지). */
+export const 찜토글중: Story = {
+  args: { wished: true, wishToggleStatus: 'pending' },
+}
+
+/** 찜토글실패 — 낙관적 갱신 롤백 후 오류 문구 인라인 표시. */
+export const 찜토글실패: Story = {
+  args: { wishToggleStatus: 'error', wishErrorMessage: '일시적 오류입니다. 다시 시도해 주세요' },
 }

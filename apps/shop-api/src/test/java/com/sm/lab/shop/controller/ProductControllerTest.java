@@ -123,12 +123,13 @@ class ProductControllerTest {
     // linked_tc: TC-FUNC-order-007-05
     // SR-353 — 컨트롤러가 이제 getDetail을 호출한다(get은 더 이상 호출되지 않음). soldOut/stockQty 단언 추가.
     // SR-351(#2) — avgRating/reviewCount 필드 단언 추가(jsonPath 필드명 기준, 위치 인덱스 비교 금지).
+    // SR-356(#6) — wishCount 필드 단언 추가(동일 관례).
     @Test
     void get_existingSku_returns200WithProduct() throws Exception {
         // 단건 조회 정상 케이스
         ProductService.ProductDetailResponse resp = new ProductService.ProductDetailResponse(
                 "SKU-1001", "마우스", 25000L, 100, "Y", null, null, false,
-                /* avgRating */ new BigDecimal("4.5"), /* reviewCount */ 3);
+                /* avgRating */ new BigDecimal("4.5"), /* reviewCount */ 3, /* wishCount */ 2);
         when(productService.getDetail("SKU-1001")).thenReturn(resp);
 
         mockMvc.perform(get("/api/products/SKU-1001"))
@@ -138,7 +139,8 @@ class ProductControllerTest {
                 .andExpect(jsonPath("$.stockQty").value(100))
                 .andExpect(jsonPath("$.soldOut").value(false))
                 .andExpect(jsonPath("$.avgRating").value(4.5))
-                .andExpect(jsonPath("$.reviewCount").value(3));
+                .andExpect(jsonPath("$.reviewCount").value(3))
+                .andExpect(jsonPath("$.wishCount").value(2));
     }
 
     // SR-353 — 품절 상품 단건 조회는 soldOut=true를 그대로 직렬화한다.
@@ -146,7 +148,7 @@ class ProductControllerTest {
     void get_soldOutProduct_returnsSoldOutTrueInBody() throws Exception {
         ProductService.ProductDetailResponse resp = new ProductService.ProductDetailResponse(
                 "SKU-2002", "품절 상품", 15000L, 0, "Y", null, null, true,
-                /* avgRating */ null, /* reviewCount */ 0);
+                /* avgRating */ null, /* reviewCount */ 0, /* wishCount */ 0);
         when(productService.getDetail("SKU-2002")).thenReturn(resp);
 
         mockMvc.perform(get("/api/products/SKU-2002"))
@@ -164,14 +166,15 @@ class ProductControllerTest {
     void get_nullStockQty_returnsNullField() throws Exception {
         ProductService.ProductDetailResponse resp = new ProductService.ProductDetailResponse(
                 "SKU-2003", "재고미상품", 20000L, null, "Y", null, null, false,
-                /* avgRating */ null, /* reviewCount */ 0);
+                /* avgRating */ null, /* reviewCount */ 0, /* wishCount */ 0);
         when(productService.getDetail("SKU-2003")).thenReturn(resp);
 
         mockMvc.perform(get("/api/products/SKU-2003"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.stockQty").value(nullValue()))
                 .andExpect(jsonPath("$.avgRating").value(nullValue()))
-                .andExpect(jsonPath("$.reviewCount").value(0));
+                .andExpect(jsonPath("$.reviewCount").value(0))
+                .andExpect(jsonPath("$.wishCount").value(0));
     }
 
     // SR-353 재작업(round 2, QA CONCERNS #2) — AC "오류 응답 코드·사유(401/404) 변경 없음"을 컨트롤러가
@@ -235,7 +238,7 @@ class ProductControllerTest {
     void get_returnsListPriceAndImageUrl_withImageUrlNullWhenMissing() throws Exception {
         ProductService.ProductDetailResponse resp = new ProductService.ProductDetailResponse(
                 "SKU-1004", "단종 마우스", 35000L, 0, "N", 42000L, null, true,
-                /* avgRating */ null, /* reviewCount */ 0);
+                /* avgRating */ null, /* reviewCount */ 0, /* wishCount */ 0);
         when(productService.getDetail("SKU-1004")).thenReturn(resp);
 
         mockMvc.perform(get("/api/products/SKU-1004"))
@@ -253,7 +256,7 @@ class ProductControllerTest {
     void get_discontinuedProduct_returns200WithSaleYnN() throws Exception {
         ProductService.ProductDetailResponse resp = new ProductService.ProductDetailResponse(
                 "SKU-9001", "단종된 마우스", 28000L, 0, "N", null, null, true,
-                /* avgRating */ null, /* reviewCount */ 0);
+                /* avgRating */ null, /* reviewCount */ 0, /* wishCount */ 0);
         when(productService.getDetail("SKU-9001")).thenReturn(resp);
 
         mockMvc.perform(get("/api/products/SKU-9001"))

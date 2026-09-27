@@ -22,6 +22,7 @@ function product(i: number, overrides: Partial<ProductDetail> = {}): ProductDeta
   return {
     sku: `sku-detail-${i}`, productName: `상세테스트상품${i}`, price: 10000 + i * 1000, stockQty,
     saleYn: 'Y', listPrice: null, imageUrl: null, soldOut: stockQty !== null && stockQty <= 0,
+    wishCount: 0, // SR-356 — 신규 필드(끝에 추가). 이 파일의 케이스들은 찜하기와 무관해 기본값만 채운다.
     ...overrides,
   }
 }

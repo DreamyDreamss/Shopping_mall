@@ -4,6 +4,7 @@ package com.sm.lab.shop.service;
 
 import com.sm.lab.shop.dao.ProductDao;
 import com.sm.lab.shop.dao.ProductReviewDao;
+import com.sm.lab.shop.dao.ProductWishDao;
 import com.sm.lab.shop.domain.Product;
 import com.sm.lab.shop.domain.ProductReviewSummary;
 import org.junit.jupiter.api.Test;
@@ -31,6 +32,11 @@ class ProductServiceTest {
     // getDetail을 호출하지 않으므로 이 mock을 스텁하지 않아도 영향 없다(추가 인자일 뿐, 회귀 없음).
     @Mock
     private ProductReviewDao productReviewDao;
+    // SR-356(#6) — ProductService 생성자가 (ProductDao, ProductReviewDao, ProductWishDao)로
+    // 확장됐다(getDetail()이 wishCount 집계에 이 DAO를 쓴다). getDetail을 호출하지 않는 이 클래스의
+    // 다른 FUNC(정렬·목록) 테스트는 이 mock을 스텁하지 않아도 영향 없다(추가 인자일 뿐, 회귀 없음).
+    @Mock
+    private ProductWishDao productWishDao;
 
     private static ProductReviewSummary summary(BigDecimal avgRating, int reviewCount) {
         ProductReviewSummary s = new ProductReviewSummary();
@@ -43,7 +49,7 @@ class ProductServiceTest {
     void list_withoutKeyword_delegatesToDaoWithNullKeyword() {
         // AS-IS 회귀: keyword 미지정 시 기존과 동일하게 dao에 null을 전달한다 (TC-FUNC-order-007-03)
         when(productDao.selectProducts(null, null)).thenReturn(Collections.emptyList());
-        ProductService service = new ProductService(productDao, productReviewDao);
+        ProductService service = new ProductService(productDao, productReviewDao, productWishDao);
 
         List<Product> result = service.list(null, null);
 
@@ -58,7 +64,7 @@ class ProductServiceTest {
         p.setSku("SKU-1002");
         p.setProductName("기계식 키보드");
         when(productDao.selectProducts("키보드", null)).thenReturn(List.of(p));
-        ProductService service = new ProductService(productDao, productReviewDao);
+        ProductService service = new ProductService(productDao, productReviewDao, productWishDao);
 
         List<Product> result = service.list("키보드", null);
 
@@ -75,7 +81,7 @@ class ProductServiceTest {
         p.setProductName("4K 모니터");
         p.setStockQty(7);
         when(productDao.selectProducts(null, true)).thenReturn(List.of(p));
-        ProductService service = new ProductService(productDao, productReviewDao);
+        ProductService service = new ProductService(productDao, productReviewDao, productWishDao);
 
         List<Product> result = service.list(null, true);
 
@@ -87,7 +93,7 @@ class ProductServiceTest {
     void list_withInStockFalse_delegatesToDaoWithInStockFalse() {
         // SR-220: inStock=false는 필터 미적용(기존과 동일) — dao에 그대로 전달
         when(productDao.selectProducts(null, false)).thenReturn(Collections.emptyList());
-        ProductService service = new ProductService(productDao, productReviewDao);
+        ProductService service = new ProductService(productDao, productReviewDao, productWishDao);
 
         List<Product> result = service.list(null, false);
 
@@ -124,7 +130,7 @@ class ProductServiceTest {
         Product p = new Product();
         p.setSku("SKU-1001");
         when(productDao.selectProducts(null, null)).thenReturn(List.of(p));
-        ProductService service = new ProductService(productDao, productReviewDao);
+        ProductService service = new ProductService(productDao, productReviewDao, productWishDao);
 
         List<Product> result = service.listSorted(null, "latest");
 
@@ -140,7 +146,7 @@ class ProductServiceTest {
         Product p = new Product();
         p.setSku("SKU-1002");
         when(productDao.selectProductsForList(null, "priceAsc")).thenReturn(List.of(p));
-        ProductService service = new ProductService(productDao, productReviewDao);
+        ProductService service = new ProductService(productDao, productReviewDao, productWishDao);
 
         List<Product> result = service.listSorted(null, "priceAsc");
 
@@ -154,7 +160,7 @@ class ProductServiceTest {
     @Test
     void list_withInvalidSort_fallsBackToLatestDaoCall() {
         when(productDao.selectProducts("키보드", null)).thenReturn(Collections.emptyList());
-        ProductService service = new ProductService(productDao, productReviewDao);
+        ProductService service = new ProductService(productDao, productReviewDao, productWishDao);
 
         service.listSorted("키보드", "bogus");
 
@@ -165,6 +171,7 @@ class ProductServiceTest {
     // SR-353 — 상품 상세(INF-ORD-009) soldOut 매핑. 재고 있음 → soldOut=false, stockQty는 조회값 그대로.
     // SR-351(#2) — avgRating/reviewCount 단언 추가(레코드 접근자 기준 — 위치 인덱스 비교 금지,
     // STORY "테스트" 절: SR-353이 soldOut 내부 구현을 바꿔도 이 단언은 영향받지 않는다).
+    // SR-356(#6) — wishCount 스텁·단언 추가(레코드 접근자 기준, 동일 관례).
     @Test
     void getDetail_inStock_returnsSoldOutFalseAndSameStockQty() {
         Product p = new Product();
@@ -175,7 +182,8 @@ class ProductServiceTest {
         p.setSaleYn("Y");
         when(productDao.selectBySku("SKU-2001")).thenReturn(p);
         when(productReviewDao.selectRatingSummary("SKU-2001")).thenReturn(summary(new BigDecimal("4.7"), 3));
-        ProductService service = new ProductService(productDao, productReviewDao);
+        when(productWishDao.countWishesBySku("SKU-2001")).thenReturn(5);
+        ProductService service = new ProductService(productDao, productReviewDao, productWishDao);
 
         ProductService.ProductDetailResponse result = service.getDetail("SKU-2001");
 
@@ -184,10 +192,12 @@ class ProductServiceTest {
         assertThat(result.soldOut()).isFalse();
         assertThat(result.avgRating()).isEqualTo(new BigDecimal("4.7"));
         assertThat(result.reviewCount()).isEqualTo(3);
+        assertThat(result.wishCount()).isEqualTo(5);
     }
 
     // SR-353 — 재고 0은 "못 읽는 경우"(null)와 다른 조건이다(STORY "테스트" 절, 혼동 금지) — stockQty는
     // 0 그대로 내려가고 soldOut만 true가 된다.
+    // SR-356(#6) — wishCount 스텁·단언 추가.
     @Test
     void getDetail_zeroStock_returnsSoldOutTrue() {
         Product p = new Product();
@@ -198,16 +208,19 @@ class ProductServiceTest {
         p.setSaleYn("Y");
         when(productDao.selectBySku("SKU-2002")).thenReturn(p);
         when(productReviewDao.selectRatingSummary("SKU-2002")).thenReturn(summary(new BigDecimal("2.0"), 1));
-        ProductService service = new ProductService(productDao, productReviewDao);
+        when(productWishDao.countWishesBySku("SKU-2002")).thenReturn(1);
+        ProductService service = new ProductService(productDao, productReviewDao, productWishDao);
 
         ProductService.ProductDetailResponse result = service.getDetail("SKU-2002");
 
         assertThat(result.stockQty()).isEqualTo(0);
         assertThat(result.soldOut()).isTrue();
+        assertThat(result.wishCount()).isEqualTo(1);
     }
 
     // SR-351(#2) — 리뷰 0건일 때 avgRating은 0.0이 아니라 null이어야 한다(확정 문답 — "0.0 아님").
     // Map.of NPE 회귀(SR-306 #2 계열 판별력 0 가드 회피)와 동일한 함정을 여기서도 직접 재현한다.
+    // SR-356(#6) — wishCount 스텁·단언 추가.
     @Test
     void getDetail_noReviews_returnsAvgRatingNullAndReviewCountZero() {
         Product p = new Product();
@@ -218,11 +231,33 @@ class ProductServiceTest {
         p.setSaleYn("Y");
         when(productDao.selectBySku("SKU-2003")).thenReturn(p);
         when(productReviewDao.selectRatingSummary("SKU-2003")).thenReturn(summary(null, 0));
-        ProductService service = new ProductService(productDao, productReviewDao);
+        when(productWishDao.countWishesBySku("SKU-2003")).thenReturn(0);
+        ProductService service = new ProductService(productDao, productReviewDao, productWishDao);
 
         ProductService.ProductDetailResponse result = service.getDetail("SKU-2003");
 
         assertThat(result.avgRating()).isNull();
         assertThat(result.reviewCount()).isEqualTo(0);
+        assertThat(result.wishCount()).isEqualTo(0);
+    }
+
+    // SR-356(#6) — 신규 케이스: 찜 0건 상품도 wishCount=0으로 공개 응답에 그대로 포함된다(확정 답변
+    // — 비로그인 조회 시 wishCount 노출 제한 없음, avgRating/reviewCount와 동일하게 공개).
+    @Test
+    void getDetail_noWishes_returnsWishCountZero() {
+        Product p = new Product();
+        p.setSku("SKU-2004");
+        p.setProductName("찜 없는 상품");
+        p.setPrice(12000L);
+        p.setStockQty(3);
+        p.setSaleYn("Y");
+        when(productDao.selectBySku("SKU-2004")).thenReturn(p);
+        when(productReviewDao.selectRatingSummary("SKU-2004")).thenReturn(summary(new BigDecimal("3.5"), 2));
+        when(productWishDao.countWishesBySku("SKU-2004")).thenReturn(0);
+        ProductService service = new ProductService(productDao, productReviewDao, productWishDao);
+
+        ProductService.ProductDetailResponse result = service.getDetail("SKU-2004");
+
+        assertThat(result.wishCount()).isEqualTo(0);
     }
 }

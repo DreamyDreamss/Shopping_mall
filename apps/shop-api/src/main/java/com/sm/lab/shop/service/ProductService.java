@@ -4,6 +4,7 @@ package com.sm.lab.shop.service;
 
 import com.sm.lab.shop.dao.ProductDao;
 import com.sm.lab.shop.dao.ProductReviewDao;
+import com.sm.lab.shop.dao.ProductWishDao;
 import com.sm.lab.shop.domain.Product;
 import com.sm.lab.shop.domain.ProductReviewSummary;
 import org.springframework.http.HttpStatus;
@@ -25,10 +26,15 @@ public class ProductService {
     // ProductReviewDao#selectRatingSummary(sku)를 목록 API(INF-ORD-038)와 공유 호출한다(STORY
     // "데이터" 절 — 집계 쿼리 중복 금지).
     private final ProductReviewDao productReviewDao;
+    // SR-356(#6) — INF-ORD-009 응답에 wishCount를 얹기 위한 집계 조회 전용 의존성.
+    // ProductWishDao#countWishesBySku(sku)를 호출한다(ix_product_wishes_sku, V14에서 이미 예약).
+    private final ProductWishDao productWishDao;
 
-    public ProductService(ProductDao productDao, ProductReviewDao productReviewDao) {
+    public ProductService(ProductDao productDao, ProductReviewDao productReviewDao,
+                           ProductWishDao productWishDao) {
         this.productDao = productDao;
         this.productReviewDao = productReviewDao;
+        this.productWishDao = productWishDao;
     }
 
     /**
@@ -97,23 +103,28 @@ public class ProductService {
         // distribution(별점 분포 원시값)은 이 응답에 넣지 않는다 — INF-ORD-009 "추가만" 계약
         // 범위 밖(목록 API INF-ORD-038 전용, STORY "계약" 절).
         ProductReviewSummary summary = productReviewDao.selectRatingSummary(sku);
+        // SR-356(#6) — wishCount도 존재 판정 통과 후에만 집계한다(avgRating/reviewCount와 동일
+        // 순서 — 두 집계 호출은 서로 독립이라 순서 무관, STORY "순서·보안" 절).
+        int wishCount = productWishDao.countWishesBySku(sku);
         return new ProductDetailResponse(
                 p.getSku(), p.getProductName(), p.getPrice(), p.getStockQty(),
                 p.getSaleYn(), p.getListPrice(), p.getImageUrl(), p.getStockQty() <= 0,
-                /* avgRating */ summary.getAvgRating(), /* reviewCount */ summary.getReviewCount()
+                /* avgRating */ summary.getAvgRating(), /* reviewCount */ summary.getReviewCount(),
+                /* wishCount */ wishCount
         );
     }
 
     /**
-     * INF-ORD-009 응답 전용(SR-353 + SR-351(#2)). 기존 7필드(이름·타입·순서 불변, 확정 답변
-     * api_compat) + {@code soldOut}(SR-353) 뒤에 {@code avgRating}(BigDecimal, nullable — 리뷰
-     * 0건이면 null, 소수 1자리)·{@code reviewCount}(int, 0 이상)를 끝에 추가만 한다(SR-351(#2)).
-     * stockQty는 nullable로 열어 두지만(계약상 가능성), 이 메서드가 실제로 null을 채우는 경로는
-     * 없다(위 {@link #getDetail} 문서 참조).
+     * INF-ORD-009 응답 전용(SR-353 + SR-351(#2) + SR-356(#6)). 기존 7필드(이름·타입·순서 불변,
+     * 확정 답변 api_compat) + {@code soldOut}(SR-353) + {@code avgRating}(BigDecimal, nullable —
+     * 리뷰 0건이면 null, 소수 1자리)·{@code reviewCount}(int, 0 이상, SR-351(#2)) 뒤에
+     * {@code wishCount}(int, 0 이상, 찜하지 않은 상품은 0)를 끝에 추가만 한다(SR-356(#6), 확정
+     * 답변 api_compat — 기존 10필드 이름·순서·타입 불변). stockQty는 nullable로 열어 두지만(계약상
+     * 가능성), 이 메서드가 실제로 null을 채우는 경로는 없다(위 {@link #getDetail} 문서 참조).
      */
     public record ProductDetailResponse(
             String sku, String productName, long price, Integer stockQty,
             String saleYn, Long listPrice, String imageUrl, boolean soldOut,
-            BigDecimal avgRating, int reviewCount
+            BigDecimal avgRating, int reviewCount, int wishCount
     ) {}
 }

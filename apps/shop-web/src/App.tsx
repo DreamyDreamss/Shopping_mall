@@ -13,6 +13,7 @@ import ProductDetailPage from './pages/ProductDetailPage'
 import CartPage from './pages/CartPage'
 import OrderPage from './pages/OrderPage'
 import MyAddressesPage from './pages/MyAddressesPage'
+import WishListPage from './pages/WishListPage'
 import { ApiError, refreshSession } from './api'
 import { refreshOnce } from './refreshOnce'
 import { clearSession, loadSession, saveSession } from './session'
@@ -111,6 +112,9 @@ export default function App() {
         {/* SR-235 — 마이페이지 배송지 관리. 마이페이지 허브 화면은 만들지 않는다(재승인 조건) — 이
             라우트 1개가 유일한 진입점(Gnb 링크 1줄 + 직접 URL). */}
         <Route path="/shop/mypage/addresses" element={<MyAddressesPage />} />
+        {/* SR-356 — 내 찜 목록. 이번 SR의 유일한 진입점은 상품 상세의 "내 찜 목록" 링크 1개다
+            (GNB 회원 메뉴·하단 탭바 찜 탭은 넣지 않는다, SR-288 소관). */}
+        <Route path="/shop/mypage/wishes" element={<WishListPage />} />
       </Routes>
     </HashRouter>
   )

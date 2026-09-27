@@ -19,6 +19,9 @@ import type { ProductDetail } from '../../types'
 export type AddStatus = 'idle' | 'pending' | 'success' | 'error'
 export type AddAction = 'cart' | 'buyNow'
 export type NotifyStatus = 'idle' | 'requested'
+// SR-356 — 찜 토글 상태. 'success'가 없다(장바구니 addStatus와 달리 성공 알림 문구를 따로 보여주지
+// 않는다 — 토글 버튼 자체의 라벨(찜하기/찜됨) 전환이 성공 표시를 겸한다, STORY "파일" 절).
+export type WishToggleStatus = 'idle' | 'pending' | 'error'
 
 export interface ProductInfoPanelProps {
   product: ProductDetail
@@ -37,6 +40,14 @@ export interface ProductInfoPanelProps {
   /** 재입고 알림 신청 상태 — 'requested'면 버튼이 "신청됨"으로 비활성화된다. */
   notifyStatus: NotifyStatus
   onNotifyRequest: () => void
+  // SR-356 — 찜 수·찜 여부·토글 상태는 전부 부모(`ProductDetailPage`)가 판정해 내려준다(이 부품은
+  // fetch/자격 판정을 하지 않는다, 규칙 `web-fetch-only-in-api`). 토글 버튼은 `disabledReason`(로그인
+  // 필요)과 무관하게 항상 클릭 가능 — 클릭 시 로그인 판정은 부모가 한다(`onNotifyRequest`와 동일 원칙).
+  wishCount: number
+  wished: boolean
+  wishToggleStatus: WishToggleStatus
+  wishErrorMessage?: string | null
+  onToggleWish: () => void
 }
 
 const won = (n: number) => n.toLocaleString('ko-KR') + '원'
@@ -55,9 +66,18 @@ const disabledButtonStyle: React.CSSProperties = {
   border: '1px solid #d5d8dd', background: '#eef0f2', color: '#999', cursor: 'not-allowed',
 }
 
+const wishButtonStyle: React.CSSProperties = {
+  border: '1px solid #d5d8dd', borderRadius: 5, background: '#fff', color: '#333', fontSize: 13,
+  fontWeight: 600, padding: '7px 14px', cursor: 'pointer',
+}
+
+const wishActiveButtonStyle: React.CSSProperties = {
+  ...wishButtonStyle, border: '1px solid #e0392c', color: '#e0392c',
+}
+
 export function ProductInfoPanel({
   product, qty, onQtyChange, onAddToCart, onBuyNow, addStatus, addErrorMessage, lastAction, disabledReason,
-  notifyStatus, onNotifyRequest,
+  notifyStatus, onNotifyRequest, wishCount, wished, wishToggleStatus, wishErrorMessage, onToggleWish,
 }: ProductInfoPanelProps) {
   const soldOut = product.soldOut
   const hasDiscount = hasListPriceDiscount(product.price, product.listPrice)
@@ -139,6 +159,25 @@ export function ProductInfoPanel({
             {pending ? '담는 중…' : '바로 구매'}
           </button>
         </div>
+      )}
+
+      {/* SR-356 — 찜 수·찜/해제 토글·내 찜 목록 진입 링크. 담기/구매(또는 재입고 알림) 두 분기가
+          합류하는 지점 바로 아래에 둔다(STORY "파일" 절) — soldOut 여부와 무관하게 항상 보인다. 라벨은
+          `wished`(낙관적으로 이미 반영된 값)만 따른다 — pending은 disabled로만 표시하고 라벨을 별도
+          문구로 덮지 않는다(STORY "테스트" 절 "서버 응답 지연 중에도 찜됨 표시 그대로 유지"). */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 14, flexWrap: 'wrap' }}>
+        <button type="button" aria-label="찜 토글" aria-pressed={wished} onClick={onToggleWish}
+                disabled={wishToggleStatus === 'pending'}
+                style={wished ? wishActiveButtonStyle : wishButtonStyle}>
+          {wished ? '♥ 찜됨' : '♡ 찜하기'}
+        </button>
+        <span aria-label="찜 수" style={{ fontSize: 13, color: '#666' }}>찜 {wishCount}</span>
+        <a href="#/shop/mypage/wishes" style={{ fontSize: 12.5, color: '#0b4ea2', textDecoration: 'none' }}>
+          내 찜 목록
+        </a>
+      </div>
+      {wishToggleStatus === 'error' && wishErrorMessage && (
+        <div role="alert" style={{ marginTop: 8, fontSize: 12.5, color: '#912d2b' }}>{wishErrorMessage}</div>
       )}
 
       {addStatus === 'error' && addErrorMessage && (
