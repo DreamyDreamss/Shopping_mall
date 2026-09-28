@@ -65,4 +65,16 @@
     </choose>
   </select>
 
+  <!-- SR-358(#2) — 상품 상세 조회수(INF-ORD-009). 상한 없는 순수 누적 카운터라 조건부 WHERE 없이
+       단일 UPDATE로 증가시킨다(카운터 원자화 관례, harness/antipatterns.all.md 대조 — 이 카운터는
+       실패 경로에서 사라질 값이 없어 트랜잭션으로 묶지 않는다). -->
+  <update id="incrementViewCount">
+    UPDATE PRODUCTS SET view_count = view_count + 1 WHERE sku = #{sku}
+  </update>
+
+  <!-- 존재하지 않는 sku는 null(컬럼 자체가 없는 행과 "0인 행"을 구분). -->
+  <select id="selectViewCount" resultType="java.lang.Long">
+    SELECT view_count FROM PRODUCTS WHERE sku = #{sku}
+  </select>
+
 </mapper>

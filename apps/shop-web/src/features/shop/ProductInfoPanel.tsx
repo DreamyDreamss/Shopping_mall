@@ -172,6 +172,13 @@ export function ProductInfoPanel({
           {wished ? '♥ 찜됨' : '♡ 찜하기'}
         </button>
         <span aria-label="찜 수" style={{ fontSize: 13, color: '#666' }}>찜 {wishCount}</span>
+        {/* SR-358 — 상품 상세 조회수. 찜 수 바로 옆(같은 flex row)에 표시(STORY "파일" 절). 값이
+            없거나 0이면 「조회 0」(확정 답변), 천 단위 쉼표는 위 `won()`과 같은 방식(`toLocaleString`)
+            을 재사용한다. `aria-label`을 "찜 수"와 다르게 두어 같은 화면의 유사 라벨 혼동(실패
+            사례집 SR-353 #1)을 피한다. */}
+        <span aria-label="조회 수" style={{ fontSize: 13, color: '#666' }}>
+          조회 {(product.viewCount ?? 0).toLocaleString('ko-KR')}
+        </span>
         <a href="#/shop/mypage/wishes" style={{ fontSize: 12.5, color: '#0b4ea2', textDecoration: 'none' }}>
           내 찜 목록
         </a>

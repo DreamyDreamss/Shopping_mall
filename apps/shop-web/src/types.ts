@@ -120,6 +120,11 @@ export interface ProductDetail {
   // SR-356 — 상품 찜하기(위시리스트). `GET /api/products/{sku}`(INF-ORD-009)에 끝에 추가(하위호환,
   // 위 8필드 이름·순서·타입 불변, SR-356 #6 구현).
   wishCount: number
+  // SR-358 — 상품 상세 조회수. `GET /api/products/{sku}`(INF-ORD-009)에 끝에 추가(하위호환, 위
+  // 9필드 이름·순서·타입 불변). optional인 이유는 응답 부재가 아니라 이 타입을 공유하는 형제 테스트
+  // 픽스처(ProductDetailPage.reviews.test.tsx · ProductDetailPage.wish.test.tsx)가 이 필드를
+  // 채우지 않기 때문 — 화면은 `?? 0`으로 항상 「조회 0」 이상을 보장한다.
+  viewCount?: number
 }
 
 // SR-356 — 내 찜 목록(`/shop/mypage/wishes`). `GET /api/members/me/wishes`(INF-ORD-042, SR-356 #2 구현)

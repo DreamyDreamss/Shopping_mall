@@ -24,4 +24,13 @@ public interface ProductDao {
     // 화이트리스트("priceAsc"/"priceDesc")로 검증을 마친 값만 전달한다("latest"는 기존 selectProducts를 그대로
     // 재사용해 데이터 계약을 불변 유지 — 이 메서드로 오지 않는다).
     List<Product> selectProductsForList(@Param("keyword") String keyword, @Param("sort") String sort);
+
+    // SR-358(#2) — 상품 상세 조회수(INF-ORD-009). 상한 없는 순수 누적 카운터라 조건부 WHERE가
+    // 필요 없다(단일 UPDATE). Product 도메인 클래스·selectBySku/selectProducts의 SELECT 목록에는
+    // view_count를 넣지 않는다 — 목록 API(INF-ORD-008)로 원치 않게 유출되는 것을 막기 위한
+    // 전용 스칼라 메서드 분리(STORY "실패 사례집 대조" 절).
+    int incrementViewCount(@Param("sku") String sku);
+
+    // 존재하지 않는 sku는 null을 반환한다(0이 아니다 — 컬럼 자체가 없는 행과 "0인 행"을 구분).
+    Long selectViewCount(@Param("sku") String sku);
 }

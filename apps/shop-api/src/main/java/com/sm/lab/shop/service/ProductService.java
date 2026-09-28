@@ -7,6 +7,8 @@ import com.sm.lab.shop.dao.ProductReviewDao;
 import com.sm.lab.shop.dao.ProductWishDao;
 import com.sm.lab.shop.domain.Product;
 import com.sm.lab.shop.domain.ProductReviewSummary;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -16,6 +18,8 @@ import java.util.List;
 
 @Service
 public class ProductService {
+    private static final Logger log = LoggerFactory.getLogger(ProductService.class);
+
     // linked_func: FUNC-order-009 — 상품 목록 화면 정렬 셀렉트 옵션 화이트리스트(SR-214).
     // spec: docs/00_FUNC/stories/STORY-FUNC-order-009.md
     private static final String SORT_LATEST = "latest";
@@ -106,25 +110,49 @@ public class ProductService {
         // SR-356(#6) — wishCount도 존재 판정 통과 후에만 집계한다(avgRating/reviewCount와 동일
         // 순서 — 두 집계 호출은 서로 독립이라 순서 무관, STORY "순서·보안" 절).
         int wishCount = productWishDao.countWishesBySku(sku);
+        long viewCount = incrementAndReadViewCount(sku);
         return new ProductDetailResponse(
                 p.getSku(), p.getProductName(), p.getPrice(), p.getStockQty(),
                 p.getSaleYn(), p.getListPrice(), p.getImageUrl(), p.getStockQty() <= 0,
                 /* avgRating */ summary.getAvgRating(), /* reviewCount */ summary.getReviewCount(),
-                /* wishCount */ wishCount
+                /* wishCount */ wishCount, /* viewCount */ viewCount
         );
     }
 
     /**
-     * INF-ORD-009 응답 전용(SR-353 + SR-351(#2) + SR-356(#6)). 기존 7필드(이름·타입·순서 불변,
-     * 확정 답변 api_compat) + {@code soldOut}(SR-353) + {@code avgRating}(BigDecimal, nullable —
-     * 리뷰 0건이면 null, 소수 1자리)·{@code reviewCount}(int, 0 이상, SR-351(#2)) 뒤에
-     * {@code wishCount}(int, 0 이상, 찜하지 않은 상품은 0)를 끝에 추가만 한다(SR-356(#6), 확정
-     * 답변 api_compat — 기존 10필드 이름·순서·타입 불변). stockQty는 nullable로 열어 두지만(계약상
-     * 가능성), 이 메서드가 실제로 null을 채우는 경로는 없다(위 {@link #getDetail} 문서 참조).
+     * SR-358(#2) — 조회수 +1 시도 후 최신값을 읽어 "이번 조회 포함" 값을 만든다. 증가·조회 각각
+     * 독자적인 실패 허용 구간이다(둘 다 실패해도 상세 조회 자체는 200을 유지 — AC "증가 실패는
+     * 로그만 남기고 200"). 증가가 성공했으면 조회가 +1된 값을 읽고, 증가만 실패했어도 조회가
+     * 성공하면 최소한 최신 저장값을 반환한다. 둘 다 실패하면 0으로 폴백한다(이 폴백값은 AC에
+     * 명시되지 않은 판단 — STORY "데이터" 절, QA 확인 대상으로 남는다).
+     */
+    private long incrementAndReadViewCount(String sku) {
+        try {
+            productDao.incrementViewCount(sku);
+        } catch (RuntimeException e) {
+            log.warn("상품 조회수 증가 실패: sku={}", sku, e);
+        }
+        try {
+            Long viewCount = productDao.selectViewCount(sku);
+            return viewCount != null ? viewCount : 0L;
+        } catch (RuntimeException e) {
+            log.warn("상품 조회수 조회 실패: sku={}", sku, e);
+            return 0L;
+        }
+    }
+
+    /**
+     * INF-ORD-009 응답 전용(SR-353 + SR-351(#2) + SR-356(#6) + SR-358(#2)). 기존 8필드(이름·타입·
+     * 순서 불변, 확정 답변 api_compat) + {@code avgRating}(BigDecimal, nullable — 리뷰 0건이면
+     * null, 소수 1자리)·{@code reviewCount}(int, 0 이상, SR-351(#2))·{@code wishCount}(int, 0
+     * 이상, 찜하지 않은 상품은 0, SR-356(#6)) 뒤에 {@code viewCount}(long, 이번 조회 포함)를 끝에
+     * 추가만 한다(SR-358(#2), 확정 답변 api_compat — 기존 11필드 이름·순서·타입 불변). stockQty는
+     * nullable로 열어 두지만(계약상 가능성), 이 메서드가 실제로 null을 채우는 경로는 없다(위
+     * {@link #getDetail} 문서 참조).
      */
     public record ProductDetailResponse(
             String sku, String productName, long price, Integer stockQty,
             String saleYn, Long listPrice, String imageUrl, boolean soldOut,
-            BigDecimal avgRating, int reviewCount, int wishCount
+            BigDecimal avgRating, int reviewCount, int wishCount, long viewCount
     ) {}
 }

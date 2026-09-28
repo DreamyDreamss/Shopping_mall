@@ -110,3 +110,11 @@ export const 찜토글중: Story = {
 export const 찜토글실패: Story = {
   args: { wishToggleStatus: 'error', wishErrorMessage: '일시적 오류입니다. 다시 시도해 주세요' },
 }
+
+// SR-358 — 상품 상세 조회수. "없음/0" 상태는 위 `기본` 스토리가 이미 커버한다(fixture가 viewCount를
+// 채우지 않아 `?? 0`으로 「조회 0」이 자동으로 나온다, 확정 답변).
+
+/** 조회수 — 조회수 1,234회. 천 단위 쉼표 표기를 스토리로 고정한다. */
+export const 조회수: Story = {
+  args: { product: { ...product, viewCount: 1234 } },
+}
