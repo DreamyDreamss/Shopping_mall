@@ -208,4 +208,29 @@ class ProductDaoTest {
         assertThat(resultNull.stream().map(Product::getSku).anyMatch(sku -> sku.equals("SKU-TEST-OOS"))).isTrue();
         assertThat(resultFalse.stream().map(Product::getSku).anyMatch(sku -> sku.equals("SKU-TEST-OOS"))).isTrue();
     }
+
+    // SR-358(#2) — 조회수 증가는 델타(before/after)로 단언한다(절대값 아님, SR-297 #1 사례 대조 —
+    // 공유 시드 행(SKU-1001)에 대한 카운터라 다른 테스트·실행이 남긴 절대값에 플레이키할 수 있다).
+    // @Transactional로 자동 롤백해 실카운트가 영구히 불어나지 않게 한다(카운터 컬럼은 "행 삭제"로
+    // 정리할 수 없으므로 위 168번째 줄 @Transactional 단독 사용 관례를 그대로 재사용).
+    @Transactional
+    @Test
+    void incrementViewCount_existingSku_incrementsByOneAndSelectViewCountReflectsIt() {
+        Long before = productDao.selectViewCount("SKU-1001");
+
+        int updated = productDao.incrementViewCount("SKU-1001");
+
+        Long after = productDao.selectViewCount("SKU-1001");
+        assertThat(updated).isEqualTo(1);
+        assertThat(after).isEqualTo((before == null ? 0L : before) + 1L);
+    }
+
+    // 존재하지 않는 sku는 컬럼 자체가 없는 행이라 0이 아니라 null이어야 한다(컬럼 미존재 행과
+    // "0인 행"을 구분).
+    @Test
+    void selectViewCount_unknownSku_returnsNull() {
+        Long result = productDao.selectViewCount("SKU-NOPE-9999");
+
+        assertThat(result).isNull();
+    }
 }

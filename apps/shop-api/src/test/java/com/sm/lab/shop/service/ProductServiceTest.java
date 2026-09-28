@@ -11,13 +11,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -259,5 +262,86 @@ class ProductServiceTest {
         ProductService.ProductDetailResponse result = service.getDetail("SKU-2004");
 
         assertThat(result.wishCount()).isEqualTo(0);
+    }
+
+    // SR-358(#2) AC1 — 조회수 증가(incrementViewCount) 호출 1회 + selectViewCount가 반환한
+    // "이번 조회 포함" 값(43)이 응답에 그대로 실린다.
+    @Test
+    void getDetail_success_incrementsViewCountAndReturnsPostIncrementValue() {
+        Product p = new Product();
+        p.setSku("SKU-3001");
+        p.setProductName("조회수 테스트 상품");
+        p.setPrice(10000L);
+        p.setStockQty(5);
+        p.setSaleYn("Y");
+        when(productDao.selectBySku("SKU-3001")).thenReturn(p);
+        when(productReviewDao.selectRatingSummary("SKU-3001")).thenReturn(summary(null, 0));
+        when(productWishDao.countWishesBySku("SKU-3001")).thenReturn(0);
+        when(productDao.selectViewCount("SKU-3001")).thenReturn(43L);
+        ProductService service = new ProductService(productDao, productReviewDao, productWishDao);
+
+        ProductService.ProductDetailResponse result = service.getDetail("SKU-3001");
+
+        assertThat(result.viewCount()).isEqualTo(43L);
+        verify(productDao).incrementViewCount("SKU-3001");
+    }
+
+    // SR-358(#2) AC2 — incrementViewCount가 예외를 던져도 상세 조회는 예외를 전파하지 않고 200을
+    // 유지하며(로그만), selectViewCount가 반환한 값(10)으로 폴백한다.
+    @Test
+    void getDetail_incrementThrows_stillReturns200WithFallbackFromSelectViewCount() {
+        Product p = new Product();
+        p.setSku("SKU-3002");
+        p.setProductName("조회수 증가 실패 상품");
+        p.setPrice(10000L);
+        p.setStockQty(5);
+        p.setSaleYn("Y");
+        when(productDao.selectBySku("SKU-3002")).thenReturn(p);
+        when(productReviewDao.selectRatingSummary("SKU-3002")).thenReturn(summary(null, 0));
+        when(productWishDao.countWishesBySku("SKU-3002")).thenReturn(0);
+        doThrow(new RuntimeException("DB down")).when(productDao).incrementViewCount("SKU-3002");
+        when(productDao.selectViewCount("SKU-3002")).thenReturn(10L);
+        ProductService service = new ProductService(productDao, productReviewDao, productWishDao);
+
+        assertThatCode(() -> {
+            ProductService.ProductDetailResponse result = service.getDetail("SKU-3002");
+            assertThat(result.viewCount()).isEqualTo(10L);
+        }).doesNotThrowAnyException();
+    }
+
+    // SR-358(#2) — 증가·조회 둘 다 실패해도 예외 전파 없이 viewCount=0으로 폴백한다(실무상 도달
+    // 거의 없는 극단 상황이지만 STORY "데이터" 절 명시 폴백 경로).
+    @Test
+    void getDetail_selectViewCountAlsoThrows_fallsBackToZero() {
+        Product p = new Product();
+        p.setSku("SKU-3003");
+        p.setProductName("조회수 전부 실패 상품");
+        p.setPrice(10000L);
+        p.setStockQty(5);
+        p.setSaleYn("Y");
+        when(productDao.selectBySku("SKU-3003")).thenReturn(p);
+        when(productReviewDao.selectRatingSummary("SKU-3003")).thenReturn(summary(null, 0));
+        when(productWishDao.countWishesBySku("SKU-3003")).thenReturn(0);
+        doThrow(new RuntimeException("DB down")).when(productDao).incrementViewCount("SKU-3003");
+        when(productDao.selectViewCount("SKU-3003")).thenThrow(new RuntimeException("DB down"));
+        ProductService service = new ProductService(productDao, productReviewDao, productWishDao);
+
+        ProductService.ProductDetailResponse result = service.getDetail("SKU-3003");
+
+        assertThat(result.viewCount()).isEqualTo(0L);
+    }
+
+    // SR-358(#2) AC1(404 회귀) — 존재하지 않는 sku는 get(sku)이 404로 던지므로 조회수 증가·조회
+    // 모두 시도되지 않는다("404는 증가 없음" 고정, STORY "테스트" 절).
+    @Test
+    void getDetail_missingSku_neverCallsIncrementOrSelectViewCount() {
+        when(productDao.selectBySku("SKU-9999")).thenReturn(null);
+        ProductService service = new ProductService(productDao, productReviewDao, productWishDao);
+
+        org.junit.jupiter.api.Assertions.assertThrows(ResponseStatusException.class,
+                () -> service.getDetail("SKU-9999"));
+
+        verify(productDao, never()).incrementViewCount(anyString());
+        verify(productDao, never()).selectViewCount(anyString());
     }
 }
