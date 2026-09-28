@@ -218,6 +218,12 @@ public class ApiKeyAuthFilter extends OncePerRequestFilter {
     // #1/SR-232 r3와 동일한 함정, 사례집에 두 번 기록된 재발 항목).
     private static final Pattern MEMBER_ME_WISHES_PATH =
             Pattern.compile("^/api/members/me/wishes(?:/.*)?$");
+    // /api/members/me/recently-viewed(및 하위)도 URL에 memberId가 없는 "me" 자원이다.
+    // MEMBER_ME_WISHES_PATH와 완전히 동일한 이유·모양의 SCOPE_TO_SELF 대상 — 새 클래스·새 우회
+    // 경로를 만들지 않는다. isOpenRoute(화이트리스트)에는 절대 넣지 않는다 — 넣으면 필터 자체가
+    // 스킵되어 이 소유권 강제까지 함께 우회된다.
+    private static final Pattern MEMBER_ME_RECENTLY_VIEWED_PATH =
+            Pattern.compile("^/api/members/me/recently-viewed(?:/.*)?$");
     // SR-351(#1) — /api/products/{sku}/reviews(및 하위 /{reviewId})도 URL에 memberId가 없는
     // 쓰기 자원이다. MEMBER_ME_ADDRESSES_PATH와 동일한 이유의 SCOPE_TO_SELF 대상이나, 메서드를
     // POST/DELETE로 한정한다(GET은 SR-351 #2 몫 — 클래스 상단 "SR-351(#1)" 노트 참고).
@@ -415,6 +421,12 @@ public class ApiKeyAuthFilter extends OncePerRequestFilter {
         // GET/POST/DELETE 전 경로가 동일 정책으로 자기 자신으로 강제 축소한다(MEMBER_ME_ADDRESSES_PATH
         // 와 동일 이유, 메서드 무관 — STORY "순서·보안" 절).
         if (MEMBER_ME_WISHES_PATH.matcher(path).matches()) {
+            return Decision.SCOPE_TO_SELF;
+        }
+
+        // /api/members/me/recently-viewed 및 하위 — memberId 토큰이 없는 "me" 자원이라 GET/POST
+        // 전 경로가 동일 정책으로 자기 자신으로 강제 축소한다(MEMBER_ME_WISHES_PATH와 동일 이유).
+        if (MEMBER_ME_RECENTLY_VIEWED_PATH.matcher(path).matches()) {
             return Decision.SCOPE_TO_SELF;
         }
 

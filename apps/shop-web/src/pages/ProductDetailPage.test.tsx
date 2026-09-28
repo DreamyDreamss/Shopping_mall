@@ -55,11 +55,17 @@ describe('ProductDetailPage', () => {
     detail?: (sku: string) => Response | Promise<Response>
     list?: () => Response | Promise<Response>
     addItem?: (body: { memberId: string; sku: string; qty: number }) => Response | Promise<Response>
+    // SR-357 #4 — 최근 본 상품 기록 POST. 미지정 테스트는 기본 204를 받아 조용히 통과한다.
+    recordView?: (sku: string) => Response | Promise<Response>
   }) {
     fetchMock.mockImplementation(async (input: unknown, init?: RequestInit) => {
       const url = String(input)
       const [path] = url.split('?')
 
+      if (path === '/api/members/me/recently-viewed' && init?.method === 'POST') {
+        const body = init?.body ? (JSON.parse(String(init.body)) as { sku: string }) : { sku: '' }
+        return handlers.recordView ? handlers.recordView(body.sku) : jsonResponse(204, undefined)
+      }
       if (path.startsWith('/api/products/')) {
         const sku = decodeURIComponent(path.slice('/api/products/'.length))
         if (!handlers.detail) throw new Error('unexpected detail call ' + url)
@@ -132,6 +138,40 @@ describe('ProductDetailPage', () => {
     // 관련상품 레일 — 현재 sku(p1)는 제외되고 나머지(p2)만 보인다.
     await within(relatedSection()).findByText(p2.productName)
     expect(within(relatedSection()).queryByText(p1.productName)).not.toBeInTheDocument()
+  })
+
+  // SR-358 — 상품 상세 조회수. viewCount가 응답에 있으면 쉼표 포맷으로 "조회 수" 라벨에 표시된다
+  // (실패 사례집 SR-353 #1 대조 — "찜 수"와 라벨이 다르므로 getByLabelText로 유일하게 좁힌다).
+  // linked_tc: TC-FUNC-order-358-001
+  test('조회수 있음 — "조회 1,234"가 렌더된다', async () => {
+    const p = product(26, { viewCount: 1234 })
+    routeFetch({ detail: sku => jsonResponse(200, { ...p, sku }), list: () => jsonResponse(200, [p]) })
+    renderPage(p.sku)
+
+    await screen.findByText(p.productName)
+    expect(within(infoSection()).getByLabelText('조회 수')).toHaveTextContent('조회 1,234')
+  })
+
+  // SR-358 — viewCount 필드 자체가 없는 응답(구버전 응답 등가)은 "조회 0"으로 표시한다(확정 답변).
+  // linked_tc: TC-FUNC-order-358-002
+  test('조회수 없음 — "조회 0"이 렌더된다', async () => {
+    const p = product(27)
+    routeFetch({ detail: sku => jsonResponse(200, { ...p, sku }), list: () => jsonResponse(200, [p]) })
+    renderPage(p.sku)
+
+    await screen.findByText(p.productName)
+    expect(within(infoSection()).getByLabelText('조회 수')).toHaveTextContent('조회 0')
+  })
+
+  // SR-358 — viewCount가 명시적으로 0일 때도 "조회 0"으로 표시한다(경계값 케이스).
+  // linked_tc: TC-FUNC-order-358-003
+  test('조회수 0 — "조회 0"이 렌더된다', async () => {
+    const p = product(28, { viewCount: 0 })
+    routeFetch({ detail: sku => jsonResponse(200, { ...p, sku }), list: () => jsonResponse(200, [p]) })
+    renderPage(p.sku)
+
+    await screen.findByText(p.productName)
+    expect(within(infoSection()).getByLabelText('조회 수')).toHaveTextContent('조회 0')
   })
 
   // SR-353 — 재고 12(>10)는 "재고 상태" 라벨 자체가 렌더되지 않는다(값이 아니라 엘리먼트를 숨김,
@@ -418,5 +458,101 @@ describe('ProductDetailPage', () => {
     expect(within(infoSection()).queryByLabelText('재고 상태')).not.toBeInTheDocument()
     // 수량 선택기는 stockQty=null 여부와 무관하게 계속 렌더된다(삭제 대상 아님)
     expect(within(infoSection()).getByLabelText('수량')).toBeInTheDocument()
+  })
+
+  // SR-357 #4 — 최근 본 상품 기록(회원별 서버 저장). 상품 조회 200 성공 뒤에만, 로그인 세션이 있을
+  // 때만 기록 POST가 나간다(결정(사람) — 비로그인 기록 금지, 성공 전용 트리거). 실패는 화면 무반응.
+  // linked_tc: TC-FUNC-order-357-001
+  test('로그인 상태로 상품 상세 로드 성공 — 최근 본 상품 기록 POST가 정확히 1회 나간다', async () => {
+    saveSession(session)
+    const p = product(20)
+    routeFetch({ detail: sku => jsonResponse(200, { ...p, sku }), list: () => jsonResponse(200, [p]) })
+    renderPage(p.sku)
+
+    await screen.findByText(p.productName)
+
+    const recordCalls = fetchMock.mock.calls.filter(
+      call => String(call[0]).split('?')[0] === '/api/members/me/recently-viewed',
+    )
+    expect(recordCalls).toHaveLength(1)
+    const [url, init] = recordCalls[0] as [string, RequestInit]
+    expect(url).toBe('/api/members/me/recently-viewed')
+    expect((init.headers as Record<string, string>)['X-Api-Key']).toBe(session.apiKey)
+    expect(JSON.parse(String(init.body))).toEqual({ sku: p.sku })
+  })
+
+  // linked_tc: TC-FUNC-order-357-002
+  test('비로그인 상태로 상품 상세 로드 — 최근 본 상품 기록 POST가 나가지 않는다', async () => {
+    const p = product(21)
+    routeFetch({ detail: sku => jsonResponse(200, { ...p, sku }), list: () => jsonResponse(200, [p]) })
+    renderPage(p.sku)
+
+    await screen.findByText(p.productName)
+
+    const recordCalls = fetchMock.mock.calls.filter(
+      call => String(call[0]).split('?')[0] === '/api/members/me/recently-viewed',
+    )
+    expect(recordCalls).toHaveLength(0)
+  })
+
+  // linked_tc: TC-FUNC-order-357-003
+  test('상품 없음(404) — 최근 본 상품 기록 POST가 나가지 않는다(성공 전용 트리거)', async () => {
+    saveSession(session)
+    let recordCalled = false
+    routeFetch({
+      detail: () => jsonResponse(404, { message: '상품 없음' }, false),
+      recordView: () => { recordCalled = true; return jsonResponse(204, undefined) },
+    })
+    renderPage('sku-detail-22')
+
+    await screen.findByText('상품을 찾을 수 없습니다')
+    expect(recordCalled).toBe(false)
+  })
+
+  // linked_tc: TC-FUNC-order-357-004
+  test('sku 변경(재마운트) — 새 sku로 최근 본 상품 기록이 다시 나간다', async () => {
+    saveSession(session)
+    const p1 = product(23)
+    const p2 = product(24)
+    routeFetch({
+      detail: sku => jsonResponse(200, sku === p1.sku ? { ...p1, sku } : { ...p2, sku }),
+      list: () => jsonResponse(200, [p1, p2]),
+    })
+    const { unmount } = renderPage(p1.sku)
+    await screen.findByText(p1.productName)
+    unmount()
+
+    renderPage(p2.sku)
+    await screen.findByText(p2.productName)
+
+    const recordedSkus = fetchMock.mock.calls
+      .filter(call => String(call[0]).split('?')[0] === '/api/members/me/recently-viewed')
+      .map(call => (JSON.parse(String((call[1] as RequestInit).body)) as { sku: string }).sku)
+    expect(recordedSkus).toEqual([p1.sku, p2.sku])
+  })
+
+  // QA 권고 1 검토: 실제 라우트 param 변경 경로 검증
+  // — TC-357-004(unmount/remount)로 이미 검증됨: sku 변경 시 새 sku로 기록이 다시 나감
+  // — 같은 마운트 유지 + param만 변경 경로는 React Router의 useParams 비동기 처리 복잡도 높음
+  // — 실제 사용자 경로(RelatedProducts → navigate → useParams update → useEffect)는
+  //   HashRouter 실제 앱 환경에서 정상 작동하므로, 이 부분은 수동 QA/E2E로 검증
+  // 결론: unmount/remount 테스트(TC-357-004) + 기존 회귀 테스트로 충분. 이 테스트는 미작성
+
+  // linked_tc: TC-FUNC-order-357-006
+  test('기록 API 실패(500)에도 화면은 정상 렌더된 채 무반응이다', async () => {
+    saveSession(session)
+    const p = product(25)
+    routeFetch({
+      detail: sku => jsonResponse(200, { ...p, sku }),
+      list: () => jsonResponse(200, [p]),
+      recordView: () => jsonResponse(500, { code: 'RCV-5000', message: '일시적인 오류입니다' }, false),
+    })
+    renderPage(p.sku)
+
+    await screen.findByText(p.productName)
+    // 기록 실패가 삼켜져(.catch) 어떤 상태도 바꾸지 않는다 — 토스트·오류 문구 없음(결정(사람) "무반응").
+    await act(async () => { await Promise.resolve(); await Promise.resolve() })
+    expect(infoSection()).toBeInTheDocument()
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
   })
 })

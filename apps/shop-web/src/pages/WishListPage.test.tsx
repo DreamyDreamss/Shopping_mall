@@ -89,6 +89,7 @@ describe('WishListPage', () => {
     )
   }
 
+  // linked_tc: TC-FUNC-order-wish-001
   // (1) 비로그인 진입 → /login?redirect=%2Fshop%2Fmypage%2Fwishes로 즉시 이동, 목록 GET 안 나감.
   test('비로그인 진입 — 로그인 화면으로 리다이렉트되고 목록 조회는 호출되지 않는다', async () => {
     routeFetch({})
@@ -100,6 +101,7 @@ describe('WishListPage', () => {
     expect(listHeaders).toHaveLength(0)
   })
 
+  // linked_tc: TC-FUNC-order-wish-002
   // (2) 0건 응답 → "찜한 상품이 없습니다" + 상품 보러 가기 링크(href).
   test('0건 — 안내 문구 + 상품 보러 가기 링크', async () => {
     saveSession(session(1))
@@ -111,6 +113,21 @@ describe('WishListPage', () => {
     expect(listHeaders[0]['X-Api-Key']).toBe('key-wishpage-1')
   })
 
+  // linked_tc: TC-FUNC-order-wish-008
+  // (SR-357, 재작업 round2 필수4) 「최근 본 상품」 진입 링크 — href가 신설 라우트를 가리키고, 로딩
+  // 상태에서도 보인다. in-flight 목록 GET을 기다리지 않으면 act 경고·테스트 간 누수에 취약해(QA 권고3)
+  // findByRole로 렌더 완료(및 그에 딸린 fetch)를 기다린 뒤 단언한다.
+  test('최근 본 상품 링크 — href가 /shop/mypage/recently-viewed를 가리킨다', async () => {
+    saveSession(session(7))
+    routeFetch({ list: () => jsonResponse(200, { items: [] }) })
+    renderPage()
+
+    expect(await screen.findByRole('link', { name: '최근 본 상품' }))
+      .toHaveAttribute('href', '#/shop/mypage/recently-viewed')
+    await screen.findByText('찜한 상품이 없습니다')
+  })
+
+  // linked_tc: TC-FUNC-order-wish-003
   // (3) 목록 GET 실패(500) → 오류 문구 + 다시 시도, 클릭 시 재요청.
   test('목록 조회 실패(500) — 오류 문구 + 다시 시도, 클릭 시 재요청이 성공한다', async () => {
     saveSession(session(2))
@@ -129,6 +146,7 @@ describe('WishListPage', () => {
     expect(calls).toBe(2)
   })
 
+  // linked_tc: TC-FUNC-order-wish-004
   // (4) N건 응답 → 행 렌더, "찜 해제" 클릭 → DELETE 호출 + 그 행이 즉시 사라짐.
   test('N건 — 행이 렌더되고 찜 해제 클릭 시 DELETE 호출 + 그 행이 즉시 사라진다', async () => {
     saveSession(session(3))
@@ -144,6 +162,7 @@ describe('WishListPage', () => {
     expect(screen.getByText(rows[1].productName)).toBeInTheDocument()
   })
 
+  // linked_tc: TC-FUNC-order-wish-005
   // (5) 해제 API 실패 → 지웠던 행이 되돌아옴(롤백) + 오류 문구.
   test('해제 API 실패 — 지웠던 행이 되돌아오고 오류 문구가 뜬다', async () => {
     saveSession(session(4))
@@ -161,6 +180,7 @@ describe('WishListPage', () => {
     expect(screen.getByText(rows[0].productName)).toBeInTheDocument()
   })
 
+  // linked_tc: TC-FUNC-order-wish-006
   // (6) 해제 연타(같은 행 2회 클릭) → DELETE 1회만.
   test('해제 연타 — 같은 행 2회 클릭에도 DELETE 호출은 1회만 나간다', async () => {
     saveSession(session(5))
@@ -178,6 +198,7 @@ describe('WishListPage', () => {
     await waitFor(() => expect(removeCalls).toEqual([rows[0].sku]))
   })
 
+  // linked_tc: TC-FUNC-order-wish-007
   // (7, 재작업 round2 — QA round1 FAIL 필수2 재현) A행 해제(실패 예정)와 B행 해제(즉시 성공)를 겹쳐
   // 누른다. B가 먼저 성공해 화면에서 사라진 뒤에야 A의 실패 응답이 늦게 도착한다 — A의 롤백이 클릭
   // 시점 스냅샷 전체를 되돌리면 이미 서버에서 지워진 B까지 되살아난다(QA 프로브 실측과 동일 재현).

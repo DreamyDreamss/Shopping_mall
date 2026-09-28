@@ -14,6 +14,7 @@ import CartPage from './pages/CartPage'
 import OrderPage from './pages/OrderPage'
 import MyAddressesPage from './pages/MyAddressesPage'
 import WishListPage from './pages/WishListPage'
+import RecentlyViewedPage from './pages/RecentlyViewedPage'
 import { ApiError, refreshSession } from './api'
 import { refreshOnce } from './refreshOnce'
 import { clearSession, loadSession, saveSession } from './session'
@@ -115,6 +116,9 @@ export default function App() {
         {/* SR-356 — 내 찜 목록. 이번 SR의 유일한 진입점은 상품 상세의 "내 찜 목록" 링크 1개다
             (GNB 회원 메뉴·하단 탭바 찜 탭은 넣지 않는다, SR-288 소관). */}
         <Route path="/shop/mypage/wishes" element={<WishListPage />} />
+        {/* SR-357 — 마이페이지 최근 본 상품. 이번 SR의 유일한 진입점은 찜 목록(UIS-ORD-100) 상단의
+            「최근 본 상품」 링크 1개다(앱 헤더 메뉴에는 넣지 않는다, 확정 답변). */}
+        <Route path="/shop/mypage/recently-viewed" element={<RecentlyViewedPage />} />
       </Routes>
     </HashRouter>
   )

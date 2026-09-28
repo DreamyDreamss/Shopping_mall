@@ -3,7 +3,7 @@
 // 제외 — `src/pages/`).
 import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
-import { addCartItem, fetchCartItemCount, fetchProduct, fetchProducts, logout, OrderHttpError } from '../api'
+import { addCartItem, fetchCartItemCount, fetchProduct, fetchProducts, logout, OrderHttpError, recordRecentlyViewed } from '../api'
 import { clearSession, loadSession } from '../session'
 import type { Product, ProductDetail, SessionResult } from '../types'
 import { AppShell } from '../features/shop/AppShell'
@@ -97,6 +97,10 @@ export default function ProductDetailPage() {
       const data = await fetchProduct(targetSku)
       if (id !== requestIdRef.current) return
       setProduct(data)
+      // SR-357 #4 — 최근 본 상품 기록. 상품 조회 200 성공 뒤에만, 로그인 세션이 있을 때만 호출한다
+      // (결정(사람) — 비로그인 기록 금지·성공 전용 트리거). await하지 않는다 — 기록 실패는 화면
+      // 무반응(토스트·상태 변화 없음, `.catch`로 삼킨다)이라 로딩·렌더를 지연시키면 안 된다.
+      if (session?.apiKey) { void recordRecentlyViewed(session.apiKey, data.sku).catch(() => {}) }
       setQty(1)
       setAddStatus('idle')
       setAddErrorMessage(null)

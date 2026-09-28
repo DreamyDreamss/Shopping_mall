@@ -19,6 +19,7 @@ import com.sm.lab.shop.dao.MemberDao;
 import com.sm.lab.shop.dao.MemberSignupRateLimitDao;
 import com.sm.lab.shop.dao.MemberSignupVerificationDao;
 import com.sm.lab.shop.dao.OrderDao;
+import com.sm.lab.shop.dao.ProductViewHistoryDao;
 import com.sm.lab.shop.domain.MemberAddress;
 import com.sm.lab.shop.domain.Order;
 import com.sm.lab.shop.domain.OrderItem;
@@ -138,6 +139,10 @@ class ApiKeyAuthIntegrationTest {
     // 타 회원(M-0002) 소유 배송지 행 정리용.
     @Autowired
     private MemberAddressDao memberAddressDao;
+    // SR-357.2 round2(재작업 지시 2) — recentlyViewedRoute_* 강제 축소 회귀 테스트가 직접 심는
+    // 타 회원(M-0002) 소유 최근 본 상품 행 정리·확인용.
+    @Autowired
+    private ProductViewHistoryDao viewHistoryDao;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     // signUpRoute_* 두 테스트가 만든 회원 행 정리용(memberId는 응답에서 읽는다 — round2부터
@@ -892,6 +897,80 @@ class ApiKeyAuthIntegrationTest {
         }
     }
 
+    // ===== SR-357.2(round2, QA CONCERNS 재작업 지시 2) — /api/members/me/recently-viewed도
+    // memberId가 URL에 없는 "me" 자원이다. addresses(:846~)와 동일한 이유로 무키 401 + member 키
+    // 타인 memberId 강제(SCOPE_TO_SELF) 회귀를 실 서버로 고정한다 — @WebMvcTest 슬라이스
+    // (AdminApiKeyTestConfig)는 무키 상태를 만들 수 없어(그 클래스 Javadoc) 이 통합 테스트가 대신
+    // 검증한다(사례집 SR-307 #1/SR-232 r3 — 화이트리스트 우회 재발 방지).
+    private static final String RECENTLY_VIEWED_SEED_SKU = "SKU-1001";
+    private static final String RECENTLY_VIEWED_FOREIGN_SKU = "SKU-1002";
+
+    // linked_tc: 무키 GET — 필터 레벨에서 컨트롤러 도달 전 401(어드바이스가 아니라 필터의
+    // {"error":"unauthorized"}).
+    @Test
+    void recentlyViewedRoute_getWithoutApiKey_returns401Unauthorized() {
+        ResponseEntity<String> res = get("/api/members/me/recently-viewed", null);
+
+        assertThat(res.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        assertThat(res.getBody()).contains("\"error\"").contains("unauthorized");
+    }
+
+    // linked_tc: 무키 POST — TestRestTemplate 기본 팩토리는 POST+401 조합에서 JDK 인증 재시도
+    // 예외를 던진다(클래스 상단 rawPostJson Javadoc 근거) — sessionsLogoutRoute_withoutApiKey_*와
+    // 동일하게 raw HttpClient로 우회한다.
+    @Test
+    void recentlyViewedRoute_postWithoutApiKey_returns401Unauthorized() throws Exception {
+        HttpResponse<String> res = rawPostJson("/api/members/me/recently-viewed", null,
+                "{\"sku\":\"" + RECENTLY_VIEWED_SEED_SKU + "\"}");
+
+        assertThat(res.statusCode()).isEqualTo(401);
+        assertThat(res.body()).contains("\"error\"").contains("unauthorized");
+    }
+
+    // 목록(GET): ?memberId=타인을 실어도 응답은 호출자 자신의 목록으로 강제되어 타인이 본 상품이
+    // 노출되지 않는다(addresses 목록 테스트와 동일 관례, :854~).
+    @Test
+    void recentlyViewedRoute_foreignMemberIdQueryParam_forcedToSelf_getExcludesForeignData() {
+        viewHistoryDao.recordView(OTHER_MEMBER_ID, RECENTLY_VIEWED_FOREIGN_SKU, LocalDateTime.now());
+        try {
+            ResponseEntity<String> res = get(
+                    "/api/members/me/recently-viewed?memberId=" + OTHER_MEMBER_ID, MEMBER_0001_KEY);
+
+            assertThat(res.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(res.getBody())
+                    .as("SCOPE_TO_SELF가 memberId를 강제해 타인이 본 상품이 목록에 노출되면 안 된다")
+                    .doesNotContain("\"sku\":\"" + RECENTLY_VIEWED_FOREIGN_SKU + "\"");
+        } finally {
+            jdbcTemplate.update("DELETE FROM PRODUCT_VIEW_HISTORY WHERE member_id = ? AND sku = ?",
+                    OTHER_MEMBER_ID, RECENTLY_VIEWED_FOREIGN_SKU);
+        }
+    }
+
+    // 기록(POST): ?memberId=타인을 실어도 실제 저장은 호출자 자신(M-0001) 이름으로 강제된다 —
+    // 타인 이름으로는 절대 기록되지 않는지까지 DB로 직접 확인한다(addresses PUT/DELETE 테스트와
+    // 동일한 "강제가 소유자 판정까지 적용된다" 원칙, :873~).
+    @Test
+    void recentlyViewedRoute_foreignMemberIdQueryParam_forcedToSelf_postRecordsUnderOwnMemberId() {
+        try {
+            ResponseEntity<String> res = postJson(
+                    "/api/members/me/recently-viewed?memberId=" + OTHER_MEMBER_ID, MEMBER_0001_KEY,
+                    "{\"sku\":\"" + RECENTLY_VIEWED_SEED_SKU + "\"}");
+
+            assertThat(res.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+            Integer ownRow = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM PRODUCT_VIEW_HISTORY WHERE member_id = ? AND sku = ?",
+                    Integer.class, OWN_MEMBER_ID, RECENTLY_VIEWED_SEED_SKU);
+            Integer foreignRow = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM PRODUCT_VIEW_HISTORY WHERE member_id = ? AND sku = ?",
+                    Integer.class, OTHER_MEMBER_ID, RECENTLY_VIEWED_SEED_SKU);
+            assertThat(ownRow).as("SCOPE_TO_SELF가 강제해 기록은 호출자 자신(M-0001) 이름으로 저장된다").isEqualTo(1);
+            assertThat(foreignRow).as("타인(M-0002) 이름으로는 기록되지 않는다").isEqualTo(0);
+        } finally {
+            jdbcTemplate.update("DELETE FROM PRODUCT_VIEW_HISTORY WHERE member_id = ? AND sku = ?",
+                    OWN_MEMBER_ID, RECENTLY_VIEWED_SEED_SKU);
+        }
+    }
+
     // ===== SR-235(FUNC-member-012) — 우편번호(도로명) 검색 API도 /api/** 전역 필터 아래 있다.
     // ZipcodeControllerTest(@WebMvcTest + AdminApiKeyTestConfig)는 슬라이스 제약상 "무키" 상태를
     // 만들 수 없어(그 클래스 javadoc 참고) 이 실 서버 통합 테스트가 대신 검증한다.
@@ -915,6 +994,9 @@ class ApiKeyAuthIntegrationTest {
     // ===== SR-307(SR-307.1) — 상품 조회 GET 공개 경로 =====
     // 랩 시드 실측 SKU-1001(CartDaoTest 주석: 스탠딩데스크, 재고12) 재사용. 전부 순수 GET
     // 또는 무매핑 POST(컨트롤러 도달 전 필터 차단)라 DB 변경이 없어 별도 정리가 불필요하다.
+    // SR-358(#2) 정정 — GET도 이제 view_count를 증가시킨다(단건 조회 성공마다 +1). 이 테스트가
+    // 두 차례 호출하는 GET /api/products/SKU-1001(200/404 회귀)도 이제 그 부수효과를 일으키지만,
+    // 값 자체를 단언하지 않아 이 테스트는 깨지지 않는다 — 상한 없는 표시용 카운터라 정리 불필요.
     private static final String SEED_SKU = "SKU-1001";
     private static final String UNKNOWN_SKU = "SKU-NOPE-9999";
 

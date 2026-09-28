@@ -56,12 +56,18 @@ describe('ProductDetailPage — 상품평 탭', () => {
     deleteReview?: (sku: string, reviewId: string) => Response | Promise<Response>
     orders?: () => Response | Promise<Response>
     orderDetail?: (orderNo: string) => Response | Promise<Response>
+    // SR-357 #4 — 최근 본 상품 기록 POST. 미지정 테스트는 기본 204를 받아 조용히 통과한다.
+    recordView?: (sku: string) => Response | Promise<Response>
   }) {
     fetchMock.mockImplementation(async (input: unknown, init?: RequestInit) => {
       const url = String(input)
       const method = (init?.method ?? 'GET').toUpperCase()
       const [path, queryString] = url.split('?')
 
+      if (path === '/api/members/me/recently-viewed' && method === 'POST') {
+        const body = init?.body ? (JSON.parse(String(init.body)) as { sku: string }) : { sku: '' }
+        return handlers.recordView ? handlers.recordView(body.sku) : jsonResponse(204, undefined)
+      }
       if (path.startsWith('/api/products/') && path.includes('/reviews')) {
         const parts = path.slice('/api/products/'.length).split('/') // [sku, 'reviews', maybe reviewId]
         const sku = decodeURIComponent(parts[0])

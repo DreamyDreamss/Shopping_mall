@@ -132,6 +132,13 @@ export default function WishListPage() {
               onSearchChange={setSearchValue} onSearchSubmit={handleSearchSubmit} onLogout={handleLogout}>
       <div style={{ fontFamily: 'system-ui, sans-serif', color: '#222', padding: '16px 18px 40px' }}>
         <h1 style={{ fontSize: 18, marginBottom: 14 }}>내 찜 목록</h1>
+        {/* SR-357 — 「최근 본 상품」 진입 링크. 세션 분기 없이 어느 상태(로딩/오류/목록)에서도 항상
+            표시한다(02_변경명세 결정 그대로, STORY "파일" 절). */}
+        <div style={{ marginBottom: 14 }}>
+          <a href="#/shop/mypage/recently-viewed" style={{ fontSize: 13, color: '#0b4ea2', textDecoration: 'none' }}>
+            최근 본 상품
+          </a>
+        </div>
         {!session ? (
           <div role="status" style={{ padding: '40px 16px', textAlign: 'center', color: '#666' }}>이동 중…</div>
         ) : loading ? (

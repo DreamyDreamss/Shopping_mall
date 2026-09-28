@@ -15,6 +15,7 @@ import type {
   OrderRow,
   Product,
   ProductDetail,
+  RecentlyViewedItem,
   ReviewCreateResult,
   ReviewInput,
   ReviewListResult,
@@ -419,4 +420,29 @@ export function removeWish(apiKey: string, sku: string): Promise<void> {
   }).then(async r => {
     if (!r.ok) throw new ApiError(r.status, await parseErrorBody(r))
   })
+}
+
+// SR-357 — 최근 본 상품(회원별 서버 저장, `/shop/products/:sku` 상세 진입 시 기록). API(INF-ORD-043)는
+// SR-357 #2에서 이미 구현·Done이다 — 이 함수는 그 계약을 소비만 한다. `ProductRecentlyViewedController`는
+// `ProductViewHistoryExceptionHandler` 스코프({code,message} 봉투)라 `addWish`/`removeWish`와 동일한
+// `ApiError` 계열이다(`OrderHttpError`가 아니다). 성공 204라 바디를 읽지 않는다(`removeWish`와 동일).
+
+/** POST /api/members/me/recently-viewed — 최근 본 상품 기록(같은 sku는 viewed_at만 갱신). 응답 바디
+ * 형태가 계약에 없어 파싱하지 않는다. `apiKey`를 명시적으로 실어 보낸다 — 생략하면 vite 프록시가
+ * admin 키로 채워 SCOPE_TO_SELF가 안 타 400 `RCV-4001`로 막힌다(`addWish`/`registerAddress`와 동일 이유). */
+export function recordRecentlyViewed(apiKey: string, sku: string): Promise<void> {
+  return fetch('/api/members/me/recently-viewed', {
+    method: 'POST',
+    headers: { 'X-Api-Key': apiKey, 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify({ sku }),
+  }).then(async r => {
+    if (!r.ok) throw new ApiError(r.status, await parseErrorBody(r))
+  })
+}
+
+/** GET /api/members/me/recently-viewed — 최근 본 순 최대 20개(`{items}` 봉투, 0건도 200). 회원 자신의
+ * `apiKey`를 명시적으로 실어 보낸다(`fetchWishes`와 동일 이유 — 생략하면 vite 프록시가 admin 키로
+ * 채워 SCOPE_TO_SELF가 안 타 400 `RCV-4001`로 막힌다). */
+export function fetchRecentlyViewed(apiKey: string): Promise<RecentlyViewedItem[]> {
+  return getAuth<{ items: RecentlyViewedItem[] }>('/api/members/me/recently-viewed', apiKey).then(r => r.items)
 }

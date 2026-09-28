@@ -138,6 +138,18 @@ export interface WishItem {
   wishedAt: string
 }
 
+// SR-357 — 최근 본 상품(회원별 서버 저장, `/shop/mypage/recently-viewed`). `GET
+// /api/members/me/recently-viewed`(INF-ORD-044, SR-357 #2 구현) 응답 items[] 1건 — 실측
+// (`ProductViewHistoryService.list`) 필드 그대로: sku·productName·price·imageUrl·soldOut·viewedAt.
+export interface RecentlyViewedItem {
+  sku: string
+  productName: string
+  price: number
+  imageUrl: string | null
+  soldOut: boolean
+  viewedAt: string
+}
+
 // SR-304 — 상품 상세(`/shop/products/:sku`). `POST /api/cart/items` 응답(`CartController.addItem` →
 // `CartItem` 도메인)에는 memberId·productName·price·addedAt 필드도 더 있지만, 화면이 실제로 쓰는
 // 필드(담기 수량 반영용 qty, sku)만 선언한다 — 필요 최소만 옮긴다(하위호환 유지, 응답 형식은 그대로).

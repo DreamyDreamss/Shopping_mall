@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sm.lab.shop.dao.ProductViewHistoryDao">
+
+  <!-- 기록: 단일 원자 UPSERT. 이미 있으면 viewed_at만 갱신(맨 앞으로), 없으면 신규 삽입(카운터·
+       존재판정을 read-then-write로 만들지 않는다는 관례 — CartDao#upsertMergeQty와 동일 원리).
+       PRODUCT_WISHES의 INSERT IGNORE와 다르다 — 여기는 갱신이 필요해 IGNORE가 아니라 UPSERT. -->
+  <insert id="recordView">
+    INSERT INTO PRODUCT_VIEW_HISTORY (member_id, sku, viewed_at)
+    VALUES (#{memberId}, #{sku}, #{viewedAt})
+    ON DUPLICATE KEY UPDATE viewed_at = VALUES(viewed_at)
+  </insert>
+
+  <!-- 상한 초과분(viewed_at 오래된 순, 동률은 sku ASC) 삭제. 삭제 대상 테이블을 그대로 서브쿼리
+       FROM에 못 쓰는 MariaDB 제약(Error 1093) 때문에 "유지할 목록"을 파생 테이블로 한 번 더
+       감싼다(MemberRefreshTokenDao#enforceActiveCap과 동일 이유). -->
+  <delete id="enforceRecentCap">
+    DELETE FROM PRODUCT_VIEW_HISTORY
+     WHERE member_id = #{memberId}
+       AND sku NOT IN (
+         SELECT sku FROM (
+           SELECT sku
+             FROM PRODUCT_VIEW_HISTORY
+            WHERE member_id = #{memberId}
+            ORDER BY viewed_at DESC, sku ASC
+            LIMIT #{limit}
+         ) AS keep
+       )
+  </delete>
+
+  <!-- 목록: 최근 본 순(viewed_at DESC), 동률은 sku ASC(tie-breaker — 목록 순서와 상한 삭제 판정을
+       일치시킨다, productWish.xml과 동일 원리). 상품 조인, soldOut은 stock_qty<=0으로 SQL에서
+       계산(ProductService.getDetail/ProductWishView와 동일 정의, 새 정의 금지). no-select-star. -->
+  <select id="selectRecentlyViewed" resultType="com.sm.lab.shop.domain.ProductViewHistoryView">
+    SELECT h.sku, p.product_name AS productName, p.price, p.image_url AS imageUrl,
+           (p.stock_qty &lt;= 0) AS soldOut, h.viewed_at AS viewedAt
+      FROM PRODUCT_VIEW_HISTORY h
+      JOIN PRODUCTS p ON h.sku = p.sku
+     WHERE h.member_id = #{memberId}
+     ORDER BY h.viewed_at DESC, h.sku ASC
+     LIMIT #{limit}
+  </select>
+
+</mapper>
