@@ -150,6 +150,23 @@ export interface RecentlyViewedItem {
   viewedAt: string
 }
 
+// SR-360 — 상품 비교함(`/shop/products/:sku` [비교함 담기]·`/shop/compare`). `GET
+// /api/members/me/compares`(INF-ORD-047, SR-360 #2 구현) 응답 items[] 1건 그대로(하위호환 유지, 필드
+// 재발명 금지) — 최대 4건이라 페이지 필드 없음. avgRating은 리뷰 0건이면 null(화면은 이때 '—'로 표시,
+// `ReviewListResult.avgRating`과 동일 계약).
+export interface ProductCompareItem {
+  sku: string
+  productName: string
+  price: number
+  listPrice: number | null
+  imageUrl: string | null
+  avgRating: number | null
+  reviewCount: number
+  stockQty: number
+  soldOut: boolean
+  comparedAt: string
+}
+
 // SR-304 — 상품 상세(`/shop/products/:sku`). `POST /api/cart/items` 응답(`CartController.addItem` →
 // `CartItem` 도메인)에는 memberId·productName·price·addedAt 필드도 더 있지만, 화면이 실제로 쓰는
 // 필드(담기 수량 반영용 qty, sku)만 선언한다 — 필요 최소만 옮긴다(하위호환 유지, 응답 형식은 그대로).

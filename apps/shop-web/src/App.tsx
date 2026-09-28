@@ -15,6 +15,7 @@ import OrderPage from './pages/OrderPage'
 import MyAddressesPage from './pages/MyAddressesPage'
 import WishListPage from './pages/WishListPage'
 import RecentlyViewedPage from './pages/RecentlyViewedPage'
+import ProductComparePage from './pages/ProductComparePage'
 import { ApiError, refreshSession } from './api'
 import { refreshOnce } from './refreshOnce'
 import { clearSession, loadSession, saveSession } from './session'
@@ -119,6 +120,11 @@ export default function App() {
         {/* SR-357 — 마이페이지 최근 본 상품. 이번 SR의 유일한 진입점은 찜 목록(UIS-ORD-100) 상단의
             「최근 본 상품」 링크 1개다(앱 헤더 메뉴에는 넣지 않는다, 확정 답변). */}
         <Route path="/shop/mypage/recently-viewed" element={<RecentlyViewedPage />} />
+        {/* SR-360 — 상품 비교 화면. 이번 항목의 유일한 진입점은 상품 상세(UIS-ORD-010, SR-360 #5 —
+            이미 Done)의 [비교하기] 링크 하나다(헤더 진입점은 범위 밖, 확정 답변). 그 링크가 이미
+            `#/shop/compare`를 가리키고 있었으므로(그 항목의 QA round1 medium 권고 1) 이 줄이 빠지면
+            SR-303/SR-302와 같은 "도달 불가 화면" 결함이 재발한다(STORY "실패 사례집 대조" 절). */}
+        <Route path="/shop/compare" element={<ProductComparePage />} />
       </Routes>
     </HashRouter>
   )

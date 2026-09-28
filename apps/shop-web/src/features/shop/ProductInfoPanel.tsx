@@ -22,6 +22,9 @@ export type NotifyStatus = 'idle' | 'requested'
 // SR-356 — 찜 토글 상태. 'success'가 없다(장바구니 addStatus와 달리 성공 알림 문구를 따로 보여주지
 // 않는다 — 토글 버튼 자체의 라벨(찜하기/찜됨) 전환이 성공 표시를 겸한다, STORY "파일" 절).
 export type WishToggleStatus = 'idle' | 'pending' | 'error'
+// SR-360 — 비교함 토글 상태. `WishToggleStatus`와 같은 3값이지만 별도 타입으로 export한다(`AddStatus`/
+// `NotifyStatus`/`WishToggleStatus`가 이미 각자 별도 export인 관례를 따름, STORY "계약" 절).
+export type CompareToggleStatus = 'idle' | 'pending' | 'error'
 
 export interface ProductInfoPanelProps {
   product: ProductDetail
@@ -48,6 +51,13 @@ export interface ProductInfoPanelProps {
   wishToggleStatus: WishToggleStatus
   wishErrorMessage?: string | null
   onToggleWish: () => void
+  // SR-360 — 비교함 담김 여부·토글 상태는 전부 부모(`ProductDetailPage`)가 판정해 내려준다(이 부품은
+  // fetch/자격 판정을 하지 않는다, 규칙 `web-fetch-only-in-api`). 토글 버튼은 `disabledReason`(로그인
+  // 필요)과 무관하게 항상 클릭 가능 — 클릭 시 로그인 판정은 부모가 한다(`onToggleWish`와 동일 원칙).
+  compared: boolean
+  compareStatus: CompareToggleStatus
+  compareErrorMessage?: string | null
+  onToggleCompare: () => void
 }
 
 const won = (n: number) => n.toLocaleString('ko-KR') + '원'
@@ -78,6 +88,7 @@ const wishActiveButtonStyle: React.CSSProperties = {
 export function ProductInfoPanel({
   product, qty, onQtyChange, onAddToCart, onBuyNow, addStatus, addErrorMessage, lastAction, disabledReason,
   notifyStatus, onNotifyRequest, wishCount, wished, wishToggleStatus, wishErrorMessage, onToggleWish,
+  compared, compareStatus, compareErrorMessage, onToggleCompare,
 }: ProductInfoPanelProps) {
   const soldOut = product.soldOut
   const hasDiscount = hasListPriceDiscount(product.price, product.listPrice)
@@ -185,6 +196,22 @@ export function ProductInfoPanel({
       </div>
       {wishToggleStatus === 'error' && wishErrorMessage && (
         <div role="alert" style={{ marginTop: 8, fontSize: 12.5, color: '#912d2b' }}>{wishErrorMessage}</div>
+      )}
+
+      {/* SR-360 — 비교함 담기/빼기 토글 + 비교하기 링크. 찜 블록(SR-356) 바로 아래에 둔다(STORY "파일"
+          절) — soldOut 여부와 무관하게 항상 보인다. */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 10, flexWrap: 'wrap' }}>
+        <button type="button" aria-label="비교함 토글" aria-pressed={compared} onClick={onToggleCompare}
+                disabled={compareStatus === 'pending'}
+                style={compared ? wishActiveButtonStyle : wishButtonStyle}>
+          {compared ? '비교함에서 빼기' : '비교함 담기'}
+        </button>
+        <a href="#/shop/compare" style={{ fontSize: 12.5, color: '#0b4ea2', textDecoration: 'none' }}>
+          비교하기
+        </a>
+      </div>
+      {compareStatus === 'error' && compareErrorMessage && (
+        <div role="alert" style={{ marginTop: 8, fontSize: 12.5, color: '#912d2b' }}>{compareErrorMessage}</div>
       )}
 
       {addStatus === 'error' && addErrorMessage && (

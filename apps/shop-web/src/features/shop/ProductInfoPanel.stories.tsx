@@ -20,6 +20,8 @@ const meta = {
     notifyStatus: 'idle', onNotifyRequest: () => {},
     // SR-356 — 찜 수 0(0도 '0'으로 표시), 찜 안 한 상태, 토글 idle.
     wishCount: 0, wished: false, wishToggleStatus: 'idle', wishErrorMessage: null, onToggleWish: () => {},
+    // SR-360 — 비교함 담기 전(기본값), 토글 idle.
+    compared: false, compareStatus: 'idle', compareErrorMessage: null, onToggleCompare: () => {},
   },
   tags: ['UIS-ORD-010'],
 } satisfies Meta<typeof ProductInfoPanel>
@@ -117,4 +119,17 @@ export const 찜토글실패: Story = {
 /** 조회수 — 조회수 1,234회. 천 단위 쉼표 표기를 스토리로 고정한다. */
 export const 조회수: Story = {
   args: { product: { ...product, viewCount: 1234 } },
+}
+
+// SR-360 — 비교함 담기/빼기 토글 상태("담기 전"은 위 meta.args 기본값(compared:false)이 곧 `기본`
+// 스토리로 이미 커버되므로 따로 만들지 않는다, 찜의 "기본=찜0" 관례를 그대로 따름).
+
+/** 비교담김 — 비교함에 담긴 상태(버튼 라벨이 "비교함에서 빼기"로 바뀐다). */
+export const 비교담김: Story = {
+  args: { compared: true },
+}
+
+/** 비교가득거절 — 5번째 담기 시도(CMP-4091), 서버 메시지 원문 그대로 인라인 오류로 노출한다. */
+export const 비교가득거절: Story = {
+  args: { compareStatus: 'error', compareErrorMessage: '비교함은 최대 4개까지 담을 수 있습니다' },
 }

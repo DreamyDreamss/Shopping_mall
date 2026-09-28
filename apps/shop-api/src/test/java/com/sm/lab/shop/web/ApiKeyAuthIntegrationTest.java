@@ -1253,4 +1253,35 @@ class ApiKeyAuthIntegrationTest {
         memberAddressDao.insertAddress(address);
         return address.getAddressId();
     }
+
+    // ===== SR-360(#2) round2(재작업 지시 3, QA CONCERNS low) — AC 3건(INF-ORD-045/046/047)이 모두
+    // "비로그인 401"을 요구하는데 ProductCompareControllerTest는 전 케이스가 X-Api-Key를 보낸다.
+    // 그 클래스는 @WebMvcTest + AdminApiKeyTestConfig 슬라이스라 모든 요청에 기본 admin 키가
+    // 주입돼(defaultRequest) "무키" 상태 자체를 만들 수 없다(ProductReviewControllerTest 상단
+    // 코멘트와 동일한 제약) — 무인증 자체는 이 실 서버 통합 테스트가 검증한다. POST/DELETE + 401
+    // 조합은 TestRestTemplate 기본 SimpleClientHttpRequestFactory(JDK HttpURLConnection)의 알려진
+    // 한계(클래스 상단 rawPostJson/rawRequest 코멘트)로 raw 헬퍼를 쓴다.
+    @Test
+    void comparesRoute_postWithoutApiKey_returns401() throws Exception {
+        HttpResponse<String> res = rawPostJson("/api/members/me/compares", null, "{\"sku\":\"SKU-1001\"}");
+
+        assertThat(res.statusCode()).isEqualTo(401);
+        assertThat(res.body()).contains("\"error\"").contains("unauthorized");
+    }
+
+    @Test
+    void comparesRoute_getWithoutApiKey_returns401() {
+        ResponseEntity<String> res = get("/api/members/me/compares", null);
+
+        assertThat(res.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        assertThat(res.getBody()).contains("\"error\"").contains("unauthorized");
+    }
+
+    @Test
+    void comparesRoute_deleteWithoutApiKey_returns401() throws Exception {
+        HttpResponse<String> res = rawRequest("DELETE", "/api/members/me/compares/SKU-1001");
+
+        assertThat(res.statusCode()).isEqualTo(401);
+        assertThat(res.body()).contains("\"error\"").contains("unauthorized");
+    }
 }

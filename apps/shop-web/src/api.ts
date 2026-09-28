@@ -14,6 +14,7 @@ import type {
   OrderQuery,
   OrderRow,
   Product,
+  ProductCompareItem,
   ProductDetail,
   RecentlyViewedItem,
   ReviewCreateResult,
@@ -415,6 +416,39 @@ export function addWish(apiKey: string, sku: string): Promise<void> {
 /** DELETE /api/members/me/wishes/{sku} — 찜 해제(INF-ORD-041). 찜 안 한 상품 해제는 멱등 204. */
 export function removeWish(apiKey: string, sku: string): Promise<void> {
   return fetch(`/api/members/me/wishes/${encodeURIComponent(sku)}`, {
+    method: 'DELETE',
+    headers: { 'X-Api-Key': apiKey, Accept: 'application/json' },
+  }).then(async r => {
+    if (!r.ok) throw new ApiError(r.status, await parseErrorBody(r))
+  })
+}
+
+// SR-360 — 상품 비교함(`/shop/products/:sku` [비교함 담기]·`/shop/compare`). `ProductCompareController`류
+// (INF-ORD-045/046/047, SR-360 #2 구현)는 `ApiError`({code,message}) 계열이다 — `addWish`/`removeWish`와
+// 동일 원칙으로 memberId는 어느 함수에도 싣지 않는다(`SCOPE_TO_SELF`가 회원 X-Api-Key에서 강제한다).
+
+/** GET /api/members/me/compares — `{items}` 봉투. 최대 4건이라 페이지 파라미터가 없다(INF-ORD-047,
+ * `fetchWishes`의 `?page=` 관례를 그대로 베끼지 않는다). */
+export function fetchCompares(apiKey: string): Promise<ProductCompareItem[]> {
+  return getAuth<{ items: ProductCompareItem[] }>('/api/members/me/compares', apiKey).then(r => r.items)
+}
+
+/** POST /api/members/me/compares — 비교함 담기(INF-ORD-045). 이미 담긴 상품 재담기는 멱등 200, 5번째는
+ * 409 `CMP-4091`. 응답 바디 형태를 파싱하지 않는다(`addWish`와 동일하게 상태코드만 본다). */
+export function addCompare(apiKey: string, sku: string): Promise<void> {
+  return fetch('/api/members/me/compares', {
+    method: 'POST',
+    headers: { 'X-Api-Key': apiKey, 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify({ sku }),
+  }).then(async r => {
+    if (!r.ok) throw new ApiError(r.status, await parseErrorBody(r))
+  })
+}
+
+/** DELETE /api/members/me/compares/{sku} — 비교함 빼기(INF-ORD-046). 담기지 않은 상품 빼기도 멱등 204
+ * (`removeWish`와 동일 패턴). */
+export function removeCompare(apiKey: string, sku: string): Promise<void> {
+  return fetch(`/api/members/me/compares/${encodeURIComponent(sku)}`, {
     method: 'DELETE',
     headers: { 'X-Api-Key': apiKey, Accept: 'application/json' },
   }).then(async r => {

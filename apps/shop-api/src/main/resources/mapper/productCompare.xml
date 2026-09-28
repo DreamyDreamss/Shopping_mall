@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sm.lab.shop.dao.ProductCompareDao">
+
+  <!-- SR-360(#2) — 담기: 상한(4개, 호출 sku 자신은 카운트에서 제외) 서브쿼리를 결합한 단일 조건부
+       INSERT IGNORE. 이미 담긴 상품 재담기는(자기 자신을 빼면 최대 3이라 조건이 항상 참) IGNORE까지
+       도달해 PK 충돌로 0행, 상한 초과도 서브쿼리 조건 자체가 거짓이라 0행 — 두 경우 모두 호출부가
+       existsCompare로 원인을 가른다(STORY "데이터" 절). -->
+  <insert id="insertCompareIfUnderLimit">
+    INSERT IGNORE INTO PRODUCT_COMPARES (member_id, sku, created_at)
+    SELECT #{memberId}, #{sku}, #{createdAt}
+      FROM DUAL
+     WHERE (SELECT COUNT(*) FROM PRODUCT_COMPARES
+             WHERE member_id = #{memberId} AND sku &lt;&gt; #{sku}) &lt; 4
+  </insert>
+
+  <!-- SR-360(#2) — 0행 원인 재조회 전용. 실제 삽입 제약(PK member_id+sku)과 동일한 술어 그대로.
+       round2(재작업 지시 1, QA CONCERNS medium) — 비잠금 일관읽기였던 이전 버전은 트랜잭션 첫
+       읽기(productDao.selectBySku) 시점의 REPEATABLE READ 스냅샷을 써서, 상한 판정
+       insertCompareIfUnderLimit(INSERT...SELECT, 잠금읽기=항상 최신)와 읽기 시점이 어긋났다 —
+       같은 sku 동시 담기(더블클릭)의 뒤 요청이 방금 커밋된 앞 요청의 행을 옛 스냅샷에서 못 봐
+       "존재하지 않음"으로 판정, 진짜 상한 초과가 아닌데도 409로 떨어졌다(QA 실측). FOR UPDATE로
+       같은 트랜잭션 안에서 잠금읽기(최신)로 통일해 두 읽기의 시점을 맞춘다. -->
+  <select id="existsCompare" resultType="boolean">
+    SELECT COUNT(*) > 0
+      FROM PRODUCT_COMPARES
+     WHERE member_id = #{memberId}
+       AND sku = #{sku}
+     FOR UPDATE
+  </select>
+
+  <!-- SR-360(#2) — 빼기: 단일 DML, 존재 여부를 먼저 조회하지 않는다(영향행수 0/1 무관 — 호출부가
+       항상 204로 응답). sku가 실재 상품인지도 확인하지 않는다(이 회원의 비교함 행만 다루는 연산). -->
+  <delete id="deleteCompare">
+    DELETE FROM PRODUCT_COMPARES
+     WHERE member_id = #{memberId}
+       AND sku = #{sku}
+  </delete>
+
+  <!-- SR-360(#2) — 목록: 담은 시각 오름차순, 동률은 sku(AC 명시), 상품 조인(soldOut은
+       stock_qty<=0으로 SQL에서 계산 — ProductWishDao와 동일 정의). no-select-star. avgRating/
+       reviewCount는 여기 없다 — 서비스가 ProductReviewDao#selectRatingSummary로 별도 병합. -->
+  <select id="selectCompareList" resultType="com.sm.lab.shop.domain.ProductCompareView">
+    SELECT c.sku, p.product_name AS productName, p.price, p.list_price AS listPrice,
+           p.image_url AS imageUrl, p.stock_qty AS stockQty, (p.stock_qty &lt;= 0) AS soldOut,
+           c.created_at AS comparedAt
+      FROM PRODUCT_COMPARES c
+      JOIN PRODUCTS p ON c.sku = p.sku
+     WHERE c.member_id = #{memberId}
+     ORDER BY c.created_at ASC, c.sku ASC
+  </select>
+
+</mapper>
