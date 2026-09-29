@@ -97,6 +97,12 @@ describe('ProductDetailPage — 상품평 탭', () => {
       if (path.startsWith('/api/orders')) {
         return handlers.orders ? handlers.orders() : jsonResponse(200, [])
       }
+      // SR-360 — 비교함 담김 여부 확인 GET이 로그인 상태의 모든 테스트에서 마운트 시 나간다. 이 파일의
+      // 케이스들은 비교함과 무관해 기본 빈 목록으로 흡수한다(`ProductDetailPage.compare.test.tsx`가
+      // 실제 동작을 검증한다).
+      if (path === '/api/members/me/compares' && method === 'GET') {
+        return jsonResponse(200, { items: [] })
+      }
       if (path.startsWith('/api/products/')) {
         const sku = decodeURIComponent(path.slice('/api/products/'.length))
         if (!handlers.detail) throw new Error('unexpected detail call ' + url)
@@ -142,7 +148,12 @@ describe('ProductDetailPage — 상품평 탭', () => {
   // `reviewRegion()`은 항상 탭 클릭 뒤에만 쓴다(탭 진입 전에는 존재하지 않음).
   const reviewRegion = () => screen.getByRole('region', { name: '상품평' })
 
-  test('상품평 탭 — 진입 전에는 GET이 나가지 않고, 클릭 후에만 나간다(AC "탭 진입 시에만")', async () => {
+  // 재작업(SR-361) — SR-351 당시 AC("탭 진입 시에만 GET")는 SR-361의 확정 답변("화면 진입 즉시 GET,
+  // 탭 진입은 재사용해 중복 호출하지 않는다")으로 대체됐다(사례집 대조 — 더 최근에 승인된 확정 문답이
+  // 옛 테스트 서술보다 우선한다, 옛 테스트를 그대로 둔 채 코드만 맞추면 항상 실패하는 죽은 게이트가
+  // 된다). "아직 상품평이 없습니다"는 이제 미리보기(`최근 상품평`)와 탭(`상품평`) 두 region에 동시에
+  // 나타나 모호해지므로 `within(...)`으로 좁혀 쓴다.
+  test('상품평 미리보기/탭 — 화면 진입 즉시 GET이 나가고, 탭 진입은 그 결과를 재사용해 중복 호출하지 않는다', async () => {
     const p = product(20)
     let reviewCalls = 0
     routeFetch({
@@ -153,10 +164,13 @@ describe('ProductDetailPage — 상품평 탭', () => {
     renderPage(p.sku)
 
     await screen.findByText(p.productName)
-    expect(reviewCalls).toBe(0)
+    // 화면 진입 즉시(탭 클릭 전) 미리보기가 이미 GET 결과를 반영한다.
+    await within(screen.getByRole('region', { name: '최근 상품평' })).findByText('아직 상품평이 없습니다')
+    expect(reviewCalls).toBe(1)
 
     fireEvent.click(screen.getByRole('tab', { name: '상품평' }))
-    await screen.findByText('아직 상품평이 없습니다')
+    await within(reviewRegion()).findByText('아직 상품평이 없습니다')
+    // 탭 진입은 미리보기와 같은 결과를 재사용한다 — 추가 GET이 나가지 않는다(AC).
     expect(reviewCalls).toBe(1)
   })
 
@@ -222,7 +236,9 @@ describe('ProductDetailPage — 상품평 탭', () => {
     fetchMock.mock.calls.forEach(call => {
       expect(String(call[0])).not.toMatch(/^\/api\/orders/)
     })
-    expect(fetchMock.mock.calls.length).toBeGreaterThan(callsBefore)
+    // 재작업(SR-361) — 목록 조회가 이제 always-on이라 `callsBefore` 캡처 시점에 이미 리뷰 GET이
+    // 끝나 있다. 탭 진입은 같은 결과를 재사용하므로 탭 클릭 후에도 호출 수가 더는 늘지 않는다.
+    expect(fetchMock.mock.calls.length).toBe(callsBefore)
   })
 
   test('상품평 탭 — 로그인 상태에서 주문 자격 조회 후(구매 이력 있음) 작성 폼이 뜬다', async () => {

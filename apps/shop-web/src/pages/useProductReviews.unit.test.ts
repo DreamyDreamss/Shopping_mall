@@ -76,17 +76,22 @@ describe('useProductReviews', () => {
     items: [{ reviewId: 1, rating: 5, content: '고정 테스트용 리뷰 내용입니다', authorName: '홍*동', createdAt: '2026-09-01T00:00:00Z' }],
   })
 
-  test('탭 진입(enabled) 시에만 목록을 조회하고, 정렬·페이지 변경마다 재조회한다', async () => {
+  // 재작업(SR-361, AC "화면 진입 즉시 GET" + "탭 진입은 재사용, 중복 호출 안 함") — 목록 조회는 이제
+  // 탭 활성 여부(`tabActive`, 구 `enabled` — 훅 옵션 이름 자체는 호출부·기존 테스트 영향을 줄이려
+  // 그대로 뒀다)와 무관하게 always-on이다. 마운트 즉시(`tabActive=false`여도) 1회 나가고, 이후 탭
+  // 진입(`tabActive=true`)해도 같은 결과를 재사용해 추가 호출이 없어야 한다(훅 레벨 직접 증거).
+  test('목록 조회는 화면 진입 즉시(tabActive=false여도) 1회 나가고, 탭 진입(tabActive=true)은 재사용해 추가 호출이 없다', async () => {
     mockFetchReviews.mockResolvedValue(oneItemList)
     const { result, rerender } = renderHook(
-      (props: { enabled: boolean }) => useProductReviews({ sku: 'sku-1', session: null, enabled: props.enabled }),
-      { initialProps: { enabled: false } },
+      (props: { tabActive: boolean }) => useProductReviews({ sku: 'sku-1', session: null, enabled: props.tabActive }),
+      { initialProps: { tabActive: false } },
     )
-    expect(mockFetchReviews).not.toHaveBeenCalled()
-
-    rerender({ enabled: true })
     await waitFor(() => expect(mockFetchReviews).toHaveBeenCalledTimes(1))
     expect(mockFetchReviews).toHaveBeenLastCalledWith('sku-1', 'latest', 1)
+
+    rerender({ tabActive: true })
+    await waitFor(() => expect(result.current.listStatus).toBe('ready'))
+    expect(mockFetchReviews).toHaveBeenCalledTimes(1) // 탭 진입 자체는 추가 GET을 만들지 않는다
 
     act(() => result.current.onSortChange('ratingDesc'))
     await waitFor(() => expect(mockFetchReviews).toHaveBeenCalledTimes(2))

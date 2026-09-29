@@ -14,7 +14,9 @@ import type { ReviewInput, ReviewListResult, ReviewSort, SessionResult } from '.
 export interface UseProductReviewsOptions {
   sku: string
   session: SessionResult | null
-  /** true일 때만(탭 활성) 목록 조회를 시작한다 — AC "탭 진입 시에만 GET". */
+  /** SR-361 — 목록 조회(아래 첫 번째 effect)는 이제 이 값과 무관하게 always-on이다(AC "화면 진입
+   * 즉시 GET"). 이름은 호출부·기존 단위테스트의 불필요한 치환을 피하려 그대로 뒀다 — 지금은 주문
+   * 자격 조회(작성 폼 전용 부수효과)에만 영향을 준다. */
   enabled: boolean
 }
 
@@ -113,11 +115,12 @@ export function useProductReviews({ sku, session, enabled }: UseProductReviewsOp
   const [deleteErrorMessage, setDeleteErrorMessage] = useState<string | null>(null)
   const deleteInFlightRef = useRef(false)
 
-  // 목록 조회 — 탭 진입 시(enabled)에만, 정렬·페이지 변경마다 재조회한다. 요청 시점의 target을
-  // 클로저에 고정해 두고, 성공했을 때만 그 값을 applied로 승격한다(실패하면 applied는 그대로 —
-  // 위 "target/applied 분리" 주석 참고). requestId 가드는 기존 그대로(건드리지 않는다).
+  // 목록 조회 — SR-361: 화면(상품 상세) 진입 즉시 always-on으로 나간다(AC "화면 진입 즉시 GET"). 탭
+  // 활성 여부(enabled)는 더 이상 이 effect를 게이팅하지 않는다 — 미리보기(ProductReviewPreview)와
+  // 리뷰 탭(ProductReviewsSection)이 같은 결과를 재사용해 중복 호출하지 않는다(AC). 요청 시점의
+  // target을 클로저에 고정해 두고, 성공했을 때만 그 값을 applied로 승격한다(실패하면 applied는
+  // 그대로 — 위 "target/applied 분리" 주석 참고). requestId 가드는 기존 그대로(건드리지 않는다).
   useEffect(() => {
-    if (!enabled) return
     const id = ++listRequestIdRef.current
     const requestSort = targetSort
     const requestPage = targetPage
@@ -134,7 +137,7 @@ export function useProductReviews({ sku, session, enabled }: UseProductReviewsOp
         if (id !== listRequestIdRef.current) return
         setListStatus('error')
       })
-  }, [sku, targetSort, targetPage, enabled, listReloadTick, listRequestAttempt])
+  }, [sku, targetSort, targetPage, listReloadTick, listRequestAttempt])
 
   // 마지막 페이지의 마지막 1건을 지운 경우 빈 페이지가 남지 않게 한 페이지 내려 재조회한다(데이터 절).
   useEffect(() => {

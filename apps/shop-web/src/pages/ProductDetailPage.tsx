@@ -13,11 +13,13 @@ import { ProductImageGallery } from '../features/shop/ProductImageGallery'
 import { ProductInfoPanel, type AddAction, type AddStatus, type NotifyStatus } from '../features/shop/ProductInfoPanel'
 import { ProductDetailTabs, type ProductDetailTabKey } from '../features/shop/ProductDetailTabs'
 import { ProductNoticeTable } from '../features/shop/ProductNoticeTable'
+import { ProductReviewPreview } from '../features/shop/ProductReviewPreview'
 import { ProductReviewsSection } from '../features/shop/ProductReviewsSection'
 import { RelatedProducts } from '../features/shop/RelatedProducts'
 import { pickRelatedProducts } from '../features/shop/relatedProductsPicker'
 import { ToastStack } from '../components/common/ToastStack'
 import { pushToast, type ToastItem } from '../components/common/toastQueue'
+import { useProductCompare } from './useProductCompare'
 import { useProductReviews } from './useProductReviews'
 import { useProductWish } from './useProductWish'
 
@@ -89,6 +91,16 @@ export default function ProductDetailPage() {
     onRequireLogin: () => navigate('/login?redirect=' + encodeURIComponent(location.pathname + location.search)),
   })
 
+  // SR-360 — 비교함 담기/빼기. 상태·확인 effect·토글 핸들러는 `useProductCompare`로 옮긴다(`wish`와
+  // 동일한 소유권 분리 원칙, STORY "파일" 절). `onRequireLogin` 리다이렉트 규약은 `wish`와 완전히
+  // 동일한 문자열 그대로 재사용한다(신규 규약 금지).
+  const compare = useProductCompare({
+    sku,
+    session,
+    product,
+    onRequireLogin: () => navigate('/login?redirect=' + encodeURIComponent(location.pathname + location.search)),
+  })
+
   const load = async (targetSku: string) => {
     const id = ++requestIdRef.current
     setLoading(true)
@@ -111,6 +123,9 @@ export default function ProductDetailPage() {
       // SR-356 — 찜 카운트·토글 상태 리셋은 `setProduct`와 같은 동기 블록에서(렌더 지연 없이) 한다.
       // wished 판정은 `useProductWish`의 별도 effect가 sku/세션 변경을 보고 스스로 재조회한다.
       wish.resetForProduct(data.wishCount)
+      // SR-360 — 비교함 토글 상태 리셋도 같은 동기 블록에서(렌더 지연 없이) 한다. 담김 여부(compared)
+      // 판정은 `useProductCompare`의 별도 effect가 sku/세션 변경을 보고 스스로 재조회한다.
+      compare.resetForProduct()
     } catch (e) {
       if (id !== requestIdRef.current) return
       setProduct(null)
@@ -234,11 +249,22 @@ export default function ProductDetailPage() {
                                    disabledReason={disabledReason}
                                    notifyStatus={notifyStatus} onNotifyRequest={handleNotifyRequest}
                                    wishCount={wish.wishCount} wished={wish.wished} wishToggleStatus={wish.wishToggleStatus}
-                                   wishErrorMessage={wish.wishErrorMessage} onToggleWish={wish.onToggleWish} />
+                                   wishErrorMessage={wish.wishErrorMessage} onToggleWish={wish.onToggleWish}
+                                   compared={compare.compared} compareStatus={compare.compareStatus}
+                                   compareErrorMessage={compare.compareErrorMessage} onToggleCompare={compare.onToggleCompare} />
               </div>
             </div>
             <div style={{ marginTop: 32 }}>
+              <ProductReviewPreview
+                listStatus={reviews.listStatus}
+                listResult={reviews.listResult}
+                onRetry={reviews.onRetryList}
+                onViewAll={() => setActiveTab('review')}
+              />
+            </div>
+            <div style={{ marginTop: 32 }}>
               <ProductDetailTabs
+                activeTab={activeTab}
                 onTabChange={setActiveTab}
                 reviewContent={
                   <ProductReviewsSection

@@ -83,6 +83,11 @@ describe('ProductDetailPage — 찜하기', () => {
         const body = init?.body ? (JSON.parse(String(init.body)) as { sku: string }) : { sku: '' }
         return handlers.recordView ? handlers.recordView(body.sku) : jsonResponse(204, undefined)
       }
+      // SR-361 — 리뷰 목록 조회가 이제 always-on이라(같은 원인으로 `ProductDetailPage.test.tsx`에도
+      // 동일 분기를 추가) 이 파일의 테스트들도 마운트 시 리뷰 GET을 내보낸다. 기본 빈 목록으로 흡수한다.
+      if (path.includes('/reviews')) {
+        return jsonResponse(200, { totalCount: 0, page: 1, size: 10, avgRating: null, reviewCount: 0, distribution: { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 }, items: [] })
+      }
       if (path === '/api/members/me/wishes' && method === 'GET') {
         const params = new URLSearchParams(queryString ?? '')
         const page = Number(params.get('page') ?? '1')
@@ -99,6 +104,12 @@ describe('ProductDetailPage — 찜하기', () => {
         const sku = decodeURIComponent(removeMatch[1])
         removeWishCalls.push(sku)
         return handlers.removeWish ? handlers.removeWish(sku) : jsonResponse(204, null)
+      }
+      // SR-360 — 비교함 담김 여부 확인 GET이 로그인 상태의 모든 테스트에서 마운트 시 나간다. 이 파일의
+      // 케이스들은 비교함과 무관해 기본 빈 목록으로 흡수한다(`ProductDetailPage.compare.test.tsx`가
+      // 실제 동작을 검증한다).
+      if (path === '/api/members/me/compares' && method === 'GET') {
+        return jsonResponse(200, { items: [] })
       }
       if (path.startsWith('/api/products/')) {
         const sku = decodeURIComponent(path.slice('/api/products/'.length))

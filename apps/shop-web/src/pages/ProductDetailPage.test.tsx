@@ -66,6 +66,20 @@ describe('ProductDetailPage', () => {
         const body = init?.body ? (JSON.parse(String(init.body)) as { sku: string }) : { sku: '' }
         return handlers.recordView ? handlers.recordView(body.sku) : jsonResponse(204, undefined)
       }
+      // SR-361 — 리뷰 목록 조회가 이제 always-on이라 이 파일의 모든 테스트가 마운트 시 리뷰 GET을
+      // 내보낸다. `/api/products/` 일반 분기보다 먼저 가로채 기본 빈 목록을 돌려준다(개별 테스트는
+      // 리뷰 내용을 검증하지 않으므로 옵션 파라미터화하지 않는다) — 안 그러면 `/reviews` 접미 경로까지
+      // `handlers.detail`로 오라우팅돼 `ProductReviewPreview`가 `listResult.items`를 `undefined`로
+      // 받아 렌더 중 throw한다(실패 사례집 대조, 이 파일 기존 테스트 전부가 크래시할 뻔했다).
+      if (path.includes('/reviews')) {
+        return jsonResponse(200, { totalCount: 0, page: 1, size: 10, avgRating: null, reviewCount: 0, distribution: { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 }, items: [] })
+      }
+      // SR-360 — 비교함 담김 여부 확인 GET이 로그인 상태의 모든 테스트에서 마운트 시 나간다. 이 파일의
+      // 케이스들은 비교함과 무관해 기본 빈 목록으로 흡수한다(`ProductDetailPage.compare.test.tsx`가
+      // 실제 동작을 검증한다).
+      if (path === '/api/members/me/compares' && (init?.method ?? 'GET').toUpperCase() === 'GET') {
+        return jsonResponse(200, { items: [] })
+      }
       if (path.startsWith('/api/products/')) {
         const sku = decodeURIComponent(path.slice('/api/products/'.length))
         if (!handlers.detail) throw new Error('unexpected detail call ' + url)
