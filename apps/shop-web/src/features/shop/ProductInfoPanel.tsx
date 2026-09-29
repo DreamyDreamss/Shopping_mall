@@ -14,11 +14,13 @@
 // 버튼 1개만 보인다(`notifyStatus`·`onNotifyRequest`는 부모가 로그인 판정 뒤에만 전환한다, STORY
 // "순서·보안" 절).
 import { hasListPriceDiscount, calcDiscountRate } from './discountRate'
+import { calcTotalsFromProductAmount } from './cartTotals'
 import type { ProductDetail } from '../../types'
 
 export type AddStatus = 'idle' | 'pending' | 'success' | 'error'
 export type AddAction = 'cart' | 'buyNow'
-export type NotifyStatus = 'idle' | 'requested'
+// SR-364 — 'pending' 추가(서버 저장 신청 중, 왕복 대기). 라벨·비활성 분기는 아래 렌더 로직 참고.
+export type NotifyStatus = 'idle' | 'pending' | 'requested'
 // SR-356 — 찜 토글 상태. 'success'가 없다(장바구니 addStatus와 달리 성공 알림 문구를 따로 보여주지
 // 않는다 — 토글 버튼 자체의 라벨(찜하기/찜됨) 전환이 성공 표시를 겸한다, STORY "파일" 절).
 export type WishToggleStatus = 'idle' | 'pending' | 'error'
@@ -96,6 +98,8 @@ export function ProductInfoPanel({
   const pending = addStatus === 'pending'
   const actionsDisabled = !!disabledReason || pending
   const notifyRequested = notifyStatus === 'requested'
+  // SR-364 — 서버 왕복 대기 중(연타 방지는 부모 `notifyInFlightRef`가 하고, 이 부품은 표시만 담당한다).
+  const notifyPending = notifyStatus === 'pending'
   // 계약(STORY "계약" 절): soldOut이면 "품절"(문구 불변), 아니면 stockQty!=null && <=10일 때만
   // "남은 수량 N개" — 조건 미충족 시 값이 아니라 엘리먼트 자체를 숨긴다(null이면 라벨 렌더 안 함).
   const stockLabel = soldOut
@@ -103,6 +107,12 @@ export function ProductInfoPanel({
     : product.stockQty != null && product.stockQty <= 10
       ? `남은 수량 ${product.stockQty}개`
       : null
+  // SR-365 — 가격 바로 아래 배송비 안내 한 줄. 장바구니와 같은 배송비 규칙(`cartTotals.ts`의
+  // `calcTotalsFromProductAmount`)을 그대로 재사용한다(새 계산식을 이 파일에 만들지 않는다, STORY
+  // "실패 사례집 대조" 절 — SR-306 #1의 재계산 금지 원칙을 배송비에도 적용). 가격이 없거나 0이면
+  // 줄 자체를 숨긴다(AC).
+  const shippingFee = product.price > 0 ? calcTotalsFromProductAmount(product.price).shippingFee : null
+  const shippingLabel = shippingFee == null ? null : shippingFee === 0 ? '무료 배송' : `배송비 ${won(shippingFee)}`
 
   return (
     <section aria-label="상품 정보">
@@ -115,6 +125,12 @@ export function ProductInfoPanel({
       {hasDiscount && (
         <div style={{ fontSize: 13, color: '#999', textDecoration: 'line-through', marginTop: 2 }}>
           {won(product.listPrice!)}
+        </div>
+      )}
+
+      {shippingLabel !== null && (
+        <div aria-label="배송비 안내" style={{ marginTop: 6, fontSize: 12.5, color: '#666' }}>
+          {shippingLabel}
         </div>
       )}
 
@@ -154,9 +170,9 @@ export function ProductInfoPanel({
 
       {soldOut ? (
         <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
-          <button type="button" onClick={onNotifyRequest} disabled={notifyRequested}
-                  style={notifyRequested ? { ...primaryButtonStyle, ...disabledButtonStyle } : primaryButtonStyle}>
-            {notifyRequested ? '신청됨' : '재입고 알림 신청'}
+          <button type="button" onClick={onNotifyRequest} disabled={notifyPending || notifyRequested}
+                  style={notifyPending || notifyRequested ? { ...primaryButtonStyle, ...disabledButtonStyle } : primaryButtonStyle}>
+            {notifyRequested ? '신청됨' : notifyPending ? '신청 중…' : '재입고 알림 신청'}
           </button>
         </div>
       ) : (
