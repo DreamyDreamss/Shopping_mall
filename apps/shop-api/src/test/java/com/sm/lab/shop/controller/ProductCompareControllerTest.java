@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -126,6 +127,24 @@ class ProductCompareControllerTest {
         mockMvc.perform(get(BASE_URL).header("X-Api-Key", MEMBER_KEY))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.items[0].sku").value("SKU-1001"))
+                .andExpect(jsonPath("$.page").doesNotExist())
+                .andExpect(jsonPath("$.size").doesNotExist());
+
+        verify(productCompareService).list(MEMBER_ID);
+    }
+
+    // SR-363.1 — 담은 상품이 하나도 없을 때 200 + items가 실제 빈 배열임을 명시 단언(사례집
+    // SR-306 #2 — doesNotExist() 같은 판별력 없는 매처를 items 자체에는 쓰지 않는다, isArray()+
+    // hasSize(0)로 빈 배열 그 자체를 증명). page/size 부재는 원래도 "없음"만 확인하면 충분해
+    // doesNotExist()를 그대로 쓴다.
+    @Test
+    void list_emptyCompareBox_returns200WithEmptyItemsArray() throws Exception {
+        when(productCompareService.list(MEMBER_ID)).thenReturn(Map.of("items", List.of()));
+
+        mockMvc.perform(get(BASE_URL).header("X-Api-Key", MEMBER_KEY))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.items").isArray())
+                .andExpect(jsonPath("$.items", hasSize(0)))
                 .andExpect(jsonPath("$.page").doesNotExist())
                 .andExpect(jsonPath("$.size").doesNotExist());
 

@@ -223,6 +223,22 @@ class ProductCompareServiceTest {
         assertThat(body).doesNotContainKey("size");
     }
 
+    // SR-363.1 — DAO가 빈 리스트를 반환하면 items는 빈 배열이고, 순회할 행이 없어
+    // productReviewDao(avgRating 병합 스트림)가 전혀 호출되지 않는다(0회 반복의 실질 검증).
+    @Test
+    void list_daoReturnsEmptyList_returnsItemsEmptyArrayWithoutRatingLookup() {
+        when(dao.selectCompareList(MEMBER_ID)).thenReturn(List.of());
+
+        Map<String, Object> body = service.list(MEMBER_ID);
+
+        @SuppressWarnings("unchecked")
+        List<Map<String, Object>> items = (List<Map<String, Object>>) body.get("items");
+        assertThat(items).isEmpty();
+        verifyNoInteractions(productReviewDao);
+        assertThat(body).doesNotContainKey("page");
+        assertThat(body).doesNotContainKey("size");
+    }
+
     // linked_tc: 데드락 재시도 — DAO가 1회 DeadlockLoserDataAccessException을 던진 뒤 성공하면,
     // 정확히 2회 시도(1회 실패 + 1회 성공) 후 예외 없이 반환한다(round2 QA 권고 — 재시도 경로
     // 결정적 검증).

@@ -31,6 +31,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ProductCompareDaoTest {
 
     private static final String MEMBER_ID = "M-0001";
+    // SR-363.1 — 존재하지 않는 회원. selectCompareList가 MEMBERS를 조인·FK 참조하지 않아(확인함)
+    // 이 값으로도 0행이 결정적으로 나온다. M-0001을 재사용하지 않는 이유: 같은 클래스의 다른
+    // 테스트가 매번 M-0001의 4개 seed sku를 @BeforeEach/@AfterEach로 정리하므로, 신규 테스트가
+    // M-0001을 같이 쓰면 실행 순서·타이밍에 따라 다른 테스트의 잔류/정리 상태에 의존하게 된다
+    // (사례집 SR-356 #6과 같은 계열의 플레이키 위험). M-9999는 아무 테스트도 INSERT하지 않으므로
+    // 정리 대상 자체가 없다.
+    private static final String EMPTY_MEMBER_ID = "M-9999";
     private static final String SKU_1 = "SKU-1001";
     private static final String SKU_2 = "SKU-1002";
     private static final String SKU_3 = "SKU-1003";
@@ -126,6 +133,20 @@ class ProductCompareDaoTest {
         assertThat(first.getPrice()).isEqualTo(390000L);
         assertThat(first.isSoldOut()).isFalse();
         assertThat(first.getComparedAt()).isNotNull();
+    }
+
+    // SR-363.1 round2(QA CONCERNS medium 재작업) — round1 버전은 PRODUCT_COMPARES가 전역 0행이라
+    // WHERE c.member_id 절을 통째로 지워도 통과하는 판별력 없는 테스트였다(사례집 SR-353 #1 —
+    // 테이블이 애초에 비어 있는 것이 먼저 게이팅). 다른 회원(M-0001)의 행을 1건 먼저 심어 테이블을
+    // 비지 않은 상태로 만든 뒤 대상 회원(M-9999, 존재하지 않는 회원)으로 조회해야 회원 필터가 실제로
+    // 행사된다. 심은 SKU_1 행은 클래스의 @AfterEach(cleanUp)가 MEMBER_ID 기준으로 이미 정리한다.
+    @Test
+    void selectCompareList_noRowsForMember_returnsEmptyList() {
+        dao.insertCompareIfUnderLimit(MEMBER_ID, SKU_1, LocalDateTime.now());
+
+        List<ProductCompareView> result = dao.selectCompareList(EMPTY_MEMBER_ID);
+
+        assertThat(result).isEmpty();
     }
 
     // linked_tc: 동일 created_at 동률(tie)일 때 sku ASC tie-breaker(productCompare.xml)가 순서를
