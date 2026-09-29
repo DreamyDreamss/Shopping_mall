@@ -17,6 +17,7 @@ import type {
   ProductCompareItem,
   ProductDetail,
   RecentlyViewedItem,
+  RestockAlertItem,
   ReviewCreateResult,
   ReviewInput,
   ReviewListResult,
@@ -479,4 +480,29 @@ export function recordRecentlyViewed(apiKey: string, sku: string): Promise<void>
  * 채워 SCOPE_TO_SELF가 안 타 400 `RCV-4001`로 막힌다). */
 export function fetchRecentlyViewed(apiKey: string): Promise<RecentlyViewedItem[]> {
   return getAuth<{ items: RecentlyViewedItem[] }>('/api/members/me/recently-viewed', apiKey).then(r => r.items)
+}
+
+// SR-364 — 재입고 알림 신청(`/shop/products/:sku`, 품절 상품). `RestockAlertController`류(INF-ORD-048
+// POST는 SR-364 #1에서 이미 구현·Done, INF-ORD-049 GET은 SR-364 #2 몫이라 이 항목 시점엔 미구현 —
+// STORY-3 "구현 계획" 절이 전제한 계약을 그대로 소비한다)는 `ApiError`({code,message}) 계열이다 —
+// `addWish`/`addCompare`와 동일 원칙으로 memberId는 어느 함수에도 싣지 않는다(`SCOPE_TO_SELF`가 회원
+// X-Api-Key에서 강제한다).
+
+/** GET /api/members/me/restock-alerts — `{items}` 봉투, 최근 신청 순, 무페이지(INF-ORD-049,
+ * `fetchCompares`와 동일하게 페이지 파라미터가 없다). */
+export function fetchRestockAlerts(apiKey: string): Promise<RestockAlertItem[]> {
+  return getAuth<{ items: RestockAlertItem[] }>('/api/members/me/restock-alerts', apiKey).then(r => r.items)
+}
+
+/** POST /api/members/me/restock-alerts — 재입고 알림 신청(INF-ORD-048). 이미 신청한 상품 재신청은 멱등
+ * 200. 응답 바디 형태를 파싱하지 않는다(`addWish`/`addCompare`와 동일하게 상태코드만 본다). 400
+ * `RSA-4001`/404 `PRODUCT_NOT_FOUND`·`RSA-4042`/409 `NOT_SOLD_OUT`/500 `RSA-5000`. */
+export function requestRestockAlert(apiKey: string, sku: string): Promise<void> {
+  return fetch('/api/members/me/restock-alerts', {
+    method: 'POST',
+    headers: { 'X-Api-Key': apiKey, 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify({ sku }),
+  }).then(async r => {
+    if (!r.ok) throw new ApiError(r.status, await parseErrorBody(r))
+  })
 }

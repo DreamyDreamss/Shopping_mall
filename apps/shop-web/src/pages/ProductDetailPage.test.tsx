@@ -57,6 +57,10 @@ describe('ProductDetailPage', () => {
     addItem?: (body: { memberId: string; sku: string; qty: number }) => Response | Promise<Response>
     // SR-357 #4 — 최근 본 상품 기록 POST. 미지정 테스트는 기본 204를 받아 조용히 통과한다.
     recordView?: (sku: string) => Response | Promise<Response>
+    // SR-364 — 재입고 알림 신청 여부 확인 GET. 미지정 테스트는 기본 빈 목록(미신청)을 받는다.
+    restockAlerts?: () => Response | Promise<Response>
+    // SR-364 — 재입고 알림 신청 POST. 미지정 테스트는 기본 200(멱등)을 받는다.
+    registerRestockAlert?: (sku: string) => Response | Promise<Response>
   }) {
     fetchMock.mockImplementation(async (input: unknown, init?: RequestInit) => {
       const url = String(input)
@@ -79,6 +83,20 @@ describe('ProductDetailPage', () => {
       // 실제 동작을 검증한다).
       if (path === '/api/members/me/compares' && (init?.method ?? 'GET').toUpperCase() === 'GET') {
         return jsonResponse(200, { items: [] })
+      }
+      // SR-364 — 재입고 알림 신청 여부 확인 GET·신청 POST. 품절 상품 진입 시 마운트에서 GET이 나가고,
+      // [재입고 알림 신청] 클릭 시 POST가 나간다(`compares`와 동일하게 미지정 테스트는 기본값으로 흡수).
+      if (path === '/api/members/me/restock-alerts') {
+        const method = (init?.method ?? 'GET').toUpperCase()
+        if (method === 'GET') {
+          return handlers.restockAlerts ? handlers.restockAlerts() : jsonResponse(200, { items: [] })
+        }
+        if (method === 'POST') {
+          const body = init?.body ? (JSON.parse(String(init.body)) as { sku: string }) : { sku: '' }
+          return handlers.registerRestockAlert
+            ? handlers.registerRestockAlert(body.sku)
+            : jsonResponse(200, { sku: body.sku, requested: true })
+        }
       }
       if (path.startsWith('/api/products/')) {
         const sku = decodeURIComponent(path.slice('/api/products/'.length))
@@ -402,6 +420,8 @@ describe('ProductDetailPage', () => {
   })
 
   // SR-353 — 재입고 알림 신청(로그인 상태) — 버튼이 "신청됨"으로 바뀌고 완료 토스트가 뜬다.
+  // SR-364 재작업 — 이제 POST 왕복을 기다려야 "신청됨"이 된다(이전엔 클릭과 동시에 낙관 전환이었다,
+  // STORY "테스트" 절 "405번째 줄 기존 테스트" 수정 지시). 클릭 직후 동기 어서션을 비동기로 바꾼다.
   test('재입고 알림 신청(로그인) — 버튼이 신청됨으로 바뀌고 토스트가 뜬다', async () => {
     saveSession(session)
     const p = product(13, { stockQty: 0 })
@@ -411,8 +431,299 @@ describe('ProductDetailPage', () => {
     await screen.findByText(p.productName)
     fireEvent.click(within(infoSection()).getByRole('button', { name: '재입고 알림 신청' }))
 
-    expect(within(infoSection()).getByRole('button', { name: '신청됨' })).toBeDisabled()
+    expect(await within(infoSection()).findByRole('button', { name: '신청됨' })).toBeDisabled()
     expect(await screen.findByRole('status')).toHaveTextContent('재입고 알림 신청이 완료되었습니다')
+  })
+
+  // SR-364 — AC1: 품절 상세 진입 시 서버 GET이 이 sku를 이미 포함하면 클릭 없이 "신청됨"으로 렌더된다.
+  test('재입고 알림 신청 여부 확인(로그인, 이미 신청됨) — 클릭 없이 신청됨으로 렌더된다', async () => {
+    saveSession(session)
+    const p = product(29, { stockQty: 0 })
+    routeFetch({
+      detail: sku => jsonResponse(200, { ...p, sku }),
+      list: () => jsonResponse(200, [p]),
+      restockAlerts: () => jsonResponse(200, { items: [{ sku: p.sku, createdAt: '2026-09-01T00:00:00Z' }] }),
+    })
+    renderPage(p.sku)
+
+    await screen.findByText(p.productName)
+    expect(await within(infoSection()).findByRole('button', { name: '신청됨' })).toBeDisabled()
+  })
+
+  // SR-364 — AC3: 신청 여부 확인 GET이 실패하면 기본 상태(재입고 알림 신청)를 유지하고 토스트를
+  // 띄우지 않는다(확정 답변). 같은 렌더 사이클에서 병행 발사되는 다른 비동기 GET(장바구니 조회)을
+  // 동기화 포인트로 재사용한다(이 파일 292번째 줄 기존 관례, 신규 대기 기법을 발명하지 않는다).
+  test('재입고 알림 신청 여부 확인 실패(500) — 기본 상태 유지·토스트 없음', async () => {
+    saveSession(session)
+    const p = product(30, { stockQty: 0 })
+    routeFetch({
+      detail: sku => jsonResponse(200, { ...p, sku }),
+      list: () => jsonResponse(200, [p]),
+      restockAlerts: () => jsonResponse(500, { message: 'boom' }, false),
+    })
+    renderPage(p.sku)
+
+    await screen.findByText(p.productName)
+    await screen.findByLabelText('장바구니 0개') // 세션 있음 → GET /api/cart 조회 반영을 동기화 포인트로 쓴다.
+    expect(within(infoSection()).getByRole('button', { name: '재입고 알림 신청' })).toBeInTheDocument()
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
+  })
+
+  // SR-364 — AC2: POST 응답 도착 전까지 버튼이 "신청 중…"으로 비활성화된다(STORY "화면 상태" 절 신규
+  // 3번째 상태). resolve하지 않은 Promise로 mid-flight를 만든 뒤 resolve해 "신청됨"으로 전환됨을 마저
+  // 확인한다.
+  test('재입고 알림 신청 진행 중 — "신청 중…"으로 비활성화됐다가 응답 도착 후 신청됨으로 바뀐다', async () => {
+    saveSession(session)
+    const p = product(31, { stockQty: 0 })
+    let resolvePost!: (r: Response) => void
+    const pending = new Promise<Response>(resolve => { resolvePost = resolve })
+    routeFetch({
+      detail: sku => jsonResponse(200, { ...p, sku }),
+      list: () => jsonResponse(200, [p]),
+      registerRestockAlert: () => pending,
+    })
+    renderPage(p.sku)
+
+    await screen.findByText(p.productName)
+    fireEvent.click(within(infoSection()).getByRole('button', { name: '재입고 알림 신청' }))
+
+    const pendingBtn = await within(infoSection()).findByRole('button', { name: '신청 중…' })
+    expect(pendingBtn).toBeDisabled()
+
+    await act(async () => { resolvePost(jsonResponse(200, { sku: p.sku, requested: true })) })
+
+    expect(await within(infoSection()).findByRole('button', { name: '신청됨' })).toBeDisabled()
+  })
+
+  // SR-364 — POST 실패(500) 시 idle 복귀 + 실패 토스트(`toDisplayMessage`의 일반 문구). 확정 답변
+  // 7건은 GET(목록 조회) 실패만 명시하고 POST 자체 실패의 화면 표기는 다루지 않아, 기존 SR-353 성공
+  // 토스트 채널을 실패에도 재사용하는 쪽으로 해석했다(STORY "테스트" 절 — 이 해석은 QA 확인 필요).
+  test('재입고 알림 신청 실패(500) — idle로 복귀하고 실패 토스트가 뜬다', async () => {
+    saveSession(session)
+    const p = product(32, { stockQty: 0 })
+    routeFetch({
+      detail: sku => jsonResponse(200, { ...p, sku }),
+      list: () => jsonResponse(200, [p]),
+      registerRestockAlert: () => jsonResponse(500, { message: 'boom' }, false),
+    })
+    renderPage(p.sku)
+
+    await screen.findByText(p.productName)
+    fireEvent.click(within(infoSection()).getByRole('button', { name: '재입고 알림 신청' }))
+
+    expect(await within(infoSection()).findByRole('button', { name: '재입고 알림 신청' })).not.toBeDisabled()
+    expect(await screen.findByRole('status')).toHaveTextContent('일시적 오류입니다. 다시 시도해 주세요')
+  })
+
+  // SR-364 재작업(round2) — QA FAIL 필수1 회귀. 품절 A(신청됨) → 관련상품 클릭으로 품절 B(이미
+  // 신청됨)로 SPA param-only 이동(언마운트 없음, `RelatedProducts`의 `onSelect` → `navigate`)해도
+  // B가 「신청됨」으로 유지돼야 한다(round1 결함: 확인 GET(B)이 상세 GET(B)보다 먼저 도착하면
+  // `resetForProduct()`가 그 결과를 'idle'로 덮어썼다). 이 파일 647~653번째 줄이 SR-357 때
+  // "param-only 이동은 미작성"으로 남긴 사각을 이 시나리오로 메운다. 레이스를 우연에 맡기면 판별력이
+  // 0이므로(사례집 SR-302 #1/SR-353 #1 대조) 상세 GET(B)만 수동으로 붙잡아, 확인 GET(B)이 반드시 먼저
+  // 끝나는 순서를 고정한다.
+  test('재입고 알림 신청됨 유지 — 품절 A에서 관련상품 클릭으로 품절 B(이미 신청됨)로 이동해도 신청됨이 유지된다', async () => {
+    saveSession(session)
+    const pA = product(33, { stockQty: 0 })
+    const pB = product(34, { stockQty: 0 })
+    let resolveDetailB!: (r: Response) => void
+    const detailBPending = new Promise<Response>(resolve => { resolveDetailB = resolve })
+    routeFetch({
+      // 상세 GET(B)만 수동 제어한다 — 확인 GET(B)은 즉시 응답해 상세 GET(B)보다 먼저 끝나는 순서를
+      // 강제로 재현한다(품절 A의 상세 GET은 그대로 즉시 응답).
+      detail: sku => (sku === pB.sku ? detailBPending : jsonResponse(200, { ...pA, sku })),
+      list: () => jsonResponse(200, [pA, pB]),
+      restockAlerts: () => jsonResponse(200, {
+        items: [
+          { sku: pA.sku, createdAt: '2026-09-01T00:00:00Z' },
+          { sku: pB.sku, createdAt: '2026-09-02T00:00:00Z' },
+        ],
+      }),
+    })
+    renderPage(pA.sku)
+
+    await screen.findByText(pA.productName)
+    expect(await within(infoSection()).findByRole('button', { name: '신청됨' })).toBeDisabled()
+    await within(relatedSection()).findByText(pB.productName)
+
+    fireEvent.click(within(relatedSection()).getByText(pB.productName))
+
+    // 확인 GET(B)이 완전히 끝날 시간을 번다 — 상세 GET(B)은 아직 붙잡아 둔 상태라 `resetForProduct()`는
+    // 아직 호출되지 않았다. 매크로태스크 경계까지 흘려보내 대기 중인 마이크로태스크를 전부 비운다.
+    await act(async () => { await new Promise(resolve => setTimeout(resolve, 0)) })
+
+    // 이제 상세 GET(B)을 풀어준다 — `load()`가 `setProduct(B)` 뒤 `restockAlert.resetForProduct()`를
+    // 호출한다(round1 결함이면 여기서 신청됨이 'idle'로 덮인다).
+    await act(async () => { resolveDetailB(jsonResponse(200, { ...pB, sku: pB.sku })) })
+
+    expect(await within(infoSection()).findByRole('button', { name: '신청됨' })).toBeDisabled()
+  })
+
+  // SR-364 재작업(round3→round4) — 재작업 지시 1·2, 사람 코멘트 [테스트·완료 조건] 1건째 + medium 권고
+  // (round2 회귀 테스트가 A·B 둘 다 신청됨으로 응답해 "B를 새로 판정한다"는 술어를 검증하지 못했다).
+  // round3은 호출 순서로 A(1회차)=신청됨·B(2회차)=빈 목록을 구분했으나, 이 GET은 **회원 전체 목록**이라
+  // B 화면에서도 A의 신청 기록은 그대로 남아 있어야 한다 — 2회차를 빈 목록으로 주는 것은 실제로 불가능한
+  // 응답이었고, 그 탓에 `items.some(it => it.sku === sku)`를 `items.length > 0`으로 바꾸는 변이가
+  // 33/33 전부 통과했다(round4 QA 변이 실측, medium 권고). 호출 순서 분기를 없애고 두 호출 모두
+  // A의 신청 기록만 담은 **현실적인** 같은 목록을 돌려준다 — B의 sku는 포함하지 않으므로 "sku별로
+  // 새로 판정한다"는 술어는 여전히 검증된다(items.length > 0 변이로 바꾸면 이 테스트가 깨진다).
+  test('재입고 알림 신청 여부 재판정 — 품절 A(신청됨)에서 품절 B(미신청)로 이동하면 B는 기본 상태로 렌더된다', async () => {
+    saveSession(session)
+    const pA = product(35, { stockQty: 0 })
+    const pB = product(36, { stockQty: 0 })
+    routeFetch({
+      detail: sku => jsonResponse(200, { ...(sku === pB.sku ? pB : pA), sku }),
+      list: () => jsonResponse(200, [pA, pB]),
+      // 회원 전체 목록 — A의 신청 기록만 있고 B는 없다(현실적인 목, A 화면·B 화면 확인 GET 모두 동일).
+      restockAlerts: () => jsonResponse(200, { items: [{ sku: pA.sku, createdAt: '2026-09-01T00:00:00Z' }] }),
+    })
+    renderPage(pA.sku)
+
+    await screen.findByText(pA.productName)
+    expect(await within(infoSection()).findByRole('button', { name: '신청됨' })).toBeDisabled()
+    await within(relatedSection()).findByText(pB.productName)
+
+    fireEvent.click(within(relatedSection()).getByText(pB.productName))
+
+    await screen.findByText(pB.productName)
+    expect(await within(infoSection()).findByRole('button', { name: '재입고 알림 신청' })).not.toBeDisabled()
+  })
+
+  // SR-364 재작업(round3) — 재작업 지시 1, 필수 수정 회귀 ①(QA 지정): 품절 A(신청됨)→품절 B로 이동 중
+  // B의 확인 GET이 실패(500)해도 B는 A의 신청됨 상태를 이어받지 않고 기본 상태(활성)를 유지한다(AC3,
+  // 확정 답변 6). round2 FAIL 재현 조건 그대로 — notified가 sku에 묶이지 않으면 GET 실패 시 이전
+  // 상품 값이 남아 B가 신청 자체를 할 수 없는 상태(disabled)로 굳는다.
+  test('재입고 알림 신청 여부 확인 실패 — 품절 A(신청됨)에서 품절 B로 이동 중 B의 확인 GET이 실패해도 B는 기본 상태를 유지한다', async () => {
+    saveSession(session)
+    const pA = product(37, { stockQty: 0 })
+    const pB = product(38, { stockQty: 0 })
+    let restockCall = 0
+    routeFetch({
+      detail: sku => jsonResponse(200, { ...(sku === pB.sku ? pB : pA), sku }),
+      list: () => jsonResponse(200, [pA, pB]),
+      restockAlerts: () => {
+        restockCall++
+        return restockCall === 1
+          ? jsonResponse(200, { items: [{ sku: pA.sku, createdAt: '2026-09-01T00:00:00Z' }] })
+          : jsonResponse(500, { message: 'boom' }, false)
+      },
+    })
+    renderPage(pA.sku)
+
+    await screen.findByText(pA.productName)
+    expect(await within(infoSection()).findByRole('button', { name: '신청됨' })).toBeDisabled()
+    await within(relatedSection()).findByText(pB.productName)
+
+    fireEvent.click(within(relatedSection()).getByText(pB.productName))
+
+    await screen.findByText(pB.productName)
+    expect(await within(infoSection()).findByRole('button', { name: '재입고 알림 신청' })).not.toBeDisabled()
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
+  })
+
+  // SR-364 재작업(round3) — 재작업 지시 1, 필수 수정 회귀 ②(QA 지정): 클릭 직후(POST 왕복 완료 전)
+  // 다른 상품으로 이동하면, 늦게 도착한 POST 성공 응답이 새 상품(B)의 상태를 오염시키지 않는다(round2
+  // FAIL (c) — POST 성공 핸들러가 세대·sku 검사 없이 setNotified(true)를 해 클릭 직후 이동 시 A의
+  // 결과가 B를 신청됨으로 만들었다). 응답 순서를 수동 제어해 고정 재현한다(기존 `detailBPending` 기법과
+  // 동일 원리 — 레이스를 우연에 맡기지 않는다).
+  test('재입고 알림 신청 POST 레이스 — 클릭 직후 다른 상품으로 이동하면 늦게 도착한 POST 성공이 새 상품을 오염시키지 않는다', async () => {
+    saveSession(session)
+    const pA = product(39, { stockQty: 0 })
+    const pB = product(40, { stockQty: 0 })
+    let resolvePost!: (r: Response) => void
+    const pending = new Promise<Response>(resolve => { resolvePost = resolve })
+    routeFetch({
+      detail: sku => jsonResponse(200, { ...(sku === pB.sku ? pB : pA), sku }),
+      list: () => jsonResponse(200, [pA, pB]),
+      registerRestockAlert: sku => (sku === pA.sku ? pending : jsonResponse(200, { sku, requested: true })),
+    })
+    renderPage(pA.sku)
+
+    await screen.findByText(pA.productName)
+    fireEvent.click(within(infoSection()).getByRole('button', { name: '재입고 알림 신청' }))
+    await within(infoSection()).findByRole('button', { name: '신청 중…' })
+
+    await within(relatedSection()).findByText(pB.productName)
+    fireEvent.click(within(relatedSection()).getByText(pB.productName))
+    await screen.findByText(pB.productName) // 이동 완료(상세 GET(B) 반영) 대기 — 이 시점에 화면은 이미 B.
+
+    // 이제서야 A의 POST 성공 응답이 늦게 도착한다.
+    await act(async () => { resolvePost(jsonResponse(200, { sku: pA.sku, requested: true })) })
+
+    expect(await within(infoSection()).findByRole('button', { name: '재입고 알림 신청' })).not.toBeDisabled()
+  })
+
+  // SR-364 재작업(round4, QA FAIL round3 필수1 — PROBE2 실측 재현, 사람 승인 처방) — round3은 POST 성공
+  // 처리에 "지금 렌더링 중인 sku와 일치하는지" 검사를 넣지 않았다(코드 주석이 "대조 대상이 없다"고
+  // 정당화했으나 틀렸다 — notifiedSku는 sku 하나만 담는 단일 슬롯이다). A(미신청)에서 클릭해 POST를
+  // 미resolve 상태로 붙잡은 채 B(이미 신청됨)로 이동하면, B는 자신의 확인 GET으로 정상적으로 「신청됨」
+  // 으로 먼저 확정된다 — 그 뒤에야 A의 POST 성공이 늦게 도착해도(캡처된 targetSku=A와 지금 렌더링 중인
+  // sku=B가 다르므로 skuRef 검사에서 걸린다) B는 여전히 「신청됨」을 유지한다(단일 슬롯이 A로 덮이지
+  // 않는다). 응답 순서를 수동 제어해 고정 재현한다.
+  test('재입고 알림 신청 POST 지연 — A 클릭 중 이미 신청된 B로 이동해도 B는 신청됨을 유지한다', async () => {
+    saveSession(session)
+    const pA = product(41, { stockQty: 0 })
+    const pB = product(42, { stockQty: 0 })
+    let resolvePost!: (r: Response) => void
+    const pending = new Promise<Response>(resolve => { resolvePost = resolve })
+    routeFetch({
+      detail: sku => jsonResponse(200, { ...(sku === pB.sku ? pB : pA), sku }),
+      list: () => jsonResponse(200, [pA, pB]),
+      // 회원 전체 목록 — B는 이미 신청됨, A는 아직 아니다(현실적인 목, A·B 화면 확인 GET 모두 동일).
+      restockAlerts: () => jsonResponse(200, { items: [{ sku: pB.sku, createdAt: '2026-09-01T00:00:00Z' }] }),
+      registerRestockAlert: sku => (sku === pA.sku ? pending : jsonResponse(200, { sku, requested: true })),
+    })
+    renderPage(pA.sku)
+
+    await screen.findByText(pA.productName)
+    fireEvent.click(within(infoSection()).getByRole('button', { name: '재입고 알림 신청' }))
+    await within(infoSection()).findByRole('button', { name: '신청 중…' })
+
+    await within(relatedSection()).findByText(pB.productName)
+    fireEvent.click(within(relatedSection()).getByText(pB.productName))
+    await screen.findByText(pB.productName) // 이동 완료(상세 GET(B) 반영) 대기 — 이 시점부터 infoSection()이 유효하다.
+
+    // B로 이동 후, B 자신의 확인 GET으로 정상적으로 「신청됨」이 확정된다(A의 POST와 무관하게).
+    expect(await within(infoSection()).findByRole('button', { name: '신청됨' })).toBeDisabled()
+
+    // 이제서야 A의 POST 성공 응답이 늦게 도착한다 — B는 여전히 신청됨이어야 한다(round3 필수1 재현 조건).
+    await act(async () => { resolvePost(jsonResponse(200, { sku: pA.sku, requested: true })) })
+
+    expect(await within(infoSection()).findByRole('button', { name: '신청됨' })).toBeDisabled()
+  })
+
+  // SR-364 재작업(round4, QA FAIL round3 필수1 — PROBE3 실측 재현) — 같은 경로에서 늦게 도착한 A의 POST
+  // 성공이 무조건 `onNotifyResult({success:true})`를 불러 B 화면에 A의 성공 토스트를 띄우던 결함(round3
+  // 필수1의 두 번째 잔여)도 같은 처방(skuRef 검사)으로 함께 닫힌다 — B 화면에는 어떤 토스트도 뜨지 않는다.
+  test('재입고 알림 신청 POST 지연 — B로 이동 후 늦게 도착한 A의 POST 성공에 완료 토스트가 뜨지 않는다', async () => {
+    saveSession(session)
+    const pA = product(43, { stockQty: 0 })
+    const pB = product(44, { stockQty: 0 })
+    let resolvePost!: (r: Response) => void
+    const pending = new Promise<Response>(resolve => { resolvePost = resolve })
+    routeFetch({
+      detail: sku => jsonResponse(200, { ...(sku === pB.sku ? pB : pA), sku }),
+      list: () => jsonResponse(200, [pA, pB]),
+      restockAlerts: () => jsonResponse(200, { items: [{ sku: pB.sku, createdAt: '2026-09-01T00:00:00Z' }] }),
+      registerRestockAlert: sku => (sku === pA.sku ? pending : jsonResponse(200, { sku, requested: true })),
+    })
+    renderPage(pA.sku)
+
+    await screen.findByText(pA.productName)
+    fireEvent.click(within(infoSection()).getByRole('button', { name: '재입고 알림 신청' }))
+    await within(infoSection()).findByRole('button', { name: '신청 중…' })
+
+    await within(relatedSection()).findByText(pB.productName)
+    fireEvent.click(within(relatedSection()).getByText(pB.productName))
+    await screen.findByText(pB.productName) // 이동 완료(상세 GET(B) 반영) 대기 — 이 시점부터 infoSection()이 유효하다.
+    expect(await within(infoSection()).findByRole('button', { name: '신청됨' })).toBeDisabled()
+
+    await act(async () => { resolvePost(jsonResponse(200, { sku: pA.sku, requested: true })) })
+    // resolvePost 처리 뒤 한 틱 더 흘려보내, (만약 잘못 불렸다면) onNotifyResult가 토스트를 렌더할
+    // 시간을 충분히 준다.
+    await act(async () => { await new Promise(resolve => setTimeout(resolve, 0)) })
+
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
   })
 
   // SR-353 — 재입고 알림 신청(비로그인) — 로그인 판정이 먼저다(부수효과보다 앞선 순서, STORY
@@ -435,8 +746,9 @@ describe('ProductDetailPage', () => {
   })
 
   // 실패 사례집 대조(SR-302 #1) — 연타 검증은 act() 한 스코프 안에서 flush 없이 묶어 발사한다. 가드
-  // (`ProductDetailPage.tsx`의 `notifyInFlightRef`)를 임시로 제거해 이 테스트가 실제로 토스트 2개로
-  // 깨지는지 먼저 확인한 뒤 가드를 복원했다(Dev 기록 참조).
+  // (`useProductRestockAlert.ts`의 `notifyInFlightRef` — SR-364 재작업 round2 사람 지시 ③: 이전 주석은
+  // `ProductDetailPage.tsx`를 잘못 지목했다. 가드는 round1부터 이미 이 훅에 있었다)를 임시로 제거해 이
+  // 테스트가 실제로 토스트 2개로 깨지는지 먼저 확인한 뒤 가드를 복원했다(Dev 기록 참조).
   test('재입고 알림 신청 연타 방지 — 토스트가 1개만 뜬다', async () => {
     saveSession(session)
     const p = product(15, { stockQty: 0 })

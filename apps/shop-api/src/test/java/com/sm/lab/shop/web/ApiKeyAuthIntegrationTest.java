@@ -1284,4 +1284,32 @@ class ApiKeyAuthIntegrationTest {
         assertThat(res.statusCode()).isEqualTo(401);
         assertThat(res.body()).contains("\"error\"").contains("unauthorized");
     }
+
+    // ===== SR-364(#1) round2(재작업 지시 1, QA CONCERNS medium) — AC가 명시한 "미인증 401"을
+    // POST /api/members/me/restock-alerts 경로로 실제 검증하는 케이스가 어디에도 없었다.
+    // RestockAlertControllerTest는 @WebMvcTest + AdminApiKeyTestConfig 슬라이스라 모든 요청에
+    // admin 키가 기본 주입돼 "무키" 상태 자체를 만들 수 없다(그 클래스 javadoc 명시) — 그
+    // 검증은 이 통합 테스트(TestRestTemplate, 헤더 완전 제어)의 책임이다. 동작 자체는
+    // isOpenRoute 미등록 + default-deny로 구조적으로 보장되지만(결함 아님), 경로별 커버리지
+    // 공백이었다(직전 comparesRoute_postWithoutApiKey_returns401·recentlyViewedRoute_* 선례와
+    // 동일 관례). TestRestTemplate 기본 SimpleClientHttpRequestFactory(JDK
+    // HttpURLConnection)의 POST+401 한계로 rawPostJson 헬퍼를 쓴다.
+    @Test
+    void restockAlertsRoute_postWithoutApiKey_returns401() throws Exception {
+        HttpResponse<String> res = rawPostJson("/api/members/me/restock-alerts", null, "{\"sku\":\"SKU-1001\"}");
+
+        assertThat(res.statusCode()).isEqualTo(401);
+        assertThat(res.body()).contains("\"error\"").contains("unauthorized");
+    }
+
+    // ===== SR-364(#2) — GET /api/members/me/restock-alerts 미인증 401(INF-ORD-049 AC). GET은
+    // HttpURLConnection 에러스트림 한계(POST/DELETE 전용)가 없어 raw 헬퍼 없이 기존 get(path,
+    // apiKey) 헬퍼로 검증한다(comparesRoute_getWithoutApiKey_returns401과 동일 패턴).
+    @Test
+    void restockAlertsRoute_getWithoutApiKey_returns401() {
+        ResponseEntity<String> res = get("/api/members/me/restock-alerts", null);
+
+        assertThat(res.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        assertThat(res.getBody()).contains("\"error\"").contains("unauthorized");
+    }
 }

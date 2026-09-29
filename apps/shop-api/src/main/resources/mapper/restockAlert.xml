@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sm.lab.shop.dao.RestockAlertDao">
+
+  <!-- SR-364(#1) — 등록: INSERT IGNORE 단일 원자문. PK(member_id, sku) 충돌은 DB가 조용히 흡수
+       (0행) — 존재 여부와 무관하게 예외 없이 항상 성공한다(사례집 SR-231 r2/SR-298 #1·#2와 동일
+       계열, 선조회 후 INSERT 금지). -->
+  <insert id="insertAlert">
+    INSERT IGNORE INTO RESTOCK_ALERTS (member_id, sku, created_at)
+    VALUES (#{memberId}, #{sku}, #{createdAt})
+  </insert>
+
+  <!-- SR-364(#2), INF-ORD-049 — 내 재입고 알림 신청 목록. 상품 조인 없음(sku, created_at 두 컬럼만
+       — AC 초과 구현 금지, STORY "파일" 절). -->
+  <select id="selectAlertList" resultType="com.sm.lab.shop.domain.RestockAlertView">
+    SELECT sku, created_at
+    FROM RESTOCK_ALERTS
+    WHERE member_id = #{memberId}
+    ORDER BY created_at DESC
+  </select>
+
+</mapper>

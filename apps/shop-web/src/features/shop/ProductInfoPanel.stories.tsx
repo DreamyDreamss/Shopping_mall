@@ -62,6 +62,14 @@ export const 품절신청됨: Story = {
   },
 }
 
+/** 신청중 — SR-364, POST 서버 왕복 대기 중. 버튼이 "신청 중…"으로 비활성화된다(연타 방지 표시). */
+export const 신청중: Story = {
+  args: {
+    product: { ...product, stockQty: 0, soldOut: true },
+    notifyStatus: 'pending',
+  },
+}
+
 /** 담기실패 — 409(재고초과·품절·판매중지) 사유 인라인 표시, 버튼은 재시도 가능하도록 다시 활성. */
 export const 담기실패: Story = {
   args: { addStatus: 'error', addErrorMessage: '재고가 부족하거나 판매중지된 상품입니다' },

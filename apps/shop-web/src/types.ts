@@ -167,6 +167,15 @@ export interface ProductCompareItem {
   comparedAt: string
 }
 
+// SR-364 — 재입고 알림 신청(`/shop/products/:sku`, 품절 상품). `GET
+// /api/members/me/restock-alerts`(INF-ORD-049, SR-364 #2) 응답 items[] 1건 — 최근 신청 순, 무페이지
+// (STORY-3 "구현 계획" 절이 전제한 계약, SR-364 #2가 아직 미구현이라 이 타입은 계획 단계 계약을 그대로
+// 옮긴다).
+export interface RestockAlertItem {
+  sku: string
+  createdAt: string
+}
+
 // SR-304 — 상품 상세(`/shop/products/:sku`). `POST /api/cart/items` 응답(`CartController.addItem` →
 // `CartItem` 도메인)에는 memberId·productName·price·addedAt 필드도 더 있지만, 화면이 실제로 쓰는
 // 필드(담기 수량 반영용 qty, sku)만 선언한다 — 필요 최소만 옮긴다(하위호환 유지, 응답 형식은 그대로).

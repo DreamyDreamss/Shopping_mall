@@ -81,9 +81,13 @@ spring:
       # API) 추가. 착수 직전 이 목록과 db/ 폴더를 재확인해 V17이 비어 있음을 확인했다(LAB-105 #1
       # 재발 방지 — 동시 진행 SR이 먼저 점유했으면 다음 빈 번호로 재넘버링할 예정이었으나 이번엔
       # 그대로 V17). 기존 16개 항목 순서는 건드리지 않고 목록 맨 끝에 이어붙였다.
+      # SR-364(#1) — V18__restock_alerts.sql(RESTOCK_ALERTS 신설, 재입고 알림 신청 API) 추가.
+      # 착수 직전 이 목록과 db/ 폴더를 재확인해 V18이 비어 있음을 확인했다(LAB-105 #1 재발 방지 —
+      # 동시 진행 SR이 먼저 점유했으면 다음 빈 번호로 재넘버링할 예정이었으나 이번엔 그대로 V18).
+      # 기존 17개 항목 순서는 건드리지 않고 목록 맨 끝에 이어붙였다.
       encoding: UTF-8
       mode: always
-      schema-locations: classpath:db/member_signup_verifications.sql,classpath:db/member_signup_rate_limits.sql,classpath:db/V3__members_signup.sql,classpath:db/V4__members_login.sql,classpath:db/V5__member_password_resets.sql,classpath:db/V6__member_password_reset_confirmation.sql,classpath:db/V7__member_addresses.sql,classpath:db/V8__zipcodes.sql,classpath:db/V9__member_password_reset_rate_limits.sql,classpath:db/V10__product_list_price_image.sql,classpath:db/V11__product_reviews.sql,classpath:db/V12__order_delivery_carrier.sql,classpath:db/V13__product_reviews_list_indexes.sql,classpath:db/V14__product_wishes.sql,classpath:db/V15__product_view_history.sql,classpath:db/V16__products_view_count.sql,classpath:db/V17__product_compares.sql
+      schema-locations: classpath:db/member_signup_verifications.sql,classpath:db/member_signup_rate_limits.sql,classpath:db/V3__members_signup.sql,classpath:db/V4__members_login.sql,classpath:db/V5__member_password_resets.sql,classpath:db/V6__member_password_reset_confirmation.sql,classpath:db/V7__member_addresses.sql,classpath:db/V8__zipcodes.sql,classpath:db/V9__member_password_reset_rate_limits.sql,classpath:db/V10__product_list_price_image.sql,classpath:db/V11__product_reviews.sql,classpath:db/V12__order_delivery_carrier.sql,classpath:db/V13__product_reviews_list_indexes.sql,classpath:db/V14__product_wishes.sql,classpath:db/V15__product_view_history.sql,classpath:db/V16__products_view_count.sql,classpath:db/V17__product_compares.sql,classpath:db/V18__restock_alerts.sql
 
 mybatis:
   mapper-locations: classpath:mapper/*.xml

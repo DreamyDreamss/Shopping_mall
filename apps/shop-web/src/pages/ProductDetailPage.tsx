@@ -10,7 +10,7 @@ import { AppShell } from '../features/shop/AppShell'
 import { ProductDetailSkeleton } from '../features/shop/ProductDetailSkeleton'
 import { ProductNotFoundNotice } from '../features/shop/ProductNotFoundNotice'
 import { ProductImageGallery } from '../features/shop/ProductImageGallery'
-import { ProductInfoPanel, type AddAction, type AddStatus, type NotifyStatus } from '../features/shop/ProductInfoPanel'
+import { ProductInfoPanel, type AddAction, type AddStatus } from '../features/shop/ProductInfoPanel'
 import { ProductDetailTabs, type ProductDetailTabKey } from '../features/shop/ProductDetailTabs'
 import { ProductNoticeTable } from '../features/shop/ProductNoticeTable'
 import { ProductReviewPreview } from '../features/shop/ProductReviewPreview'
@@ -21,6 +21,7 @@ import { ToastStack } from '../components/common/ToastStack'
 import { pushToast, type ToastItem } from '../components/common/toastQueue'
 import { useProductCompare } from './useProductCompare'
 import { useProductReviews } from './useProductReviews'
+import { useProductRestockAlert } from './useProductRestockAlert'
 import { useProductWish } from './useProductWish'
 
 type ErrorKind = 'notFound' | 'fetchError' | null
@@ -65,12 +66,6 @@ export default function ProductDetailPage() {
   // 지연에 의존하지 않음, 사용자 더블클릭이 실제로 두 번의 POST를 만드는 것을 막는다).
   const inFlightRef = useRef(false)
 
-  // SR-353 — 재입고 알림 신청(프론트 상태만, 서버 저장 없음, 확정 답변). `notifyStatus`는 표시용,
-  // `notifyInFlightRef`는 동기 잠금(addCartItem의 `inFlightRef`와 동일 원리 — state 검사만으로는 같은
-  // 이벤트 루프 안의 연속 클릭을 못 막는다, STORY "프레임워크 실행 모델 함정" 절). 한 번 신청되면 이
-  // 상품 조회 중에는 계속 true — 새 상품 로드(load) 시에만 리셋한다.
-  const [notifyStatus, setNotifyStatus] = useState<NotifyStatus>('idle')
-  const notifyInFlightRef = useRef(false)
   const [toasts, setToasts] = useState<ToastItem[]>([])
   const toastIdRef = useRef(0)
 
@@ -101,6 +96,24 @@ export default function ProductDetailPage() {
     onRequireLogin: () => navigate('/login?redirect=' + encodeURIComponent(location.pathname + location.search)),
   })
 
+  // SR-364 — 재입고 알림 신청 서버 저장. 상태·확인 effect·신청 핸들러는 `useProductRestockAlert`로
+  // 옮긴다(`wish`/`compare`와 동일한 소유권 분리 원칙, STORY "파일" 절). `onRequireLogin` 리다이렉트
+  // 규약은 `wish`/`compare`와 완전히 동일한 문자열 그대로 재사용한다(신규 규약 금지). 성공/실패
+  // 토스트는 기존 `toasts` 채널(SR-353)을 그대로 재사용한다(신규 인라인 오류 상태를 만들지 않는다).
+  const restockAlert = useProductRestockAlert({
+    sku,
+    session,
+    product,
+    onRequireLogin: () => navigate('/login?redirect=' + encodeURIComponent(location.pathname + location.search)),
+    onNotifyResult: result => {
+      setToasts(prev => pushToast(prev, {
+        id: String(++toastIdRef.current),
+        message: result.success ? '재입고 알림 신청이 완료되었습니다' : result.message,
+        variant: result.success ? 'success' : 'error',
+      }))
+    },
+  })
+
   const load = async (targetSku: string) => {
     const id = ++requestIdRef.current
     setLoading(true)
@@ -117,8 +130,6 @@ export default function ProductDetailPage() {
       setAddStatus('idle')
       setAddErrorMessage(null)
       setLastAction(null)
-      setNotifyStatus('idle')
-      notifyInFlightRef.current = false
       setToasts([])
       // SR-356 — 찜 카운트·토글 상태 리셋은 `setProduct`와 같은 동기 블록에서(렌더 지연 없이) 한다.
       // wished 판정은 `useProductWish`의 별도 effect가 sku/세션 변경을 보고 스스로 재조회한다.
@@ -126,6 +137,9 @@ export default function ProductDetailPage() {
       // SR-360 — 비교함 토글 상태 리셋도 같은 동기 블록에서(렌더 지연 없이) 한다. 담김 여부(compared)
       // 판정은 `useProductCompare`의 별도 effect가 sku/세션 변경을 보고 스스로 재조회한다.
       compare.resetForProduct()
+      // SR-364 — 재입고 알림 신청 상태 리셋도 같은 동기 블록에서(렌더 지연 없이) 한다. 신청 여부
+      // 판정은 `useProductRestockAlert`의 별도 effect가 sku/세션/품절여부 변경을 보고 스스로 재조회한다.
+      restockAlert.resetForProduct()
     } catch (e) {
       if (id !== requestIdRef.current) return
       setProduct(null)
@@ -204,26 +218,6 @@ export default function ProductDetailPage() {
   // `ProductInfoPanel`이 `product.soldOut` 분기로 렌더). 로그인 필요만 남는다(회귀 없음).
   const disabledReason = !session ? '로그인이 필요합니다' : null
 
-  // 재입고 알림 신청 — 로그인 판정이 부수효과(토스트)보다 먼저다(STORY "순서·보안" 3·4, RUN8/SR-234
-  // FUNC-member-008 r1 사례 대조). 비로그인 클릭은 어떤 프론트 상태도 바꾸지 않고 즉시 로그인 화면으로
-  // 보낸다(신청됨으로 낙관 전환 금지) — `QuickBar`/`MyAddressesPage`와 동일한
-  // `/login?redirect=<encodeURIComponent(pathname+search)>` 규약을 그대로 쓴다(신규 리다이렉트 규약을
-  // 만들지 않는다).
-  const handleNotifyRequest = () => {
-    if (notifyInFlightRef.current) return // 연타 방지 — 동기 잠금(addCartItem의 inFlightRef와 동일 원리)
-    if (!session?.memberId) {
-      navigate('/login?redirect=' + encodeURIComponent(location.pathname + location.search))
-      return
-    }
-    notifyInFlightRef.current = true
-    setNotifyStatus('requested')
-    setToasts(prev => pushToast(prev, {
-      id: String(++toastIdRef.current),
-      message: '재입고 알림 신청이 완료되었습니다',
-      variant: 'success',
-    }))
-  }
-
   const relatedProducts = pickRelatedProducts(allProducts, sku, 8)
 
   return (
@@ -247,7 +241,7 @@ export default function ProductDetailPage() {
                                    onAddToCart={() => handleAdd('cart')} onBuyNow={() => handleAdd('buyNow')}
                                    addStatus={addStatus} addErrorMessage={addErrorMessage} lastAction={lastAction}
                                    disabledReason={disabledReason}
-                                   notifyStatus={notifyStatus} onNotifyRequest={handleNotifyRequest}
+                                   notifyStatus={restockAlert.notifyStatus} onNotifyRequest={restockAlert.onNotifyRequest}
                                    wishCount={wish.wishCount} wished={wish.wished} wishToggleStatus={wish.wishToggleStatus}
                                    wishErrorMessage={wish.wishErrorMessage} onToggleWish={wish.onToggleWish}
                                    compared={compare.compared} compareStatus={compare.compareStatus}
