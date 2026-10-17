@@ -3,6 +3,7 @@
 // linked_func: FUNC-member-007 — 비밀번호 재설정 호출부 추가(parseErrorBody 분리·postVoid 신설)
 // INF-ORD-003(GET /api/orders) · INF-ORD-004(GET /api/orders/{orderNo})
 // spec: docs/05_설계서/member/INF/INF-MBR-003.md · INF-MBR-005.md · INF-MBR-006.md · INF-MBR-007.md
+import { loadSession } from './session'
 import type {
   ApiErrorBody,
   CartItem,
@@ -29,9 +30,16 @@ import type {
 } from './types'
 
 async function get<T>(url: string): Promise<T> {
-  const r = await fetch(url, { headers: { Accept: 'application/json' } })
+  const r = await fetch(url, { headers: { ...memberSessionHeaders(), Accept: 'application/json' } })
   if (!r.ok) throw new Error(`${r.status} ${r.statusText}`)
   return (await r.json()) as T
+}
+
+// Packaged static serving has no Vite proxy to supply credentials. Use the
+// signed-in member's own key; authorization and ownership remain server checks.
+function memberSessionHeaders(): Record<string, string> {
+  const session = loadSession()
+  return session?.apiKey ? { 'X-Api-Key': session.apiKey } : {}
 }
 
 /** 서버가 `{code, message}`(+429의 retryAfterSeconds)로 낸 오류를 그대로 옮겨 담는다(재해석 금지). */
@@ -228,7 +236,7 @@ export function fetchProduct(sku: string): Promise<ProductDetail> {
 export function addCartItem(memberId: string, sku: string, qty: number): Promise<CartItem> {
   return fetch('/api/cart/items', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    headers: { ...memberSessionHeaders(), 'Content-Type': 'application/json', Accept: 'application/json' },
     body: JSON.stringify({ memberId, sku, qty }),
   }).then(async r => {
     if (!r.ok) throw new OrderHttpError(r.status, await parseOrderErrorMessage(r))
@@ -244,7 +252,7 @@ export function addCartItem(memberId: string, sku: string, qty: number): Promise
 
 /** GET /api/cart — `CartService.get` 응답(`{items, totalAmount}`)에서 items만 옮긴다(404: 회원 없음). */
 export function fetchCart(memberId: string): Promise<CartRow[]> {
-  return fetch('/api/cart?memberId=' + encodeURIComponent(memberId), { headers: { Accept: 'application/json' } })
+  return fetch('/api/cart?memberId=' + encodeURIComponent(memberId), { headers: { ...memberSessionHeaders(), Accept: 'application/json' } })
     .then(async r => {
       if (!r.ok) throw new OrderHttpError(r.status, await parseOrderErrorMessage(r))
       const body = (await r.json()) as { items?: CartRow[] }
@@ -256,7 +264,7 @@ export function fetchCart(memberId: string): Promise<CartRow[]> {
 export function updateCartItemQty(memberId: string, sku: string, qty: number): Promise<CartRow> {
   return fetch(`/api/cart/items/${encodeURIComponent(sku)}?memberId=${encodeURIComponent(memberId)}`, {
     method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    headers: { ...memberSessionHeaders(), 'Content-Type': 'application/json', Accept: 'application/json' },
     body: JSON.stringify({ qty }),
   }).then(async r => {
     if (!r.ok) throw new OrderHttpError(r.status, await parseOrderErrorMessage(r))
@@ -268,6 +276,7 @@ export function updateCartItemQty(memberId: string, sku: string, qty: number): P
 export function deleteCartItem(memberId: string, sku: string): Promise<void> {
   return fetch(`/api/cart/items/${encodeURIComponent(sku)}?memberId=${encodeURIComponent(memberId)}`, {
     method: 'DELETE',
+    headers: memberSessionHeaders(),
   }).then(async r => {
     if (!r.ok) throw new OrderHttpError(r.status, await parseOrderErrorMessage(r))
   })
@@ -280,7 +289,7 @@ export function deleteCartItem(memberId: string, sku: string): Promise<void> {
 export function checkoutCart(memberId: string): Promise<CheckoutResult> {
   return fetch('/api/cart/checkout', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    headers: { ...memberSessionHeaders(), 'Content-Type': 'application/json', Accept: 'application/json' },
     body: JSON.stringify({ memberId }),
   }).then(async r => {
     if (!r.ok) throw new OrderHttpError(r.status, await parseOrderErrorMessage(r))
@@ -290,7 +299,7 @@ export function checkoutCart(memberId: string): Promise<CheckoutResult> {
 
 /** GET /api/zipcodes?q= — `ZipcodeController.search` 응답(`{items}`, 0건도 200). 400(검색어 미달/초과). */
 export function searchZipcodes(q: string): Promise<ZipcodeResult[]> {
-  return fetch('/api/zipcodes?q=' + encodeURIComponent(q), { headers: { Accept: 'application/json' } })
+  return fetch('/api/zipcodes?q=' + encodeURIComponent(q), { headers: { ...memberSessionHeaders(), Accept: 'application/json' } })
     .then(async r => {
       if (!r.ok) throw new OrderHttpError(r.status, await parseOrderErrorMessage(r))
       const body = (await r.json()) as { items?: ZipcodeResult[] }
