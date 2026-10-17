@@ -41,14 +41,11 @@ class ProductReviewDaoTest {
     private static final String SKU = "SKU-1001";
     private static final String OTHER_SKU = "SKU-1002";
 
-    // SR-351(#2) — 목록·집계(selectReviews/selectRatingSummary) 전용 고정 ID 세트(STORY "테스트
-    // 격리" 절, -DAO-TST 접미와 겹치지 않게). PRODUCT_REVIEWS.sku 자체는 PRODUCTS에 FK가 없지만
-    // (실측 확인), ORDER_ITEMS.sku는 PRODUCTS(sku) FK가 걸려 있다(db/schema.sql 실측) — 리뷰를
-    // 만들려면 그 앞단 ORDER_ITEMS 행이 실존 SKU를 필요로 하므로, 이 스위트도 시드 SKU(SKU-1001)를
-    // 그대로 재사용한다(STORY "테스트 격리" 절 — 시드 SKU 재사용 쪽 채택). member_id/order_no는
-    // 이 스위트 전용 새 값이라 #1 테스트 데이터(-DAO-TST)와 행이 섞이지 않는다.
+    // 목록·집계는 전용 상품까지 생성한다. 시드 SKU를 공유하면 실제 리뷰가 정렬·페이지
+    // 경계에 섞여 테스트가 실패한다. 기존 리뷰는 지우지 않고 테스트 소유 행만 정리한다.
     private static final String LIST_MEMBER_ID = "M-9012-RVWLISTTST";
-    private static final String LIST_SKU = SKU;
+    private static final String LIST_SKU = "RVW-" + java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 16);
+    private boolean listProductCreated;
     private static final String LIST_ORDER_PREFIX = "20260903-RVWLIST";
 
     @Autowired
@@ -104,6 +101,9 @@ class ProductReviewDaoTest {
         jdbcTemplate.update("DELETE FROM ORDER_ITEMS WHERE order_no LIKE ?", LIST_ORDER_PREFIX + "%");
         jdbcTemplate.update("DELETE FROM ORDERS WHERE order_no LIKE ?", LIST_ORDER_PREFIX + "%");
         jdbcTemplate.update("DELETE FROM MEMBERS WHERE member_id = ?", LIST_MEMBER_ID);
+        if (listProductCreated) {
+            jdbcTemplate.update("DELETE FROM PRODUCTS WHERE sku = ?", LIST_SKU);
+        }
     }
 
     @Test
@@ -235,9 +235,8 @@ class ProductReviewDaoTest {
     // 시점에 정확히 0건이라고 가정하고 reviewCount==3/avgRating==4.7을 절대값으로 단언했다. 그
     // 가정은 cleanUpListFixtures()의 전역 삭제가 매번 시드 SKU를 비워 준 덕에만 성립했다 — 그
     // 전역 삭제 자체가 이 스위트 밖 리뷰(수동 확인·#3 화면 데모 데이터 등)를 파괴하는 버그였다.
-    // 전역 삭제를 걷어낸 이상 시드 SKU에는 이 테스트 밖 리뷰가 이미 있을 수 있으므로, 시딩 전
-    // baseline을 직접 조회해 "baseline + N" 상대 단언으로 바꾼다(시드 SKU 재사용은 유지 — STORY
-    // "테스트 격리" 절, ORDER_ITEMS.sku가 PRODUCTS FK라 신규 SKU를 쓸 수 없음).
+    // 지금은 전용 상품을 만들어 시드 리뷰와 분리한다. 시딩 전 baseline을 조회하는 상대 단언도
+    // 유지한다. ORDER_ITEMS FK는 insertListMember()가 먼저 생성하는 전용 PRODUCTS 행으로 만족한다.
     @Test
     void selectRatingSummary_threeReviews_returnsRoundedAverageAndDistributionSumEqualsReviewCount() {
         long baselineSum = sumOfActiveRatings(LIST_SKU);
@@ -427,6 +426,9 @@ class ProductReviewDaoTest {
     }
 
     private void insertListMember() {
+        jdbcTemplate.update("INSERT INTO PRODUCTS (sku, product_name, price, stock_qty, sale_yn) "
+                + "VALUES (?, ?, ?, ?, ?)", LIST_SKU, "상품평 목록 테스트 전용 상품", 10000, 100, "Y");
+        listProductCreated = true;
         Integer existing = jdbcTemplate.queryForObject(
                 "SELECT COUNT(*) FROM MEMBERS WHERE member_id = ?", Integer.class, LIST_MEMBER_ID);
         if (existing != null && existing > 0) {
