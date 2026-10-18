@@ -25,9 +25,12 @@
 
 ## 생성·검증 도구
 
+추가 실습 SR-904는 DB 변경 카드·실제 리허설 자료·이관/복구 SQL을 검토하는 **미승인 RECEIVED 요청**이다. 현재 체험 DB의 products 메타데이터와 리허설 시작 상태를 대조해 준비했다. SQL 실행·구현·QA·사용자 승인은 하지 않는다. 기존 요청 파일 801개를 보존했고 원장에는 새 접수만 추가했다.
+
 - `configure_modern_testbed.py`: 기존 워크스페이스를 백업하고 환경을 구성한다. 대상과 기존 DB를 덮어쓰지 않는 최초 실행용이다.
 - `import_modern_data.py`: 누적 DB를 논리 복제하고 체험·회귀 데이터를 분리한다.
 - `seed_modern_workspace.py`, `prepare_design_exercise.py`: 출처가 표시된 미승인 실습 자료를 만든다.
+- `prepare_schema_exercise.py`: 배포된 DB 계약 자료의 지문과 현재 DB 메타데이터를 대조해 새 DB 검토 실습을 만든다. 같은 번호가 있으면 보존하며 기존 요청·승인·DB 행을 바꾸지 않는다.
 - `refresh_modern_testbed.py`: 소스·라우터·기능·화면·설계·Storybook·용어 색인을 재생성한다.
 - `snapshot_modern_db.py`: 실제 읽기 전용 MCP로 DB 사실·FK를 갱신한다.
 - `check_modern_testbed.py`: 패키징 후 플러그인 run_tests로 전체 테스트를 실행하고 실제 결과로만 기준선을 기록한다. 이전 기준선은 외부 백업한다.
