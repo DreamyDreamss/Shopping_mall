@@ -31,6 +31,8 @@ def main():
             print(json.dumps({'sr':args.sr,'changed':False,'status':'preserved-existing-edits'}));return
     path=folder/'02_변경명세.md';raw=path.read_bytes();base=raw.decode('utf-8-sig')
     proposal=(plugin/'docs/audit/sr-lifecycle-20261018/model-cli-6-draft.md').read_text(encoding='utf-8-sig')
+    if not re.search(r'^#\s+'+re.escape(args.sr)+r'\b',proposal,re.M):
+        raise ValueError('Recorded proposal belongs to a different request')
     metadata=re.search(r'<!-- source-evidence: (.*?) -->',proposal)
     if not metadata:raise ValueError('Recorded source provenance is required')
     files=json.loads(metadata.group(1))['files']
