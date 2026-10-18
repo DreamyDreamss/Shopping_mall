@@ -1,0 +1,43 @@
+# 개선 플러그인용 로컬 테스트베드
+
+현재 로컬 실행 대상은 `D:/sl-shop`과 `D:/Shopping_mall-modern`이다. 기존 `D:/Shopping_mall` 브랜치는 유지한다. 플러그인은 `D:/speclinker-main`의 main을 사용한다.
+
+| 대상 | 현재 설정 |
+|---|---|
+| SpecLens | http://localhost:18772/docs/viewer2/index.html |
+| AI 사이드카 | 18773, 현재 워크스페이스에 연결 |
+| 쇼핑몰 | http://127.0.0.1:18985/shop |
+| 체험 DB | 127.0.0.1:13328/sl_shop_modern |
+| 자동 회귀 DB | 같은 인스턴스의 sl_shop_modern_test, 체험 데이터와 분리 |
+| 실행·백업·측정 기록 | D:/sl-shop-runtime |
+
+`tools/start-modern-testbed.ps1`로 재기동한다. 자기 실행 경로와 포트를 확인하며 다른 프로세스가 점유한 포트를 재사용하거나 중지하지 않는다. 기존 감사용 임시 경로는 현재 앱·DB 실행 설정에서 사용하지 않는다. MariaDB와 Maven 바이너리는 기존 Shopping_mall/.runtime 설치를 재사용한다.
+
+## 데이터
+
+기존 D:/sl-shop의 2,000개 파일은 SHA-256 확인 후 D:/sl-shop-runtime/sl-shop-before-*에 통째로 보존했다. 새 워크스페이스는 누적 감사 사본의 실제 문서·요청·완료 기록을 가져오고 현재 환경을 다시 연결했다. 이전 QA·설계 승인·소스 지문을 현재 승인으로 다시 발급하지 않는다.
+
+기존 감사 DB 21테이블·127행을 새 인스턴스로 논리 복제했다. 읽기 전용 DB MCP로 21테이블·125컬럼·17외래키를 재수집했다. 자동 회귀 DB는 **원래 상품 카탈로그**를 사용한다. 데모 상품을 회귀 DB에 섞으면 기존 상품 목록의 정확한 집합 단언과 충돌하므로 체험 DB에만 추가한다.
+
+체험 계정은 buyer@speclinker.local(M-9001), other@speclinker.local(M-9002), 비밀번호는 로컬 전용 `Shop-demo-local-20261018!`이다. 상품은 SKU-DEMO-SHIP, SKU-DEMO-FREE(고가 상품), SKU-DEMO-SOLDOUT, SKU-DEMO-HIDDEN이다. 실제 배송비 정책은 **선택 상품이 있으면 고정 3,000원**이며 무료배송 기준금액은 없다. 상품명의 '고가'가 무료배송을 뜻하지 않는다.
+
+일반 요청 SR-901은 문답 실습, SR-903은 DB·개인정보 영향 검토용이다. SR-902는 샘플 문답과 영향 범위가 채워진 **미승인 ANALYZED 요청**으로 구조화 표 편집·미리보기·비교·판본 복구를 바로 사용할 수 있다. 샘플 작성자는 testbed-fixture로 표시하며 사용자 승인·인수로 간주하지 않는다. 기존 구현·검증·종료 이력도 함께 탐색할 수 있다.
+
+## 생성·검증 도구
+
+- `configure_modern_testbed.py`: 기존 워크스페이스를 백업하고 환경을 구성한다. 대상과 기존 DB를 덮어쓰지 않는 최초 실행용이다.
+- `import_modern_data.py`: 누적 DB를 논리 복제하고 체험·회귀 데이터를 분리한다.
+- `seed_modern_workspace.py`, `prepare_design_exercise.py`: 출처가 표시된 미승인 실습 자료를 만든다.
+- `refresh_modern_testbed.py`: 소스·라우터·기능·화면·설계·Storybook·용어 색인을 재생성한다.
+- `snapshot_modern_db.py`: 실제 읽기 전용 MCP로 DB 사실·FK를 갱신한다.
+- `check_modern_testbed.py`: 패키징 후 플러그인 run_tests로 전체 테스트를 실행하고 실제 결과로만 기준선을 기록한다. 이전 기준선은 외부 백업한다.
+- `verify_modern_browser.cjs`: 실제 로그인 상태 CDP 캡처·새 브라우저 문맥 재사용, 모바일·데스크톱의 일반 요청·7단계·설계 편집기를 확인한다. 유료 모델 요청은 보내지 않는다.
+- `export_modern_seed.py`: 문서·설정 템플릿·운영 기준·DB의 같은 시점 복원 묶음을 runtime에 만든다. 토큰·세션·프로세스·재개 가능한 작업은 배포하지 않는다.
+
+현재 앱 코드에서 백엔드 789개·웹 419개 테스트가 통과했다. Windows JVM 실행 파일 탐색 문제는 플러그인 main에서 수정했고 관련 27개 회귀 검사를 통과했다. 새 실행용 브라우저 E2E는 로그인→장바구니→주소 검색→주문 생성, 소유권·취소 API, 고가 상품·404, 무인증 401을 검증한다. 기존 TODO가 있는 생성 E2E는 tests/e2e-legacy로 보존했다. 실습 E2E는 선택한 체험 상품 외 장바구니 상품이 있으면 지우지 않고 중단한다.
+
+실행: `cd D:/sl-shop; $env:E2E_WRITE='allow'; $env:E2E_BASE_URL='http://127.0.0.1:18985'; npm run test:e2e`.
+
+## 범위와 남은 표시
+
+원래 도메인 계획에 예약만 되어 있는 상품카탈로그·방송편성 경로, 중복 TC 앵커, 과거 승인 표식 드리프트는 존재한다. 색인 갱신을 승인·구현 완료로 바꾸지 않는다. Jira는 로컬 목업이며 실계정 Jira/Wiki 연동, 실제 결제·배송, 고객 인수, OS 샌드박스는 수행한 것으로 표시하지 않는다.
