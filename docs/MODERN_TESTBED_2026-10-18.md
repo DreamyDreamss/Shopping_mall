@@ -27,10 +27,13 @@
 
 추가 실습 SR-904는 DB 변경 카드·실제 리허설 자료·이관/복구 SQL을 검토하는 **미승인 RECEIVED 요청**이다. 현재 체험 DB의 products 메타데이터와 리허설 시작 상태를 대조해 준비했다. SQL 실행·구현·QA·사용자 승인은 하지 않는다. 기존 요청 파일 801개를 보존했고 원장에는 새 접수만 추가했다.
 
+SR-902의 변경 설계는 현재 소스 10개 지문과 일치하는 기록된 CLI 생성 예시로 갱신했다. 이전 seed와 동일한 미승인 실습만 갱신하며, 원본 초안과 근거 판본은 이력에 보존한다. 새 모델 실행·설계 승인·구현 완료로 기록하지 않는다. 필수 칸의 미확인은 검토 대상으로 남긴다.
+
 - `configure_modern_testbed.py`: 기존 워크스페이스를 백업하고 환경을 구성한다. 대상과 기존 DB를 덮어쓰지 않는 최초 실행용이다.
 - `import_modern_data.py`: 누적 DB를 논리 복제하고 체험·회귀 데이터를 분리한다.
 - `seed_modern_workspace.py`, `prepare_design_exercise.py`: 출처가 표시된 미승인 실습 자료를 만든다.
 - `prepare_schema_exercise.py`: 배포된 DB 계약 자료의 지문과 현재 DB 메타데이터를 대조해 새 DB 검토 실습을 만든다. 같은 번호가 있으면 보존하며 기존 요청·승인·DB 행을 바꾸지 않는다.
+- `upgrade_design_exercise.py`: `--seed`의 요구·문답·영향·초안·유형과 일치하는 미승인 실습만 갱신한다. 현재 소스 지문을 대조하고 기존 저장·판본 보존·근거 수집 경로를 사용한다. 사람의 편집이 있으면 보존한다.
 - `refresh_modern_testbed.py`: 소스·라우터·기능·화면·설계·Storybook·용어 색인을 재생성한다.
 - `snapshot_modern_db.py`: 실제 읽기 전용 MCP로 DB 사실·FK를 갱신한다.
 - `check_modern_testbed.py`: 패키징 후 플러그인 run_tests로 전체 테스트를 실행하고 실제 결과로만 기준선을 기록한다. 이전 기준선은 외부 백업한다.
