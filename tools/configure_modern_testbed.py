@@ -63,6 +63,8 @@ SOURCE_2_PATH={src}/apps/shop-web
 PREVIEW_BASE_URL=http://127.0.0.1:18985/shop
 MCP_DB_MARIADB=true
 MCP_DB_mariadb=true
+MCP_JIRA=true
+MCP_WIKI=false
 E2E_BASE_URL_local=http://127.0.0.1:18985
 API_TRY_BASE=http://127.0.0.1:18985
 APP_RUN_CMD="{maven}" -q spring-boot:run -Dspring-boot.run.arguments="--server.address=127.0.0.1 --server.port={{PORT}} --spring.datasource.url={dburl} --spring.datasource.username=root --spring.datasource.password= --spring.sql.init.mode=never"

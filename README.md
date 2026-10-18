@@ -1,5 +1,8 @@
 # Shopping_mall — speclinker 테스트베드
 
+현재 PC의 개선 플러그인용 환경은 [2026-10-18 로컬 구성 안내](docs/MODERN_TESTBED_2026-10-18.md)를 따른다.
+`tools/start-modern-testbed.ps1`로 `D:/sl-shop`·독립 DB·최신 main SpecLens를 다시 띄운다.
+
 이커머스 쇼핑몰(`shop-api` · `shop-web`)과 그 위에 쌓인 시연 데이터를 담는다.
 **clone 하나로 시연과 개발을 이어갈 수 있게** 앱 소스 · DB 데이터 전량 · SR 이력이 모두 들어 있다.
 
