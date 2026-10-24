@@ -22,7 +22,8 @@ state.mkdir()
 for name in ('approved', 'asis', 'rules_proposals', 'snapshots', 'document_drafts',
              'stage_gates.yaml', 'profile.yaml', 'test_baseline.json', 'db_facts.json',
              'db_fk_snapshot.json', 'func_registry.json', 'table_registry.json',
-             'inf_targets.json', 'bat_targets.json', 'epic_notes.json'):
+             'inf_targets.json', 'bat_targets.json', 'epic_notes.json',
+             'source_integrity.jsonl', 'source_integrity_backups'):
     p = ws / '.speclinker' / name
     if p.is_dir(): shutil.copytree(p, state / name, ignore=ignore)
     elif p.is_file(): shutil.copy2(p, state / name)

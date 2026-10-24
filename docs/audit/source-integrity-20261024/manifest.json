@@ -1,0 +1,36 @@
+{
+  "kind": "source-integrity-audit-overlay",
+  "created_at": "2026-10-24T15:03:37.699430+00:00",
+  "workspace_commit": "139f4432be570475901e9bed561031dd420b7476",
+  "plugin_source_commit": "c1f92692db4f6352e6dd7baba2eccd43e3debec5",
+  "no_approvals_issued": true,
+  "no_credentials_or_database_exports": true,
+  "files": {
+    ".gitattributes": {
+      "bytes": 1367,
+      "sha256": "2a419217ae78aad2306990b52658c3868a8968d12197520679c4f1625eb6ba0e"
+    },
+    ".gitignore": {
+      "bytes": 967,
+      "sha256": "8a84eb4e734db99a6a893d80f881b77954313035cdd7601546e3224028b7f9b5"
+    },
+    ".speclinker/source_integrity.jsonl": {
+      "bytes": 51982,
+      "sha256": "6dcce5ad390155b92d0b9ed58c50881840f6731d90393bd415894e2f7ac67297"
+    },
+    ".speclinker/source_integrity_backups/.gitattributes": {
+      "bytes": 12,
+      "sha256": "185e80895cdf046bc8ad242b93bce073bdff3321563f611c133c7f06f7135049"
+    },
+    ".speclinker/source_integrity_backups/6702eb205149d2e4a30c9aa7b91282f8263869b6bedfa1baee3380a4d09ef126.md": {
+      "bytes": 26741,
+      "sha256": "6702eb205149d2e4a30c9aa7b91282f8263869b6bedfa1baee3380a4d09ef126"
+    },
+    "docs/05_설계서/order/UIS/UIS-ORD-008_shop/spec.md": {
+      "bytes": 26776,
+      "sha256": "854cb7cdf8b990628400486c4ad36bc689e048d786d8181d5b6513b636d2e18c"
+    }
+  },
+  "archive_sha256": "dbdc35d98acf9539397d87ea1332ff794f1e127280b20cd317e3a4286c2c8103",
+  "release_source_commit": "3090d375807fbd2a50eb484e18ef444dfe4f47a5"
+}
